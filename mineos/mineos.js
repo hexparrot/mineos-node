@@ -12,19 +12,17 @@ var DIRS = {
 }
 
 mineos.server_list = function(base_dir) {
-  return fs.readdirSync(path.join(base_dir, 'servers'));
+  return fs.readdirSync(path.join(base_dir, DIRS['servers']));
 }
 
-mineos.is_server = function(server_name) {
-  return fs.existsSync(path.join(BASE_DIR, 'servers', server_name, 'server.properties'));
+mineos.is_server = function(env) {
+  return fs.existsSync(env.sp);
 }
 
-mineos.create_server = function(server_name) {
-  var server_path = path.join(BASE_DIR, 'servers', server_name);
-
-  fs.mkdirSync(server_path);
-  touch.sync(path.join(server_path, 'server.properties'));
-  touch.sync(path.join(server_path, 'server.config'));
+mineos.create_server = function(env) {
+  fs.mkdirSync(env.cwd);
+  touch.sync(env.sp);
+  touch.sync(env.sc);
 }
 
 mineos.env = function(server_name, base_dir) {
