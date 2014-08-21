@@ -4,11 +4,18 @@ var touch = require("touch");
 var mineos = require('../mineos/mineos');
 var test = exports;
 var BASE_DIR = '/var/games/minecraft';
+var DIRS = {
+  'servers': 'servers',
+  'backup': 'backup',
+  'archive': 'archive',
+  'profiles': 'profiles',
+  'import': 'import'
+}
 
 test.tearDown = function(callback) {
   var server_list = mineos.server_list(BASE_DIR);
   for (var i in server_list) {
-    fs.rmrfSync(path.join(BASE_DIR, 'servers', server_list[i]));
+    fs.rmrfSync(path.join(BASE_DIR, DIRS['servers'], server_list[i]));
   }
   callback();
 }
@@ -39,7 +46,7 @@ test.is_server = function(test) {
 
 test.create_server = function(test) {
   var server_name = 'ccc';
-  var server_path = path.join(BASE_DIR, 'servers', server_name);
+  var server_path = path.join(BASE_DIR, DIRS['servers'], server_name);
 
   test.equal(mineos.server_list(BASE_DIR).length, 0);
 
