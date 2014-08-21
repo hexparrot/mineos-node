@@ -62,3 +62,17 @@ test.create_server = function(test) {
   
   test.done();
 }
+
+test.environment = function(test) {
+  var server_name = 'aaa';
+  var env = mineos.env(server_name, BASE_DIR);
+
+  test.equal(env.cwd, path.join(BASE_DIR, DIRS['servers'], server_name));
+  test.equal(env.bwd, path.join(BASE_DIR, DIRS['backup'], server_name));
+  test.equal(env.awd, path.join(BASE_DIR, DIRS['archive'], server_name));
+  test.equal(env.base_dir, BASE_DIR);
+  test.equal(env.server_name, server_name);
+  test.equal(env.sp, path.join(BASE_DIR, DIRS['servers'], server_name, 'server.properties'));
+  test.equal(env.sc, path.join(BASE_DIR, DIRS['servers'], server_name, 'server.config'));
+  test.done();
+}
