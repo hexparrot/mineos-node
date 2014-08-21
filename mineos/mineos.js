@@ -1,8 +1,8 @@
 var fs = require('fs');
 var path = require('path');
 var mineos = exports;
-var BASE_DIR = '/var/games/minecraft';
-var DIRS = {
+
+mineos.DIRS = {
   'servers': 'servers',
   'backup': 'backup',
   'archive': 'archive',
@@ -11,7 +11,7 @@ var DIRS = {
 }
 
 mineos.server_list = function(base_dir) {
-  return fs.readdirSync(path.join(base_dir, DIRS['servers']));
+  return fs.readdirSync(path.join(base_dir, mineos.DIRS['servers']));
 }
 
 mineos.mc = function(server_name, base_dir) {
@@ -20,11 +20,11 @@ mineos.mc = function(server_name, base_dir) {
   self.env = {
     server_name: server_name,
     base_dir: base_dir,
-    cwd: path.join(base_dir, DIRS['servers'], server_name),
-    bwd: path.join(base_dir, DIRS['backup'], server_name),
-    awd: path.join(base_dir, DIRS['archive'], server_name),
-    sp: path.join(base_dir, DIRS['servers'], server_name, 'server.properties'),
-    sc: path.join(base_dir, DIRS['servers'], server_name, 'server.config'),
+    cwd: path.join(base_dir, mineos.DIRS['servers'], server_name),
+    bwd: path.join(base_dir, mineos.DIRS['backup'], server_name),
+    awd: path.join(base_dir, mineos.DIRS['archive'], server_name),
+    sp: path.join(base_dir, mineos.DIRS['servers'], server_name, 'server.properties'),
+    sc: path.join(base_dir, mineos.DIRS['servers'], server_name, 'server.config'),
   }
 
   self.create = function() {
@@ -37,6 +37,31 @@ mineos.mc = function(server_name, base_dir) {
 
   self.is_server = function() {
     return fs.existsSync(self.env.sp);
+  }
+
+  self.sp = function() {
+    var DEFAULTS = {
+      'server-port': 25565,
+      'max-players': 20,
+      'level-seed': '',
+      'gamemode': 0,
+      'difficulty': 1,
+      'level-type': 'DEFAULT',
+      'level-name': 'world',
+      'max-build-height': 256,
+      'generate-structures': 'false',
+      'generator-settings': '',
+      'server-ip': '0.0.0.0',
+    }
+
+    if (typeof(self._sp) == 'undefined') {
+      self._sp = {};
+      for (var k in DEFAULTS) {
+        self._sp[k] = DEFAULTS[k];
+      }
+    }
+      
+    return self._sp;
   }
 
   return self;
