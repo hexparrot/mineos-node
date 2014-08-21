@@ -24,11 +24,13 @@ test.server_list = function (test) {
   var servers = mineos.server_list(BASE_DIR);
   test.ok(servers instanceof Array, "server returns an array");
 
-  mineos.create_server(mineos.mc('testing', BASE_DIR));
+  var instance = mineos.mc('testing', BASE_DIR);
+  instance.create();
   servers = mineos.server_list(BASE_DIR);
 
   for (var i=0; i < servers.length; i++) {
-    test.ok(mineos.is_server(mineos.mc(servers[i], BASE_DIR)));
+    instance = mineos.mc(servers[i], BASE_DIR);
+    test.ok(instance.is_server());
   }
   test.done();
 };
@@ -36,9 +38,9 @@ test.server_list = function (test) {
 test.is_server = function(test) {
   var instance = mineos.mc('testing', BASE_DIR);
 
-  test.ok(!mineos.is_server(instance), 'non-existent path should fail');
-  mineos.create_server(instance);
-  test.ok(mineos.is_server(instance), 'newly created path + sp should succeed');
+  test.ok(!instance.is_server(), 'non-existent path should fail');
+  instance.create();
+  test.ok(instance.is_server(), 'newly created path + sp should succeed');
 
   test.done();
 }
@@ -49,9 +51,9 @@ test.create_server = function(test) {
   var server_path = path.join(BASE_DIR, DIRS['servers'], server_name);
 
   test.equal(mineos.server_list(BASE_DIR).length, 0);
-  test.ok(!mineos.is_server(instance));
+  test.ok(!instance.is_server(instance));
 
-  mineos.create_server(instance);
+  instance.create();
 
   test.ok(fs.existsSync(server_path));
   test.ok(fs.existsSync(path.join(server_path, 'server.properties')));

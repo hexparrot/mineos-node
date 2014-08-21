@@ -1,5 +1,4 @@
 var fs = require('fs');
-var touch = require("touch");
 var path = require('path');
 var mineos = exports;
 var BASE_DIR = '/var/games/minecraft';
@@ -15,16 +14,6 @@ mineos.server_list = function(base_dir) {
   return fs.readdirSync(path.join(base_dir, DIRS['servers']));
 }
 
-mineos.is_server = function(instance) {
-  return fs.existsSync(instance.env.sp);
-}
-
-mineos.create_server = function(instance) {
-  fs.mkdirSync(instance.env.cwd);
-  touch.sync(instance.env.sp);
-  touch.sync(instance.env.sc);
-}
-
 mineos.mc = function(server_name, base_dir) {
   var self = this;
 
@@ -36,6 +25,18 @@ mineos.mc = function(server_name, base_dir) {
     awd: path.join(base_dir, DIRS['archive'], server_name),
     sp: path.join(base_dir, DIRS['servers'], server_name, 'server.properties'),
     sc: path.join(base_dir, DIRS['servers'], server_name, 'server.config'),
+  }
+
+  self.create = function() {
+    var touch = require("touch");
+
+    fs.mkdirSync(self.env.cwd);
+    touch.sync(self.env.sp);
+    touch.sync(self.env.sc);
+  }
+
+  self.is_server = function() {
+    return fs.existsSync(self.env.sp);
   }
 
   return self;
