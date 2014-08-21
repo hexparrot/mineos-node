@@ -24,17 +24,17 @@ test.server_list = function (test) {
   var servers = mineos.server_list(BASE_DIR);
   test.ok(servers instanceof Array, "server returns an array");
 
-  mineos.create_server(mineos.env('testing', BASE_DIR));
+  mineos.create_server(mineos.mc('testing', BASE_DIR));
   servers = mineos.server_list(BASE_DIR);
 
   for (var i=0; i < servers.length; i++) {
-    test.ok(mineos.is_server(mineos.env(servers[i], BASE_DIR)));
+    test.ok(mineos.is_server(mineos.mc(servers[i], BASE_DIR)));
   }
   test.done();
 };
 
 test.is_server = function(test) {
-  var instance = mineos.env('testing', BASE_DIR);
+  var instance = mineos.mc('testing', BASE_DIR);
 
   test.ok(!mineos.is_server(instance), 'non-existent path should fail');
   mineos.create_server(instance);
@@ -45,14 +45,14 @@ test.is_server = function(test) {
 
 test.create_server = function(test) {
   var server_name = 'testing';
-  var instance = mineos.env(server_name, BASE_DIR);
+  var instance = mineos.mc(server_name, BASE_DIR);
   var server_path = path.join(BASE_DIR, DIRS['servers'], server_name);
 
   test.equal(mineos.server_list(BASE_DIR).length, 0);
   test.ok(!mineos.is_server(instance));
 
   mineos.create_server(instance);
-  
+
   test.ok(fs.existsSync(server_path));
   test.ok(fs.existsSync(path.join(server_path, 'server.properties')));
   test.ok(fs.existsSync(path.join(server_path, 'server.config')));
@@ -63,16 +63,24 @@ test.create_server = function(test) {
   test.done();
 }
 
-test.environment = function(test) {
+test.instance = function(test) {
   var server_name = 'aaa';
-  var instance = mineos.env(server_name, BASE_DIR);
+  var instance = mineos.mc(server_name, BASE_DIR);
 
-  test.equal(instance.cwd, path.join(BASE_DIR, DIRS['servers'], server_name));
-  test.equal(instance.bwd, path.join(BASE_DIR, DIRS['backup'], server_name));
-  test.equal(instance.awd, path.join(BASE_DIR, DIRS['archive'], server_name));
-  test.equal(instance.base_dir, BASE_DIR);
-  test.equal(instance.server_name, server_name);
-  test.equal(instance.sp, path.join(BASE_DIR, DIRS['servers'], server_name, 'server.properties'));
-  test.equal(instance.sc, path.join(BASE_DIR, DIRS['servers'], server_name, 'server.config'));
+  test.ok(instance.env instanceof Object);
+  test.done();
+}
+
+test.mc_instance = function(test) {
+  var server_name = 'aaa';
+  var instance = mineos.mc(server_name, BASE_DIR);
+
+  test.equal(instance.env.cwd, path.join(BASE_DIR, DIRS['servers'], server_name));
+  test.equal(instance.env.bwd, path.join(BASE_DIR, DIRS['backup'], server_name));
+  test.equal(instance.env.awd, path.join(BASE_DIR, DIRS['archive'], server_name));
+  test.equal(instance.env.base_dir, BASE_DIR);
+  test.equal(instance.env.server_name, server_name);
+  test.equal(instance.env.sp, path.join(BASE_DIR, DIRS['servers'], server_name, 'server.properties'));
+  test.equal(instance.env.sc, path.join(BASE_DIR, DIRS['servers'], server_name, 'server.config'));
   test.done();
 }
