@@ -74,7 +74,7 @@ test.mc_instance = function(test) {
   test.equal(instance.env.bwd, path.join(BASE_DIR, mineos.DIRS['backup'], server_name));
   test.equal(instance.env.awd, path.join(BASE_DIR, mineos.DIRS['archive'], server_name));
   test.equal(instance.env.base_dir, BASE_DIR);
-  test.equal(instance.env.server_name, server_name);
+  test.equal(instance.server_name, server_name);
   test.equal(instance.env.sp, path.join(BASE_DIR, mineos.DIRS['servers'], server_name, 'server.properties'));
   test.equal(instance.env.sc, path.join(BASE_DIR, mineos.DIRS['servers'], server_name, 'server.config'));
   test.done();
@@ -113,5 +113,14 @@ test.valid_server_name = function(test) {
   test.ok(!mineos.valid_server_name('my server'));
   test.ok(!mineos.valid_server_name('bukkit^ftb'));
 
+  test.done();
+}
+
+test.command_start = function(test) {
+  var server_name = 'aaa';
+
+  var instance = new mineos.mc(server_name, BASE_DIR);
+  instance.create();
+  test.equal(instance.command_start(), '/usr/bin/screen -dmS mc-aaa /usr/bin/java -server  -Xmx256M -Xms256M  -jar minecraft_server.jar nogui');
   test.done();
 }

@@ -1,5 +1,6 @@
 var fs = require('fs');
 var path = require('path');
+var child_process = require('child_process');
 var mineos = exports;
 
 mineos.DIRS = {
@@ -21,9 +22,9 @@ mineos.valid_server_name = function(server_name) {
 
 mineos.mc = function(server_name, base_dir) {
   var self = this;
+  self.server_name = server_name;
 
   self.env = {
-    server_name: server_name,
     base_dir: base_dir,
     cwd: path.join(base_dir, mineos.DIRS['servers'], server_name),
     bwd: path.join(base_dir, mineos.DIRS['backup'], server_name),
@@ -69,5 +70,26 @@ mineos.mc = function(server_name, base_dir) {
     return self._sp;
   }
 
+  self.command_start = function() {
+    var string = '{0} -dmS {1} {2} -server {3} -Xmx{4}M -Xms{5}M {6} -jar {7} {8}';
+    return string.format( '/usr/bin/screen', //path to screen
+                          'mc-{0}'.format(self.server_name), //server_name
+                          '/usr/bin/java',   //path to java
+                          '',                //java_debug_args
+                          '256',             //xmx
+                          '256',             //xms
+                          '',                //java_tweaks
+                          'minecraft_server.jar', //server_jar
+                          'nogui')           //jar_args
+  }
+
   return self;
 }
+
+String.prototype.format = function() {
+  var s = this;
+  for(var i = 0, iL = arguments.length; i<iL; i++) {
+    s = s.replace(new RegExp('\\{'+i+'\\}', 'gm'), arguments[i]);
+  }
+  return s;
+};
