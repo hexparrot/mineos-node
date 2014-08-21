@@ -87,14 +87,7 @@ test.sp = function(test) {
   test.equal(instance.sp()['server-port'], '25565');
   test.equal(instance.sp()['max-players'], '20');
   test.equal(instance.sp()['level-seed'], '');
-  test.equal(instance.sp()['gamemode'], '0');
-  test.equal(instance.sp()['difficulty'], '1');
-  test.equal(instance.sp()['level-type'], 'DEFAULT');
-  test.equal(instance.sp()['level-name'], 'world');
-  test.equal(instance.sp()['max-build-height'], '256');
   test.equal(instance.sp()['generate-structures'], 'false');
-  test.equal(instance.sp()['generator-settings'], '');
-  test.equal(instance.sp()['server-ip'], '0.0.0.0');
 
   instance.sp()['server-port'] = 25570;
   test.equal(instance.sp()['server-port'], '25570');
@@ -103,6 +96,22 @@ test.sp = function(test) {
   test.equal(instance2.sp()['server-port'], '25565');
 
   test.notDeepEqual(instance.sp(), instance2.sp());
+
+  test.done();
+}
+
+test.valid_server_name = function(test) {
+  var regex_valid_server_name = /^(?!\.)[a-zA-Z0-9_\.]+$/;
+  test.ok(mineos.valid_server_name('aaa'));
+  test.ok(mineos.valid_server_name('server_1'));
+  test.ok(mineos.valid_server_name('myserver'));
+  test.ok(mineos.valid_server_name('1111'));
+  test.ok(!mineos.valid_server_name('.aaa'));
+  test.ok(!mineos.valid_server_name(''));
+  test.ok(!mineos.valid_server_name('something!'));
+  test.ok(!mineos.valid_server_name('#hashtag'));
+  test.ok(!mineos.valid_server_name('my server'));
+  test.ok(!mineos.valid_server_name('bukkit^ftb'));
 
   test.done();
 }

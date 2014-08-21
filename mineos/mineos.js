@@ -14,6 +14,11 @@ mineos.server_list = function(base_dir) {
   return fs.readdirSync(path.join(base_dir, mineos.DIRS['servers']));
 }
 
+mineos.valid_server_name = function(server_name) {
+  var regex_valid_server_name = /^(?!\.)[a-zA-Z0-9_\.]+$/;
+  return regex_valid_server_name.test(server_name);
+}
+
 mineos.mc = function(server_name, base_dir) {
   var self = this;
 
