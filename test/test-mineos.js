@@ -39,6 +39,17 @@ test.server_list_up = function(test) {
   test.done();
 }
 
+test.server_pids_up = function(test) {
+  var servers = mineos.server_pids_up();
+  test.ok(servers instanceof Object);
+
+  for (var key in servers) {
+    test.ok(servers[key].hasOwnProperty('screen'))
+  }
+
+  test.done();
+}
+
 test.is_server = function(test) {
   var instance = new mineos.mc('testing', BASE_DIR);
 

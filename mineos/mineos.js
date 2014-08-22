@@ -32,6 +32,23 @@ mineos.server_list_up = function() {
   return servers_found;
 }
 
+mineos.server_pids_up = function() {
+  var cmdline, match;
+  var pids = fs.readdirSync('/proc').filter(function(e) { if (/^([0-9]+)$/.test(e)) {return e} });
+  var SCREEN_REGEX = /screen[^S]+S mc-([^ ]+)/i;
+  var servers_found = {};
+
+  for (var i=0; i < pids.length; i++) {
+    cmdline = fs.readFileSync('/proc/{0}/cmdline'.format(pids[i]))
+                              .toString('ascii')
+                              .replace(/\u0000/g, ' ');
+    match = SCREEN_REGEX.exec(cmdline);
+    if (match && !(match[1] in servers_found))
+      servers_found[match[1]] = {'screen': parseInt(pids[i])};
+  }
+  return servers_found;
+}
+
 mineos.valid_server_name = function(server_name) {
   var regex_valid_server_name = /^(?!\.)[a-zA-Z0-9_\.]+$/;
   return regex_valid_server_name.test(server_name);
