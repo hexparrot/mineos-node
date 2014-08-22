@@ -1,4 +1,4 @@
-var fs = require('fs');
+var fs = require('fs-extra');
 var path = require('path');
 var child_process = require('child_process');
 var mineos = exports;
@@ -72,11 +72,9 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.create = function() {
-    var touch = require("touch");
-
     fs.mkdirSync(self.env.cwd);
-    touch.sync(self.env.sp);
-    touch.sync(self.env.sc);
+    fs.createFileSync(self.env.sp);
+    fs.createFileSync(self.env.sc);
   }
 
   self.sp = function() {
@@ -118,7 +116,26 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.start = function() {
-    var proc = child_process.exec(self.command_start())
+    var params = {
+      cwd: self.env.cwd,
+      uid: 1000,
+      gid: 1001
+    }
+    fs.copySync('/var/games/minecraft/profiles/vanilla179/minecraft_server.1.7.9.jar',
+                path.join(self.env.cwd, 'minecraft_server.jar'));
+    
+    var proc = child_process.spawn('/usr/bin/screen', [
+                                   '-dmS',
+                                   'mc-{0}'.format(self.server_name),
+                                   '/usr/bin/java',
+                                   '-server',
+                                   '-Xmx256M',
+                                   '-Xms256M',
+                                   '-jar',
+                                   'minecraft_server.jar',
+                                   'nogui'],
+                                   params);
+
     return proc;
   }
 

@@ -1,6 +1,5 @@
-var fs = require('fs.extra');
+var fs = require('fs-extra');
 var path = require('path');
-var touch = require("touch");
 var mineos = require('../mineos/mineos');
 var test = exports;
 var BASE_DIR = '/var/games/minecraft';
@@ -8,7 +7,7 @@ var BASE_DIR = '/var/games/minecraft';
 test.tearDown = function(callback) {
   var server_list = new mineos.server_list(BASE_DIR);
   for (var i in server_list) {
-    fs.rmrfSync(path.join(BASE_DIR, mineos.DIRS['servers'], server_list[i]));
+    fs.removeSync(path.join(BASE_DIR, mineos.DIRS['servers'], server_list[i]));
   }
   callback();
 }
@@ -158,8 +157,6 @@ test.start = function(test) {
     setTimeout(function() {
       //console.log(mineos.server_list_up());
       test.done();
-    }, 25)
+    }, 50)
   })
-
-
 }
