@@ -103,7 +103,12 @@ test.delete_server = function(test) {
   instance.create();
   test.ok(instance.is_server());
   instance.delete();
-  test.ok(!instance.is_server());
+
+  test.ok(!fs.existsSync(instance.env.cwd));
+  test.ok(!fs.existsSync(instance.env.bwd));
+  test.ok(!fs.existsSync(instance.env.awd));
+  test.ok(!fs.existsSync(instance.env.sp));
+  test.ok(!fs.existsSync(instance.env.sc));
 
   test.done();
 }
