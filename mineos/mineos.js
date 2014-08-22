@@ -33,16 +33,16 @@ mineos.mc = function(server_name, base_dir) {
     sc: path.join(base_dir, mineos.DIRS['servers'], server_name, 'server.config'),
   }
 
+  self.is_server = function() {
+    return fs.existsSync(self.env.sp);
+  }
+
   self.create = function() {
     var touch = require("touch");
 
     fs.mkdirSync(self.env.cwd);
     touch.sync(self.env.sp);
     touch.sync(self.env.sc);
-  }
-
-  self.is_server = function() {
-    return fs.existsSync(self.env.sp);
   }
 
   self.sp = function() {
@@ -81,6 +81,11 @@ mineos.mc = function(server_name, base_dir) {
                           '',                //java_tweaks
                           'minecraft_server.jar', //server_jar
                           'nogui')           //jar_args
+  }
+
+  self.start = function() {
+    var proc = child_process.exec(self.command_start())
+    return proc;
   }
 
   return self;

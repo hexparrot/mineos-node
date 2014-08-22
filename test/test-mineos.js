@@ -124,3 +124,16 @@ test.command_start = function(test) {
   test.equal(instance.command_start(), '/usr/bin/screen -dmS mc-aaa /usr/bin/java -server  -Xmx256M -Xms256M  -jar minecraft_server.jar nogui');
   test.done();
 }
+
+test.start = function(test) {
+  var server_name = 'aaa';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+  
+  instance.create();
+  var proc = instance.start();
+
+  proc.on('close', function(code) {
+    console.log(code);
+    test.done();
+  })
+}
