@@ -28,6 +28,17 @@ test.server_list = function (test) {
   test.done();
 };
 
+test.server_list_up = function(test) {
+  var servers = mineos.server_list_up();
+  test.ok(servers instanceof Array);
+
+  for (var i=0; i < servers.length; i++) {
+    test.ok(/^(?!\.)[a-zA-Z0-9_\.]+$/.test(servers[i]));
+  }
+
+  test.done();
+}
+
 test.is_server = function(test) {
   var instance = new mineos.mc('testing', BASE_DIR);
 
@@ -126,14 +137,18 @@ test.command_start = function(test) {
 }
 
 test.start = function(test) {
-  var server_name = 'aaa';
+  var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
   
   instance.create();
   var proc = instance.start();
 
   proc.on('close', function(code) {
-    console.log(code);
-    test.done();
+    setTimeout(function() {
+      //console.log(mineos.server_list_up());
+      test.done();
+    }, 25)
   })
+
+
 }
