@@ -7,9 +7,8 @@ var BASE_DIR = '/var/games/minecraft';
 test.tearDown = function(callback) {
   var server_list = new mineos.server_list(BASE_DIR);
   for (var i in server_list) {
-    fs.removeSync(path.join(BASE_DIR, mineos.DIRS['servers'], server_list[i]));
-    fs.removeSync(path.join(BASE_DIR, mineos.DIRS['backup'], server_list[i]));
-    fs.removeSync(path.join(BASE_DIR, mineos.DIRS['archive'], server_list[i]));
+    var instance = new mineos.mc(server_list[i], BASE_DIR);
+    instance.delete();
   }
   callback();
 }
@@ -52,6 +51,7 @@ test.server_pids_up = function(test) {
 }
 
 test.is_server = function(test) {
+  //tests if sp exists
   var instance = new mineos.mc('testing', BASE_DIR);
 
   test.ok(!instance.is_server(), 'non-existent path should fail');
@@ -93,6 +93,18 @@ test.create_server = function(test) {
   test.equal(mineos.server_list(BASE_DIR)[0], server_name);
   test.equal(mineos.server_list(BASE_DIR).length, 1);
   
+  test.done();
+}
+
+test.delete_server = function(test) {
+  var server_name = 'aaa';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  instance.create();
+  test.ok(instance.is_server());
+  instance.delete();
+  test.ok(!instance.is_server());
+
   test.done();
 }
 

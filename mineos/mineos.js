@@ -85,6 +85,12 @@ mineos.mc = function(server_name, base_dir) {
     }
   }
 
+  self.delete = function() {
+    fs.removeSync(self.env.cwd);
+    fs.removeSync(self.env.bwd);
+    fs.removeSync(self.env.awd);
+  }
+
   self.sp = function() {
     var DEFAULTS = {
       'server-port': 25565,
