@@ -102,39 +102,21 @@ mineos.mc = function(server_name, base_dir) {
     return self._sp;
   }
 
-  self.command_start = function() {
-    var string = '{0} -dmS {1} {2} -server {3} -Xmx{4}M -Xms{5}M {6} -jar {7} {8}';
-    return string.format( '/usr/bin/screen', //path to screen
-                          'mc-{0}'.format(self.server_name), //server_name
-                          '/usr/bin/java',   //path to java
-                          '',                //java_debug_args
-                          '256',             //xmx
-                          '256',             //xms
-                          '',                //java_tweaks
-                          'minecraft_server.jar', //server_jar
-                          'nogui')           //jar_args
-  }
-
   self.start = function() {
-    var params = {
-      cwd: self.env.cwd,
-      uid: 1000,
-      gid: 1001
-    }
+    
     fs.copySync('/var/games/minecraft/profiles/vanilla179/minecraft_server.1.7.9.jar',
                 path.join(self.env.cwd, 'minecraft_server.jar'));
     
-    var proc = child_process.spawn('/usr/bin/screen', [
-                                   '-dmS',
-                                   'mc-{0}'.format(self.server_name),
-                                   '/usr/bin/java',
-                                   '-server',
-                                   '-Xmx256M',
-                                   '-Xms256M',
-                                   '-jar',
-                                   'minecraft_server.jar',
-                                   'nogui'],
-                                   params);
+    var binary = '/usr/bin/screen';
+    var args = ['-dmS', 'mc-{0}'.format(self.server_name), 
+                '/usr/bin/java', '-server', '-Xmx256M', '-Xms256M',
+                '-jar',  'minecraft_server.jar', 'nogui'];
+    var params = {
+        cwd: self.env.cwd,
+        uid: 1000,
+        gid: 1001
+      }
+    var proc = child_process.spawn(binary, args, params);
 
     return proc;
   }

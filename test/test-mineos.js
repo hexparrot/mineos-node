@@ -60,7 +60,7 @@ test.is_server = function(test) {
 }
 
 test.create_server = function(test) {
-  var server_name = 'testing';
+  var server_name = 'aaa';
   var instance = new mineos.mc(server_name, BASE_DIR);
   var server_path = path.join(BASE_DIR, mineos.DIRS['servers'], server_name);
 
@@ -137,17 +137,8 @@ test.valid_server_name = function(test) {
   test.done();
 }
 
-test.command_start = function(test) {
-  var server_name = 'aaa';
-
-  var instance = new mineos.mc(server_name, BASE_DIR);
-  instance.create();
-  test.equal(instance.command_start(), '/usr/bin/screen -dmS mc-aaa /usr/bin/java -server  -Xmx256M -Xms256M  -jar minecraft_server.jar nogui');
-  test.done();
-}
-
 test.start = function(test) {
-  var server_name = 'testing';
+  var server_name = 'aaa';
   var instance = new mineos.mc(server_name, BASE_DIR);
   
   instance.create();
