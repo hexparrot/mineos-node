@@ -103,7 +103,6 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.start = function() {
-    
     fs.copySync('/var/games/minecraft/profiles/vanilla179/minecraft_server.1.7.9.jar',
                 path.join(self.env.cwd, 'minecraft_server.jar'));
     
@@ -116,9 +115,19 @@ mineos.mc = function(server_name, base_dir) {
         uid: 1000,
         gid: 1001
       }
-    var proc = child_process.spawn(binary, args, params);
+    return child_process.spawn(binary, args, params);
+  }
 
-    return proc;
+  self.stuff = function(msg) {
+    var params = {
+      cwd: self.env.cwd,
+      uid: 1000,
+      gid: 1001
+    }
+    return child_process.spawn('/usr/bin/screen', 
+                               ['-S', 'mc-{0}'.format(self.server_name), 
+                                '-p', '0', '-X', 'eval', 'stuff "{0}\012"'.format(msg)], 
+                               params);
   }
 
   return self;
