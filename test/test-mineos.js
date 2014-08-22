@@ -8,6 +8,8 @@ test.tearDown = function(callback) {
   var server_list = new mineos.server_list(BASE_DIR);
   for (var i in server_list) {
     fs.removeSync(path.join(BASE_DIR, mineos.DIRS['servers'], server_list[i]));
+    fs.removeSync(path.join(BASE_DIR, mineos.DIRS['backup'], server_list[i]));
+    fs.removeSync(path.join(BASE_DIR, mineos.DIRS['archive'], server_list[i]));
   }
   callback();
 }
@@ -62,16 +64,31 @@ test.is_server = function(test) {
 test.create_server = function(test) {
   var server_name = 'aaa';
   var instance = new mineos.mc(server_name, BASE_DIR);
-  var server_path = path.join(BASE_DIR, mineos.DIRS['servers'], server_name);
+  var uid = 1000;
+  var gid = 1001;
 
   test.equal(mineos.server_list(BASE_DIR).length, 0);
   test.ok(!instance.is_server(instance));
 
   instance.create();
 
-  test.ok(fs.existsSync(server_path));
-  test.ok(fs.existsSync(path.join(server_path, 'server.properties')));
-  test.ok(fs.existsSync(path.join(server_path, 'server.config')));
+  test.ok(fs.existsSync(instance.env.cwd));
+  test.ok(fs.existsSync(instance.env.bwd));
+  test.ok(fs.existsSync(instance.env.awd));
+  test.ok(fs.existsSync(instance.env.sp));
+  test.ok(fs.existsSync(instance.env.sc));
+
+  test.equal(fs.statSync(instance.env.cwd).uid, uid);
+  test.equal(fs.statSync(instance.env.bwd).uid, uid);
+  test.equal(fs.statSync(instance.env.awd).uid, uid);
+  test.equal(fs.statSync(instance.env.sp).uid, uid);
+  test.equal(fs.statSync(instance.env.sc).uid, uid);
+
+  test.equal(fs.statSync(instance.env.cwd).gid, gid);
+  test.equal(fs.statSync(instance.env.bwd).gid, gid);
+  test.equal(fs.statSync(instance.env.awd).gid, gid);
+  test.equal(fs.statSync(instance.env.sp).gid, gid);
+  test.equal(fs.statSync(instance.env.sc).gid, gid);
 
   test.equal(mineos.server_list(BASE_DIR)[0], server_name);
   test.equal(mineos.server_list(BASE_DIR).length, 1);
@@ -151,3 +168,4 @@ test.start = function(test) {
     }, 50)
   })
 }
+
