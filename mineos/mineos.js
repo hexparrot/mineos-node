@@ -77,17 +77,16 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.create = function() {
-    fs.mkdirSync(self.env.cwd);
-    fs.mkdirSync(self.env.bwd);
-    fs.mkdirSync(self.env.awd);
-    fs.createFileSync(self.env.sp);
-    fs.createFileSync(self.env.sc);
+    async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.mkdirs, function(err) {
+      fs.createFileSync(self.env.sp);
+      fs.createFileSync(self.env.sc);
 
-    var dest = [self.env.cwd, self.env.bwd, self.env.awd, self.env.sp, self.env.sc];
-
-    for (var i=0; i < dest.length; i++) {
-      fs.chown(dest[i], 1000, 1001);
-    }
+      var dest = [self.env.cwd, self.env.bwd, self.env.awd, self.env.sp, self.env.sc];
+      for (var i=0; i < dest.length; i++) {
+        fs.chown(dest[i], 1000, 1001);
+      }
+      self.ev.emit('create', true);
+    });
   }
 
   self.delete = function() {
