@@ -1,5 +1,7 @@
 var fs = require('fs-extra');
 var path = require('path');
+var events = require('events');
+var async = require('async');
 var child_process = require('child_process');
 var mineos = exports;
 
@@ -57,6 +59,7 @@ mineos.valid_server_name = function(server_name) {
 mineos.mc = function(server_name, base_dir) {
   var self = this;
   self.server_name = server_name;
+  self.ev = new events.EventEmitter();
 
   self.env = {
     base_dir: base_dir,
@@ -68,7 +71,9 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.is_server = function() {
-    return fs.existsSync(self.env.sp);
+    fs.exists(self.env.sp, function(exists) {
+      self.ev.emit('is_server', exists);
+    });
   }
 
   self.create = function() {
