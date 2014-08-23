@@ -122,9 +122,6 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.start = function() {
-    fs.copySync('/var/games/minecraft/profiles/vanilla179/minecraft_server.1.7.9.jar',
-                path.join(self.env.cwd, 'minecraft_server.jar'));
-    
     var binary = '/usr/bin/screen';
     var args = ['-dmS', 'mc-{0}'.format(self.server_name), 
                 '/usr/bin/java', '-server', '-Xmx256M', '-Xms256M',
@@ -134,7 +131,11 @@ mineos.mc = function(server_name, base_dir) {
         uid: 1000,
         gid: 1001
       }
-    return child_process.spawn(binary, args, params);
+
+    fs.copy('/var/games/minecraft/profiles/vanilla179/minecraft_server.1.7.9.jar',
+            path.join(self.env.cwd, 'minecraft_server.jar'), function(err) {
+              self.ev.emit('start', child_process.spawn(binary, args, params));
+            });
   }
 
   self.stuff = function(msg) {

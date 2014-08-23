@@ -173,14 +173,20 @@ test.start = function(test) {
   var server_name = 'aaa';
   var instance = new mineos.mc(server_name, BASE_DIR);
   
-  instance.create();
-  var proc = instance.start();
-
-  proc.on('close', function(code) {
-    setTimeout(function() {
-      //console.log(mineos.server_list_up());
-      test.done();
-    }, 50)
+  instance.ev.on('start', function(proc) {
+    proc.on('close', function(code) {
+      setTimeout(function() {
+        //console.log(mineos.server_list_up());
+        test.done();
+      }, 50)
+    })
   })
+
+  instance.create();
+  instance.start();
+
+
+
+  
 }
 
