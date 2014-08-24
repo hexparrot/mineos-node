@@ -6,9 +6,13 @@ var BASE_DIR = '/var/games/minecraft';
 
 test.tearDown = function(callback) {
   var server_list = new mineos.server_list(BASE_DIR);
+
   for (var i in server_list) {
     var instance = new mineos.mc(server_list[i], BASE_DIR);
-    instance.delete();
+
+    fs.removeSync(instance.env.cwd);
+    fs.removeSync(instance.env.bwd);
+    fs.removeSync(instance.env.awd);
   }
   callback();
 }
@@ -53,14 +57,22 @@ test.is_server = function(test) {
 
   instance.ev.once('is_server', function(data) {
     test.ok(!data);
-    test.done();
+    instance.create();
+  })
+
+  instance.ev.once('create', function() {
+    instance.ev.once('is_server', function(data) {
+      test.ok(data);
+      test.done();
+    })
+    instance.is_server();
   })
 
   instance.is_server();
 }
 
 test.create_server = function(test) {
-  var server_name = 'aaa';
+  var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
   var uid = 1000;
   var gid = 1001;
@@ -95,11 +107,14 @@ test.create_server = function(test) {
 }
 
 test.delete_server = function(test) {
-  var server_name = 'aaa';
+  var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
-  instance.ev.once('is_server', function(data) {
+  instance.ev.once('create', function(data) {
     instance.delete();
+  })
+
+  instance.ev.once('delete', function() {
     test.ok(!fs.existsSync(instance.env.cwd));
     test.ok(!fs.existsSync(instance.env.bwd));
     test.ok(!fs.existsSync(instance.env.awd));
@@ -109,11 +124,10 @@ test.delete_server = function(test) {
   })
 
   instance.create();
-  instance.is_server();
 }
 
 test.instance = function(test) {
-  var server_name = 'aaa';
+  var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   test.ok(instance.env instanceof Object);
@@ -121,7 +135,7 @@ test.instance = function(test) {
 }
 
 test.mc_instance = function(test) {
-  var server_name = 'aaa';
+  var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   test.equal(instance.env.cwd, path.join(BASE_DIR, mineos.DIRS['servers'], server_name));
@@ -135,7 +149,7 @@ test.mc_instance = function(test) {
 }
 
 test.sp = function(test) {
-  var server_name = 'aaa';
+  var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   test.equal(instance.sp()['server-port'], '25565');
@@ -171,9 +185,12 @@ test.valid_server_name = function(test) {
 }
 
 test.start = function(test) {
-  var server_name = 'aaa';
+  var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
   
+  instance.ev.on('create', function() {
+    instance.start();
+  })
   instance.ev.on('start', function(proc) {
     proc.on('close', function(code) {
       setTimeout(function() {
@@ -184,6 +201,5 @@ test.start = function(test) {
   })
 
   instance.create();
-  instance.start();
 }
 

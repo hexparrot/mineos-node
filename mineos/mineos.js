@@ -90,9 +90,9 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.delete = function() {
-    fs.removeSync(self.env.cwd);
-    fs.removeSync(self.env.bwd);
-    fs.removeSync(self.env.awd);
+    async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.remove, function(err) {
+      self.ev.emit('delete', true);
+    });
   }
 
   self.sp = function() {
