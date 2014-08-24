@@ -18,6 +18,7 @@ test.commit = function(test) {
   instance.ev.once('commit', function() {
     instance.ev.once('read', function() {
       test.equal(Object.keys(instance.props).length, 1);
+      test.equal(instance.props['newprop'], 'true');
       fs.removeSync(instance.file_path);
       test.done();
     })
@@ -40,5 +41,12 @@ test.load_populated_file = function(test) {
     fs.removeSync(file_path);
     test.done();
   })
+}
 
+test.init_args = function(test) {
+  var file_path = 'test.config';
+  var instance = new cf.config_file('test.config', {'server-ip': '0.0.0.0'});
+
+  test.equal(instance.props['server-ip'], '0.0.0.0')
+  test.done();
 }

@@ -3,11 +3,11 @@ var path = require('path');
 var events = require('events');
 var cf = exports;
 
-cf.config_file = function(file_path) {
+cf.config_file = function(file_path, initial_properties) {
   var self = this;
   self.file_path = file_path;
   self.ev = new events.EventEmitter();
-  self.props = {};
+  self.props = initial_properties || {};
 
   self.read = function() {
     fs.readFile(self.file_path, 'utf8', function(err, lines) {
