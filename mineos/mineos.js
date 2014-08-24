@@ -1,5 +1,7 @@
 var fs = require('fs-extra');
 var path = require('path');
+var events = require('events');
+var async = require('async');
 var child_process = require('child_process');
 var mineos = exports;
 
@@ -57,6 +59,7 @@ mineos.valid_server_name = function(server_name) {
 mineos.mc = function(server_name, base_dir) {
   var self = this;
   self.server_name = server_name;
+  self.ev = new events.EventEmitter();
 
   self.env = {
     base_dir: base_dir,
@@ -68,27 +71,28 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.is_server = function() {
-    return fs.existsSync(self.env.sp);
+    fs.exists(self.env.sp, function(exists) {
+      self.ev.emit('is_server', exists);
+    });
   }
 
   self.create = function() {
-    fs.mkdirSync(self.env.cwd);
-    fs.mkdirSync(self.env.bwd);
-    fs.mkdirSync(self.env.awd);
-    fs.createFileSync(self.env.sp);
-    fs.createFileSync(self.env.sc);
+    async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.mkdirs, function(err) {
+      fs.createFileSync(self.env.sp);
+      fs.createFileSync(self.env.sc);
 
-    var dest = [self.env.cwd, self.env.bwd, self.env.awd, self.env.sp, self.env.sc];
-
-    for (var i=0; i < dest.length; i++) {
-      fs.chown(dest[i], 1000, 1001);
-    }
+      var dest = [self.env.cwd, self.env.bwd, self.env.awd, self.env.sp, self.env.sc];
+      for (var i=0; i < dest.length; i++) {
+        fs.chown(dest[i], 1000, 1001);
+      }
+      self.ev.emit('create', true);
+    });
   }
 
   self.delete = function() {
-    fs.removeSync(self.env.cwd);
-    fs.removeSync(self.env.bwd);
-    fs.removeSync(self.env.awd);
+    async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.remove, function(err) {
+      self.ev.emit('delete', true);
+    });
   }
 
   self.sp = function() {
@@ -117,9 +121,6 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.start = function() {
-    fs.copySync('/var/games/minecraft/profiles/vanilla179/minecraft_server.1.7.9.jar',
-                path.join(self.env.cwd, 'minecraft_server.jar'));
-    
     var binary = '/usr/bin/screen';
     var args = ['-dmS', 'mc-{0}'.format(self.server_name), 
                 '/usr/bin/java', '-server', '-Xmx256M', '-Xms256M',
@@ -129,7 +130,11 @@ mineos.mc = function(server_name, base_dir) {
         uid: 1000,
         gid: 1001
       }
-    return child_process.spawn(binary, args, params);
+
+    fs.copy('/var/games/minecraft/profiles/vanilla179/minecraft_server.1.7.9.jar',
+            path.join(self.env.cwd, 'minecraft_server.jar'), function(err) {
+              self.ev.emit('start', child_process.spawn(binary, args, params));
+            });
   }
 
   self.stuff = function(msg) {
