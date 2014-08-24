@@ -15,12 +15,30 @@ test.load_absent_file = function(test) {
 test.commit = function(test) {
   var instance = new cf.config_file('test.config');
 
-  instance.ev.on('commit', function() {
-    test.equal(Object.keys(instance.props).length, 1);
-    fs.removeSync(instance.file_path);
+  instance.ev.once('commit', function() {
+    instance.ev.once('read', function() {
+      test.equal(Object.keys(instance.props).length, 1);
+      fs.removeSync(instance.file_path);
+      test.done();
+    })
+    instance.read();
+  })
+  
+  instance.props['newprop'] = true;
+  instance.commit();
+}
+
+test.load_populated_file = function(test) {
+  var file_path = 'test.config';
+  fs.writeFileSync(file_path, 'server-ip=0.0.0.0');
+  
+  test.ok(fs.existsSync(file_path));
+
+  var instance = new cf.config_file(file_path);
+  instance.ev.on('read', function() {
+    test.equal(instance.props['server-ip'], '0.0.0.0');
+    fs.removeSync(file_path);
     test.done();
   })
 
-  instance.props['newprop'] = true;
-  instance.commit();
 }

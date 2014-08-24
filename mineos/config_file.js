@@ -16,25 +16,26 @@ cf.config_file = function(file_path) {
       } else {
         var p = {};
         var row;
+        lines = lines.split('\n');
         for (var i=0; i < lines.length; i++) {
           row = lines[i].split('=');
           p[row[0]] = row[1];
         }
         self.props = p;
       }
+      self.ev.emit('read', true);
     });
   }
 
   self.commit = function() {
-    var writer = fs.createWriteStream(self.file_path);
-    writer.on('finish', function() {
-      self.ev.emit('commit', true);
-    })
-
+    var lines = [];
     for (var key in self.props) {
-      writer.write(self.props[key] + '\n');
+      lines.push(key + '=' + self.props[key]);
     }
-    writer.end();
+    fs.writeFile(self.file_path, lines.join('\n'), function() {
+      self.ev.emit('commit', true);
+    });
   }
 
+  self.read();
 }
