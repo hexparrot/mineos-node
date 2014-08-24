@@ -12,9 +12,15 @@ test.load_absent_file = function(test) {
   test.done();
 }
 
-/*test.commit = function(test) {
+test.commit = function(test) {
   var instance = new cf.config_file('test.config');
+
+  instance.ev.on('commit', function() {
+    test.equal(Object.keys(instance.props).length, 1);
+    fs.removeSync(instance.file_path);
+    test.done();
+  })
 
   instance.props['newprop'] = true;
   instance.commit();
-}*/
+}
