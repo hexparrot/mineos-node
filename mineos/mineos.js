@@ -50,18 +50,36 @@ mineos.server_list_up = function() {
 }
 
 mineos.server_pids_up = function() {
-  var cmdline, match;
+  var cmdline, environ, match;
   var pids = fs.readdirSync('/proc').filter(function(e) { if (/^([0-9]+)$/.test(e)) {return e} });
   var SCREEN_REGEX = /screen[^S]+S mc-([^ ]+)/i;
+  var JAVA_REGEX = /\.mc-([^ ]+)/i;
   var servers_found = {};
 
   for (var i=0; i < pids.length; i++) {
     cmdline = fs.readFileSync('/proc/{0}/cmdline'.format(pids[i]))
                               .toString('ascii')
                               .replace(/\u0000/g, ' ');
-    match = SCREEN_REGEX.exec(cmdline);
-    if (match && !(match[1] in servers_found))
-      servers_found[match[1]] = {'screen': parseInt(pids[i])};
+    screen_match = SCREEN_REGEX.exec(cmdline);
+
+    if (screen_match) {
+      if (screen_match[1] in servers_found)
+        servers_found[screen_match[1]]['screen'] = parseInt(pids[i]);
+      else
+        servers_found[screen_match[1]] = {'screen': parseInt(pids[i])}
+    } else {
+      environ = fs.readFileSync('/proc/{0}/environ'.format(pids[i]))
+                                .toString('ascii')
+                                .replace(/\u0000/g, ' ');
+      java_match = JAVA_REGEX.exec(environ);
+
+      if (java_match) {
+        if (java_match[1] in servers_found)
+          servers_found[java_match[1]]['java'] = parseInt(pids[i]);
+        else
+          servers_found[java_match[1]] = {'java': parseInt(pids[i])}
+        }
+    }
   }
   return servers_found;
 }

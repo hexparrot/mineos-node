@@ -182,13 +182,14 @@ test.start = function(test) {
   })
   instance.ev.once('start', function(proc) {
     proc.once('close', function(code) {
-      
-      var servers = mineos.server_pids_up();
-      for (var key in servers) {
-        test.ok(servers[key].hasOwnProperty('screen'));
-        //test.ok(servers[key].hasOwnProperty('java'));
-      }
-      test.done();
+      setTimeout(function() {
+        var servers = mineos.server_pids_up();
+        for (var key in servers) {
+          test.ok(servers[key].hasOwnProperty('screen'));
+          test.ok(servers[key].hasOwnProperty('java'));
+        }
+        test.done();
+      }, 50)
     })
   })
 
