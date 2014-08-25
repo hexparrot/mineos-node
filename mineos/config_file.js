@@ -11,9 +11,7 @@ cf.config_file = function(file_path, initial_properties) {
 
   self.read = function() {
     fs.readFile(self.file_path, 'utf8', function(err, lines) {
-      if (err) {
-        self.props = {};
-      } else {
+      if (!err) {
         var p = {};
         var row;
         lines = lines.split('\n');
@@ -22,8 +20,8 @@ cf.config_file = function(file_path, initial_properties) {
           p[row[0]] = row[1];
         }
         self.props = p;
+        self.ev.emit('read', true);
       }
-      self.ev.emit('read', true);
     });
   }
 
@@ -37,5 +35,6 @@ cf.config_file = function(file_path, initial_properties) {
     });
   }
 
-  self.read();
+  if (!Object.keys(self.props).length)
+    self.read();
 }

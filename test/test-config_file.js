@@ -30,23 +30,15 @@ test.commit = function(test) {
 }
 
 test.load_populated_file = function(test) {
-  var file_path = 'test.config';
+  var file_path = 'server.properties';
   fs.writeFileSync(file_path, 'server-ip=0.0.0.0');
-  
   test.ok(fs.existsSync(file_path));
 
   var instance = new cf.config_file(file_path);
+
   instance.ev.on('read', function() {
     test.equal(instance.props['server-ip'], '0.0.0.0');
     fs.removeSync(file_path);
     test.done();
   })
-}
-
-test.init_args = function(test) {
-  var file_path = 'test.config';
-  var instance = new cf.config_file('test.config', {'server-ip': '0.0.0.0'});
-
-  test.equal(instance.props['server-ip'], '0.0.0.0')
-  test.done();
 }
