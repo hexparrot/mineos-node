@@ -3,6 +3,7 @@ var path = require('path');
 var events = require('events');
 var async = require('async');
 var child_process = require('child_process');
+var cf = require('../mineos/config_file');
 var mineos = exports;
 
 mineos.DIRS = {
@@ -11,6 +12,20 @@ mineos.DIRS = {
   'archive': 'archive',
   'profiles': 'profiles',
   'import': 'import'
+}
+
+mineos.SP_DEFAULTS = {
+  'server-port': 25565,
+  'max-players': 20,
+  'level-seed': '',
+  'gamemode': 0,
+  'difficulty': 1,
+  'level-type': 'DEFAULT',
+  'level-name': 'world',
+  'max-build-height': 256,
+  'generate-structures': 'false',
+  'generator-settings': '',
+  'server-ip': '0.0.0.0',
 }
 
 mineos.server_list = function(base_dir) {
@@ -78,14 +93,30 @@ mineos.mc = function(server_name, base_dir) {
 
   self.create = function() {
     async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.mkdirs, function(err) {
-      fs.createFileSync(self.env.sp);
-      fs.createFileSync(self.env.sc);
-
-      var dest = [self.env.cwd, self.env.bwd, self.env.awd, self.env.sp, self.env.sc];
-      for (var i=0; i < dest.length; i++) {
-        fs.chown(dest[i], 1000, 1001);
-      }
-      self.ev.emit('create', true);
+      async.series([
+        function(callback) {
+          var sp = new cf.config_file(self.env.sp, mineos.SP_DEFAULTS);
+          sp.ev.once('commit', function() {
+            callback();
+          })
+          sp.commit();
+        },
+        function(callback) {
+          /*FIXME: SP_defaults should not be used*/
+          var sc = new cf.config_file(self.env.sc, mineos.SP_DEFAULTS);
+          sc.ev.once('commit', function() {
+            callback();
+          })
+          sc.commit();
+        }], function(err) {
+          if (!err) {
+            var dest = [self.env.cwd, self.env.bwd, self.env.awd, self.env.sp, self.env.sc];
+            for (var i=0; i < dest.length; i++) {
+              fs.chown(dest[i], 1000, 1001);
+            }
+            self.ev.emit('create', true);
+          }
+        })      
     });
   }
 
@@ -96,24 +127,10 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.sp = function() {
-    var DEFAULTS = {
-      'server-port': 25565,
-      'max-players': 20,
-      'level-seed': '',
-      'gamemode': 0,
-      'difficulty': 1,
-      'level-type': 'DEFAULT',
-      'level-name': 'world',
-      'max-build-height': 256,
-      'generate-structures': 'false',
-      'generator-settings': '',
-      'server-ip': '0.0.0.0',
-    }
-
     if (typeof(self._sp) == 'undefined') {
       self._sp = {};
-      for (var k in DEFAULTS) {
-        self._sp[k] = DEFAULTS[k];
+      for (var k in mineos.SP_DEFAULTS) {
+        self._sp[k] = mineos.SP_DEFAULTS[k];
       }
     }
       
