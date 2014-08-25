@@ -33,20 +33,7 @@ mineos.server_list = function(base_dir) {
 }
 
 mineos.server_list_up = function() {
-  var cmdline, match;
-  var pids = fs.readdirSync('/proc').filter(function(e) { if (/^([0-9]+)$/.test(e)) {return e} });
-  var SCREEN_REGEX = /screen[^S]+S mc-([^ ]+)/i;
-  var servers_found = [];
-
-  for (var i=0; i < pids.length; i++) {
-    cmdline = fs.readFileSync('/proc/{0}/cmdline'.format(pids[i]))
-                              .toString('ascii')
-                              .replace(/\u0000/g, ' ');
-    match = SCREEN_REGEX.exec(cmdline);
-    if (match && servers_found.indexOf(match[1]) == -1)
-      servers_found.push(match[1])
-  }
-  return servers_found;
+  return Object.keys(mineos.server_pids_up());
 }
 
 mineos.server_pids_up = function() {
