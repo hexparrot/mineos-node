@@ -35,6 +35,7 @@ cf.config_file = function(file_path, initial_properties) {
     });
   }
 
-  if (!Object.keys(self.props).length)
+  if (!Object.keys(self.props).length) {
     self.read();
+  }
 }
