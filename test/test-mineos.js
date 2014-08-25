@@ -40,17 +40,6 @@ test.server_list_up = function(test) {
   test.done();
 }
 
-test.server_pids_up = function(test) {
-  var servers = mineos.server_pids_up();
-  test.ok(servers instanceof Object);
-
-  for (var key in servers) {
-    test.ok(servers[key].hasOwnProperty('screen'))
-  }
-
-  test.done();
-}
-
 test.is_server = function(test) {
   //tests if sp exists
   var instance = new mineos.mc('testing', BASE_DIR);
@@ -188,18 +177,21 @@ test.start = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
   
-  instance.ev.on('create', function() {
+  instance.ev.once('create', function() {
     instance.start();
   })
-  instance.ev.on('start', function(proc) {
-    proc.on('close', function(code) {
-      setTimeout(function() {
-        //console.log(mineos.server_list_up());
-        test.done();
-      }, 50)
+  instance.ev.once('start', function(proc) {
+    proc.once('close', function(code) {
+      
+      var servers = mineos.server_pids_up();
+      for (var key in servers) {
+        test.ok(servers[key].hasOwnProperty('screen'));
+        //test.ok(servers[key].hasOwnProperty('java'));
+      }
+      test.done();
     })
   })
 
   instance.create();
-}
 
+}
