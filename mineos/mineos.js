@@ -92,31 +92,35 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.create = function() {
-    async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.mkdirs, function(err) {
-      async.series([
-        function(callback) {
-          var sp = new cf.config_file(self.env.sp, mineos.SP_DEFAULTS);
-          sp.ev.once('commit', function() {
-            callback();
-          })
-          sp.commit();
-        },
-        function(callback) {
-          /*FIXME: SP_defaults should not be used*/
-          var sc = new cf.config_file(self.env.sc, mineos.SP_DEFAULTS);
-          sc.ev.once('commit', function() {
-            callback();
-          })
-          sc.commit();
-        }], function(err) {
-          if (!err) {
-            var dest = [self.env.cwd, self.env.bwd, self.env.awd, self.env.sp, self.env.sc];
-            for (var i=0; i < dest.length; i++) {
-              fs.chown(dest[i], 1000, 1001);
-            }
-            self.ev.emit('create', true);
+    function create_configs() {
+      function create_sp(callback) {
+        var sp = new cf.config_file(self.env.sp, mineos.SP_DEFAULTS);
+        sp.ev.once('commit', function() {
+          callback();
+        })
+        sp.commit();
+      }
+
+      function create_sc(callback) {
+        var sc = new cf.config_file(self.env.sc, mineos.SP_DEFAULTS);
+        sc.ev.once('commit', function() {
+          callback();
+        })
+        sc.commit();
+      }
+
+      async.series([create_sp, create_sc], function(err) {
+        if (!err) {
+          var dest = [self.env.cwd, self.env.bwd, self.env.awd, self.env.sp, self.env.sc];
+          for (var i=0; i < dest.length; i++) {
+            fs.chown(dest[i], 1000, 1001);
           }
-        })      
+          self.ev.emit('create', true);
+        }
+      })
+    }
+    async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.mkdirs, function(err) {
+      create_configs();
     });
   }
 
