@@ -176,23 +176,30 @@ test.valid_server_name = function(test) {
 test.start = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
+
+  test.expect(2);
   
   instance.ev.once('create', function() {
     instance.start();
   })
+
   instance.ev.once('start', function(proc) {
     proc.once('close', function(code) {
+
       setTimeout(function() {
         var servers = mineos.server_pids_up();
         for (var key in servers) {
           test.ok(servers[key].hasOwnProperty('screen'));
           test.ok(servers[key].hasOwnProperty('java'));
         }
-        test.done();
-      }, 50)
+        instance.kill();
+      }, 200)
     })
   })
 
-  instance.create();
+  instance.ev.once('kill', function() {
+    test.done();
+  })
 
+  instance.create();
 }

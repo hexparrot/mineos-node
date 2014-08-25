@@ -170,6 +170,11 @@ mineos.mc = function(server_name, base_dir) {
             });
   }
 
+  self.kill = function() {
+    process.kill(mineos.server_pids_up()[self.server_name].java);
+    self.ev.emit('kill', true);
+  }
+
   self.stuff = function(msg) {
     var params = {
       cwd: self.env.cwd,
