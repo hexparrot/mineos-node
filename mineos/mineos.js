@@ -204,8 +204,8 @@ mineos.mc = function(server_name, base_dir) {
 
   self.archive = function() {
     var strftime = require('strftime');
-
     var now = Date.now();
+
     var binary = '/bin/tar';
     var filename = 'server-{0}_{1}.tgz'.format(self.server_name, strftime('%Y-%m-%d_%H:%M:%S'));
     var args = ['czf', path.join(self.env.awd, filename), self.env.cwd];
@@ -216,6 +216,20 @@ mineos.mc = function(server_name, base_dir) {
     }
 
     self.broadcast('archive', true, now, child_process.spawn(binary, args, params));
+  }
+
+  self.backup = function() {
+    var now = Date.now();
+
+    var binary = '/usr/bin/rdiff-backup';
+    var args = ['{0}/'.format(self.env.cwd), self.env.bwd];
+    var params = {
+      cwd: self.env.bwd,
+      uid: 1000,
+      gid: 1001
+    }
+
+    self.broadcast('backup', true, now, child_process.spawn(binary, args, params));
   }
 
   return self;

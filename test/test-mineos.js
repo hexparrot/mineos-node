@@ -249,3 +249,26 @@ test.archive = function(test) {
 
   instance.create();
 }
+
+test.backup = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  instance.ev.once('create', function(event_reply) {
+    test.ok(event_reply.success);
+    instance.backup();
+  })
+
+  instance.ev.once('backup', function(event_reply) {
+    test.ok(event_reply.success);
+    var proc = event_reply.payload;
+    proc.once('close', function(code) {
+      setTimeout(function() {
+        test.equal(fs.readdirSync(instance.env.bwd).length, 3); //+ridd-backup-data
+        test.done();
+      }, 200)
+    })
+  })
+
+  instance.create();
+}
