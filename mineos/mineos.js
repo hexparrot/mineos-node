@@ -202,6 +202,22 @@ mineos.mc = function(server_name, base_dir) {
                                params);
   }
 
+  self.archive = function() {
+    var strftime = require('strftime');
+
+    var now = Date.now();
+    var binary = '/bin/tar';
+    var filename = 'server-{0}_{1}.tgz'.format(self.server_name, strftime('%Y-%m-%d_%H:%M:%S'));
+    var args = ['czf', path.join(self.env.awd, filename), self.env.cwd];
+    var params = {
+      cwd: self.env.awd,
+      uid: 1000,
+      gid: 1001
+    }
+
+    self.broadcast('archive', true, now, child_process.spawn(binary, args, params));
+  }
+
   return self;
 }
 
