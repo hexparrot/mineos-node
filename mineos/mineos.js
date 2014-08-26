@@ -65,7 +65,7 @@ mineos.server_pids_up = function() {
           servers_found[java_match[1]]['java'] = parseInt(pids[i]);
         else
           servers_found[java_match[1]] = {'java': parseInt(pids[i])}
-        }
+      }
     }
   }
   return servers_found;
@@ -90,9 +90,20 @@ mineos.mc = function(server_name, base_dir) {
     sc: path.join(base_dir, mineos.DIRS['servers'], server_name, 'server.config'),
   }
 
+  self.broadcast = function(action, success, start_time, payload) {
+    self.ev.emit(action, {
+      action: action,
+      success: success,
+      time_start: start_time,
+      time_end: Date.now(),
+      payload: payload
+    });
+  }
+
   self.is_server = function() {
+    var now = Date.now();
     fs.exists(self.env.sp, function(exists) {
-      self.ev.emit('is_server', exists);
+      self.broadcast('is_server', exists, now, null);
     });
   }
 
@@ -122,6 +133,7 @@ mineos.mc = function(server_name, base_dir) {
       self.ev.once('sc-created', function() { callback(); })
       self.create_sc();
     }
+    var now = Date.now();
 
     async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.mkdirs, function(err) {
       async.series([new_sp, new_sc], function(err) {
@@ -130,15 +142,16 @@ mineos.mc = function(server_name, base_dir) {
           for (var i=0; i < dest.length; i++) {
             fs.chown(dest[i], 1000, 1001);
           }
-          self.ev.emit('create', true);
+          self.broadcast('create', true, now, null);
         }
       })
     })
   }
 
   self.delete = function() {
+    var now = Date.now();
     async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.remove, function(err) {
-      self.ev.emit('delete', true);
+      self.broadcast('delete', true, now, null);
     });
   }
 
@@ -154,6 +167,7 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.start = function() {
+    var now = Date.now();
     var binary = '/usr/bin/screen';
     var args = ['-dmS', 'mc-{0}'.format(self.server_name), 
                 '/usr/bin/java', '-server', '-Xmx256M', '-Xms256M',
@@ -166,13 +180,14 @@ mineos.mc = function(server_name, base_dir) {
 
     fs.copy('/var/games/minecraft/profiles/vanilla179/minecraft_server.1.7.9.jar',
             path.join(self.env.cwd, 'minecraft_server.jar'), function(err) {
-              self.ev.emit('start', child_process.spawn(binary, args, params));
+              self.broadcast('start', true, now, child_process.spawn(binary, args, params));
             });
   }
 
   self.kill = function() {
+    var now = Date.now();
     process.kill(mineos.server_pids_up()[self.server_name].java);
-    self.ev.emit('kill', true);
+    self.broadcast('kill', true, now, null);
   }
 
   self.stuff = function(msg) {

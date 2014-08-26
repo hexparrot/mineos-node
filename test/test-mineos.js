@@ -40,18 +40,33 @@ test.server_list_up = function(test) {
   test.done();
 }
 
+test.broadcast = function(test) {
+  var instance = new mineos.mc('testing', BASE_DIR);
+  var now = Date.now();
+
+  instance.ev.once('is_server', function(event_reply) {
+    test.ok(!event_reply.success);
+    test.equal(event_reply.time_start, now);
+    test.equal(event_reply.payload, null);
+    test.equal(event_reply.action, 'is_server');
+    test.done();
+  })
+
+  instance.is_server();
+}
+
 test.is_server = function(test) {
   //tests if sp exists
   var instance = new mineos.mc('testing', BASE_DIR);
 
-  instance.ev.once('is_server', function(data) {
-    test.ok(!data);
+  instance.ev.once('is_server', function(event_reply) {
+    test.ok(!event_reply.success);
     instance.create();
   })
 
   instance.ev.once('create', function() {
-    instance.ev.once('is_server', function(data) {
-      test.ok(data);
+    instance.ev.once('is_server', function(event_reply) {
+      test.ok(event_reply.success);
       test.done();
     })
     instance.is_server();
@@ -68,7 +83,9 @@ test.create_server = function(test) {
 
   test.equal(mineos.server_list(BASE_DIR).length, 0);
 
-  instance.ev.on('create', function(bool){
+  instance.ev.once('create', function(event_reply){
+    test.ok(event_reply.success);
+
     test.ok(fs.existsSync(instance.env.cwd));
     test.ok(fs.existsSync(instance.env.bwd));
     test.ok(fs.existsSync(instance.env.awd));
@@ -99,11 +116,13 @@ test.delete_server = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
-  instance.ev.once('create', function(data) {
+  instance.ev.once('create', function(event_reply) {
+    test.ok(event_reply.success)
     instance.delete();
   })
 
-  instance.ev.once('delete', function() {
+  instance.ev.once('delete', function(event_reply) {
+    test.ok(event_reply.success);
     test.ok(!fs.existsSync(instance.env.cwd));
     test.ok(!fs.existsSync(instance.env.bwd));
     test.ok(!fs.existsSync(instance.env.awd));
@@ -177,13 +196,16 @@ test.start = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
-  test.expect(2);
+  test.expect(5);
   
-  instance.ev.once('create', function() {
+  instance.ev.once('create', function(event_reply) {
+    test.ok(event_reply.success);
     instance.start();
   })
 
-  instance.ev.once('start', function(proc) {
+  instance.ev.once('start', function(event_reply) {
+    test.ok(event_reply.success);
+    var proc = event_reply.payload;
     proc.once('close', function(code) {
 
       setTimeout(function() {
@@ -197,7 +219,8 @@ test.start = function(test) {
     })
   })
 
-  instance.ev.once('kill', function() {
+  instance.ev.once('kill', function(event_reply) {
+    test.ok(event_reply.success);
     test.done();
   })
 
