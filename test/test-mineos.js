@@ -272,3 +272,43 @@ test.backup = function(test) {
 
   instance.create();
 }
+
+test.restore = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  instance.ev.once('create', function(event_reply) {
+    test.ok(event_reply.success);
+    instance.backup();
+  })
+
+  instance.ev.once('backup', function(event_reply) {
+    test.ok(event_reply.success);
+    var proc = event_reply.payload;
+    proc.once('close', function(code) {
+      setTimeout(function() {
+        test.equal(fs.readdirSync(instance.env.bwd).length, 3); //+rdiff-backup-data
+        instance.ev.emit('commence-delete', true);
+      }, 200)
+    })
+  })
+
+  instance.ev.once('commence-delete', function() {
+    fs.removeSync(instance.env.cwd);
+    test.ok(!fs.existsSync(instance.env.cwd));
+    instance.restore('now');
+  })
+
+  instance.ev.once('restore', function(event_reply) {
+    test.ok(event_reply.success);
+    var proc = event_reply.payload;
+    proc.once('close', function(code, signal) {
+      setTimeout(function() {
+        test.equal(fs.readdirSync(instance.env.cwd).length, 2); //+rdiff-backup-data
+        test.done();
+      }, 200)
+    })
+  })
+
+  instance.create();
+}
