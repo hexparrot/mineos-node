@@ -287,3 +287,24 @@ test.restore = function(test) {
 
   instance.create();
 }
+
+test.sp = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  instance.ev.once('create', function(event_reply) {
+    test.ok(event_reply.success);
+    test.equal(instance.sp()['server-port'], '25565');
+
+    instance.ev.once('sp-written', function(event_reply2) {
+      test.ok(event_reply2.success);
+      test.equal(instance.sp()['server-port'], '25570');
+      test.done();
+    })
+
+    var sp = instance.sp();
+    sp['server-port'] = '25570';
+    instance.write_sp(sp);
+  })
+  instance.create();
+}

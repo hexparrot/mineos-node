@@ -106,6 +106,10 @@ mineos.mc = function(server_name, base_dir) {
     });
   }
 
+  self.sp = function() {
+    return ini.parse(fs.readFileSync(self.env.sp, 'utf8'));
+  }
+
   self.write_sp = function(config) {
     var now = Date.now();
     fs.writeFile(self.env.sp, ini.encode(config), {encoding: 'utf8', mode: 436}, function(err){
