@@ -3,7 +3,7 @@ var path = require('path');
 var events = require('events');
 var async = require('async');
 var child_process = require('child_process');
-var cf = require('../mineos/config_file');
+var ini = require('ini');
 var mineos = exports;
 
 mineos.DIRS = {
@@ -108,19 +108,15 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.create_sp = function() {
-    var sp = new cf.config_file(self.env.sp, mineos.SP_DEFAULTS);
-    sp.ev.once('commit', function() {
+    fs.writeFile(self.env.sp, ini.encode(mineos.SP_DEFAULTS), {encoding: 'utf8', mode: 436}, function(err){
       self.ev.emit('sp-created', true);
     })
-    sp.commit();
   }
 
   self.create_sc = function() {
-    var sc = new cf.config_file(self.env.sc, mineos.SP_DEFAULTS);
-    sc.ev.once('commit', function() {
+    fs.writeFile(self.env.sc, ini.encode(mineos.SP_DEFAULTS), {encoding: 'utf8', mode: 436}, function(err){
       self.ev.emit('sc-created', true);
     })
-    sc.commit();
   }
 
   self.create = function() {
@@ -153,17 +149,6 @@ mineos.mc = function(server_name, base_dir) {
     async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.remove, function(err) {
       self.broadcast('delete', true, now, null);
     });
-  }
-
-  self.sp = function() {
-    if (typeof(self._sp) == 'undefined') {
-      self._sp = {};
-      for (var k in mineos.SP_DEFAULTS) {
-        self._sp[k] = mineos.SP_DEFAULTS[k];
-      }
-    }
-      
-    return self._sp;
   }
 
   self.start = function() {

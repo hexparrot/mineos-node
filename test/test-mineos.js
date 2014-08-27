@@ -156,26 +156,6 @@ test.mc_instance = function(test) {
   test.done();
 }
 
-test.sp = function(test) {
-  var server_name = 'testing';
-  var instance = new mineos.mc(server_name, BASE_DIR);
-
-  test.equal(instance.sp()['server-port'], '25565');
-  test.equal(instance.sp()['max-players'], '20');
-  test.equal(instance.sp()['level-seed'], '');
-  test.equal(instance.sp()['generate-structures'], 'false');
-
-  instance.sp()['server-port'] = 25570;
-  test.equal(instance.sp()['server-port'], '25570');
-
-  var instance2 = new mineos.mc(server_name, BASE_DIR);
-  test.equal(instance2.sp()['server-port'], '25565');
-
-  test.notDeepEqual(instance.sp(), instance2.sp());
-
-  test.done();
-}
-
 test.valid_server_name = function(test) {
   var regex_valid_server_name = /^(?!\.)[a-zA-Z0-9_\.]+$/;
   test.ok(mineos.valid_server_name('aaa'));
