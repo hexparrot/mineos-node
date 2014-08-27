@@ -90,19 +90,16 @@ test.create_server = function(test) {
     test.ok(fs.existsSync(instance.env.bwd));
     test.ok(fs.existsSync(instance.env.awd));
     test.ok(fs.existsSync(instance.env.sp));
-    test.ok(fs.existsSync(instance.env.sc));
 
     test.equal(fs.statSync(instance.env.cwd).uid, uid);
     test.equal(fs.statSync(instance.env.bwd).uid, uid);
     test.equal(fs.statSync(instance.env.awd).uid, uid);
     test.equal(fs.statSync(instance.env.sp).uid, uid);
-    test.equal(fs.statSync(instance.env.sc).uid, uid);
 
     test.equal(fs.statSync(instance.env.cwd).gid, gid);
     test.equal(fs.statSync(instance.env.bwd).gid, gid);
     test.equal(fs.statSync(instance.env.awd).gid, gid);
     test.equal(fs.statSync(instance.env.sp).gid, gid);
-    test.equal(fs.statSync(instance.env.sc).gid, gid);
 
     test.equal(mineos.server_list(BASE_DIR)[0], server_name);
     test.equal(mineos.server_list(BASE_DIR).length, 1);
@@ -127,7 +124,6 @@ test.delete_server = function(test) {
     test.ok(!fs.existsSync(instance.env.bwd));
     test.ok(!fs.existsSync(instance.env.awd));
     test.ok(!fs.existsSync(instance.env.sp));
-    test.ok(!fs.existsSync(instance.env.sc));
     test.done();
   })
 
@@ -152,7 +148,6 @@ test.mc_instance = function(test) {
   test.equal(instance.env.base_dir, BASE_DIR);
   test.equal(instance.server_name, server_name);
   test.equal(instance.env.sp, path.join(BASE_DIR, mineos.DIRS['servers'], server_name, 'server.properties'));
-  test.equal(instance.env.sc, path.join(BASE_DIR, mineos.DIRS['servers'], server_name, 'server.config'));
   test.done();
 }
 
@@ -244,7 +239,7 @@ test.backup = function(test) {
     var proc = event_reply.payload;
     proc.once('close', function(code) {
       setTimeout(function() {
-        test.equal(fs.readdirSync(instance.env.bwd).length, 3); //+ridd-backup-data
+        test.equal(fs.readdirSync(instance.env.bwd).length, 2); //+ridd-backup-data
         test.done();
       }, 200)
     })
@@ -267,7 +262,7 @@ test.restore = function(test) {
     var proc = event_reply.payload;
     proc.once('close', function(code) {
       setTimeout(function() {
-        test.equal(fs.readdirSync(instance.env.bwd).length, 3); //+rdiff-backup-data
+        test.equal(fs.readdirSync(instance.env.bwd).length, 2); //+rdiff-backup-data
         instance.ev.emit('commence-delete', true);
       }, 200)
     })
@@ -284,7 +279,7 @@ test.restore = function(test) {
     var proc = event_reply.payload;
     proc.once('close', function(code, signal) {
       setTimeout(function() {
-        test.equal(fs.readdirSync(instance.env.cwd).length, 2); //+rdiff-backup-data
+        test.equal(fs.readdirSync(instance.env.cwd).length, 1); //+rdiff-backup-data
         test.done();
       }, 200)
     })

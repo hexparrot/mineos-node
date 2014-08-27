@@ -86,8 +86,7 @@ mineos.mc = function(server_name, base_dir) {
     cwd: path.join(base_dir, mineos.DIRS['servers'], server_name),
     bwd: path.join(base_dir, mineos.DIRS['backup'], server_name),
     awd: path.join(base_dir, mineos.DIRS['archive'], server_name),
-    sp: path.join(base_dir, mineos.DIRS['servers'], server_name, 'server.properties'),
-    sc: path.join(base_dir, mineos.DIRS['servers'], server_name, 'server.config'),
+    sp: path.join(base_dir, mineos.DIRS['servers'], server_name, 'server.properties')
   }
 
   self.broadcast = function(action, success, start_time, payload) {
@@ -107,40 +106,27 @@ mineos.mc = function(server_name, base_dir) {
     });
   }
 
-  self.create_sp = function() {
-    fs.writeFile(self.env.sp, ini.encode(mineos.SP_DEFAULTS), {encoding: 'utf8', mode: 436}, function(err){
-      self.ev.emit('sp-created', true);
-    })
-  }
-
-  self.create_sc = function() {
-    fs.writeFile(self.env.sc, ini.encode(mineos.SP_DEFAULTS), {encoding: 'utf8', mode: 436}, function(err){
-      self.ev.emit('sc-created', true);
+  self.write_sp = function(config) {
+    var now = Date.now();
+    fs.writeFile(self.env.sp, ini.encode(config), {encoding: 'utf8', mode: 436}, function(err){
+      self.broadcast('sp-written', true, now, null);
     })
   }
 
   self.create = function() {
-    function new_sp(callback) {
-      self.ev.once('sp-created', function() { callback(); })
-      self.create_sp();
-    }
-
-    function new_sc(callback) {
-      self.ev.once('sc-created', function() { callback(); })
-      self.create_sc();
-    }
     var now = Date.now();
 
     async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.mkdirs, function(err) {
-      async.series([new_sp, new_sc], function(err) {
-        if (!err) {
-          var dest = [self.env.cwd, self.env.bwd, self.env.awd, self.env.sp, self.env.sc];
+      self.ev.once('sp-written', function(event_reply) {
+        if (event_reply.success) {
+          var dest = [self.env.cwd, self.env.bwd, self.env.awd, self.env.sp];
           for (var i=0; i < dest.length; i++) {
             fs.chown(dest[i], 1000, 1001);
           }
           self.broadcast('create', true, now, null);
         }
       })
+      self.write_sp(mineos.SP_DEFAULTS);
     })
   }
 
