@@ -1,4 +1,4 @@
-var auth = require('../mineos/yggdrasil');
+var auth = require('../yggdrasil');
 
 var test = exports;
 

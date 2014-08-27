@@ -1,6 +1,6 @@
 var fs = require('fs-extra');
 var path = require('path');
-var mineos = require('../mineos/mineos');
+var mineos = require('../mineos');
 var test = exports;
 var BASE_DIR = '/var/games/minecraft';
 
