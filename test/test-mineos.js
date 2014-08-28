@@ -296,15 +296,12 @@ test.sp = function(test) {
     test.ok(event_reply.success);
     test.equal(instance.sp()['server-port'], '25565');
 
-    instance.ev.once('sp-written', function(event_reply2) {
-      test.ok(event_reply2.success);
-      test.equal(instance.sp()['server-port'], '25570');
-      test.done();
+    instance._sp.modify('server-port', '25570', function(err) {
+      if (!err) {
+        test.equal(instance.sp()['server-port'], '25570');
+        test.done();
+      }
     })
-
-    var sp = instance.sp();
-    sp['server-port'] = '25570';
-    instance.write_sp(sp);
   })
   instance.create();
 }

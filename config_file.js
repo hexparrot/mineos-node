@@ -7,21 +7,17 @@ cf.config_file = function(file_path) {
   self.props = {};
   self.file_path = file_path;
 
-  self.write_ini = function(dict, callback) {
+  self.write = function(dict, callback) {
     self.props = dict;
     fs.writeFile(self.file_path, ini.stringify(self.props), 'utf8', function(err) {
-      if (!err)
-        callback(false);
-      callback(true);
+      callback(err);
     })
   }
 
   self.modify = function(property, value, callback) {
     self.props[property] = value;
-    self.write_ini(self.props, function(err) {
-      if (!err)
-        callback(false);
-      callback(true);
+    self.write(self.props, function(err) {
+      callback(err);
     })
   }
 
@@ -29,9 +25,8 @@ cf.config_file = function(file_path) {
     fs.readFile(file_path, 'utf8', function(err, data) {
       if (!err) {
         self.props = ini.parse(data);
-        callback(false);
       }
-      callback(true);
+      callback(err);
     })
   }
 }

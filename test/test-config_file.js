@@ -25,7 +25,7 @@ test.make_new_file = function(test) {
 
   test.expect(2);
 
-  config.write_ini(new_dict, function(err) {
+  config.write(new_dict, function(err) {
     if (!err) {
       var written_data = ini.parse(fs.readFileSync(file_path, 'utf8'));
       test.equal(written_data['level-name'], 'world');
@@ -42,7 +42,7 @@ test.change_property = function(test) {
 
   test.expect(2);
 
-  config.write_ini({'level-name':'world'}, function(err) {
+  config.write({'level-name':'world'}, function(err) {
     if (!err) {
       var written_data = ini.parse(fs.readFileSync(file_path, 'utf8'));
       test.equal(written_data['level-name'], 'world');

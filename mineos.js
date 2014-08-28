@@ -2,6 +2,7 @@ var fs = require('fs-extra');
 var path = require('path');
 var events = require('events');
 var async = require('async');
+var cf = require('./config_file');
 var child_process = require('child_process');
 var ini = require('ini');
 var mineos = exports;
@@ -89,6 +90,8 @@ mineos.mc = function(server_name, base_dir) {
     sp: path.join(base_dir, mineos.DIRS['servers'], server_name, 'server.properties')
   }
 
+  self._sp = new cf.config_file(self.env.sp);
+
   self.broadcast = function(action, success, start_time, payload) {
     self.ev.emit(action, {
       action: action,
@@ -107,30 +110,28 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.sp = function() {
-    return ini.parse(fs.readFileSync(self.env.sp, 'utf8'));
-  }
-
-  self.write_sp = function(config) {
-    var now = Date.now();
-    fs.writeFile(self.env.sp, ini.encode(config), {encoding: 'utf8', mode: 436}, function(err){
-      self.broadcast('sp-written', true, now, null);
-    })
+    if (!Object.keys(self._sp).length) {
+      self._sp.load(function(err) {
+        return self._sp.props;
+      })
+    } else {
+      return self._sp.props;
+    }
   }
 
   self.create = function() {
     var now = Date.now();
 
     async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.mkdirs, function(err) {
-      self.ev.once('sp-written', function(event_reply) {
-        if (event_reply.success) {
+      self._sp.write(mineos.SP_DEFAULTS, function(err) {
+        if (!err) {
           var dest = [self.env.cwd, self.env.bwd, self.env.awd, self.env.sp];
           for (var i=0; i < dest.length; i++) {
             fs.chown(dest[i], 1000, 1001);
           }
           self.broadcast('create', true, now, null);
         }
-      })
-      self.write_sp(mineos.SP_DEFAULTS);
+      });
     })
   }
 
