@@ -3,8 +3,8 @@ var path = require('path');
 var async = require('async');
 var mineos = require('../mineos');
 var test = exports;
-var BASE_DIR = '/var/games/minecraft';
 
+var BASE_DIR = '/var/games/minecraft';
 var FS_DELAY_MS = 200;
 
 test.tearDown = function(callback) {
@@ -342,17 +342,4 @@ test.sp = function(test) {
   ], function(err, results) {
     test.done();
   })
-
-  /*instance.create(function(did_create) {
-    test.ok(did_create);
-    instance.sp(function(props) {
-      test.equal(instance.sp()['server-port'], '25565');
-      instance._sp.modify('server-port', '25570', function(err) {
-        if (!err) {
-          test.equal(instance.sp()['server-port'], '25570');
-          test.done();
-        }
-      })
-    })
-  })*/
 }
