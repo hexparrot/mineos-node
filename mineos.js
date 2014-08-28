@@ -92,36 +92,23 @@ mineos.mc = function(server_name, base_dir) {
 
   self._sp = new cf.config_file(self.env.sp);
 
-  self.broadcast = function(action, success, start_time, payload) {
-    self.ev.emit(action, {
-      action: action,
-      success: success,
-      time_start: start_time,
-      time_end: Date.now(),
-      payload: payload
-    });
-  }
-
-  self.is_server = function() {
-    var now = Date.now();
+  self.is_server = function(callback) {
     fs.exists(self.env.sp, function(exists) {
-      self.broadcast('is_server', exists, now, null);
+      callback(exists);
     });
   }
 
-  self.sp = function() {
-    if (!Object.keys(self._sp).length) {
+  self.sp = function(callback) {
+    if (!Object.keys(self._sp.props).length) {
       self._sp.load(function(err) {
-        return self._sp.props;
+        callback(self._sp.props);
       })
     } else {
-      return self._sp.props;
+      callback(self._sp.props);
     }
   }
 
-  self.create = function() {
-    var now = Date.now();
-
+  self.create = function(callback) {
     async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.mkdirs, function(err) {
       self._sp.write(mineos.SP_DEFAULTS, function(err) {
         if (!err) {
@@ -129,21 +116,19 @@ mineos.mc = function(server_name, base_dir) {
           for (var i=0; i < dest.length; i++) {
             fs.chown(dest[i], 1000, 1001);
           }
-          self.broadcast('create', true, now, null);
+          callback(true);
         }
       });
     })
   }
 
-  self.delete = function() {
-    var now = Date.now();
+  self.delete = function(callback) {
     async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.remove, function(err) {
-      self.broadcast('delete', true, now, null);
+      callback(true);
     });
   }
 
-  self.start = function() {
-    var now = Date.now();
+  self.start = function(callback) {
     var binary = '/usr/bin/screen';
     var args = ['-dmS', 'mc-{0}'.format(self.server_name), 
                 '/usr/bin/java', '-server', '-Xmx256M', '-Xms256M',
@@ -156,14 +141,16 @@ mineos.mc = function(server_name, base_dir) {
 
     fs.copy('/var/games/minecraft/profiles/vanilla179/minecraft_server.1.7.9.jar',
             path.join(self.env.cwd, 'minecraft_server.jar'), function(err) {
-              self.broadcast('start', true, now, child_process.spawn(binary, args, params));
+              if (!err)
+                callback(true, child_process.spawn(binary, args, params));
+              else
+                callback(false, null);
             });
   }
 
-  self.kill = function() {
-    var now = Date.now();
+  self.kill = function(callback) {
     process.kill(mineos.server_pids_up()[self.server_name].java);
-    self.broadcast('kill', true, now, null);
+    callback(true);
   }
 
   self.stuff = function(msg) {
@@ -178,10 +165,8 @@ mineos.mc = function(server_name, base_dir) {
                                params);
   }
 
-  self.archive = function() {
+  self.archive = function(callback) {
     var strftime = require('strftime');
-    var now = Date.now();
-
     var binary = '/bin/tar';
     var filename = 'server-{0}_{1}.tgz'.format(self.server_name, strftime('%Y-%m-%d_%H:%M:%S'));
     var args = ['czf', path.join(self.env.awd, filename), self.env.cwd];
@@ -191,12 +176,10 @@ mineos.mc = function(server_name, base_dir) {
       gid: 1001
     }
 
-    self.broadcast('archive', true, now, child_process.spawn(binary, args, params));
+    callback(true, child_process.spawn(binary, args, params));
   }
 
-  self.backup = function() {
-    var now = Date.now();
-
+  self.backup = function(callback) {
     var binary = '/usr/bin/rdiff-backup';
     var args = ['{0}/'.format(self.env.cwd), self.env.bwd];
     var params = {
@@ -205,19 +188,17 @@ mineos.mc = function(server_name, base_dir) {
       gid: 1001
     }
 
-    self.broadcast('backup', true, now, child_process.spawn(binary, args, params));
+    callback(true, child_process.spawn(binary, args, params));
   }
 
-  self.restore = function(step) {
-    var now = Date.now();
-
+  self.restore = function(step, callback) {
     var binary = '/usr/bin/rdiff-backup';
     var args = ['--restore-as-of', step, self.env.bwd, self.env.cwd];
     var params = {
       cwd: self.env.bwd
     }
 
-    self.broadcast('restore', true, now, child_process.spawn(binary, args, params));
+    callback(true, child_process.spawn(binary, args, params));
   }
 
   return self;
