@@ -1,8 +1,11 @@
 var fs = require('fs-extra');
 var path = require('path');
+var async = require('async');
 var mineos = require('../mineos');
 var test = exports;
 var BASE_DIR = '/var/games/minecraft';
+
+var FS_DELAY_MS = 200;
 
 test.tearDown = function(callback) {
   var server_list = new mineos.server_list(BASE_DIR);
@@ -43,15 +46,27 @@ test.is_server = function(test) {
   //tests if sp exists
   var instance = new mineos.mc('testing', BASE_DIR);
 
-  instance.is_server(function(bool_one) {
-    test.ok(!bool_one);
-    instance.create(function(bool_two) {
-      test.ok(bool_two);
-      instance.is_server(function(bool_three) {
-        test.ok(bool_three);
-        test.done();
+  async.series([
+    function(callback) {
+      instance.is_server(function(is_server) {
+        test.ok(!is_server);
+        callback(null);
       })
-    })
+    },
+    function(callback) {
+      instance.create(function(did_create) {
+        test.ok(did_create);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.is_server(function(is_server) {
+        test.ok(is_server);
+        callback(null);
+      })
+    }
+  ], function(err, results) {
+    test.done();
   })
 }
 
@@ -63,25 +78,32 @@ test.create_server = function(test) {
 
   test.equal(mineos.server_list(BASE_DIR).length, 0);
 
-  instance.create(function(did_create) {
-    test.ok(did_create);
-    test.ok(fs.existsSync(instance.env.cwd));
-    test.ok(fs.existsSync(instance.env.bwd));
-    test.ok(fs.existsSync(instance.env.awd));
-    test.ok(fs.existsSync(instance.env.sp));
+  async.series([
+    function(callback) {
+      instance.create(function(did_create){
+        test.ok(did_create);
 
-    test.equal(fs.statSync(instance.env.cwd).uid, uid);
-    test.equal(fs.statSync(instance.env.bwd).uid, uid);
-    test.equal(fs.statSync(instance.env.awd).uid, uid);
-    test.equal(fs.statSync(instance.env.sp).uid, uid);
+        test.ok(fs.existsSync(instance.env.cwd));
+        test.ok(fs.existsSync(instance.env.bwd));
+        test.ok(fs.existsSync(instance.env.awd));
+        test.ok(fs.existsSync(instance.env.sp));
 
-    test.equal(fs.statSync(instance.env.cwd).gid, gid);
-    test.equal(fs.statSync(instance.env.bwd).gid, gid);
-    test.equal(fs.statSync(instance.env.awd).gid, gid);
-    test.equal(fs.statSync(instance.env.sp).gid, gid);
+        test.equal(fs.statSync(instance.env.cwd).uid, uid);
+        test.equal(fs.statSync(instance.env.bwd).uid, uid);
+        test.equal(fs.statSync(instance.env.awd).uid, uid);
+        test.equal(fs.statSync(instance.env.sp).uid, uid);
 
-    test.equal(mineos.server_list(BASE_DIR)[0], server_name);
-    test.equal(mineos.server_list(BASE_DIR).length, 1);
+        test.equal(fs.statSync(instance.env.cwd).gid, gid);
+        test.equal(fs.statSync(instance.env.bwd).gid, gid);
+        test.equal(fs.statSync(instance.env.awd).gid, gid);
+        test.equal(fs.statSync(instance.env.sp).gid, gid);
+
+        test.equal(mineos.server_list(BASE_DIR)[0], server_name);
+        test.equal(mineos.server_list(BASE_DIR).length, 1);
+        callback(null);
+      })
+    }
+  ], function(err, results) {
     test.done();
   })
 }
@@ -90,16 +112,33 @@ test.delete_server = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
-  instance.create(function(did_create) {
-    test.ok(did_create);
-    instance.delete(function(did_delete) {
-      test.ok(did_delete);
-      test.ok(!fs.existsSync(instance.env.cwd));
-      test.ok(!fs.existsSync(instance.env.bwd));
-      test.ok(!fs.existsSync(instance.env.awd));
-      test.ok(!fs.existsSync(instance.env.sp));
-      test.done();
-    })
+  async.series([
+    function(callback) {
+      instance.create(function(did_create) {
+        test.ok(did_create);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.is_server(function(is_server) {
+        test.ok(is_server);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.delete(function(did_delete) {
+        test.ok(did_delete);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.is_server(function(is_server) {
+        test.ok(!is_server);
+        callback(null);
+      })
+    }
+  ], function(err, results) {
+    test.done();
   })
 }
 
@@ -138,25 +177,36 @@ test.start = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
-  instance.create(function(did_create) {
-    test.ok(did_create);
-
-    instance.start(function(did_start, proc) {
-      test.ok(did_start);
-      proc.once('close', function(code) {
-        setTimeout(function() {
-          var servers = mineos.server_pids_up();
-          for (var key in servers) {
-            test.ok(servers[key].hasOwnProperty('screen'));
-            test.ok(servers[key].hasOwnProperty('java'));
-          }
-          instance.kill(function(did_kill) {
-            test.ok(did_kill);
-            test.done();
-          });
-        }, 200)
+  async.series([
+    function(callback) {
+      instance.create(function(did_create) {
+        test.ok(did_create);
+        callback(null);
       })
-    })
+    },
+    function(callback) {
+      instance.start(function(did_start, proc) {
+        test.ok(did_start);
+        proc.once('close', function(code) {
+
+        })
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.delete(function(did_delete) {
+        test.ok(did_delete);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.is_server(function(is_server) {
+        test.ok(!is_server);
+        callback(null);
+      })
+    }
+  ], function(err, results) {
+    test.done();
   })
 }
 
@@ -164,17 +214,27 @@ test.archive = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
-  instance.create(function(did_create) {
-    test.ok(did_create);
-    instance.archive(function(did_archive, proc) {
-      test.ok(did_archive);
-      proc.once('close', function(code) {
-        setTimeout(function() {
-          test.equal(fs.readdirSync(instance.env.awd).length, 1);
-          test.done();
-        }, 200)
+  async.series([
+    function(callback) {
+      instance.create(function(did_create) {
+        test.ok(did_create);
+        callback(null);
       })
-    })
+    },
+    function(callback) {
+      instance.archive(function(did_archve, proc) {
+        test.ok(did_archve);
+        proc.once('close', function(code) {
+          setTimeout(function() {
+            test.equal(fs.readdirSync(instance.env.awd).length, 1);
+            callback(null);
+          }, FS_DELAY_MS)
+        })
+        
+      })
+    }
+  ], function(err, results) {
+    test.done();
   })
 }
 
@@ -182,45 +242,71 @@ test.backup = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
-  instance.create(function(did_create) {
-    instance.backup(function(did_backup, proc) {
-      test.ok(did_backup);
-      proc.once('close', function(code) {
-        setTimeout(function() {
-          test.equal(fs.readdirSync(instance.env.bwd).length, 2); //+ridd-backup-data
-          test.done();
-        }, 200)
+  async.series([
+    function(callback) {
+      instance.create(function(did_create) {
+        test.ok(did_create);
+        callback(null);
       })
-    })
+    },
+    function(callback) {
+      instance.backup(function(did_backup, proc) {
+        test.ok(did_backup);
+        proc.once('close', function(code) {
+          setTimeout(function() {
+            test.equal(fs.readdirSync(instance.env.bwd).length, 2);
+            callback(null);
+          }, FS_DELAY_MS)
+        })
+      })
+    }
+  ], function(err, results) {
+    test.done();
   })
 }
 
-/*
 test.restore = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
-  instance.create(function(did_create) {
-    instance.backup(function(did_backup, proc) {
-      test.ok(did_backup);
-      proc.once('close', function(code) {
-        setTimeout(function() {
-          test.equal(fs.readdirSync(instance.env.bwd).length, 2); //+ridd-backup-data
-          instance.delete(function(did_delete) {
-            test.ok(did_delete);
-            instance.restore(function(did_restore, proc2) {
-              test.ok(did_restore);
-              proc2.once('close', function(code2, signal2) {
-                setTimeout(function() {
-                  test.equal(fs.readdirSync(instance.env.cwd).length, 1); //+rdiff-backup-data
-                  test.done();
-                }, 200)
-              })
-            })
-          })
-        }, 200)
+  async.series([
+    function(callback) {
+      instance.create(function(did_create) {
+        test.ok(did_create);
+        callback(null);
       })
-    })
+    },
+    function(callback) {
+      instance.backup(function(did_backup, proc) {
+        test.ok(did_backup);
+        proc.once('close', function(code) {
+          setTimeout(function() {
+            test.equal(fs.readdirSync(instance.env.bwd).length, 2);
+            callback(null);
+          }, FS_DELAY_MS)
+        })
+      })
+    },
+    function(callback) {
+      fs.removeSync(instance.env.cwd);
+      instance.is_server(function(is_server) {
+        test.ok(!is_server);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.restore('now', function(did_restore, proc) {
+        test.ok(did_restore);
+        proc.once('close', function(code) {
+          setTimeout(function() {
+            test.equal(fs.readdirSync(instance.env.cwd).length, 1);
+            callback(null);
+          }, FS_DELAY_MS)
+        })
+      })
+    }
+  ], function(err, results) {
+    test.done();
   })
 }
 
@@ -228,7 +314,36 @@ test.sp = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
-  instance.create(function(did_create) {
+  async.series([
+    function(callback) {
+      instance.create(function(did_create) {
+        test.ok(did_create);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.sp(function(dict) {
+        test.equal(dict['server-port'], '25565');
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance._sp.modify('server-port', '25570', function(err) {
+        test.ok(!err);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.sp(function(dict) {
+        test.equal(dict['server-port'], '25570');
+        callback(null);
+      })
+    }
+  ], function(err, results) {
+    test.done();
+  })
+
+  /*instance.create(function(did_create) {
     test.ok(did_create);
     instance.sp(function(props) {
       test.equal(instance.sp()['server-port'], '25565');
@@ -239,6 +354,5 @@ test.sp = function(test) {
         }
       })
     })
-  })
+  })*/
 }
-*/
