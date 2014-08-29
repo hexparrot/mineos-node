@@ -50,6 +50,34 @@ server.backend = function(socket_emitter) {
         self.front_end.emit('server.properties', sp_data);
       })
     })
+
+    socket.on('create', function(server_name) {
+      var instance = new mineos.mc(server_name, BASE_DIR);
+      instance.create(function(did_create) {
+        if (did_create){
+          console.log('Server created: {0}'.format(server_name));
+        }
+      })
+    })
+
+    socket.on('start', function(server_name) {
+      self.servers[server_name].start(function(did_start) {
+        if (did_start){
+          console.log('Server started: {0}'.format(server_name));
+        }
+      })
+    })
+
+    socket.on('stuff', function(server_name, msg) {
+      self.servers[server_name].stuff(msg, function(did_stuff, proc) {
+        if (did_stuff){
+          console.log('Server {0} sent command: {1}'.format(server_name, msg));
+        } else {
+          console.log('Ignored attempt to send "{0}" to {1}'.format(msg, server_name));
+        }
+      })
+    })
+
   })
 
   self.watcher_server_list = chokidar.watch(path.join(BASE_DIR, mineos.DIRS['servers']),
