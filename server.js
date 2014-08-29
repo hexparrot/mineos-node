@@ -24,23 +24,24 @@ server.backend = function(socket_emitter) {
   self.front_end = socket_emitter || new events.EventEmitter();
 
   self.front_end.on('connection', function(socket) {
-    console.log('user connected');
+    console.log('User connected');
     self.front_end.emit('server_list', Object.keys(self.servers));
 
-    socket.on('stream_log', function(info) {
-      var room = '{0}_{1}'.format(info.server_name, info.file_path);
+    socket.on('start_tail', function(server_name, fp) {
+      var file_path = path.join(self.servers[server_name].env.cwd, fp);
+      var room = path.join(server_name, fp);
       socket.join(room);
 
-      console.log('connecting, watching')
-      var ft = new tail(info.file_path);
+      console.log('Creating tail "{0}" on {1}'.format(room, file_path));
+      var ft = new tail(file_path);
 
       ft.on("line", function(data) {
-        self.front_end.in(room).emit('file_stream', data);
+        self.front_end.in(room).emit('tail_data', data);
       })
       
       socket.on('disconnect', function() {
         ft.unwatch();
-        console.log('disconnecting, unwatching')
+        console.log('Dropping tail: {0}'.format(room));
       })
     })
   })
@@ -59,7 +60,7 @@ server.backend = function(socket_emitter) {
     throwaway.is_server(function(is_server) {
       if (is_server) {
         self.servers[server_name] = throwaway;
-        console.log('tracking', server_name);
+        console.log('Discovered server: {0}'.format(server_name));
         self.front_end.emit('server_list', Object.keys(self.servers));
       }
     })
@@ -73,7 +74,7 @@ server.backend = function(socket_emitter) {
     }
 
     delete self.servers[server_name];
-    console.log('untracking', server_name);
+    console.log('Server removed: {0}'.format(server_name));
     self.front_end.emit('server_list', Object.keys(self.servers));
   })
 
