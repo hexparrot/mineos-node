@@ -90,14 +90,16 @@ server.backend = function(socket_emitter) {
       return;
     }
 
-    var instance = new mineos.mc(server_name, BASE_DIR);
-    instance.is_server(function(is_server) {
-      if (is_server) {
-        self.servers[server_name] = instance;
-        console.log('Discovered server: {0}'.format(server_name));
-        self.front_end.emit('server_list', Object.keys(self.servers));
-      }
-    })
+    if (server_name == path.basename(path.dirname(newpath))) {
+      var instance = new mineos.mc(server_name, BASE_DIR);
+      instance.is_server(function(is_server) {
+        if (is_server) {
+          self.servers[server_name] = instance;
+          console.log('Discovered server: {0}'.format(server_name));
+          self.front_end.emit('server_list', Object.keys(self.servers));
+        }
+      })
+    }
   })
 
   self.watcher_server_list.on('unlinkDir', function(newpath) {
