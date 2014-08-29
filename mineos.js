@@ -159,10 +159,16 @@ mineos.mc = function(server_name, base_dir) {
       uid: 1000,
       gid: 1001
     }
-    callback(true, child_process.spawn('/usr/bin/screen', 
-                   ['-S', 'mc-{0}'.format(self.server_name), 
-                    '-p', '0', '-X', 'eval', 'stuff "{0}\012"'.format(msg)], 
-                   params));
+
+    self.property('up', function(up) {
+      if (up)
+        callback(true, child_process.spawn('/usr/bin/screen', 
+                       ['-S', 'mc-{0}'.format(self.server_name), 
+                        '-p', '0', '-X', 'eval', 'stuff "{0}\012"'.format(msg)], 
+                       params));
+      else
+        callback(false, null);
+    })
   }
 
   self.archive = function(callback) {

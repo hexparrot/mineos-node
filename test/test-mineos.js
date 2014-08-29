@@ -179,6 +179,12 @@ test.start = function(test) {
 
   async.series([
     function(callback) {
+      instance.stuff('stop', function(did_stuff, proc) {
+        test.ok(!did_stuff);
+        callback(null);
+      })
+    },
+    function(callback) {
       instance.create(function(did_create) {
         test.ok(did_create);
         callback(null);
