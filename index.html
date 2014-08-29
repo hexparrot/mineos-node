@@ -37,12 +37,20 @@
         })
       })
 
+      socket.on('server.properties', function(data) {
+        $('#sp').empty();
+        $.each(data, function(k,v) {
+          $('#sp').append($('<li>').text('{0}:{1}'.format(k,v)));
+        })
+      })
+
       socket.on('tail_data', function(msg) {
         console.log(msg)
         $('#log_latest').append($('<li>').text(msg));
       })
 
       /*socket.emit('start_tail', 'a', '/logs/latest.log')*/
+      /*socket.emit('server_overview', 'a')*/
     </script>
   </body>
 </html>

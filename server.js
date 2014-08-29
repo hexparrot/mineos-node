@@ -44,6 +44,12 @@ server.backend = function(socket_emitter) {
         console.log('Dropping tail: {0}'.format(room));
       })
     })
+
+    socket.on('server_overview', function(server_name) {
+      self.servers[server_name].sp(function(sp_data) {
+        self.front_end.emit('server.properties', sp_data);
+      })
+    })
   })
 
   self.watcher_server_list = chokidar.watch(path.join(BASE_DIR, mineos.DIRS['servers']),
