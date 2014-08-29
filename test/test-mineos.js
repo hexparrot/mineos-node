@@ -188,8 +188,21 @@ test.start = function(test) {
       instance.start(function(did_start, proc) {
         test.ok(did_start);
         proc.once('close', function(code) {
-
+          callback(null);
         })
+      })
+    },
+    function(callback) {
+      instance.property('screen_pid', function(pid) {
+        test.equal(typeof(pid), 'number');
+        test.ok(pid > 0);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('java_pid', function(pid) {
+        test.equal(typeof(pid), 'number');
+        test.ok(pid > 0);
         callback(null);
       })
     },
