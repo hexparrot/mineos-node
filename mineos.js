@@ -153,16 +153,22 @@ mineos.mc = function(server_name, base_dir) {
     callback(true);
   }
 
-  self.stuff = function(msg) {
+  self.stuff = function(msg, callback) {
     var params = {
       cwd: self.env.cwd,
       uid: 1000,
       gid: 1001
     }
-    return child_process.spawn('/usr/bin/screen', 
-                               ['-S', 'mc-{0}'.format(self.server_name), 
-                                '-p', '0', '-X', 'eval', 'stuff "{0}\012"'.format(msg)], 
-                               params);
+
+    self.property('up', function(up) {
+      if (up)
+        callback(true, child_process.spawn('/usr/bin/screen', 
+                       ['-S', 'mc-{0}'.format(self.server_name), 
+                        '-p', '0', '-X', 'eval', 'stuff "{0}\012"'.format(msg)], 
+                       params));
+      else
+        callback(false, null);
+    })
   }
 
   self.archive = function(callback) {
@@ -199,6 +205,37 @@ mineos.mc = function(server_name, base_dir) {
     }
 
     callback(true, child_process.spawn(binary, args, params));
+  }
+
+  self.property = function(property, callback) {
+    switch(property) {
+      case 'up':
+        var pids = mineos.server_pids_up();
+        callback(self.server_name in pids);
+        break;
+      case 'java_pid':
+        var pids = mineos.server_pids_up();
+        callback(pids[self.server_name]['java']);
+        break;
+      case 'screen_pid':
+        var pids = mineos.server_pids_up();
+        callback(pids[self.server_name]['screen']);
+        break;
+      case 'server-port':
+        var sp = self.sp(function(dict) {
+          callback(dict['server-port']);
+        })
+        break;
+      case 'server-ip':
+        var sp = self.sp(function(dict) {
+          callback(dict['server-ip']);
+        })
+        break;
+      case 'memory':
+        break;
+      case 'ping':
+        break;
+    }
   }
 
   return self;

@@ -179,6 +179,12 @@ test.start = function(test) {
 
   async.series([
     function(callback) {
+      instance.stuff('stop', function(did_stuff, proc) {
+        test.ok(!did_stuff);
+        callback(null);
+      })
+    },
+    function(callback) {
       instance.create(function(did_create) {
         test.ok(did_create);
         callback(null);
@@ -188,9 +194,30 @@ test.start = function(test) {
       instance.start(function(did_start, proc) {
         test.ok(did_start);
         proc.once('close', function(code) {
-
+          callback(null);
         })
+      })
+    },
+    function(callback) {
+      instance.property('screen_pid', function(pid) {
+        test.equal(typeof(pid), 'number');
+        test.ok(pid > 0);
         callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('java_pid', function(pid) {
+        test.equal(typeof(pid), 'number');
+        test.ok(pid > 0);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.stuff('stop', function(did_stuff, proc) {
+        proc.once('close', function(code) {
+          test.ok(did_stuff);
+          callback(null);
+        })
       })
     },
     function(callback) {
@@ -336,6 +363,40 @@ test.sp = function(test) {
     function(callback) {
       instance.sp(function(dict) {
         test.equal(dict['server-port'], '25570');
+        callback(null);
+      })
+    }
+  ], function(err, results) {
+    test.done();
+  })
+}
+
+test.properties = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    function(callback) {
+      instance.create(function(did_create) {
+        test.ok(did_create);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('up', function(up) {
+        test.equal(up, false);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('server-port', function(port) {
+        test.equal(port, '25565');
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('server-ip', function(ip) {
+        test.equal(ip, '0.0.0.0');
         callback(null);
       })
     }
