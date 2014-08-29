@@ -20,8 +20,8 @@
     <h1>mineos</h1>
     <h2>server list</h2>
     <ul id="servers"></ul>
-    <h2>debug console</h2>
-    <ul id="debug"></ul>
+    <h2>log.latest</h2>
+    <ul id="log_latest"></ul>
     <h2>server.properties</h2>
     <ul id="sp"></ul>
     <script src="/socket.io/socket.io.js"></script>
@@ -37,8 +37,9 @@
         })
       })
 
-      socket.on('debug', function(msg) {
-        $('#debug').append($('<li>').text(msg));
+      socket.on('file_stream', function(msg) {
+        console.log(msg)
+        $('#log_latest').append($('<li>').text(msg));
       })
     </script>
   </body>

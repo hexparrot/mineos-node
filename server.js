@@ -5,6 +5,7 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var events = require('events');
+var tail = require('tail').Tail;
 var server = exports;
 var BASE_DIR = '/var/games/minecraft';
 
@@ -19,14 +20,28 @@ server.extract_server_name = function(path) {
 server.backend = function(socket_emitter) {
   var self = this;
   self.servers = {};
+  self.watched_files = {};
   self.front_end = socket_emitter || new events.EventEmitter();
 
   self.front_end.on('connection', function(socket) {
     console.log('user connected');
     self.front_end.emit('server_list', Object.keys(self.servers));
 
-    socket.on('chat', function(msg) {
-      console.log('CHAT:', msg);
+    socket.on('stream_log', function(info) {
+      var room = '{0}_{1}'.format(info.server_name, info.file_path);
+      socket.join(room);
+
+      console.log('connecting, watching')
+      var ft = new tail(info.file_path);
+
+      ft.on("line", function(data) {
+        self.front_end.in(room).emit('file_stream', data);
+      })
+      
+      socket.on('disconnect', function() {
+        ft.unwatch();
+        console.log('disconnecting, unwatching')
+      })
     })
   })
 
@@ -75,3 +90,11 @@ app.get('/', function(req, res){
 http.listen(3000, function(){
   console.log('listening on *:3000');
 });
+
+String.prototype.format = function() {
+  var s = this;
+  for(var i = 0, iL = arguments.length; i<iL; i++) {
+    s = s.replace(new RegExp('\\{'+i+'\\}', 'gm'), arguments[i]);
+  }
+  return s;
+};
