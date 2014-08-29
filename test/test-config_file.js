@@ -15,21 +15,21 @@ test.load_absent_file = function(test) {
     test.ok(err);
     test.done();
   })
-  
 }
 
-test.make_new_file = function(test) {
+test.write = function(test) {
   var file_path = 'new.file';
   var config = new cf.config_file(file_path);
   var new_dict = {'level-name':'world'};
 
-  test.expect(2);
+  test.expect(3);
 
   config.write(new_dict, function(err) {
+    test.equal(new_dict === config.props, false);
     if (!err) {
       var written_data = ini.parse(fs.readFileSync(file_path, 'utf8'));
       test.equal(written_data['level-name'], 'world');
-      test.equal(config.props, new_dict);
+      test.equal(config.props['level-name'], new_dict['level-name']);
       fs.removeSync(file_path);
       test.done();
     }

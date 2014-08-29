@@ -201,6 +201,37 @@ mineos.mc = function(server_name, base_dir) {
     callback(true, child_process.spawn(binary, args, params));
   }
 
+  self.property = function(property, callback) {
+    switch(property) {
+      case 'up':
+        var pids = mineos.server_pids_up();
+        callback(self.server_name in pids);
+        break;
+      case 'java_pid':
+        var pids = mineos.server_pids_up();
+        callback(pids[self.server_name]['java']);
+        break;
+      case 'screen_pid':
+        var pids = mineos.server_pids_up();
+        callback(pids[self.server_name]['screen']);
+        break;
+      case 'server-port':
+        var sp = self.sp(function(dict) {
+          callback(dict['server-port']);
+        })
+        break;
+      case 'server-ip':
+        var sp = self.sp(function(dict) {
+          callback(dict['server-ip']);
+        })
+        break;
+      case 'memory':
+        break;
+      case 'ping':
+        break;
+    }
+  }
+
   return self;
 }
 

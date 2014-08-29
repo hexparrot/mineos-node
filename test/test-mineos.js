@@ -343,3 +343,37 @@ test.sp = function(test) {
     test.done();
   })
 }
+
+test.properties = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    function(callback) {
+      instance.create(function(did_create) {
+        test.ok(did_create);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('up', function(up) {
+        test.equal(up, false);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('server-port', function(port) {
+        test.equal(port, '25565');
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('server-ip', function(ip) {
+        test.equal(ip, '0.0.0.0');
+        callback(null);
+      })
+    }
+  ], function(err, results) {
+    test.done();
+  })
+}

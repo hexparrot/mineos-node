@@ -8,7 +8,11 @@ cf.config_file = function(file_path) {
   self.file_path = file_path;
 
   self.write = function(dict, callback) {
-    self.props = dict;
+    var new_dict = {};
+    for (var key in dict)
+      new_dict[key] = dict[key];
+    
+    self.props = new_dict;
     fs.writeFile(self.file_path, ini.stringify(self.props), 'utf8', function(err) {
       callback(err);
     })
