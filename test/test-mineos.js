@@ -207,6 +207,14 @@ test.start = function(test) {
       })
     },
     function(callback) {
+      instance.stuff('stop', function(did_stuff, proc) {
+        proc.once('close', function(code) {
+          test.ok(did_stuff);
+          callback(null);
+        })
+      })
+    },
+    function(callback) {
       instance.delete(function(did_delete) {
         test.ok(did_delete);
         callback(null);
