@@ -9,9 +9,10 @@ var tail = require('tail').Tail;
 var server = exports;
 var BASE_DIR = '/var/games/minecraft';
 
-server.extract_server_name = function(path) {
+server.extract_server_name = function(server_path) {
+  var re = new RegExp('{0}/([a-zA-Z0-9_\.]+)'.format(path.join(BASE_DIR, mineos.DIRS['servers'])));
   try {
-    return path.match(/\/servers\/(?!\.)([a-zA-Z0-9_\.]+)/)[1];
+    return re.exec(server_path)[1];
   } catch(e) {
     throw new Error('no server name in path');
   }
@@ -93,6 +94,7 @@ server.backend = function(socket_emitter) {
     if (server_name == path.basename(path.dirname(newpath))) {
       var instance = new mineos.mc(server_name, BASE_DIR);
       instance.is_server(function(is_server) {
+
         if (is_server) {
           self.servers[server_name] = instance;
           console.log('Discovered server: {0}'.format(server_name));
@@ -117,7 +119,8 @@ server.backend = function(socket_emitter) {
   return self;
 }
 
-var be = server.backend(io);
+//var be = server.backend(io);
+/*var be = server.backend(null);
 var response_options = {root: '/home/mc'};
 
 app.get('/', function(req, res){
@@ -126,7 +129,7 @@ app.get('/', function(req, res){
 
 http.listen(3000, function(){
   console.log('listening on *:3000');
-});
+});*/
 
 String.prototype.format = function() {
   var s = this;

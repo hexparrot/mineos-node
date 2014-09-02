@@ -19,14 +19,8 @@ test.start_backend = function(test) {
   var events = require('events');
   var be = server.backend();
 
-  test.expect(3);
-
   test.ok(be.servers instanceof Object);
   test.ok(be.front_end instanceof events.EventEmitter);
-
-  be.front_end.on('tracking', function(server_name) {
-    test.ok(true);
-  })
 
   var throwaway = new mineos.mc('testing', BASE_DIR);
 
@@ -42,7 +36,8 @@ test.start_backend = function(test) {
     },
     function(callback) {
       throwaway.delete(function(did_delete) {
-        callback(null);
+        if (did_delete)
+          callback(null);
       })
     }
   ], function(err, results) {
