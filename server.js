@@ -21,7 +21,7 @@ server.backend = function(base_dir, socket_emitter) {
   self.front_end = socket_emitter || new events.EventEmitter();
 
   self.front_end.on('connection', function(socket) {
-    console.log('User connected');
+    console.info('User connected');
     self.front_end.emit('server_list', Object.keys(self.servers));
 
     socket.on('start_tail', function(server_name, fp) {
@@ -29,7 +29,7 @@ server.backend = function(base_dir, socket_emitter) {
       var room = path.join(server_name, fp);
       socket.join(room);
 
-      console.log('Creating tail "{0}" on {1}'.format(room, file_path));
+      console.info('Creating tail "{0}" on {1}'.format(room, file_path));
       var ft = new tail(file_path);
 
       ft.on("line", function(data) {
@@ -38,7 +38,7 @@ server.backend = function(base_dir, socket_emitter) {
       
       socket.on('disconnect', function() {
         ft.unwatch();
-        console.log('Dropping tail: {0}'.format(room));
+        console.info('Dropping tail: {0}'.format(room));
       })
     })
 
@@ -52,7 +52,7 @@ server.backend = function(base_dir, socket_emitter) {
       var instance = new mineos.mc(server_name, BASE_DIR);
       instance.create(function(did_create) {
         if (did_create){
-          console.log('Server created: {0}'.format(server_name));
+          console.info('Server created: {0}'.format(server_name));
         }
       })
     })
@@ -60,7 +60,7 @@ server.backend = function(base_dir, socket_emitter) {
     socket.on('start', function(server_name) {
       self.servers[server_name].start(function(did_start) {
         if (did_start){
-          console.log('Server started: {0}'.format(server_name));
+          console.info('Server started: {0}'.format(server_name));
         }
       })
     })
@@ -68,9 +68,9 @@ server.backend = function(base_dir, socket_emitter) {
     socket.on('stuff', function(server_name, msg) {
       self.servers[server_name].stuff(msg, function(did_stuff, proc) {
         if (did_stuff){
-          console.log('Server {0} sent command: {1}'.format(server_name, msg));
+          console.info('Server {0} sent command: {1}'.format(server_name, msg));
         } else {
-          console.log('Ignored attempt to send "{0}" to {1}'.format(msg, server_name));
+          console.warn('Ignored attempt to send "{0}" to {1}'.format(msg, server_name));
         }
       })
     })
@@ -93,7 +93,7 @@ server.backend = function(base_dir, socket_emitter) {
 
         if (is_server) {
           self.servers[server_name] = instance;
-          console.log('Discovered server: {0}'.format(server_name));
+          console.info('Discovered server: {0}'.format(server_name));
           self.front_end.emit('server_list', Object.keys(self.servers));
         }
       })
@@ -108,7 +108,7 @@ server.backend = function(base_dir, socket_emitter) {
     }
 
     delete self.servers[server_name];
-    console.log('Server removed: {0}'.format(server_name));
+    console.info('Server removed: {0}'.format(server_name));
     self.front_end.emit('server_list', Object.keys(self.servers));
   })
 
