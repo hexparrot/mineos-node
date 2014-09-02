@@ -27,33 +27,38 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
-      var socket = io();
+      var global = io();
+      var channel = {};
       
-      socket.on('server_list', function(servers) {
+      global.on('server_list', function(servers) {
         console.log(servers);
         $('#servers').empty();
-        $.each(servers, function(i,v) {
-          $('#servers').append($('<li>').text(v));
+        $.each(servers, function(idx, server_name) {
+          $('#servers').append($('<li>').text(server_name));
+          channel[server_name] = io('/' + server_name);
+
+          channel[server_name].on('server.properties', function(data) {
+            $('#sp').empty();
+            $.each(data, function(k,v) {
+              $('#sp').append($('<li>').text('{0}:{1}'.format(k,v)));
+            })
+          })
+
+          channel[server_name].on('tail_data', function(msg) {
+            console.log(msg)
+            $('#log_latest').append($('<li>').text(msg));
+          })
+
         })
       })
 
-      socket.on('server.properties', function(data) {
-        $('#sp').empty();
-        $.each(data, function(k,v) {
-          $('#sp').append($('<li>').text('{0}:{1}'.format(k,v)));
-        })
-      })
-
-      socket.on('tail_data', function(msg) {
-        console.log(msg)
-        $('#log_latest').append($('<li>').text(msg));
-      })
-
-      /*socket.emit('start_tail', 'a', '/logs/latest.log')*/
-      /*socket.emit('server_overview', 'a')*/
-      /*socket.emit('create', 'b')*/
-      /*socket.emit('start', 'b')*/
-      /*socket.emit('stuff', 'b', 'help')*/
+      /*
+      global.emit('create', 'a')
+      channel['a'].emit('start')
+      channel['a'].emit('server_overview')
+      channel['a'].emit('start_tail', 'logs/latest.log')
+      channel['a'].emit('stuff', 'op hexparrot')
+      */
     </script>
   </body>
 </html>
