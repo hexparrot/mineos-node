@@ -27,30 +27,32 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
-      var global = io();
+      var global = io('/');
       var channel = {};
-      
+
       global.on('server_list', function(servers) {
-        console.log(servers);
         $('#servers').empty();
-        $.each(servers, function(idx, server_name) {
-          $('#servers').append($('<li>').text(server_name));
-          channel[server_name] = io('/' + server_name);
-
-          channel[server_name].on('server.properties', function(data) {
-            $('#sp').empty();
-            $.each(data, function(k,v) {
-              $('#sp').append($('<li>').text('{0}:{1}'.format(k,v)));
-            })
-          })
-
-          channel[server_name].on('tail_data', function(msg) {
-            console.log(msg)
-            $('#log_latest').append($('<li>').text(msg));
-          })
-
-        })
+        for (var s in servers) {
+          track_server(servers[s]);
+        }
       })
+
+      function track_server(server_name) {
+        $('#servers').append($('<li>').text(server_name));
+        var c = channel[server_name] = io('/' + server_name);
+
+        c.on('server.properties', function(data) {
+          $('#sp').empty();
+          $.each(data, function(k,v) {
+            $('#sp').append($('<li>').text('{0}:{1}'.format(k,v)));
+          })
+        })
+
+        c.on('tail_data', function(msg) {
+          console.log(msg)
+          $('#log_latest').append($('<li>').text(msg));
+        })
+      }
 
       /*
       global.emit('create', 'a')

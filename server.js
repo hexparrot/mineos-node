@@ -52,7 +52,6 @@ server.backend = function(base_dir, socket_emitter) {
           self.create_server_namespace(server_name);
           self.servers[server_name] = instance;
           console.info('Discovered server: {0}'.format(server_name));
-          self.front_end.emit('server_list', Object.keys(self.servers));
         }
       })
     }
