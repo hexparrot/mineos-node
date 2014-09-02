@@ -1,16 +1,12 @@
 var mineos = require('./mineos');
 var chokidar = require('chokidar');
 var path = require('path');
-var app = require('express')();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
 var events = require('events');
 var tail = require('tail').Tail;
 var server = exports;
-var BASE_DIR = '/var/games/minecraft';
 
-server.extract_server_name = function(server_path) {
-  var re = new RegExp('{0}/([a-zA-Z0-9_\.]+)'.format(path.join(BASE_DIR, mineos.DIRS['servers'])));
+server.extract_server_name = function(base_dir, server_path) {
+  var re = new RegExp('{0}/([a-zA-Z0-9_\.]+)'.format(path.join(base_dir, mineos.DIRS['servers'])));
   try {
     return re.exec(server_path)[1];
   } catch(e) {
@@ -18,10 +14,10 @@ server.extract_server_name = function(server_path) {
   }
 }
 
-server.backend = function(socket_emitter) {
+server.backend = function(base_dir, socket_emitter) {
   var self = this;
   self.servers = {};
-  self.watched_files = {};
+  self.base_dir = base_dir;
   self.front_end = socket_emitter || new events.EventEmitter();
 
   self.front_end.on('connection', function(socket) {
@@ -81,18 +77,18 @@ server.backend = function(socket_emitter) {
 
   })
 
-  self.watcher_server_list = chokidar.watch(path.join(BASE_DIR, mineos.DIRS['servers']),
+  self.watcher_server_list = chokidar.watch(path.join(self.base_dir, mineos.DIRS['servers']),
                                             {persistent: true});
 
   self.watcher_server_list.on('addDir', function(newpath) {
     try {
-      var server_name = server.extract_server_name(newpath);
+      var server_name = server.extract_server_name(self.base_dir, newpath);
     } catch (e) {
       return;
     }
 
-    if (server_name == path.basename(path.dirname(newpath))) {
-      var instance = new mineos.mc(server_name, BASE_DIR);
+    if (!(server_name in self.servers)) {
+      var instance = new mineos.mc(server_name, self.base_dir);
       instance.is_server(function(is_server) {
 
         if (is_server) {
@@ -118,18 +114,6 @@ server.backend = function(socket_emitter) {
 
   return self;
 }
-
-//var be = server.backend(io);
-/*var be = server.backend(null);
-var response_options = {root: '/home/mc'};
-
-app.get('/', function(req, res){
-  res.sendFile('index.html', response_options);
-});
-
-http.listen(3000, function(){
-  console.log('listening on *:3000');
-});*/
 
 String.prototype.format = function() {
   var s = this;
