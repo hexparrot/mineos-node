@@ -5,15 +5,6 @@ var events = require('events');
 var tail = require('tail').Tail;
 var server = exports;
 
-server.extract_server_name = function(base_dir, server_path) {
-  var re = new RegExp('{0}/([a-zA-Z0-9_\.]+)'.format(path.join(base_dir, mineos.DIRS['servers'])));
-  try {
-    return re.exec(server_path)[1];
-  } catch(e) {
-    throw new Error('no server name in path');
-  }
-}
-
 server.backend = function(base_dir, socket_emitter) {
   var self = this;
   self.servers = {};
@@ -97,14 +88,11 @@ server.backend = function(base_dir, socket_emitter) {
           var watcher = chokidar.watch(file_path, {persistent: true});
           watcher
             .on('change', function(filepath) {
-              console.info(filepath, 'changed.');
-
               switch (args.filepath) {
                 case 'server.properties':
                   instance.sp(function(sp_data) {
                     nsp.emit('server.properties', sp_data);
-                    console.log(sp_data)
-                    console.info('rebroadcasting server.properties data')
+                    console.info('Rebroadcasting', args.filepath)
                   })
                   break;
               }
@@ -165,17 +153,15 @@ server.backend = function(base_dir, socket_emitter) {
   watcher
     .on('addDir', function(dirpath) {
       try {
-        var server_name = server.extract_server_name(base_dir, dirpath);
+        var server_name = mineos.extract_server_name(base_dir, dirpath);
       } catch (e) { return }
       if (server_name == path.basename(dirpath))
         track_server(server_name);
     })
     .on('unlinkDir', function(dirpath) {
-      console.log(dirpath)
       try {
-        var server_name = server.extract_server_name(base_dir, dirpath);
+        var server_name = mineos.extract_server_name(base_dir, dirpath);
       } catch (e) { return }
-      console.log(server_name)
       if (server_name == path.basename(dirpath))
         untrack_server(server_name);
     })
