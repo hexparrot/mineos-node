@@ -2,6 +2,7 @@ var mineos = require('./mineos');
 var chokidar = require('chokidar');
 var path = require('path');
 var events = require('events');
+var introspect = require('introspect');
 var tail = require('tail').Tail;
 var server = exports;
 
@@ -35,27 +36,31 @@ server.backend = function(base_dir, socket_emitter) {
     var nsp = self.front_end.of('/{0}'.format(server_name));
     var tails = {};
 
+    function dispatcher(args) {
+      var fn = instance[args.command];
+      var required_args = introspect(fn);
+      var arg_array = [];
+
+      for (var i in required_args) {
+        if (required_args[i] == 'callback') 
+          arg_array.push(function(success, payload) {
+            nsp.emit('result', '{0}: {1}'.format(args.command, success));
+          })
+        else if (required_args[i] in args)
+          arg_array.push(args[required_args[i]])
+        else
+          return;
+      }
+
+      fn.apply(instance, arg_array);
+    }
+
     function execute(args) {
       switch (args.command) {
-        case 'start':
-          instance.start(function(did_start) {
-            if (did_start){
-              console.info('Server started: {0}'.format(server_name));
-            }
-          })
-          break;
         case 'server_overview':
           instance.sp(function(sp_data) {
+            console.log('Broadcasting server.properties');
             nsp.emit('server.properties', sp_data);
-          })
-          break;
-        case 'stuff':
-          instance.stuff(args.message, function(did_stuff, proc) {
-            if (did_stuff){
-              console.info('Server {0} sent command: {1}'.format(server_name, args.message));
-            } else {
-              console.warn('Ignored attempt to send "{0}" to {1}'.format(args.message, server_name));
-            }
           })
           break;
         case 'tail':
@@ -129,7 +134,7 @@ server.backend = function(base_dir, socket_emitter) {
 
         nsp.on('connection', function(socket) {
           socket.on('command', function(args) {
-            execute(args);
+            dispatcher(args);
           })
 
           execute({

@@ -54,13 +54,17 @@
         c.on('tail_data', function(data) {
           $('#log_latest').append($('<li>').text(data))
         })
+
+        c.on('result', function(data) {
+          console.log(data);
+        })
       }
 
       /*
-      global.emit('create', 'a')
-      channel['a'].emit('start')
-      channel['a'].emit('server_overview')
-      channel['a'].emit('stuff', 'op hexparrot')
+      global.emit('command', {command: 'create', 'server_name': 'aaa'})
+      channel['aaa'].emit('command', {command: 'start'})
+      channel['aaa'].emit('command', {command: 'server_overview'})
+      channel['aaa'].emit('command', {command: 'stuff', message: 'hi'})
       */
     </script>
   </body>
