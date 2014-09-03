@@ -5,7 +5,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 var BASE_DIR = '/var/games/minecraft';
-var response_options = {root: '/home/mc'};
+var response_options = {root: __dirname};
 
 var be = server.backend(BASE_DIR, io);
 

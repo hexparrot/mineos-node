@@ -32,9 +32,12 @@
 
       global.on('server_list', function(servers) {
         $('#servers').empty();
-        for (var s in servers) {
+        for (var s in servers)
           track_server(servers[s]);
-        }
+      })
+
+      global.on('track_server', function(server_name) {
+        track_server(server_name);
       })
 
       function track_server(server_name) {
@@ -47,18 +50,12 @@
             $('#sp').append($('<li>').text('{0}:{1}'.format(k,v)));
           })
         })
-
-        c.on('tail_data', function(msg) {
-          console.log(msg)
-          $('#log_latest').append($('<li>').text(msg));
-        })
       }
 
       /*
       global.emit('create', 'a')
       channel['a'].emit('start')
       channel['a'].emit('server_overview')
-      channel['a'].emit('start_tail', 'logs/latest.log')
       channel['a'].emit('stuff', 'op hexparrot')
       */
     </script>
