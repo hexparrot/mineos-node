@@ -4,7 +4,6 @@ var events = require('events');
 var async = require('async');
 var cf = require('./config_file');
 var child_process = require('child_process');
-var ini = require('ini');
 var mineos = exports;
 
 mineos.DIRS = {
@@ -99,13 +98,9 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.sp = function(callback) {
-    if (!Object.keys(self._sp.props).length) {
-      self._sp.load(function(err) {
-        callback(self._sp.props);
-      })
-    } else {
+    self._sp.load(function(err) {
       callback(self._sp.props);
-    }
+    })
   }
 
   self.create = function(callback) {
