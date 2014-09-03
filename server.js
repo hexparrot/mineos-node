@@ -84,8 +84,8 @@ server.backend = function(base_dir, socket_emitter) {
           break;
         case 'watch':
           var file_path = path.join(instance.env.cwd, args.filepath);
-
           var watcher = chokidar.watch(file_path, {persistent: true});
+
           watcher
             .on('change', function(filepath) {
               switch (args.filepath) {
@@ -96,7 +96,6 @@ server.backend = function(base_dir, socket_emitter) {
                   })
                   break;
               }
-                
             })
 
           nsp.on('disconnect', function() {
@@ -130,8 +129,6 @@ server.backend = function(base_dir, socket_emitter) {
             filepath: 'server.properties'
           })
 
-
-            
         })
       }
     })
@@ -149,11 +146,7 @@ server.backend = function(base_dir, socket_emitter) {
 
   var server_path = path.join(base_dir, mineos.DIRS['servers']);
   var regex_servers = new RegExp('{0}\/[a-zA-Z0-9_\.]+\/.+'.format(server_path));
-  var watcher = chokidar.watch(path.join(base_dir, mineos.DIRS['servers']),
-                               {
-                                 persistent: true,
-                                 ignored: regex_servers
-                               });
+  var watcher = chokidar.watch(server_path, { persistent: true, ignored: regex_servers });
 
   watcher
     .on('addDir', function(dirpath) {
