@@ -68,6 +68,18 @@ server.backend = function(base_dir, socket_emitter) {
               tails[file_path] = new tail(file_path);
             } catch (e) {
               console.error('Creating tail on {0} failed.'.format(file_path));
+              console.log('Watching for file generation: {0}'.format(args.filepath));
+              var tailer = chokidar.watch(instance.env.cwd, {persistent: true, ignoreInitial: true});
+
+              tailer
+                .on('add', function(fp) {
+                  var file = path.basename(fp);
+                  if (path.basename(args.filepath) == file) {
+                    tailer.close();
+                    console.log('{0} created! Watchfile {1} closed.'.format(file, args.filepath));
+                    execute(args);
+                  }
+                })
               return;
             }
           }
