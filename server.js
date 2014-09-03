@@ -42,6 +42,7 @@ server.backend = function(base_dir, socket_emitter) {
   function track_server(server_name) {
     var instance = new mineos.mc(server_name, base_dir);
     var nsp = self.front_end.of('/{0}'.format(server_name));
+    var tails = {};
 
     function execute(args) {
       switch (args.command) {
@@ -66,6 +67,30 @@ server.backend = function(base_dir, socket_emitter) {
             }
           })
           break;
+        case 'tail':
+          var file_path = path.join(instance.env.cwd, args.filepath);
+          var room = args.filepath;
+          args.socket.join(room);
+
+          var ft;
+          try {
+            ft = new tail(file_path);
+          } catch (e) {
+            console.error('Creating tail on {0} failed.'.format(file_path));
+            return;
+          }
+          
+          console.info('Creating tail "{0}" on {1}'.format(room, file_path));
+
+          ft.on("line", function(data) {
+            nsp.in(room).emit('tail_data', data);
+          })
+          
+          args.socket.on('disconnect', function() {
+            ft.unwatch();
+            console.info('Dropping tail: {0}'.format(room));
+          })
+          break;
       }
     }
 
@@ -81,6 +106,15 @@ server.backend = function(base_dir, socket_emitter) {
           socket.on('command', function(args) {
             execute(args);
           })
+
+          execute({
+            command: 'tail',
+            filepath: 'logs/latest.log',
+            socket: socket
+          })
+
+
+            
         })
       }
     })
