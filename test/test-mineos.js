@@ -173,6 +173,15 @@ test.valid_server_name = function(test) {
   test.done();
 }
 
+test.extract_server_name = function(test) {
+  test.equal(mineos.extract_server_name(BASE_DIR, '/var/games/minecraft/servers/a'), 'a');
+  test.equal(mineos.extract_server_name(BASE_DIR, '/var/games/minecraft/servers/a/b'), 'a');
+  test.equal(mineos.extract_server_name(BASE_DIR, '/var/games/minecraft/servers/a/b/plugins'), 'a');
+  test.throws(function(){mineos.extract_server_name(BASE_DIR, '/var/games/minecraft/servers')}, 'no server name in path');
+  test.throws(function(){mineos.extract_server_name(BASE_DIR, '/var/games/minecraft')}, 'no server name in path');
+  test.done();
+}
+
 test.start = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);

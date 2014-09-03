@@ -76,6 +76,15 @@ mineos.valid_server_name = function(server_name) {
   return regex_valid_server_name.test(server_name);
 }
 
+mineos.extract_server_name = function(base_dir, server_path) {
+  var re = new RegExp('{0}/([a-zA-Z0-9_\.]+)'.format(path.join(base_dir, mineos.DIRS['servers'])));
+  try {
+    return re.exec(server_path)[1];
+  } catch(e) {
+    throw new Error('no server name in path');
+  }
+}
+
 mineos.mc = function(server_name, base_dir) {
   var self = this;
   self.server_name = server_name;
