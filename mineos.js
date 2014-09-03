@@ -4,7 +4,6 @@ var events = require('events');
 var async = require('async');
 var cf = require('./config_file');
 var child_process = require('child_process');
-var ini = require('ini');
 var mineos = exports;
 
 mineos.DIRS = {
@@ -77,6 +76,15 @@ mineos.valid_server_name = function(server_name) {
   return regex_valid_server_name.test(server_name);
 }
 
+mineos.extract_server_name = function(base_dir, server_path) {
+  var re = new RegExp('{0}/([a-zA-Z0-9_\.]+)'.format(path.join(base_dir, mineos.DIRS['servers'])));
+  try {
+    return re.exec(server_path)[1];
+  } catch(e) {
+    throw new Error('no server name in path');
+  }
+}
+
 mineos.mc = function(server_name, base_dir) {
   var self = this;
   self.server_name = server_name;
@@ -99,13 +107,9 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.sp = function(callback) {
-    if (!Object.keys(self._sp.props).length) {
-      self._sp.load(function(err) {
-        callback(self._sp.props);
-      })
-    } else {
+    self._sp.load(function(err) {
       callback(self._sp.props);
-    }
+    })
   }
 
   self.create = function(callback) {
