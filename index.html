@@ -56,7 +56,11 @@
         })
 
         c.on('result', function(data) {
-          console.log(data);
+          console.log('RESULT', data);
+        })
+
+        c.on('receipt', function(data) {
+          console.log('RECEIPT:', data);
         })
       }
 

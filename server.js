@@ -4,6 +4,7 @@ var path = require('path');
 var events = require('events');
 var introspect = require('introspect');
 var tail = require('tail').Tail;
+var uuid = require('node-uuid');
 var server = exports;
 
 server.backend = function(base_dir, socket_emitter) {
@@ -37,14 +38,26 @@ server.backend = function(base_dir, socket_emitter) {
     var tails = {};
 
     function dispatcher(args) {
-      var fn = instance[args.command];
-      var required_args = introspect(fn);
+      var fn, required_args;
       var arg_array = [];
+
+      try {
+        fn = instance[args.command];
+        required_args = introspect(fn);
+      } catch (e) { 
+        args.success = false;
+        args.error = e;
+        nsp.emit('result', args);
+        return;
+      }
+
+      
 
       for (var i in required_args) {
         if (required_args[i] == 'callback') 
           arg_array.push(function(success, payload) {
-            nsp.emit('result', '{0}: {1}'.format(args.command, success));
+            args.success = success;
+            nsp.emit('result', args);
           })
         else if (required_args[i] in args)
           arg_array.push(args[required_args[i]])
@@ -53,6 +66,9 @@ server.backend = function(base_dir, socket_emitter) {
       }
 
       fn.apply(instance, arg_array);
+      console.info('{0} received request {1}: {2}'.format(server_name, 
+                                                          args.command, 
+                                                          args.success))
     }
 
     function execute(args) {
@@ -134,6 +150,8 @@ server.backend = function(base_dir, socket_emitter) {
 
         nsp.on('connection', function(socket) {
           socket.on('command', function(args) {
+            args.uuid = uuid.v1();
+            nsp.emit('receipt', args)
             dispatcher(args);
           })
 
