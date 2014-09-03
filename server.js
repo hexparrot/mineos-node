@@ -91,6 +91,30 @@ server.backend = function(base_dir, socket_emitter) {
             console.info('Dropping tail: {0}'.format(room));
           })
           break;
+        case 'watch':
+          var file_path = path.join(instance.env.cwd, args.filepath);
+
+          var watcher = chokidar.watch(file_path, {persistent: true});
+          watcher
+            .on('change', function(filepath) {
+              console.info(filepath, 'changed.');
+
+              switch (args.filepath) {
+                case 'server.properties':
+                  instance.sp(function(sp_data) {
+                    nsp.emit('server.properties', sp_data);
+                    console.log(sp_data)
+                    console.info('rebroadcasting server.properties data')
+                  })
+                  break;
+              }
+                
+            })
+
+          nsp.on('disconnect', function() {
+            watcher.close();
+            console.info('Stopping watch: {0}'.format(room));
+          })
       }
     }
 
@@ -111,6 +135,11 @@ server.backend = function(base_dir, socket_emitter) {
             command: 'tail',
             filepath: 'logs/latest.log',
             socket: socket
+          })
+
+          execute({
+            command: 'watch',
+            filepath: 'server.properties'
           })
 
 
