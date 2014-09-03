@@ -50,6 +50,10 @@
             $('#sp').append($('<li>').text('{0}:{1}'.format(k,v)));
           })
         })
+
+        c.on('tail_data', function(data) {
+          $('#log_latest').append($('<li>').text(data))
+        })
       }
 
       /*

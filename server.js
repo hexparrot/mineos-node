@@ -63,22 +63,24 @@ server.backend = function(base_dir, socket_emitter) {
           var room = args.filepath;
           args.socket.join(room);
 
-          var ft;
-          try {
-            ft = new tail(file_path);
-          } catch (e) {
-            console.error('Creating tail on {0} failed.'.format(file_path));
-            return;
+          if (!(file_path in tails)) {
+            try {
+              tails[file_path] = new tail(file_path);
+            } catch (e) {
+              console.error('Creating tail on {0} failed.'.format(file_path));
+              return;
+            }
           }
-          
+
           console.info('Creating tail "{0}" on {1}'.format(room, file_path));
 
-          ft.on("line", function(data) {
-            nsp.in(room).emit('tail_data', data);
+          tails[file_path].on("line", function(data) {
+            args.socket.emit('tail_data', data);
           })
           
           args.socket.on('disconnect', function() {
-            ft.unwatch();
+            tails[file_path].unwatch();
+            delete tails[file_path];
             console.info('Dropping tail: {0}'.format(room));
           })
           break;
