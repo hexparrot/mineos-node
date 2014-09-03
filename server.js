@@ -147,8 +147,13 @@ server.backend = function(base_dir, socket_emitter) {
     console.info('Server removed: {0}'.format(server_name));
   }
 
+  var server_path = path.join(base_dir, mineos.DIRS['servers']);
+  var regex_servers = new RegExp('{0}\/[a-zA-Z0-9_\.]+\/.+'.format(server_path));
   var watcher = chokidar.watch(path.join(base_dir, mineos.DIRS['servers']),
-                               {persistent: true});
+                               {
+                                 persistent: true,
+                                 ignored: regex_servers
+                               });
 
   watcher
     .on('addDir', function(dirpath) {
