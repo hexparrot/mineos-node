@@ -88,8 +88,8 @@ server.backend = function(base_dir, socket_emitter) {
             try {
               tails[file_path] = new tail(file_path);
             } catch (e) {
-              console.error('Creating tail on {0} failed.'.format(file_path));
-              console.log('Watching for file generation: {0}'.format(args.filepath));
+              console.error('[{0}] Creating tail on {1} failed.'.format(server_name, args.filepath));
+              console.log('[{0}] Watching for file generation: {1}'.format(server_name, args.filepath));
               var tailer = chokidar.watch(instance.env.cwd, {persistent: true, ignoreInitial: true});
 
               tailer
@@ -97,7 +97,7 @@ server.backend = function(base_dir, socket_emitter) {
                   var file = path.basename(fp);
                   if (path.basename(args.filepath) == file) {
                     tailer.close();
-                    console.log('{0} created! Watchfile {1} closed.'.format(file, args.filepath));
+                    console.log('[{0}] {1} created! Watchfile {2} closed.'.format(server_name, file, args.filepath));
                     execute(args);
                   }
                 })
@@ -105,7 +105,7 @@ server.backend = function(base_dir, socket_emitter) {
             }
           }
 
-          console.info('Creating tail "{0}" on {1}'.format(room, file_path));
+          console.info('[{0}] Creating tail on {1}'.format(server_name, room));
 
           tails[file_path].on("line", function(data) {
             args.socket.emit('tail_data', data);
@@ -114,7 +114,7 @@ server.backend = function(base_dir, socket_emitter) {
           args.socket.on('disconnect', function() {
             tails[file_path].unwatch();
             delete tails[file_path];
-            console.info('Dropping tail: {0}'.format(room));
+            console.info('[{0}] Dropping tail on {1}'.format(server_name, room));
           })
           break;
         case 'watch':
@@ -127,15 +127,15 @@ server.backend = function(base_dir, socket_emitter) {
                 case 'server.properties':
                   instance.sp(function(sp_data) {
                     nsp.emit('server.properties', sp_data);
-                    console.info('Rebroadcasting', args.filepath)
+                    console.info('[{0}] Starting watch on {1}'.format(server_name, file_path))
                   })
                   break;
               }
             })
 
-          nsp.on('disconnect', function() {
+          args.socket.on('disconnect', function() {
             watcher.close();
-            console.info('Stopping watch: {0}'.format(room));
+            console.info('[{0}] Stopping watch on {1}'.format(server_name, args.filepath));
           })
       }
     }
@@ -163,7 +163,8 @@ server.backend = function(base_dir, socket_emitter) {
 
           execute({
             command: 'watch',
-            filepath: 'server.properties'
+            filepath: 'server.properties',
+            socket: socket
           })
 
         })
