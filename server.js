@@ -36,6 +36,7 @@ server.backend = function(base_dir, socket_emitter) {
     var instance = new mineos.mc(server_name, base_dir);
     var nsp = self.front_end.of('/{0}'.format(server_name));
     var tails = {};
+    var watches = {};
 
     function dispatcher(args) {
       var fn, required_args;
@@ -50,8 +51,6 @@ server.backend = function(base_dir, socket_emitter) {
         nsp.emit('result', args);
         return;
       }
-
-      
 
       for (var i in required_args) {
         if (required_args[i] == 'callback') 
@@ -75,7 +74,7 @@ server.backend = function(base_dir, socket_emitter) {
       switch (args.command) {
         case 'server_overview':
           instance.sp(function(sp_data) {
-            console.log('Broadcasting server.properties');
+            console.info('Broadcasting server.properties');
             nsp.emit('server.properties', sp_data);
           })
           break;
@@ -87,9 +86,10 @@ server.backend = function(base_dir, socket_emitter) {
           if (!(file_path in tails)) {
             try {
               tails[file_path] = new tail(file_path);
+              console.info('[{0}] Creating tail on {1}'.format(server_name, room));
             } catch (e) {
-              console.error('[{0}] Creating tail on {1} failed.'.format(server_name, args.filepath));
-              console.log('[{0}] Watching for file generation: {1}'.format(server_name, args.filepath));
+              console.error('[{0}] Creating tail on {1} failed'.format(server_name, args.filepath));
+              console.info('[{0}] Watching for file generation: {1}'.format(server_name, args.filepath));
               var tailer = chokidar.watch(instance.env.cwd, {persistent: true, ignoreInitial: true});
 
               tailer
@@ -97,15 +97,15 @@ server.backend = function(base_dir, socket_emitter) {
                   var file = path.basename(fp);
                   if (path.basename(args.filepath) == file) {
                     tailer.close();
-                    console.log('[{0}] {1} created! Watchfile {2} closed.'.format(server_name, file, args.filepath));
+                    console.info('[{0}] {1} created! Watchfile {2} closed'.format(server_name, file, args.filepath));
                     execute(args);
                   }
                 })
               return;
             }
+          } else {
+            console.info('[{0}] Tail already exists for {1}'.format(server_name, args.filepath));
           }
-
-          console.info('[{0}] Creating tail on {1}'.format(server_name, room));
 
           tails[file_path].on("line", function(data) {
             args.socket.emit('tail_data', data);
@@ -119,24 +119,31 @@ server.backend = function(base_dir, socket_emitter) {
           break;
         case 'watch':
           var file_path = path.join(instance.env.cwd, args.filepath);
-          var watcher = chokidar.watch(file_path, {persistent: true});
 
-          watcher
-            .on('change', function(filepath) {
-              switch (args.filepath) {
-                case 'server.properties':
-                  instance.sp(function(sp_data) {
-                    nsp.emit('server.properties', sp_data);
-                    console.info('[{0}] Starting watch on {1}'.format(server_name, file_path))
-                  })
-                  break;
-              }
+          if (!(file_path in watches)) {
+            var watcher = chokidar.watch(file_path, {persistent: true});
+            watches[file_path] = watcher;
+            watcher
+              .on('change', function(filepath) {
+                switch (args.filepath) {
+                  case 'server.properties':
+                    instance.sp(function(sp_data) {
+                      nsp.emit('server.properties', sp_data);
+                    })
+                    break;
+                }
+              })
+            console.info('[{0}] Starting watch on {1}'.format(server_name, args.filepath));
+
+            args.socket.on('disconnect', function() {
+              watcher.close();
+              delete watches[file_path];
+              console.info('[{0}] Stopping watch on {1}'.format(server_name, args.filepath));
             })
-
-          args.socket.on('disconnect', function() {
-            watcher.close();
-            console.info('[{0}] Stopping watch on {1}'.format(server_name, args.filepath));
-          })
+          } else {
+            console.info('[{0}] Watch already exists for {1}'.format(server_name, args.filepath));
+          }
+          break;
       }
     }
 
