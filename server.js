@@ -13,6 +13,9 @@ server.backend = function(base_dir, socket_emitter) {
   self.channels = {};
   self.front_end = socket_emitter || new events.EventEmitter();
 
+  self.tails = {};
+  self.watches = {};
+
   self.front_end.on('connection', function(socket) {
     console.info('User connected');
     self.front_end.emit('server_list', Object.keys(self.servers));
@@ -35,8 +38,7 @@ server.backend = function(base_dir, socket_emitter) {
   function track_server(server_name) {
     var instance = new mineos.mc(server_name, base_dir);
     var nsp = self.front_end.of('/{0}'.format(server_name));
-    var tails = {};
-    var watches = {};
+    
 
     function dispatcher(args) {
       var fn, required_args;
@@ -83,9 +85,9 @@ server.backend = function(base_dir, socket_emitter) {
           var room = args.filepath;
           args.socket.join(room);
 
-          if (!(file_path in tails)) {
+          if (!(file_path in self.tails)) {
             try {
-              tails[file_path] = new tail(file_path);
+              self.tails[file_path] = new tail(file_path);
               console.info('[{0}] Creating tail on {1}'.format(server_name, room));
             } catch (e) {
               console.error('[{0}] Creating tail on {1} failed'.format(server_name, args.filepath));
@@ -104,25 +106,19 @@ server.backend = function(base_dir, socket_emitter) {
               return;
             }
           } else {
-            console.info('[{0}] Tail already exists for {1}'.format(server_name, args.filepath));
+            console.warn('[{0}] Tail already exists for {1}'.format(server_name, args.filepath));
           }
 
-          tails[file_path].on("line", function(data) {
+          self.tails[file_path].on('line', function(data) {
             args.socket.emit('tail_data', data);
-          })
-          
-          args.socket.on('disconnect', function() {
-            tails[file_path].unwatch();
-            delete tails[file_path];
-            console.info('[{0}] Dropping tail on {1}'.format(server_name, room));
           })
           break;
         case 'watch':
           var file_path = path.join(instance.env.cwd, args.filepath);
 
-          if (!(file_path in watches)) {
+          if (!(file_path in self.watches)) {
             var watcher = chokidar.watch(file_path, {persistent: true});
-            watches[file_path] = watcher;
+            self.watches[file_path] = watcher;
             watcher
               .on('change', function(filepath) {
                 switch (args.filepath) {
@@ -135,11 +131,6 @@ server.backend = function(base_dir, socket_emitter) {
               })
             console.info('[{0}] Starting watch on {1}'.format(server_name, args.filepath));
 
-            args.socket.on('disconnect', function() {
-              watcher.close();
-              delete watches[file_path];
-              console.info('[{0}] Stopping watch on {1}'.format(server_name, args.filepath));
-            })
           } else {
             console.info('[{0}] Watch already exists for {1}'.format(server_name, args.filepath));
           }
@@ -208,6 +199,20 @@ server.backend = function(base_dir, socket_emitter) {
       if (server_name == path.basename(dirpath))
         untrack_server(server_name);
     })
+
+  self.shutdown = function() {
+    for (var file_path in self.tails) {
+      self.tails[file_path].unwatch();
+      delete self.tails[file_path];
+      console.info('Dropping tail on {0}'.format(file_path));
+    }
+    
+    for (var file_path in self.watches) {
+      self.watches[file_path].close();
+      delete self.watches[file_path];
+      console.info('Stopping watch on {0}'.format(file_path));     
+    }
+  }
 
   return self;
 }
