@@ -16,9 +16,9 @@ server.backend = function(base_dir, socket_emitter) {
   (function() {
     var server_path = path.join(base_dir, mineos.DIRS['servers']);
     var regex_servers = new RegExp('{0}\/[a-zA-Z0-9_\.]+\/.+'.format(server_path));
-    var watcher = chokidar.watch(server_path, { persistent: true, ignored: regex_servers });
+    self.watcher = chokidar.watch(server_path, { persistent: true, ignored: regex_servers });
 
-    watcher
+    self.watcher
       .on('addDir', function(dirpath) {
         try {
           var server_name = mineos.extract_server_name(base_dir, dirpath);
@@ -40,28 +40,26 @@ server.backend = function(base_dir, socket_emitter) {
         nsp;
 
     function setup() {
-      instance.is_server(function(is_server) {
-        nsp = self.front_end.of('/{0}'.format(server_name));
+      nsp = self.front_end.of('/{0}'.format(server_name));
 
-        self.servers[server_name] = {
-          instance: instance,
-          nsp: nsp,
-          tails: {},
-          watches: {}
-        }
+      self.servers[server_name] = {
+        instance: instance,
+        nsp: nsp,
+        tails: {},
+        watches: {}
+      }
 
-        console.info('Discovered server: {0}'.format(server_name));
-        make_tail('logs/latest.log');
-        make_watch('server.properties');
+      console.info('Discovered server: {0}'.format(server_name));
+      make_tail('logs/latest.log');
+      make_watch('server.properties');
 
-        nsp.on('connection', function(socket) {
-          console.info('User connected to namespace: {0}'.format(server_name));
-          socket.on('command', function(args) {
-            console.info('command received', args.command)
-            args.uuid = uuid.v1();
-            nsp.emit('receipt', args)
-            server_dispatcher(args);
-          })
+      nsp.on('connection', function(socket) {
+        console.info('User connected to namespace: {0}'.format(server_name));
+        socket.on('command', function(args) {
+          console.info('command received', args.command)
+          args.uuid = uuid.v1();
+          nsp.emit('receipt', args)
+          server_dispatcher(args);
         })
       })
     }
@@ -170,21 +168,27 @@ server.backend = function(base_dir, socket_emitter) {
     })
   }
 
-  function untrack_server(server_name) {
+  self.untrack_server = function(server_name) {
     var instance = new mineos.mc(server_name, base_dir);
 
-    for (var t in self.servers[server_name].tails) {
+    for (var t in self.servers[server_name].tails) 
       self.servers[server_name].tails[t].unwatch();
-    }
 
-    for (var w in self.servers[server_name].watches) {
-      self.servers[server_name].watches[t].close();
-    }
+    for (var w in self.servers[server_name].watches) 
+      self.servers[server_name].watches[w].close();
 
+    self.servers[server_name].nsp.removeAllListeners();
     delete self.servers[server_name];
 
     self.front_end.emit('server_list', Object.keys(self.servers));
     console.info('Server removed: {0}'.format(server_name));
+  }
+
+  self.shutdown = function() {
+    self.watcher.close();
+
+    for (var s in self.servers)
+      self.untrack_server(s);
   }
 
   self.front_end.on('connection', function(socket) {
