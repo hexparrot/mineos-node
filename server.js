@@ -86,10 +86,15 @@ server.backend = function(base_dir, socket_emitter) {
             args.success = success;
             nsp.emit('result', args);
           })
-        else if (required_args[i] in args)
+        else if (required_args[i] in args) {
           arg_array.push(args[required_args[i]])
-        else
+        } else {
+          args.success = false;
+          console.error('Provided values missing required argument', required_args[i]);
+          args.error = 'Provided values missing required argument: {0}'.format(required_args[i]);
+          nsp.emit('result', args);
           return;
+        }
       }
 
       fn.apply(instance, arg_array);

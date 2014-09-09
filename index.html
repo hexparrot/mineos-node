@@ -28,7 +28,7 @@
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
       var global = io('/');
-      var channel = {};
+      var channels = {};
 
       global.on('server_list', function(servers) {
         console.log(servers);
@@ -41,9 +41,13 @@
         track_server(server_name);
       })
 
+      global.on('disconnect', function() {
+        global.removeAllListeners();
+      })
+
       function track_server(server_name) {
         $('#servers').append($('<li>').text(server_name));
-        var c = channel[server_name] = io('/' + server_name);
+        var c = channels[server_name] = io('/' + server_name);
 
         c.on('server.properties', function(data) {
           $('#sp').empty();
