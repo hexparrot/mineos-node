@@ -31,6 +31,7 @@
       var channel = {};
 
       global.on('server_list', function(servers) {
+        console.log(servers);
         $('#servers').empty();
         for (var s in servers)
           track_server(servers[s]);
@@ -56,7 +57,7 @@
         })
 
         c.on('result', function(data) {
-          console.log('RESULT', data);
+          console.log('RESULT:', data);
         })
 
         c.on('receipt', function(data) {

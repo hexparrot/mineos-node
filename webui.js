@@ -14,8 +14,7 @@ app.get('/', function(req, res){
 });
 
 process.on('SIGINT', function() {
-  console.log("Caught interrupt signal; initiating webui cleanup....");
-  be.shutdown();
+  console.log("Caught interrupt signal; closing webui....");
   process.exit();
 });
 
