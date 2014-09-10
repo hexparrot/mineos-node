@@ -46,6 +46,9 @@
       })
 
       function track_server(server_name) {
+        if (server_name in channels)
+          return;
+
         $('#servers').append($('<li>').text(server_name));
         var c = channels[server_name] = io('/' + server_name);
 
