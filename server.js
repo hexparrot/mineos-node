@@ -60,13 +60,36 @@ server.backend = function(base_dir, socket_emitter) {
       });
 
       nsp.on('connection', function(socket) {
-        console.info('User connected to namespace: {0}'.format(server_name));
-        socket.on('command', function(args) {
+        function produce_receipt(args) {
           console.info('command received', args.command)
           args.uuid = uuid.v1();
           nsp.emit('receipt', args)
           server_dispatcher(args);
-        })
+        }
+
+        function tail_request(rel_filepath) {
+          if (rel_filepath in self.servers[server_name].tails) {
+            socket.join(rel_filepath);
+            console.info('joined user to tailroom', rel_filepath);
+          } else {
+            console.error('no such tailroom', rel_filepath);
+          }
+        }
+
+        function watch_request(rel_filepath) {
+          if (rel_filepath in self.servers[server_name].watches) {
+            socket.join(rel_filepath);
+            console.info('joined user to watchroom', rel_filepath);
+          } else {
+            console.error('no such watchroom', rel_filepath);
+          }
+        }
+
+        console.info('User connected to namespace: {0}'.format(server_name));
+        socket.on('command', produce_receipt);
+        socket.on('tail', tail_request);
+        socket.on('watch', watch_request);
+
       })
     }
 
@@ -119,6 +142,7 @@ server.backend = function(base_dir, socket_emitter) {
         var new_tail = new tail(abs_filepath);
         console.info('[{0}] Created tail on {1}'.format(server_name, rel_filepath));
         new_tail.on('line', function(data) {
+          //console.info('[{0}] {1}: transmitting new tail data'.format(server_name, rel_filepath));
           nsp.in(rel_filepath).emit('tail_data', data);
         })
         self.servers[server_name].tails[rel_filepath] = new_tail;
@@ -208,7 +232,6 @@ server.backend = function(base_dir, socket_emitter) {
     console.info('User connected to webui');
     self.front_end.emit('server_list', Object.keys(self.servers));
     socket.on('command', webui_dispatcher);
-
   })
 
   return self;

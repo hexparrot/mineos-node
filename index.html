@@ -60,6 +60,7 @@
         })
 
         c.on('tail_data', function(data) {
+          console.log('received tail data')
           $('#log_latest').append($('<li>').text(data))
         })
 
@@ -74,9 +75,11 @@
 
       /*
       global.emit('command', {command: 'create', 'server_name': 'aaa'})
-      channel['aaa'].emit('command', {command: 'start'})
-      channel['aaa'].emit('command', {command: 'server_overview'})
-      channel['aaa'].emit('command', {command: 'stuff', message: 'hi'})
+      channels['aaa'].emit('command', {command: 'start'})
+      channels['aaa'].emit('command', {command: 'server_overview'})
+      channels['aaa'].emit('command', {command: 'stuff', message: 'hi'})
+      channels['aaa'].emit('watch', 'server.properties')
+      channels['aaa'].emit('tail', 'logs/latest.log')
       */
     </script>
   </body>
