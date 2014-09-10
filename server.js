@@ -67,28 +67,48 @@ server.backend = function(base_dir, socket_emitter) {
           server_dispatcher(args);
         }
 
-        function tail_request(rel_filepath) {
-          if (rel_filepath in self.servers[server_name].tails) {
-            socket.join(rel_filepath);
-            console.info('joined user to tailroom', rel_filepath);
-          } else {
-            console.error('no such tailroom', rel_filepath);
-          }
-        }
-
-        function watch_request(rel_filepath) {
-          if (rel_filepath in self.servers[server_name].watches) {
-            socket.join(rel_filepath);
-            console.info('joined user to watchroom', rel_filepath);
-          } else {
-            console.error('no such watchroom', rel_filepath);
+        function file_watch(type, rel_filepath) {
+          switch (type) {
+            case 'tail':
+              if (rel_filepath in self.servers[server_name].tails) {
+                socket.join(rel_filepath);
+                console.info('joined user to tailroom', rel_filepath);
+              } else {
+                console.error('no such tailroom', rel_filepath);
+              }
+              break;
+            case 'watch':
+              if (type == 'watch') {
+                if (rel_filepath in self.servers[server_name].watches) {
+                  socket.join(rel_filepath);
+                  console.info('joined user to watchroom', rel_filepath);
+                } else {
+                  console.error('no such watchroom', rel_filepath);
+                }
+              }
+              break;
+            case 'droptail':
+              if (rel_filepath in self.servers[server_name].tails) {
+                socket.leave(rel_filepath);
+                console.info('user left tailroom', rel_filepath);
+              } else {
+                console.error('no such tailroom', rel_filepath);
+              }
+              break;
+            case 'dropwatch':
+              if (rel_filepath in self.servers[server_name].watches) {
+                socket.leave(rel_filepath);
+                console.info('user left watchroom', rel_filepath);
+              } else {
+                console.error('no such watchroom', rel_filepath);
+              }
+              break;
           }
         }
 
         console.info('User connected to namespace: {0}'.format(server_name));
         socket.on('command', produce_receipt);
-        socket.on('tail', tail_request);
-        socket.on('watch', watch_request);
+        socket.on('file', file_watch);
 
       })
     }
