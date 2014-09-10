@@ -78,8 +78,10 @@
       channels['aaa'].emit('command', {command: 'start'})
       channels['aaa'].emit('command', {command: 'server_overview'})
       channels['aaa'].emit('command', {command: 'stuff', message: 'hi'})
-      channels['aaa'].emit('file', 'watch', 'server.properties')
-      channels['aaa'].emit('file', 'tail', 'logs/latest.log')
+      channels['aaa'].emit('watch', 'server.properties')
+      channels['aaa'].emit('watch', 'logs/latest.log')
+      channels['aaa'].emit('unwatch', 'server.properties')
+      channels['aaa'].emit('unwatch', 'logs/latest.log')
       */
     </script>
   </body>
