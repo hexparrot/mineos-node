@@ -242,8 +242,11 @@ mineos.mc = function(server_name, base_dir) {
     }
   }
 
-  self.ping = function(callback) {
-    var socket = net.connect({port: 25565});
+  self.ping = function(host, port, callback) {
+    var socket = net.connect({
+      host: host || 'localhost',
+      port: port || 25565
+    });
     socket.setTimeout(2500);
     socket.on('connect', function() {
       var query = '\xfe\x01',
@@ -257,11 +260,11 @@ mineos.mc = function(server_name, base_dir) {
       socket.end();
       var split = data.toString('utf16le').split('\u0000').splice(1);
       callback({
-        protocol: parseInt(split[0]),
+        protocol: parseInt(parseInt(split[0])),
         server_version: split[1],
         motd: split[2],
-        players_online: split[3],
-        players_max: split[4]
+        players_online: parseInt(split[3]),
+        players_max: parseInt(split[4])
       });
     });
 
