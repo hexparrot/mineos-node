@@ -1,6 +1,8 @@
 var mineos = require('./mineos');
 var server = require('./server');
-var app = require('express')();
+var path = require('path');
+var express = require('express');
+var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
@@ -9,9 +11,7 @@ var response_options = {root: __dirname};
 
 var be = server.backend(BASE_DIR, io);
 
-app.get('/', function(req, res){
-  res.sendFile('index.html', response_options);
-});
+app.use(express.static(path.join(__dirname, 'html')));
 
 process.on('SIGINT', function() {
   console.log("Caught interrupt signal; closing webui....");

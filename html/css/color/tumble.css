@@ -1,0 +1,71 @@
+#header { 
+	background-color: #563d4d; /* 0 */
+	border-bottom: 2px solid #422f3b; /* -2 */
+}
+
+.pagination ul > li > a:hover, 
+.pagination ul > li > a:focus, 
+.pagination ul > .active > a, 
+.pagination ul > .active > span,
+.fc-event, .external-event {
+	border-color: #422f3b !important; /* -2 */
+	background-color: #563d4d !important; /* 0 */
+}
+
+blockquote { border-left: 5px solid #563d4d; /* 0 */ }
+blockquote.pull-right { border-right: 5px solid #563d4d; /* 0 */ }
+
+.highlight-color { background-color: #563d4d; /* 0 */ }
+
+.nav-tabs > .active > a:before,
+.tabs-below > .nav-tabs > .active > a:before,
+.tabs-left > .nav-tabs > .active > a:before,
+.tabs-right > .nav-tabs > .active > a:before,
+.ui-tabs .ui-tabs-nav li.ui-tabs-active:after,
+.thumbnail > .caption,
+#sidebar #nav > ul > li.active > a:before { border-color: #563d4d !important; /* 0 */ }
+
+.nav-pills > .active > a, 
+.nav-pills > .active > a:hover, 
+.nav-pills > .active > a:focus {
+	background-color: #563d4d; /* 0 */
+}
+
+.nav-list > .active > a, 
+.nav-list > .active > a:hover, 
+.nav-list > .active > a:focus {
+	background-color: #563d4d; /* 0 */
+}
+
+#footer .totop:hover { background-color: #563d4d; /* 0 */ }
+
+#header > .toolbar > li.open > a:after { border-color: transparent transparent #563d4d transparent; /* 0 */ }
+
+#header .dropdown-menu > header { background-color: #563d4d; /* 0 */ }
+
+#main > .navbar .breadcrumb > li.active { color: #563d4d; /* 0 */ }
+
+.widget.widget-message .body-inner ul > li > figure > figcaption > .meta a { color: #563d4d; /* 0 */ }
+
+.ui-autocomplete.ui-menu .ui-menu-item a:hover { background: #563d4d !important; /* 0 */ }
+
+.ui-datepicker td a.ui-state-active,
+.ui-datepicker td a.ui-state-active.ui-state-hover { background-color: #563d4d !important; /* 0 */ }
+
+.ui-slider .ui-slider-range { background: #563d4d !important; /* 0 */ }
+
+#sidebar #nav > ul > li > ul > li.active > a,
+#sidebar #nav > ul > li > ul > li > a:hover,
+#sidebar #nav > ul ul ul > li > a:hover,
+#sidebar #nav > ul ul ul > li.active > a  { color: #886079; /* +2 */ }
+
+#header > .toggler {
+	background-color: #422f3b; /* -2 */
+	border: 1px solid #2e2129; /* -4 */
+}
+
+.daterangepicker .ranges li.active, 
+.daterangepicker .ranges li:hover {
+	background: #563d4d !important; /* 0 */
+	border: 1px solid #563d4d !important; /* 0 */
+}

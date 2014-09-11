@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+    <!-- START META SECTION -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>MineOS - Web User Interface</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, user-scalable=0, initial-scale=1.0">
+    <!--/ END META SECTION -->
+
+    <!-- START STYLESHEET SECTION -->
+    <!-- IMPORTANT! : This is for demo purpose only. All the available plugin will be loaded at once -->
+    <!-- Stylesheet(Bootstrap) -->
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap-responsive.min.css">
+    <!--/ Stylesheet(Bootstrap) -->
+
+    <!-- Stylesheet(Application) -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/custom.css">
+    <link rel="stylesheet" id="base-color" href="/css/color/serene.css"><!-- Base Theme Color -->
+    <link rel="stylesheet" id="base-bg" href="/css/background/bg1.css"><!-- Boxed Background -->
+    <!--/ Stylesheet(Application) -->
+
+    <!-- Stylesheet(Plugins) -->
+    <link rel="stylesheet" href="/assets/jui/css/jquery-ui-1.10.3.min.css">
+    <link rel="stylesheet" href="/assets/icheck/css/jquery.icheck.min.css">
+    <link rel="stylesheet" href="/assets/formvalidation/validationengine/css/jquery.validationEngine.min.css">
+    <link rel="stylesheet" href="/assets/tagit/css/jquery.tagit.min.css">
+    <link rel="stylesheet" href="/assets/gritter/css/jquery.gritter.min.css">
+
+    <!--/ Stylesheet(Plugins) -->
+    <!--/ END STYLESHEET SECTION -->
+
+    <!-- START JAVASCRIPT SECTION - Load only modernizr script here -->
+    <!-- Javascript(Modernizr) -->
+    <script src="/assets/modernizr/js/modernizr-2.6.2.min.js"></script>
+    <!--/ Javascript(Modernizr) -->
+    <!--/ END JAVASCRIPT SECTION -->
+</head>
+<body>
+    <!-- START Template Wrapper -->
+    <!-- If you want to enable the fixed header, just add `.fixed-header` class to the `#wrapper` div below -->
+    <div id="wrapper">
+        <!-- START Template Canvas -->
+        <div id="canvas">
+
+            <!-- START Content -->
+            <div class="container-fluid">
+                <!-- START Row -->
+                <div class="row-fluid">
+                    <!-- START Login Widget Form -->
+                    <p>&nbsp;</p>
+                    <form class="widget stacked teal widget-login" name="login" method="post" action="/auth/login">
+                    	<input type="hidden" name="from_page" value="%(from_page)s" />
+                        <section class="body">
+                            <div class="body-inner">
+                                <!-- START Logo -->
+                                <div class="logo" align="center">
+                                    <img src="/img/logo-dark.png">
+                                </div>
+                                <!--/ END Logo -->
+                                
+                                <!-- Avatar -->
+                                <div class="">
+                                    <h5 align="center">Web User Interface Login</h5>
+                                </div><!--/ Avatar -->
+
+                                <!-- Username -->
+                                <div class="control-group">
+                                    <div class="controls">
+                                        <input type="text" name="username" autocomplete="off" placeholder="Username" class="span12"><i class="icon-user input-icon"></i>
+                                    </div>
+                                </div><!--/ Username -->
+
+                                <!-- Password -->
+                                <div class="control-group">
+                                    <div class="controls">
+                                        <input type="password" name="password" autocomplete="off" placeholder="Password" class="span12"><i class="icon-lock input-icon"></i>
+                                    </div>
+                                </div><!--/ Password -->
+
+                                <!-- Checkbox -->
+                                <div class="control-group">
+                                    <div class="controls">
+                                        <span>
+                                            <label class="checkbox styled pull-left">
+                                                <input type="checkbox" name="hide"> Hide password 
+                                            </label>
+                                            <a class="pull-left" href="http://www.nngroup.com/articles/stop-password-masking/">&nbsp;(?)</a>
+                                        </span>
+
+                                    </div>
+                                </div><!--/ Checkbox -->
+                            </div>
+                            <!-- Form Action -->
+                            <!-- Place out form `.body-inner` -->
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary span12">Login</button>
+                            </div>
+                            <!--/ Form Action -->
+
+                            <p align="center">The web user interface authenticates on your SSH username/password.</p>
+                        </section>
+                    </form>
+                    <!--/ END Login Widget Form -->
+                </div>
+                <!--/ END Row -->
+            </div>
+            <!--/ END Content -->
+            
+        </div>
+        <!--/ END Template Canvas -->
+    </div>
+    <!--/ END Template Wrapper -->
+
+    <!-- START JAVASCRIPT SECTION - Include at the bottom of the page to reduce load time -->
+    <!-- Javascript(Vendors) -->
+    <script src="/assets/jquery/js/jquery-2.0.3.min.js"></script>
+    <script src="/assets/jui/js/jquery-ui-1.10.3.min.js"></script>
+    <!--/ Javascript(Vendors) -->
+
+    <!-- Javascript(Plugins) -->
+    <!--[if IE 8]><script src="/assets/respond/js/respond.min.js"></script><![endif]-->
+    <script src="/assets/autosize/js/jquery.autosize.min.js"></script>
+    <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/assets/easypiechart/js/jquery.easypiechart.min.js"></script>
+    <script src="/assets/formwizard/js/jquery.formwizard.min.js"></script>
+    <script src="/assets/icheck/js/jquery.icheck.min.js"></script>
+    <script src="/assets/ie-placeholder/js/jquery.placeholder.min.js"></script>
+    <script src="/assets/inputmask/js/jquery.inputmask.min.js"></script>
+    <script src="/assets/moment/js/moment.min.js"></script>
+    <script src="/assets/mousewheel/js/jquery.mousewheel.min.js"></script>
+    <script src="/assets/daterangepicker/js/daterangepicker.min.js"></script>
+    <script src="/assets/tagit/js/tag-it.min.js"></script>
+    <script src="/assets/gritter/js/jquery.gritter.min.js"></script>
+
+    <!-- Form Validation -->
+    <script src="/assets/formvalidation/bassistance/js/jquery.validate.min.js"></script>
+    <script src="/assets/formvalidation/validationengine/js/lang/jquery.validationEngine-en.min.js"></script>
+    <script src="/assets/formvalidation/validationengine/js/jquery.validationEngine.min.js"></script>
+
+    <!-- Chart -->
+    <script src="/assets/flot/jquery.flot.min.js"></script>
+    <script src="/assets/flot/jquery.flot.pie.min.js"></script>
+    <script src="/assets/flot/jquery.flot.categories.min.js"></script>
+    <script src="/assets/flot/jquery.flot.tooltip.min.js"></script>
+    <script src="/assets/flot/jquery.flot.resize.min.js"></script>
+    <script src="/assets/flot/excanvas.min.js"></script>
+    <!--/ Javascript(Plugins) -->
+
+    <!-- Javascript (Application) -->
+    <script src="/js/plugins.js"></script>
+    <script src="/js/application.js"></script>
+
+    <script src="/js/knockout-min.js"></script>
+    <script src="/js/scriptin.js"></script>
+    <!--/ Javascript (Application) -->
+
+    <script type="text/javascript">
+      $(document).ready(function () {
+        try {
+          $('input[name=password]').attr('type', 'textbox');
+          $('input[name=hide]').on('ifChanged', function () {
+            if ($(this).is(':checked'))
+              $('input[name=password]').attr('type', 'password');
+            else
+              $('input[name=password]').attr('type', 'textbox');
+          })
+        } catch (e) {
+          $('input[name=password]').attr('type', 'password');
+        }
+
+        $.getJSON('/webui_config', function(data) {
+          if (data.mask_password)
+            $('input[name=hide]').iCheck('check');
+        })
+        
+      })
+    </script>
+
+    </body>
+    </html>

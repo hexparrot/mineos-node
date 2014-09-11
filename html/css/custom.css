@@ -1,0 +1,73 @@
+/* Cleanizr v.1.2.2 - custom.css
+ *
+ * @note : Any enhancement should be done in this file
+ * @author : you
+ * @author URL : your url
+ *
+ */
+
+input[name=password] {
+  padding-left: 6px !important;
+  margin-bottom: 10px;
+}
+li.accordion-group a, ul.nav, .pointer  {
+    cursor: pointer;
+}
+#table_status tr td:first-child, #table_profiles_view tr td:first-child{
+    cursor: pointer;
+    color: #2A5DB0;
+    font-size: 1.1em;
+}
+#table_status tr td:first-child:hover, #table_profiles_view tr td:first-child:hover{
+    text-decoration: underline;
+}
+#create_server .help-block {
+    display: block !important;
+}
+.dropdown-toggle {
+    cursor: default;
+}
+.dropdown-menu li {
+    cursor: pointer;
+}
+#prune_increment_input, #prune_archive_input {
+	margin-bottom: 0px;
+}
+#server_status h4 {
+    cursor: pointer;
+}
+#sidebar #nav > ul > li > a > .text {
+	text-transform: none;
+}
+#donate {
+	display: inline-block;
+}
+.gritter-success .gritter-top, .gritter-success .gritter-item , .gritter-success .gritter-bottom {
+	background-color: #51a351;
+	color: white;
+}
+.gritter-error .gritter-top, .gritter-error .gritter-item , .gritter-error .gritter-bottom {
+	background-color: #bd362f;
+	color: white;
+}
+.gritter-info .gritter-top, .gritter-info .gritter-item , .gritter-info .gritter-bottom {
+	background-color: #2f96b4;
+	color: white;
+}
+.gritter-warning .gritter-top, .gritter-warning .gritter-item , .gritter-warning .gritter-bottom {
+	background-color: #f89406;
+	color: white;
+}
+#header > .logo > a {
+	font-size: 90%;
+	font-weight: normal;
+}
+
+.table-hover tbody tr:hover > td,
+.table-hover tbody tr:hover > td{
+	background-color: #ddd !important;
+}
+
+#delete_server label {
+	padding-left: 0;
+}
