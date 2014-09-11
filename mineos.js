@@ -242,6 +242,34 @@ mineos.mc = function(server_name, base_dir) {
     }
   }
 
+  self.ping = function(callback) {
+    var socket = net.connect({port: 25565});
+    socket.setTimeout(2500);
+    socket.on('connect', function() {
+      var query = '\xfe\x01',
+          buf = new Buffer(2);
+
+      buf.write(query, 0, query.length, 'binary');
+      socket.write(buf);
+    });
+
+    socket.on('data', function(data) {
+      socket.end();
+      var split = data.toString('utf16le').split('\u0000').splice(1);
+      callback({
+        protocol: parseInt(split[0]),
+        server_version: split[1],
+        motd: split[2],
+        players_online: split[3],
+        players_max: split[4]
+      });
+    });
+
+    socket.on('error', function(err) {
+      console.error('error:', err);
+    })
+  }
+
   return self;
 }
 
