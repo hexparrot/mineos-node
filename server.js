@@ -16,9 +16,9 @@ server.backend = function(base_dir, socket_emitter) {
   (function() {
     var server_path = path.join(base_dir, mineos.DIRS['servers']);
     var regex_servers = new RegExp('{0}\/[a-zA-Z0-9_\.]+\/.+'.format(server_path));
-    var watcher = chokidar.watch(server_path, { persistent: true, ignored: regex_servers });
+    self.watcher = chokidar.watch(server_path, { persistent: true, ignored: regex_servers });
 
-    watcher
+    self.watcher
       .on('addDir', function(dirpath) {
         try {
           var server_name = mineos.extract_server_name(base_dir, dirpath);
@@ -40,29 +40,62 @@ server.backend = function(base_dir, socket_emitter) {
         nsp;
 
     function setup() {
-      instance.is_server(function(is_server) {
-        nsp = self.front_end.of('/{0}'.format(server_name));
+      nsp = self.front_end.of('/{0}'.format(server_name));
 
-        self.servers[server_name] = {
-          instance: instance,
-          nsp: nsp,
-          tails: {},
-          watches: {}
+      self.servers[server_name] = {
+        instance: instance,
+        nsp: nsp,
+        tails: {},
+        watches: {}
+      }
+
+      console.info('Discovered server: {0}'.format(server_name));
+      self.front_end.emit('track_server', server_name);
+      make_tail('logs/latest.log');
+      make_watch('server.properties', function(rel_filepath) {
+        instance.sp(function(sp_data) {
+          console.info('[{0}] server.properties changed'.format(server_name));
+          nsp.in(rel_filepath).emit('server.properties', sp_data);
+        })
+      });
+
+      nsp.on('connection', function(socket) {
+        function produce_receipt(args) {
+          console.info('command received', args.command)
+          args.uuid = uuid.v1();
+          nsp.emit('receipt', args)
+          server_dispatcher(args);
         }
 
-        console.info('Discovered server: {0}'.format(server_name));
-        make_tail('logs/latest.log');
-        make_watch('server.properties');
+        function start_watch(rel_filepath) {
+          if (rel_filepath in self.servers[server_name].tails) {
+            socket.join(rel_filepath);
+            console.info('[{0}] user following tail: {1}'.format(server_name, rel_filepath));
+          } else if (rel_filepath in self.servers[server_name].watches) { 
+            socket.join(rel_filepath);
+            console.info('[{0}] user watching file: {1}'.format(server_name, rel_filepath));
+          } else {
+            console.error('no room by found for', rel_filepath);
+          }
+        }
 
-        nsp.on('connection', function(socket) {
-          console.info('User connected to namespace: {0}'.format(server_name));
-          socket.on('command', function(args) {
-            console.info('command received', args.command)
-            args.uuid = uuid.v1();
-            nsp.emit('receipt', args)
-            server_dispatcher(args);
-          })
-        })
+        function unwatch(rel_filepath) {
+          if (rel_filepath in self.servers[server_name].tails) {
+            socket.leave(rel_filepath);
+            console.info('[{0}] user dropping tail: {1}'.format(server_name, rel_filepath));
+          } else if (rel_filepath in self.servers[server_name].watches) {
+            socket.leave(rel_filepath);
+            console.info('[{0}] user stopped watching file: {1}'.format(server_name, rel_filepath));
+          } else {
+            console.error('no room by found for', rel_filepath);
+          }
+        }
+
+        console.info('User connected to namespace: {0}'.format(server_name));
+        socket.on('command', produce_receipt);
+        socket.on('watch', start_watch);
+        socket.on('unwatch', unwatch);
+
       })
     }
 
@@ -86,10 +119,15 @@ server.backend = function(base_dir, socket_emitter) {
             args.success = success;
             nsp.emit('result', args);
           })
-        else if (required_args[i] in args)
+        else if (required_args[i] in args) {
           arg_array.push(args[required_args[i]])
-        else
+        } else {
+          args.success = false;
+          console.error('Provided values missing required argument', required_args[i]);
+          args.error = 'Provided values missing required argument: {0}'.format(required_args[i]);
+          nsp.emit('result', args);
           return;
+        }
       }
 
       fn.apply(instance, arg_array);
@@ -110,6 +148,7 @@ server.backend = function(base_dir, socket_emitter) {
         var new_tail = new tail(abs_filepath);
         console.info('[{0}] Created tail on {1}'.format(server_name, rel_filepath));
         new_tail.on('line', function(data) {
+          //console.info('[{0}] {1}: transmitting new tail data'.format(server_name, rel_filepath));
           nsp.in(rel_filepath).emit('tail_data', data);
         })
         self.servers[server_name].tails[rel_filepath] = new_tail;
@@ -130,7 +169,7 @@ server.backend = function(base_dir, socket_emitter) {
       }
     }
 
-    function make_watch(rel_filepath) {
+    function make_watch(rel_filepath, callback) {
       var abs_filepath = path.join(instance.env.cwd, rel_filepath);
 
       if (rel_filepath in self.servers[server_name].watches) {
@@ -140,17 +179,9 @@ server.backend = function(base_dir, socket_emitter) {
 
       try {
         var watcher = chokidar.watch(abs_filepath, {persistent: true});
-        watcher
-          .on('change', function(fp) {
-            switch (rel_filepath) {
-              case 'server.properties':
-                instance.sp(function(sp_data) {
-                  console.info('[{0}] server.properties changed'.format(server_name));
-                  nsp.in(rel_filepath).emit('server.properties', sp_data);
-                })
-                break;
-            }
-          })
+        watcher.on('change', function(fp) {
+          callback(rel_filepath);
+        })
         console.info('[{0}] Started watch on {1}'.format(server_name, rel_filepath));
         self.servers[server_name].watches[rel_filepath] = watcher;
       } catch (e) {
@@ -165,21 +196,27 @@ server.backend = function(base_dir, socket_emitter) {
     })
   }
 
-  function untrack_server(server_name) {
+  self.untrack_server = function(server_name) {
     var instance = new mineos.mc(server_name, base_dir);
 
-    for (var t in self.servers[server_name].tails) {
+    for (var t in self.servers[server_name].tails) 
       self.servers[server_name].tails[t].unwatch();
-    }
 
-    for (var w in self.servers[server_name].watches) {
-      self.servers[server_name].watches[t].close();
-    }
+    for (var w in self.servers[server_name].watches) 
+      self.servers[server_name].watches[w].close();
 
+    self.servers[server_name].nsp.removeAllListeners();
     delete self.servers[server_name];
 
     self.front_end.emit('server_list', Object.keys(self.servers));
     console.info('Server removed: {0}'.format(server_name));
+  }
+
+  self.shutdown = function() {
+    self.watcher.close();
+
+    for (var s in self.servers)
+      self.untrack_server(s);
   }
 
   self.front_end.on('connection', function(socket) {
@@ -201,7 +238,6 @@ server.backend = function(base_dir, socket_emitter) {
     console.info('User connected to webui');
     self.front_end.emit('server_list', Object.keys(self.servers));
     socket.on('command', webui_dispatcher);
-
   })
 
   return self;
