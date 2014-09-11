@@ -3,27 +3,28 @@ function webui() {
 
   self.global = io('/');
   self.servers = ko.observableArray([]);
-
   self.page = ko.observable();
-  self.page.extend({ notify: 'always' });
 
   self.global.on('server_list', function(servers) {
-    //self.servers = ko.observableArray([]);
+    var all = [];
     for (var s in servers)
-      self.track_server(servers[s]);
+      all.push(self.track_server(servers[s]));
+    self.servers(all);
   })
 
   self.global.on('track_server', function(server_name) {
-    self.track_server(server_name);
+    self.servers.push(self.track_server(server_name));
   })
 
   self.track_server = function(server_name) {
     var c = io('/' + server_name);
-
-    self.servers.push({
+    var container = {
       server_name: server_name,
-      channel: c
-    })
+      channel: c,
+      gamelog: ko.observableArray([])
+    }
+
+    c.emit('watch', 'logs/latest.log');
 
     c.on('server.properties', function(data) {
       $('#sp').empty();
@@ -33,7 +34,8 @@ function webui() {
     })
 
     c.on('tail_data', function(data) {
-      $('#log_latest').append($('<li>').text(data))
+      console.log(data);
+      container.gamelog.push(data);
     })
 
     c.on('result', function(data) {
@@ -44,6 +46,7 @@ function webui() {
       console.log('RECEIPT:', data);
     })
 
+    return container;
   }
 
   self.show_page = function(vm, event) {
