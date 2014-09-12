@@ -477,7 +477,7 @@ test.ping = function(test) {
   })
 }
 
-test.status = function(test) {
+test.memory = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
   var memory_regex = /(\d+) kB/
@@ -498,7 +498,7 @@ test.status = function(test) {
       })
     },
     function(callback) {
-      instance.status(function(memory_obj) {
+      instance.property('memory', function(memory_obj) {
         test.equal(memory_obj.Name, 'java');
         test.ok(memory_regex.test(memory_obj.VmPeak));
         test.ok(memory_regex.test(memory_obj.VmSize));

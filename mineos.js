@@ -238,8 +238,10 @@ mineos.mc = function(server_name, base_dir) {
       case 'memory':
         var pids = mineos.server_pids_up();
         if (self.server_name in pids) {
-          self.status(function(status) {
-            callback(status);
+          var procfs = require('procfs-stats');
+          var ps = procfs(pids[self.server_name]['java']);
+          ps.status(function(err, data){
+            callback(data);
           })
         } else {
           callback({});
@@ -292,17 +294,6 @@ mineos.mc = function(server_name, base_dir) {
 
     socket.on('error', function(err) {
       console.error('error:', err);
-    })
-  }
-
-  self.status = function(callback) {
-    var procfs = require('procfs-stats');
-
-    self.property('java_pid', function(pid) {
-      var ps = procfs(pid);
-      ps.status(function(err, data){
-        callback(data);
-      })
     })
   }
 
