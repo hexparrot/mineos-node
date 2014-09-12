@@ -236,8 +236,30 @@ mineos.mc = function(server_name, base_dir) {
         })
         break;
       case 'memory':
+        var pids = mineos.server_pids_up();
+        if (self.server_name in pids) {
+          self.status(function(status) {
+            callback(status);
+          })
+        } else {
+          callback({});
+        }
         break;
       case 'ping':
+        var pids = mineos.server_pids_up();
+        if (self.server_name in pids) {
+          self.ping(null, null, function(ping){
+            callback(ping);
+          })
+        } else {
+          callback({
+            protocol: null,
+            server_version: null,
+            motd: null,
+            players_online: null,
+            players_max: null
+          })
+        }
         break;
     }
   }

@@ -408,6 +408,25 @@ test.properties = function(test) {
         test.equal(ip, '0.0.0.0');
         callback(null);
       })
+    },
+    function(callback) {
+      instance.property('memory', function(memory) {
+        test.equal(Object.keys(memory).length, 0);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('ping', function(ping) {
+        test.equal(Object.keys(ping).length, 5);
+
+        test.equal(ping.protocol, null);
+        test.equal(ping.server, null);
+        test.equal(ping.motd, null);
+        test.equal(ping.players_online, null);
+        test.equal(ping.players_max, null);
+
+        callback(null);
+      })
     }
   ], function(err, results) {
     test.done();
