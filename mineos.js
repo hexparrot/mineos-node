@@ -268,10 +268,10 @@ mineos.mc = function(server_name, base_dir) {
 
   self.ping = function(callback) {
     function send_query_packet(port) {
-      var socket = net.connect({
-        port: port
-      });
+      var net = require('net');
+      var socket = net.connect({port: port});
       socket.setTimeout(2500);
+
       socket.on('connect', function() {
         var query = '\xfe\x01',
             buf = new Buffer(2);

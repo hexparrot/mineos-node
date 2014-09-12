@@ -434,8 +434,6 @@ test.properties = function(test) {
 }
 
 test.ping = function(test) {
-  /* ping seems to work infalliably, but fails in this test*/
-  test.done();
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
@@ -461,7 +459,7 @@ test.ping = function(test) {
           test.equal(pingback.server_version, '1.7.9');
           test.equal(pingback.motd, 'A Minecraft Server');
           test.equal(pingback.players_online, 0);
-          test.equal(pingback.players_max, 20);
+          test.equal(pingback.players_max, 2);
           callback(null);
         })
       }, 15000)
