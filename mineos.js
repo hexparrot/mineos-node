@@ -273,6 +273,17 @@ mineos.mc = function(server_name, base_dir) {
     })
   }
 
+  self.status = function(callback) {
+    var procfs = require('procfs-stats');
+
+    self.property('java_pid', function(pid) {
+      var ps = procfs(pid);
+      ps.status(function(err, data){
+        callback(data);
+      })
+    })
+  }
+
   return self;
 }
 
