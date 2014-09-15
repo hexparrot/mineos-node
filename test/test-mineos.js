@@ -399,7 +399,7 @@ test.properties = function(test) {
     },
     function(callback) {
       instance.property('server-port', function(port) {
-        test.equal(port, '25565');
+        test.equal(port, 25565);
         callback(null);
       })
     },
@@ -408,8 +408,104 @@ test.properties = function(test) {
         test.equal(ip, '0.0.0.0');
         callback(null);
       })
+    },
+    function(callback) {
+      instance.property('memory', function(memory) {
+        test.equal(Object.keys(memory).length, 0);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('ping', function(ping) {
+        test.equal(Object.keys(ping).length, 5);
+
+        test.equal(ping.protocol, null);
+        test.equal(ping.server, null);
+        test.equal(ping.motd, null);
+        test.equal(ping.players_online, null);
+        test.equal(ping.players_max, null);
+
+        callback(null);
+      })
     }
   ], function(err, results) {
     test.done();
   })
+}
+
+test.ping = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    function(callback) {
+      instance.create(function(did_create) {
+        test.ok(did_create);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.start(function(did_start, proc) {
+        test.ok(did_start);
+        proc.once('close', function(code) {
+          callback(null);
+        })
+      })
+    },
+    function(callback) {
+      setTimeout(function() {
+        instance.ping(function(pingback) {
+          test.equal(pingback.protocol, 127);
+          test.equal(pingback.server_version, '1.7.9');
+          test.equal(pingback.motd, 'A Minecraft Server');
+          test.equal(pingback.players_online, 0);
+          test.equal(pingback.players_max, 20);
+          callback(null);
+        })
+      }, 15000)
+    },
+    function(callback) {
+      instance.kill(function(did_kill) {
+        if (did_kill)
+          callback(null);
+      })
+    }
+  ], function(err, results) {
+    test.done();
+  })
+}
+
+test.memory = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+  var memory_regex = /(\d+) kB/
+
+  async.series([
+    function(callback) {
+      instance.create(function(did_create) {
+        test.ok(did_create);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.start(function(did_start, proc) {
+        test.ok(did_start);
+        proc.once('close', function(code) {
+          callback(null);
+        })
+      })
+    },
+    function(callback) {
+      instance.property('memory', function(memory_obj) {
+        test.equal(memory_obj.Name, 'java');
+        test.ok(memory_regex.test(memory_obj.VmPeak));
+        test.ok(memory_regex.test(memory_obj.VmSize));
+        test.ok(memory_regex.test(memory_obj.VmRSS));
+        test.ok(memory_regex.test(memory_obj.VmSwap));
+        callback(null);
+      })
+    }
+  ], function(err, results) {
+    test.done();
+  })  
 }
