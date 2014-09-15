@@ -267,6 +267,20 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.ping = function(callback) {
+    function swapBytes(buffer) {
+      /*http://stackoverflow.com/a/7460958/1191579*/
+      var l = buffer.length;
+      if (l & 0x01) {
+        throw new Error('Buffer length must be even');
+      }
+      for (var i = 0; i < l; i += 2) {
+        var a = buffer[i];
+        buffer[i] = buffer[i+1];
+        buffer[i+1] = a;
+      }
+      return buffer; 
+    }
+
     function send_query_packet(port) {
       var net = require('net');
       var socket = net.connect({port: port});
@@ -282,7 +296,7 @@ mineos.mc = function(server_name, base_dir) {
 
       socket.on('data', function(data) {
         socket.end();
-        var split = data.toString('utf16le').split('\u0000').splice(1);
+        var split = swapBytes(data.slice(3)).toString('ucs2').split('\u0000').splice(1);
         callback({
           protocol: parseInt(parseInt(split[0])),
           server_version: split[1],
