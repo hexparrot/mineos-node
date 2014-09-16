@@ -85,17 +85,17 @@ mineos.extract_server_name = function(base_dir, server_path) {
   }
 }
 
-mineos.mc = function(server_name, base_dir) {
+mineos.mc = function(server_name, init_args) {
   var self = this;
   self.server_name = server_name;
   self.ev = new events.EventEmitter();
 
   self.env = {
-    base_dir: base_dir,
-    cwd: path.join(base_dir, mineos.DIRS['servers'], server_name),
-    bwd: path.join(base_dir, mineos.DIRS['backup'], server_name),
-    awd: path.join(base_dir, mineos.DIRS['archive'], server_name),
-    sp: path.join(base_dir, mineos.DIRS['servers'], server_name, 'server.properties')
+    base_dir: init_args.base_dir,
+    cwd: path.join(init_args.base_dir, mineos.DIRS['servers'], server_name),
+    bwd: path.join(init_args.base_dir, mineos.DIRS['backup'], server_name),
+    awd: path.join(init_args.base_dir, mineos.DIRS['archive'], server_name),
+    sp: path.join(init_args.base_dir, mineos.DIRS['servers'], server_name, 'server.properties')
   }
 
   self._sp = new cf.config_file(self.env.sp);
