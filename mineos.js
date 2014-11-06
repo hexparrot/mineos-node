@@ -85,17 +85,17 @@ mineos.extract_server_name = function(base_dir, server_path) {
   }
 }
 
-mineos.mc = function(server_name, base_dir) {
+mineos.mc = function(server_name, init_args) {
   var self = this;
   self.server_name = server_name;
   self.ev = new events.EventEmitter();
 
   self.env = {
-    base_dir: base_dir,
-    cwd: path.join(base_dir, mineos.DIRS['servers'], server_name),
-    bwd: path.join(base_dir, mineos.DIRS['backup'], server_name),
-    awd: path.join(base_dir, mineos.DIRS['archive'], server_name),
-    sp: path.join(base_dir, mineos.DIRS['servers'], server_name, 'server.properties')
+    base_dir: init_args.base_dir,
+    cwd: path.join(init_args.base_dir, mineos.DIRS['servers'], server_name),
+    bwd: path.join(init_args.base_dir, mineos.DIRS['backup'], server_name),
+    awd: path.join(init_args.base_dir, mineos.DIRS['archive'], server_name),
+    sp: path.join(init_args.base_dir, mineos.DIRS['servers'], server_name, 'server.properties')
   }
 
   self._sp = new cf.config_file(self.env.sp);
@@ -236,41 +236,84 @@ mineos.mc = function(server_name, base_dir) {
         })
         break;
       case 'memory':
+        var pids = mineos.server_pids_up();
+        if (self.server_name in pids) {
+          var procfs = require('procfs-stats');
+          var ps = procfs(pids[self.server_name]['java']);
+          ps.status(function(err, data){
+            callback(data);
+          })
+        } else {
+          callback({});
+        }
         break;
       case 'ping':
+        var pids = mineos.server_pids_up();
+        if (self.server_name in pids) {
+          self.ping(null, null, function(ping){
+            callback(ping);
+          })
+        } else {
+          callback({
+            protocol: null,
+            server_version: null,
+            motd: null,
+            players_online: null,
+            players_max: null
+          })
+        }
         break;
     }
   }
 
-  self.ping = function(host, port, callback) {
-    var socket = net.connect({
-      host: host || 'localhost',
-      port: port || 25565
-    });
-    socket.setTimeout(2500);
-    socket.on('connect', function() {
-      var query = '\xfe\x01',
-          buf = new Buffer(2);
+  self.ping = function(callback) {
+    function swapBytes(buffer) {
+      /*http://stackoverflow.com/a/7460958/1191579*/
+      var l = buffer.length;
+      if (l & 0x01) {
+        throw new Error('Buffer length must be even');
+      }
+      for (var i = 0; i < l; i += 2) {
+        var a = buffer[i];
+        buffer[i] = buffer[i+1];
+        buffer[i+1] = a;
+      }
+      return buffer; 
+    }
 
-      buf.write(query, 0, query.length, 'binary');
-      socket.write(buf);
-    });
+    function send_query_packet(port) {
+      var net = require('net');
+      var socket = net.connect({port: port});
+      socket.setTimeout(2500);
 
-    socket.on('data', function(data) {
-      socket.end();
-      var split = data.toString('utf16le').split('\u0000').splice(1);
-      callback({
-        protocol: parseInt(parseInt(split[0])),
-        server_version: split[1],
-        motd: split[2],
-        players_online: parseInt(split[3]),
-        players_max: parseInt(split[4])
+      socket.on('connect', function() {
+        var query = '\xfe\x01',
+            buf = new Buffer(2);
+
+        buf.write(query, 0, query.length, 'binary');
+        socket.write(buf);
       });
-    });
 
-    socket.on('error', function(err) {
-      console.error('error:', err);
-    })
+      socket.on('data', function(data) {
+        socket.end();
+        var split = swapBytes(data.slice(3)).toString('ucs2').split('\u0000').splice(1);
+        callback({
+          protocol: parseInt(parseInt(split[0])),
+          server_version: split[1],
+          motd: split[2],
+          players_online: parseInt(split[3]),
+          players_max: parseInt(split[4])
+        });
+      });
+
+      socket.on('error', function(err) {
+        console.error('error:', err);
+      })
+    }
+
+    self.sp(function(dict) {
+      send_query_packet(dict['server-port']);
+    })  
   }
 
   return self;
