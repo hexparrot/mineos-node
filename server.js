@@ -59,7 +59,7 @@ server.backend = function(base_dir, socket_emitter) {
       self.front_end.emit('track_server', server_name);
       make_tail('logs/latest.log');
       make_watch('server.properties', function(rel_filepath) {
-        instance.sp(function(sp_data) {
+        instance.sp(function(err, sp_data) {
           console.info('[{0}] server.properties changed'.format(server_name));
           nsp.in(rel_filepath).emit('server.properties', sp_data);
         })
@@ -127,8 +127,8 @@ server.backend = function(base_dir, socket_emitter) {
       for (var i in required_args) {
         // all callbacks expected to follow the pattern (success, payload).
         if (required_args[i] == 'callback') 
-          arg_array.push(function(success, payload) {
-            args.success = success;
+          arg_array.push(function(err, payload) {
+            args.success = !err;
             nsp.emit('result', args);
           })
         else if (required_args[i] in args) {
@@ -145,7 +145,7 @@ server.backend = function(base_dir, socket_emitter) {
       switch (args.command) {
         case 'start':
           if (server_name in self.servers)
-            self.servers[server_name].instance.property('up', function(is_up) {
+            self.servers[server_name].instance.property('up', function(err, is_up) {
               if (is_up) {
                 console.warn('Ignored attempt to start already-started server: {0}'.format(server_name));
               } else {
@@ -156,7 +156,7 @@ server.backend = function(base_dir, socket_emitter) {
           break;
         case 'stuff':
           if (server_name in self.servers)
-            self.servers[server_name].instance.property('up', function(is_up) {
+            self.servers[server_name].instance.property('up', function(err, is_up) {
               if (is_up) {
                 fn.apply(instance, arg_array);
                 console.info('{0} received request {1}'.format(server_name, args.command))
@@ -260,7 +260,7 @@ server.backend = function(base_dir, socket_emitter) {
 
     }
 
-    instance.is_server(function(is_server) {
+    instance.is_server(function(err, is_server) {
       setup();
     })
   }
@@ -301,7 +301,7 @@ server.backend = function(base_dir, socket_emitter) {
             console.error('Ignored attempt to create server "{0}"; Servername already in use.'.format(args.server_name));
           } else {
             var instance = new mineos.mc(args.server_name, base_dir);
-            instance.create(function(did_create) {
+            instance.create(function(err, did_create) {
               if (did_create) {
                 //self.front_end.emit('track_server', args.server_name); //inexplicably not working. try:
                 //global.emit('command', {command: 'create', 'server_name': 'aaa'})
