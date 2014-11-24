@@ -407,6 +407,20 @@ test.properties = function(test) {
 
   async.series([
     function(callback) {
+      instance.property('java_pid', function(err, java_pid) {
+        test.ok(err); //looking for positive error
+        test.equal(java_pid, null);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('screen_pid', function(err, screen_pid) {
+        test.ok(err); //looking for positive error
+        test.equal(screen_pid, screen_pid);
+        callback(null);
+      })
+    },
+    function(callback) {
       instance.create(function(err, did_create) {
         test.ifError(err);
         test.ok(did_create);

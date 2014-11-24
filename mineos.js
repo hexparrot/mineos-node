@@ -219,11 +219,19 @@ mineos.mc = function(server_name, base_dir) {
         break;
       case 'java_pid':
         var pids = mineos.server_pids_up();
-        callback(null, pids[self.server_name]['java']);
+        try {
+          callback(null, pids[self.server_name]['java']);
+        } catch (e) {
+          callback(true, null);
+        }
         break;
       case 'screen_pid':
         var pids = mineos.server_pids_up();
-        callback(null, pids[self.server_name]['screen']);
+        try {
+          callback(null, pids[self.server_name]['screen']);
+        } catch (e) {
+          callback(true, null);
+        }
         break;
       case 'server-port':
         var sp = self.sp(function(err, dict) {
