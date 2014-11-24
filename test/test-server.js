@@ -48,15 +48,17 @@ test.backend_cleanup = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(function(did_create) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
         test.ok(did_create);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
-      instance.is_server(function(is_server) {
+      instance.is_server(function(err, is_server) {
+        test.ifError(err);
         test.ok(is_server);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {

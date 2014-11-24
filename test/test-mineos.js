@@ -24,8 +24,9 @@ test.server_list = function (test) {
   var servers = mineos.server_list(BASE_DIR);
   var instance = new mineos.mc('testing', BASE_DIR);
 
-  instance.create(function(did_create) {
+  instance.create(function(err, did_create) {
     servers = mineos.server_list(BASE_DIR);
+    test.ifError(err);
     test.ok(servers instanceof Array, "server returns an array");
     test.done();
   })
@@ -48,21 +49,24 @@ test.is_server = function(test) {
 
   async.series([
     function(callback) {
-      instance.is_server(function(is_server) {
+      instance.is_server(function(err, is_server) {
+        test.ifError(err);
         test.ok(!is_server);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
-      instance.create(function(did_create) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
         test.ok(did_create);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
-      instance.is_server(function(is_server) {
+      instance.is_server(function(err, is_server) {
+        test.ifError(err);
         test.ok(is_server);
-        callback(null);
+        callback(err);
       })
     }
   ], function(err, results) {
@@ -80,7 +84,8 @@ test.create_server = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(function(did_create){
+      instance.create(function(err, did_create){
+        test.ifError(err);
         test.ok(did_create);
 
         test.ok(fs.existsSync(instance.env.cwd));
@@ -114,25 +119,29 @@ test.delete_server = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(function(did_create) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
         test.ok(did_create);
         callback(null);
       })
     },
     function(callback) {
-      instance.is_server(function(is_server) {
+      instance.is_server(function(err, is_server) {
+        test.ifError(err);
         test.ok(is_server);
         callback(null);
       })
     },
     function(callback) {
-      instance.delete(function(did_delete) {
+      instance.delete(function(err, did_delete) {
+        test.ifError(err);
         test.ok(did_delete);
         callback(null);
       })
     },
     function(callback) {
-      instance.is_server(function(is_server) {
+      instance.is_server(function(err, is_server) {
+        test.ifError(err);
         test.ok(!is_server);
         callback(null);
       })
@@ -194,7 +203,8 @@ test.start = function(test) {
       })
     },
     function(callback) {
-      instance.create(function(did_create) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
         test.ok(did_create);
         callback(null);
       })
@@ -208,14 +218,16 @@ test.start = function(test) {
       })
     },
     function(callback) {
-      instance.property('screen_pid', function(pid) {
+      instance.property('screen_pid', function(err, pid) {
+        test.ifError(err);
         test.equal(typeof(pid), 'number');
         test.ok(pid > 0);
         callback(null);
       })
     },
     function(callback) {
-      instance.property('java_pid', function(pid) {
+      instance.property('java_pid', function(err, pid) {
+        test.ifError(err);
         test.equal(typeof(pid), 'number');
         test.ok(pid > 0);
         callback(null);
@@ -230,13 +242,15 @@ test.start = function(test) {
       })
     },
     function(callback) {
-      instance.delete(function(did_delete) {
+      instance.delete(function(err, did_delete) {
+        test.ifError(err);
         test.ok(did_delete);
         callback(null);
       })
     },
     function(callback) {
-      instance.is_server(function(is_server) {
+      instance.is_server(function(err, is_server) {
+        test.ifError(err);
         test.ok(!is_server);
         callback(null);
       })
@@ -252,7 +266,8 @@ test.archive = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(function(did_create) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
         test.ok(did_create);
         callback(null);
       })
@@ -280,7 +295,8 @@ test.backup = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(function(did_create) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
         test.ok(did_create);
         callback(null);
       })
@@ -307,7 +323,8 @@ test.restore = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(function(did_create) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
         test.ok(did_create);
         callback(null);
       })
@@ -325,7 +342,8 @@ test.restore = function(test) {
     },
     function(callback) {
       fs.removeSync(instance.env.cwd);
-      instance.is_server(function(is_server) {
+      instance.is_server(function(err, is_server) {
+        test.ifError(err);
         test.ok(!is_server);
         callback(null);
       })
@@ -352,7 +370,8 @@ test.sp = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(function(did_create) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
         test.ok(did_create);
         callback(null);
       })
@@ -386,37 +405,43 @@ test.properties = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(function(did_create) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
         test.ok(did_create);
         callback(null);
       })
     },
     function(callback) {
-      instance.property('up', function(up) {
+      instance.property('up', function(err, up) {
+        test.ifError(err);
         test.equal(up, false);
         callback(null);
       })
     },
     function(callback) {
-      instance.property('server-port', function(port) {
+      instance.property('server-port', function(err, port) {
+        test.ifError(err);
         test.equal(port, 25565);
         callback(null);
       })
     },
     function(callback) {
-      instance.property('server-ip', function(ip) {
+      instance.property('server-ip', function(err, ip) {
+        test.ifError(err);
         test.equal(ip, '0.0.0.0');
         callback(null);
       })
     },
     function(callback) {
-      instance.property('memory', function(memory) {
+      instance.property('memory', function(err, memory) {
+        test.ifError(err);
         test.equal(Object.keys(memory).length, 0);
         callback(null);
       })
     },
     function(callback) {
-      instance.property('ping', function(ping) {
+      instance.property('ping', function(err, ping) {
+        test.ifError(err);
         test.equal(Object.keys(ping).length, 5);
 
         test.equal(ping.protocol, null);
@@ -439,7 +464,8 @@ test.ping = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(function(did_create) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
         test.ok(did_create);
         callback(null);
       })
@@ -465,7 +491,8 @@ test.ping = function(test) {
       }, 15000)
     },
     function(callback) {
-      instance.kill(function(did_kill) {
+      instance.kill(function(err, did_kill) {
+        test.ifError(err);
         if (did_kill)
           callback(null);
       })
@@ -482,7 +509,8 @@ test.memory = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(function(did_create) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
         test.ok(did_create);
         callback(null);
       })
@@ -496,7 +524,8 @@ test.memory = function(test) {
       })
     },
     function(callback) {
-      instance.property('memory', function(memory_obj) {
+      instance.property('memory', function(err, memory_obj) {
+        test.ifError(err);
         test.equal(memory_obj.Name, 'java');
         test.ok(memory_regex.test(memory_obj.VmPeak));
         test.ok(memory_regex.test(memory_obj.VmSize));
