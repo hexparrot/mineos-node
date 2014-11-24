@@ -197,8 +197,8 @@ test.start = function(test) {
 
   async.series([
     function(callback) {
-      instance.stuff('stop', function(did_stuff, proc) {
-        test.ok(!did_stuff);
+      instance.stuff('stop', function(err, proc) {
+        test.ifError(err);
         callback(null);
       })
     },
@@ -210,8 +210,8 @@ test.start = function(test) {
       })
     },
     function(callback) {
-      instance.start(function(did_start, proc) {
-        test.ok(did_start);
+      instance.start(function(err, proc) {
+        test.ifError(err);
         proc.once('close', function(code) {
           callback(null);
         })
@@ -234,9 +234,9 @@ test.start = function(test) {
       })
     },
     function(callback) {
-      instance.stuff('stop', function(did_stuff, proc) {
+      instance.stuff('stop', function(err, proc) {
+        test.ifError(err);
         proc.once('close', function(code) {
-          test.ok(did_stuff);
           callback(null);
         })
       })
@@ -273,8 +273,8 @@ test.archive = function(test) {
       })
     },
     function(callback) {
-      instance.archive(function(did_archve, proc) {
-        test.ok(did_archve);
+      instance.archive(function(err, proc) {
+        test.ifError(err);
         proc.once('close', function(code) {
           setTimeout(function() {
             test.equal(fs.readdirSync(instance.env.awd).length, 1);
@@ -302,8 +302,8 @@ test.backup = function(test) {
       })
     },
     function(callback) {
-      instance.backup(function(did_backup, proc) {
-        test.ok(did_backup);
+      instance.backup(function(err, proc) {
+        test.ifError(err);
         proc.once('close', function(code) {
           setTimeout(function() {
             test.equal(fs.readdirSync(instance.env.bwd).length, 2);
@@ -330,8 +330,8 @@ test.restore = function(test) {
       })
     },
     function(callback) {
-      instance.backup(function(did_backup, proc) {
-        test.ok(did_backup);
+      instance.backup(function(err, proc) {
+        test.ifError(err);
         proc.once('close', function(code) {
           setTimeout(function() {
             test.equal(fs.readdirSync(instance.env.bwd).length, 2);
@@ -349,8 +349,8 @@ test.restore = function(test) {
       })
     },
     function(callback) {
-      instance.restore('now', function(did_restore, proc) {
-        test.ok(did_restore);
+      instance.restore('now', function(err, proc) {
+        test.ifError(err);
         proc.once('close', function(code) {
           setTimeout(function() {
             test.equal(fs.readdirSync(instance.env.cwd).length, 1);
@@ -473,8 +473,8 @@ test.ping = function(test) {
       })
     },
     function(callback) {
-      instance.start(function(did_start, proc) {
-        test.ok(did_start);
+      instance.start(function(err, proc) {
+        test.ifError(err);
         proc.once('close', function(code) {
           callback(null);
         })
@@ -519,8 +519,8 @@ test.memory = function(test) {
       })
     },
     function(callback) {
-      instance.start(function(did_start, proc) {
-        test.ok(did_start);
+      instance.start(function(err, proc) {
+        test.ifError(err);
         proc.once('close', function(code) {
           callback(null);
         })

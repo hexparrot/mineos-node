@@ -146,9 +146,9 @@ mineos.mc = function(server_name, base_dir) {
     fs.copy('/var/games/minecraft/profiles/vanilla179/minecraft_server.1.7.9.jar',
             path.join(self.env.cwd, 'minecraft_server.jar'), function(err) {
               if (!err)
-                callback(true, child_process.spawn(binary, args, params));
+                callback(err, child_process.spawn(binary, args, params));
               else
-                callback(false, null);
+                callback(err, null);
             });
   }
 
@@ -166,12 +166,12 @@ mineos.mc = function(server_name, base_dir) {
 
     self.property('up', function(err, up) {
       if (up)
-        callback(true, child_process.spawn('/usr/bin/screen', 
+        callback(err, child_process.spawn('/usr/bin/screen', 
                        ['-S', 'mc-{0}'.format(self.server_name), 
                         '-p', '0', '-X', 'eval', 'stuff "{0}\012"'.format(msg)], 
                        params));
       else
-        callback(false, null);
+        callback(err, false);
     })
   }
 
@@ -186,7 +186,7 @@ mineos.mc = function(server_name, base_dir) {
       gid: 1001
     }
 
-    callback(true, child_process.spawn(binary, args, params));
+    callback(null, child_process.spawn(binary, args, params));
   }
 
   self.backup = function(callback) {
@@ -198,7 +198,7 @@ mineos.mc = function(server_name, base_dir) {
       gid: 1001
     }
 
-    callback(true, child_process.spawn(binary, args, params));
+    callback(null, child_process.spawn(binary, args, params));
   }
 
   self.restore = function(step, callback) {
@@ -208,7 +208,7 @@ mineos.mc = function(server_name, base_dir) {
       cwd: self.env.bwd
     }
 
-    callback(true, child_process.spawn(binary, args, params));
+    callback(null, child_process.spawn(binary, args, params));
   }
 
   self.property = function(property, callback) {
