@@ -31,7 +31,7 @@ server.backend = function(base_dir, socket_emitter) {
           var server_name = mineos.extract_server_name(base_dir, dirpath);
         } catch (e) { return }
         if (server_name == path.basename(dirpath))
-          untrack_server(server_name);
+          self.untrack_server(server_name);
       })
   })();
 
@@ -130,10 +130,28 @@ server.backend = function(base_dir, socket_emitter) {
         }
       }
 
+      if (args.command == 'delete') {
+        // preemptively close tails/watches to let unlinkDir/untrackserver
+        // do all the real cleanup work without latest.log file open error
+        if (server_name in self.servers) {
+          for (var t in self.servers[server_name].tails) 
+            self.servers[server_name].tails[t].unwatch();
+
+          for (var w in self.servers[server_name].watches) 
+            self.servers[server_name].watches[w].close();
+        } else {
+          console.log('Ignored attempt to delete previously-deleted server: {0}'.format(server_name));
+          //this will occur if the socket item exists on the client-side
+          //and pretty much only after deleted during same session,
+          //i.e., consecutive attempts to delete.  will not happen under
+          //normal circumstances
+          return;
+        }
+      }
+
       fn.apply(instance, arg_array);
-      console.info('{0} received request {1}: {2}'.format(server_name, 
-                                                          args.command, 
-                                                          args.success))
+      console.info('{0} received request {1}'.format(server_name, 
+                                                     args.command))
     }
 
     function make_tail(rel_filepath) {
