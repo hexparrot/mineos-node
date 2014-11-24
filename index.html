@@ -76,12 +76,10 @@
       /*
       global.emit('command', {command: 'create', 'server_name': 'aaa'})
       channels['aaa'].emit('command', {command: 'start'})
-      channels['aaa'].emit('command', {command: 'server_overview'})
-      channels['aaa'].emit('command', {command: 'stuff', message: 'hi'})
-      channels['aaa'].emit('watch', 'server.properties')
-      channels['aaa'].emit('watch', 'logs/latest.log')
-      channels['aaa'].emit('unwatch', 'server.properties')
-      channels['aaa'].emit('unwatch', 'logs/latest.log')
+      channels['aaa'].emit('command', {command: 'ping'})
+      channels['aaa'].emit('command', {command: 'stuff', msg: 'stop'})
+      channels['aaa'].emit('command', {command: 'backup'})
+      channels['aaa'].emit('command', {command: 'archive'})
       */
     </script>
   </body>
