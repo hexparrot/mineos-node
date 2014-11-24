@@ -171,14 +171,14 @@ mineos.mc = function(server_name, base_dir) {
       gid: 1001
     }
 
-    self.property('up', function(err, up) {
+    self.property('up', function(up) {
       if (up)
-        callback(err, child_process.spawn('/usr/bin/screen', 
+        callback(false, child_process.spawn('/usr/bin/screen', 
                        ['-S', 'mc-{0}'.format(self.server_name), 
                         '-p', '0', '-X', 'eval', 'stuff "{0}\012"'.format(msg)], 
                        params));
       else
-        callback(err, false);
+        callback(null, null);
     })
   }
 
@@ -222,32 +222,32 @@ mineos.mc = function(server_name, base_dir) {
     switch(property) {
       case 'up':
         var pids = mineos.server_pids_up();
-        callback(null, self.server_name in pids);
+        callback(self.server_name in pids);
         break;
       case 'java_pid':
         var pids = mineos.server_pids_up();
         try {
-          callback(null, pids[self.server_name]['java']);
+          callback(pids[self.server_name]['java']);
         } catch (e) {
-          callback(true, null);
+          callback(null);
         }
         break;
       case 'screen_pid':
         var pids = mineos.server_pids_up();
         try {
-          callback(null, pids[self.server_name]['screen']);
+          callback(pids[self.server_name]['screen']);
         } catch (e) {
-          callback(true, null);
+          callback(null);
         }
         break;
       case 'server-port':
         var sp = self.sp(function(err, dict) {
-          callback(err, dict['server-port']);
+          callback(dict['server-port']);
         })
         break;
       case 'server-ip':
         var sp = self.sp(function(err, dict) {
-          callback(err, dict['server-ip']);
+          callback(dict['server-ip']);
         })
         break;
       case 'memory':
@@ -256,20 +256,20 @@ mineos.mc = function(server_name, base_dir) {
           var procfs = require('procfs-stats');
           var ps = procfs(pids[self.server_name]['java']);
           ps.status(function(err, data){
-            callback(err, data);
+            callback(data);
           })
         } else {
-          callback(null, {});
+          callback({});
         }
         break;
       case 'ping':
         var pids = mineos.server_pids_up();
         if (self.server_name in pids) {
           self.ping(function(ping){
-            callback(null, ping);
+            callback(ping);
           })
         } else {
-          callback(null, {
+          callback({
             protocol: null,
             server_version: null,
             motd: null,
