@@ -247,8 +247,14 @@ server.backend = function(base_dir, socket_emitter) {
           } else {
             var instance = new mineos.mc(args.server_name, base_dir);
             instance.create(function(did_create) {
-              if (did_create){
-                self.front_end.emit('track_server', args.server_name);
+              if (did_create) {
+                //self.front_end.emit('track_server', args.server_name); //inexplicably not working. try:
+                //global.emit('command', {command: 'create', 'server_name': 'aaa'})
+                //channels['aaa'].emit('command', {command: 'start'})
+                //fails, except when index.html refreshed after global emit.
+
+                self.front_end.emit('server_list', Object.keys(self.servers)); //temp workaround
+                //not preferable because it clears clients server list
                 console.info('Server created: {0}'.format(args.server_name));
               }
             })
