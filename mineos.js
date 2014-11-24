@@ -113,16 +113,23 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.create = function(callback) {
-    async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.mkdirs, function(err) {
-      self._sp.write(mineos.SP_DEFAULTS, function(err) {
-        if (!err) {
-          var dest = [self.env.cwd, self.env.bwd, self.env.awd, self.env.sp];
-          for (var i=0; i < dest.length; i++) {
-            fs.chown(dest[i], 1000, 1001);
+    async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.mkdirs, function(async_err) {
+      if (!async_err) {
+        self._sp.write(mineos.SP_DEFAULTS, function(err) {
+          if (!err) {
+            var dest = [self.env.cwd, self.env.bwd, self.env.awd, self.env.sp];
+            for (var i=0; i < dest.length; i++) {
+              fs.chown(dest[i], 1000, 1001);
+            }
+            callback(null, true);
+          } else {
+            callback(true, false);
           }
-          callback(err, true);
-        }
-      });
+        });
+      } else {
+        callback(true, false);
+      }
+  
     })
   }
 
