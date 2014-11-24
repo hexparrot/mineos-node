@@ -130,28 +130,45 @@ server.backend = function(base_dir, socket_emitter) {
         }
       }
 
-      if (args.command == 'delete') {
-        // preemptively close tails/watches to let unlinkDir/untrackserver
-        // do all the real cleanup work without latest.log file open error
-        if (server_name in self.servers) {
-          for (var t in self.servers[server_name].tails) 
-            self.servers[server_name].tails[t].unwatch();
+      switch (args.command) {
+        case 'start':
+          if (server_name in self.servers)
+            self.servers[server_name].instance.property('up', function(is_up) {
+              if (is_up) {
+                console.warn('Ignored attempt to start already-started server: {0}'.format(server_name));
+              } else {
+                fn.apply(instance, arg_array);
+                console.info('{0} received request {1}'.format(server_name, args.command))
+              }
+            })
+          break;
+        case 'delete':
+          // preemptively close tails/watches to let unlinkDir/untrackserver
+          // do all the real cleanup work without latest.log file open error
+          if (server_name in self.servers) {
+            for (var t in self.servers[server_name].tails) 
+              self.servers[server_name].tails[t].unwatch();
 
-          for (var w in self.servers[server_name].watches) 
-            self.servers[server_name].watches[w].close();
-        } else {
-          console.log('Ignored attempt to delete previously-deleted server: {0}'.format(server_name));
-          //this will occur if the socket item exists on the client-side
-          //and pretty much only after deleted during same session,
-          //i.e., consecutive attempts to delete.  will not happen under
-          //normal circumstances
-          return;
-        }
+            for (var w in self.servers[server_name].watches) 
+              self.servers[server_name].watches[w].close();
+
+            fn.apply(instance, arg_array);
+            console.info('{0} received request {1}'.format(server_name, args.command))
+          } else {
+            console.warn('Ignored attempt to delete previously-deleted server: {0}'.format(server_name));
+            //this will occur if the socket item exists on the client-side
+            //and pretty much only after deleted during same session,
+            //i.e., consecutive attempts to delete.  will not happen under
+            //normal circumstances
+          }
+          break;
+        default:
+          //default fallback. all named commands from this switch() must manually invoke the
+          //following lines where appropriate.
+          fn.apply(instance, arg_array);
+          console.info('{0} received request {1}'.format(server_name, args.command))
+          break;
       }
-
-      fn.apply(instance, arg_array);
-      console.info('{0} received request {1}'.format(server_name, 
-                                                     args.command))
     }
 
     function make_tail(rel_filepath) {
