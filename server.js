@@ -142,6 +142,17 @@ server.backend = function(base_dir, socket_emitter) {
               }
             })
           break;
+        case 'stuff':
+          if (server_name in self.servers)
+            self.servers[server_name].instance.property('up', function(is_up) {
+              if (is_up) {
+                fn.apply(instance, arg_array);
+                console.info('{0} received request {1}'.format(server_name, args.command))
+              } else {
+                console.warn('Ignored attempt to send command to downed server: {0}'.format(server_name));
+              }
+            })
+          break;
         case 'delete':
           // preemptively close tails/watches to let unlinkDir/untrackserver
           // do all the real cleanup work without latest.log file open error
