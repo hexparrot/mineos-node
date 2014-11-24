@@ -108,7 +108,7 @@ mineos.mc = function(server_name, base_dir) {
 
   self.sp = function(callback) {
     self._sp.load(function(err) {
-      callback(self._sp.props);
+      callback(err, self._sp.props);
     })
   }
 
@@ -226,13 +226,13 @@ mineos.mc = function(server_name, base_dir) {
         callback(null, pids[self.server_name]['screen']);
         break;
       case 'server-port':
-        var sp = self.sp(function(dict) {
-          callback(null, dict['server-port']);
+        var sp = self.sp(function(err, dict) {
+          callback(err, dict['server-port']);
         })
         break;
       case 'server-ip':
-        var sp = self.sp(function(dict) {
-          callback(null, dict['server-ip']);
+        var sp = self.sp(function(err, dict) {
+          callback(err, dict['server-ip']);
         })
         break;
       case 'memory':
@@ -250,7 +250,7 @@ mineos.mc = function(server_name, base_dir) {
       case 'ping':
         var pids = mineos.server_pids_up();
         if (self.server_name in pids) {
-          self.ping(null, null, function(ping){
+          self.ping(function(ping){
             callback(null, ping);
           })
         } else {
@@ -297,7 +297,7 @@ mineos.mc = function(server_name, base_dir) {
       socket.on('data', function(data) {
         socket.end();
         var split = swapBytes(data.slice(3)).toString('ucs2').split('\u0000').splice(1);
-        callback({
+        callback(null, {
           protocol: parseInt(parseInt(split[0])),
           server_version: split[1],
           motd: split[2],
@@ -311,7 +311,7 @@ mineos.mc = function(server_name, base_dir) {
       })
     }
 
-    self.sp(function(dict) {
+    self.sp(function(err, dict) {
       send_query_packet(dict['server-port']);
     })  
   }

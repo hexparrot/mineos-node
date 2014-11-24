@@ -377,19 +377,21 @@ test.sp = function(test) {
       })
     },
     function(callback) {
-      instance.sp(function(dict) {
+      instance.sp(function(err, dict) {
+        test.ifError(err);
         test.equal(dict['server-port'], '25565');
         callback(null);
       })
     },
     function(callback) {
       instance._sp.modify('server-port', '25570', function(err) {
-        test.ok(!err);
+        test.ifError(err);
         callback(null);
       })
     },
     function(callback) {
-      instance.sp(function(dict) {
+      instance.sp(function(err, dict) {
+        test.ifError(err);
         test.equal(dict['server-port'], '25570');
         callback(null);
       })
@@ -480,7 +482,8 @@ test.ping = function(test) {
     },
     function(callback) {
       setTimeout(function() {
-        instance.ping(function(pingback) {
+        instance.ping(function(err, pingback) {
+          test.ifError(err);
           test.equal(pingback.protocol, 127);
           test.equal(pingback.server_version, '1.7.9');
           test.equal(pingback.motd, 'A Minecraft Server');
