@@ -242,13 +242,17 @@ server.backend = function(base_dir, socket_emitter) {
       console.info('[WEBUI] Received emit command', args);
       switch (args.command) {
         case 'create':
-          var instance = new mineos.mc(args.server_name, base_dir);
-          instance.create(function(did_create) {
-            if (did_create){
-              self.front_end.emit('track_server', args.server_name);
-              console.info('Server created: {0}'.format(args.server_name));
-            }
-          })
+          if (args.server_name in self.servers) {
+            console.error('Ignored attempt to create server "{0}"; Servername already in use.'.format(args.server_name));
+          } else {
+            var instance = new mineos.mc(args.server_name, base_dir);
+            instance.create(function(did_create) {
+              if (did_create){
+                self.front_end.emit('track_server', args.server_name);
+                console.info('Server created: {0}'.format(args.server_name));
+              }
+            })
+          }
           break;
       }
     }
