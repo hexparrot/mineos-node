@@ -416,7 +416,7 @@ test.properties = function(test) {
     function(callback) {
       instance.property('screen_pid', function(err, screen_pid) {
         test.ok(err); //looking for positive error
-        test.equal(screen_pid, screen_pid);
+        test.equal(screen_pid, null);
         callback(null);
       })
     },
