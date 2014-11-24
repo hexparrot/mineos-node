@@ -218,14 +218,16 @@ test.start = function(test) {
       })
     },
     function(callback) {
-      instance.property('screen_pid', function(pid) {
+      instance.property('screen_pid', function(err, pid) {
+        test.ifError(err);
         test.equal(typeof(pid), 'number');
         test.ok(pid > 0);
         callback(null);
       })
     },
     function(callback) {
-      instance.property('java_pid', function(pid) {
+      instance.property('java_pid', function(err, pid) {
+        test.ifError(err);
         test.equal(typeof(pid), 'number');
         test.ok(pid > 0);
         callback(null);
@@ -405,13 +407,15 @@ test.properties = function(test) {
 
   async.series([
     function(callback) {
-      instance.property('java_pid', function(java_pid) {
+      instance.property('java_pid', function(err, java_pid) {
+        test.ok(err); //looking for positive error
         test.equal(java_pid, null);
         callback(null);
       })
     },
     function(callback) {
-      instance.property('screen_pid', function(screen_pid) {
+      instance.property('screen_pid', function(err, screen_pid) {
+        test.ok(err); //looking for positive error
         test.equal(screen_pid, null);
         callback(null);
       })
@@ -424,31 +428,36 @@ test.properties = function(test) {
       })
     },
     function(callback) {
-      instance.property('up', function(up) {
+      instance.property('up', function(err, up) {
+        test.ifError(err);
         test.equal(up, false);
         callback(null);
       })
     },
     function(callback) {
-      instance.property('server-port', function(port) {
+      instance.property('server-port', function(err, port) {
+        test.ifError(err);
         test.equal(port, 25565);
         callback(null);
       })
     },
     function(callback) {
-      instance.property('server-ip', function(ip) {
+      instance.property('server-ip', function(err, ip) {
+        test.ifError(err);
         test.equal(ip, '0.0.0.0');
         callback(null);
       })
     },
     function(callback) {
-      instance.property('memory', function(memory) {
+      instance.property('memory', function(err, memory) {
+        test.ifError(err);
         test.equal(Object.keys(memory).length, 0);
         callback(null);
       })
     },
     function(callback) {
-      instance.property('ping', function(ping) {
+      instance.property('ping', function(err, ping) {
+        test.ifError(err);
         test.equal(Object.keys(ping).length, 5);
 
         test.equal(ping.protocol, null);
@@ -532,7 +541,8 @@ test.memory = function(test) {
       })
     },
     function(callback) {
-      instance.property('memory', function(memory_obj) {
+      instance.property('memory', function(err, memory_obj) {
+        test.ifError(err);
         test.equal(memory_obj.Name, 'java');
         test.ok(memory_regex.test(memory_obj.VmPeak));
         test.ok(memory_regex.test(memory_obj.VmSize));

@@ -145,7 +145,7 @@ server.backend = function(base_dir, socket_emitter) {
       switch (args.command) {
         case 'start':
           if (server_name in self.servers)
-            self.servers[server_name].instance.property('up', function(is_up) {
+            self.servers[server_name].instance.property('up', function(err, is_up) {
               if (is_up) {
                 console.warn('Ignored attempt to start already-started server: {0}'.format(server_name));
               } else {
@@ -156,7 +156,7 @@ server.backend = function(base_dir, socket_emitter) {
           break;
         case 'stuff':
           if (server_name in self.servers)
-            self.servers[server_name].instance.property('up', function(is_up) {
+            self.servers[server_name].instance.property('up', function(err, is_up) {
               if (is_up) {
                 fn.apply(instance, arg_array);
                 console.info('{0} received request {1}'.format(server_name, args.command))
