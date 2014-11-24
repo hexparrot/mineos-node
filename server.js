@@ -17,9 +17,11 @@ server.backend = function(base_dir, socket_emitter) {
     var server_path = path.join(base_dir, mineos.DIRS['servers']);
     var regex_servers = new RegExp('{0}\/[a-zA-Z0-9_\.]+\/.+'.format(server_path));
     self.watcher = chokidar.watch(server_path, { persistent: true, ignored: regex_servers });
+    // ignores event updates from servers that have more path beyond the /servers/<dirhere>/<filehere>
 
     self.watcher
       .on('addDir', function(dirpath) {
+        // event to trigger when new server detected, e.g., /var/games/minecraft/servers/<newdirhere>
         try {
           var server_name = mineos.extract_server_name(base_dir, dirpath);
         } catch (e) { return }
@@ -27,6 +29,7 @@ server.backend = function(base_dir, socket_emitter) {
           track_server(server_name);
       })
       .on('unlinkDir', function(dirpath) {
+        // event to trigger when server directory deleted
         try {
           var server_name = mineos.extract_server_name(base_dir, dirpath);
         } catch (e) { return }
@@ -36,6 +39,9 @@ server.backend = function(base_dir, socket_emitter) {
   })();
 
   function track_server(server_name) {
+    /* when evoked, creates a permanant 'mc' instance, namespace, and place for file tails/watches. 
+       track_server should only happen in response to the above chokidar watcher.
+    */
     var instance = new mineos.mc(server_name, base_dir),
         nsp;
 
@@ -61,6 +67,7 @@ server.backend = function(base_dir, socket_emitter) {
 
       nsp.on('connection', function(socket) {
         function produce_receipt(args) {
+          /* when a command is received, immediately respond to client it has been received */
           console.info('command received', args.command)
           args.uuid = uuid.v1();
           nsp.emit('receipt', args)
@@ -68,6 +75,7 @@ server.backend = function(base_dir, socket_emitter) {
         }
 
         function start_watch(rel_filepath) {
+          /* can put a tail/watch on any file, and joins a room for all future communication */
           if (rel_filepath in self.servers[server_name].tails) {
             socket.join(rel_filepath);
             console.info('[{0}] user following tail: {1}'.format(server_name, rel_filepath));
@@ -80,6 +88,7 @@ server.backend = function(base_dir, socket_emitter) {
         }
 
         function unwatch(rel_filepath) {
+          /* removes a tail/watch for a given file, and leaves the room */
           if (rel_filepath in self.servers[server_name].tails) {
             socket.leave(rel_filepath);
             console.info('[{0}] user dropping tail: {1}'.format(server_name, rel_filepath));
@@ -106,6 +115,8 @@ server.backend = function(base_dir, socket_emitter) {
       try {
         fn = instance[args.command];
         required_args = introspect(fn);
+        // receives an array of all expected arguments, using introspection.
+        // they are in order as listed by the function definition, which makes iteration possible.
       } catch (e) { 
         args.success = false;
         args.error = e;
@@ -114,6 +125,7 @@ server.backend = function(base_dir, socket_emitter) {
       }
 
       for (var i in required_args) {
+        // all callbacks expected to follow the pattern (success, payload).
         if (required_args[i] == 'callback') 
           arg_array.push(function(success, payload) {
             args.success = success;
@@ -183,6 +195,13 @@ server.backend = function(base_dir, socket_emitter) {
     }
 
     function make_tail(rel_filepath) {
+      /* makes a file tail relative to the CWD, e.g., /var/games/minecraft/servers/myserver.
+
+         tails are used to get live-event reads on files.
+
+         if the server does not exist, a watch is made in the interim, waiting for its creation.  
+         once the watch is satisfied, the watch is closed and a tail is finally created.
+      */
       var abs_filepath = path.join(instance.env.cwd, rel_filepath);
 
       if (rel_filepath in self.servers[server_name].tails) {
@@ -216,6 +235,10 @@ server.backend = function(base_dir, socket_emitter) {
     }
 
     function make_watch(rel_filepath, callback) {
+      /* creates a watch for a file relative to the CWD, e.g., /var/games/minecraft/servers/myserver.
+
+         watches are used for detecting file creation and changes.
+      */
       var abs_filepath = path.join(instance.env.cwd, rel_filepath);
 
       if (rel_filepath in self.servers[server_name].watches) {
@@ -243,6 +266,9 @@ server.backend = function(base_dir, socket_emitter) {
   }
 
   self.untrack_server = function(server_name) {
+    /* closes all watches and tails for a server and 
+       deletes the server from the master container self.servers
+    */
     var instance = new mineos.mc(server_name, base_dir);
 
     for (var t in self.servers[server_name].tails) 
@@ -259,6 +285,7 @@ server.backend = function(base_dir, socket_emitter) {
   }
 
   self.shutdown = function() {
+    /* cleans up all servers that are open, including all tails and watches */
     self.watcher.close();
 
     for (var s in self.servers)
