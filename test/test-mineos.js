@@ -593,7 +593,7 @@ test.ping = function(test) {
       instance.kill(function(err, did_kill) {
         test.ifError(err);
         if (did_kill)
-          callback(null);
+          setTimeout(function() { callback(null) }, 1000);
       })
     }
   ], function(err, results) {
