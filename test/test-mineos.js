@@ -7,17 +7,11 @@ var test = exports;
 var BASE_DIR = '/var/games/minecraft';
 var FS_DELAY_MS = 200;
 
-var init_args = {
-  base_dir: BASE_DIR,
-  uid: 1000,
-  gid: 1001
-}
-
 test.tearDown = function(callback) {
   var server_list = new mineos.server_list(BASE_DIR);
 
   for (var i in server_list) {
-    var instance = new mineos.mc(server_list[i], init_args);
+    var instance = new mineos.mc(server_list[i], BASE_DIR);
 
     fs.removeSync(instance.env.cwd);
     fs.removeSync(instance.env.bwd);
@@ -28,7 +22,7 @@ test.tearDown = function(callback) {
 
 test.server_list = function (test) {
   var servers = mineos.server_list(BASE_DIR);
-  var instance = new mineos.mc('testing', init_args);
+  var instance = new mineos.mc('testing', BASE_DIR);
 
   instance.create(function(err, did_create) {
     servers = mineos.server_list(BASE_DIR);
@@ -51,7 +45,7 @@ test.server_list_up = function(test) {
 
 test.is_server = function(test) {
   //tests if sp exists
-  var instance = new mineos.mc('testing', init_args);
+  var instance = new mineos.mc('testing', BASE_DIR);
 
   async.series([
     function(callback) {
@@ -82,7 +76,7 @@ test.is_server = function(test) {
 
 test.create_server = function(test) {
   var server_name = 'testing';
-  var instance = new mineos.mc(server_name, init_args);
+  var instance = new mineos.mc(server_name, BASE_DIR);
   var uid = 1000;
   var gid = 1001;
 
@@ -121,7 +115,7 @@ test.create_server = function(test) {
 
 test.delete_server = function(test) {
   var server_name = 'testing';
-  var instance = new mineos.mc(server_name, init_args);
+  var instance = new mineos.mc(server_name, BASE_DIR);
 
   async.series([
     function(callback) {
@@ -159,7 +153,7 @@ test.delete_server = function(test) {
 
 test.mc_instance = function(test) {
   var server_name = 'testing';
-  var instance = new mineos.mc(server_name, init_args);
+  var instance = new mineos.mc(server_name, BASE_DIR);
 
   test.ok(instance.env instanceof Object);
 
@@ -199,7 +193,7 @@ test.extract_server_name = function(test) {
 
 test.start = function(test) {
   var server_name = 'testing';
-  var instance = new mineos.mc(server_name, init_args);
+  var instance = new mineos.mc(server_name, BASE_DIR);
 
   async.series([
     function(callback) {
@@ -268,7 +262,7 @@ test.start = function(test) {
 
 test.archive = function(test) {
   var server_name = 'testing';
-  var instance = new mineos.mc(server_name, init_args);
+  var instance = new mineos.mc(server_name, BASE_DIR);
 
   async.series([
     function(callback) {
@@ -297,7 +291,7 @@ test.archive = function(test) {
 
 test.backup = function(test) {
   var server_name = 'testing';
-  var instance = new mineos.mc(server_name, init_args);
+  var instance = new mineos.mc(server_name, BASE_DIR);
 
   async.series([
     function(callback) {
@@ -325,7 +319,7 @@ test.backup = function(test) {
 
 test.restore = function(test) {
   var server_name = 'testing';
-  var instance = new mineos.mc(server_name, init_args);
+  var instance = new mineos.mc(server_name, BASE_DIR);
 
   async.series([
     function(callback) {
@@ -372,7 +366,7 @@ test.restore = function(test) {
 
 test.sp = function(test) {
   var server_name = 'testing';
-  var instance = new mineos.mc(server_name, init_args);
+  var instance = new mineos.mc(server_name, BASE_DIR);
 
   async.series([
     function(callback) {
@@ -409,7 +403,7 @@ test.sp = function(test) {
 
 test.properties = function(test) {
   var server_name = 'testing';
-  var instance = new mineos.mc(server_name, init_args);
+  var instance = new mineos.mc(server_name, BASE_DIR);
 
   async.series([
     function(callback) {
@@ -563,10 +557,8 @@ test.verify = function(test) {
 }
 
 test.ping = function(test) {
-  /* skipping for time-saving */
-  test.done();
   var server_name = 'testing';
-  var instance = new mineos.mc(server_name, init_args);
+  var instance = new mineos.mc(server_name, BASE_DIR);
 
   async.series([
     function(callback) {
@@ -611,7 +603,7 @@ test.ping = function(test) {
 
 test.memory = function(test) {
   var server_name = 'testing';
-  var instance = new mineos.mc(server_name, init_args);
+  var instance = new mineos.mc(server_name, BASE_DIR);
   var memory_regex = /(\d+) kB/
 
   async.series([
@@ -651,42 +643,4 @@ test.memory = function(test) {
   ], function(err, results) {
     test.done();
   })  
-}
-
-test.change_ownership = function(test) {
-  var server_name = 'testing';
-  var instance = new mineos.mc(server_name, init_args);
-  var uid = 1000;
-  var gid = 1001;
-
-  test.equal(mineos.server_list(BASE_DIR).length, 0);
-
-  async.series([
-    function(callback) {
-      instance.create(function(did_create){
-        test.ok(did_create);
-
-        test.ok(fs.existsSync(instance.env.cwd));
-        test.ok(fs.existsSync(instance.env.bwd));
-        test.ok(fs.existsSync(instance.env.awd));
-        test.ok(fs.existsSync(instance.env.sp));
-
-        test.equal(fs.statSync(instance.env.cwd).uid, uid);
-        test.equal(fs.statSync(instance.env.bwd).uid, uid);
-        test.equal(fs.statSync(instance.env.awd).uid, uid);
-        test.equal(fs.statSync(instance.env.sp).uid, uid);
-
-        test.equal(fs.statSync(instance.env.cwd).gid, gid);
-        test.equal(fs.statSync(instance.env.bwd).gid, gid);
-        test.equal(fs.statSync(instance.env.awd).gid, gid);
-        test.equal(fs.statSync(instance.env.sp).gid, gid);
-
-        test.equal(mineos.server_list(BASE_DIR)[0], server_name);
-        test.equal(mineos.server_list(BASE_DIR).length, 1);
-        callback(null);
-      })
-    }
-  ], function(err, results) {
-    test.done();
-  })
 }
