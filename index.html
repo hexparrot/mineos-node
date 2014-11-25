@@ -28,7 +28,7 @@
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
       var global = io('/');
-      var channel = {};
+      var channels = {};
 
       global.on('server_list', function(servers) {
         console.log(servers);
@@ -41,9 +41,16 @@
         track_server(server_name);
       })
 
+      global.on('disconnect', function() {
+        global.removeAllListeners();
+      })
+
       function track_server(server_name) {
+        if (server_name in channels)
+          return;
+
         $('#servers').append($('<li>').text(server_name));
-        var c = channel[server_name] = io('/' + server_name);
+        var c = channels[server_name] = io('/' + server_name);
 
         c.on('server.properties', function(data) {
           $('#sp').empty();
@@ -53,6 +60,7 @@
         })
 
         c.on('tail_data', function(data) {
+          console.log('received tail data')
           $('#log_latest').append($('<li>').text(data))
         })
 
@@ -67,9 +75,11 @@
 
       /*
       global.emit('command', {command: 'create', 'server_name': 'aaa'})
-      channel['aaa'].emit('command', {command: 'start'})
-      channel['aaa'].emit('command', {command: 'server_overview'})
-      channel['aaa'].emit('command', {command: 'stuff', message: 'hi'})
+      channels['aaa'].emit('command', {command: 'start'})
+      channels['aaa'].emit('command', {command: 'ping'})
+      channels['aaa'].emit('command', {command: 'stuff', msg: 'stop'})
+      channels['aaa'].emit('command', {command: 'backup'})
+      channels['aaa'].emit('command', {command: 'archive'})
       */
     </script>
   </body>

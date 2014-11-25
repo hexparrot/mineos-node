@@ -100,35 +100,36 @@ mineos.mc = function(server_name, init_args) {
 
   self._sp = new cf.config_file(self.env.sp);
 
-  self.is_server = function(callback) {
-    fs.exists(self.env.sp, function(exists) {
-      callback(exists);
-    });
-  }
-
   self.sp = function(callback) {
     self._sp.load(function(err) {
-      callback(self._sp.props);
+      callback(err, self._sp.props);
     })
   }
 
   self.create = function(callback) {
-    async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.mkdirs, function(err) {
-      self._sp.write(mineos.SP_DEFAULTS, function(err) {
-        if (!err) {
-          var dest = [self.env.cwd, self.env.bwd, self.env.awd, self.env.sp];
-          for (var i=0; i < dest.length; i++) {
-            fs.chown(dest[i], 1000, 1001);
+    async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.mkdirs, function(async_err) {
+      if (!async_err) {
+        self._sp.write(mineos.SP_DEFAULTS, function(err) {
+          if (!err) {
+            var dest = [self.env.cwd, self.env.bwd, self.env.awd, self.env.sp];
+            for (var i=0; i < dest.length; i++) {
+              fs.chown(dest[i], 1000, 1001);
+            }
+            callback(null, true);
+          } else {
+            callback(true, false);
           }
-          callback(true);
-        }
-      });
+        });
+      } else {
+        callback(true, false);
+      }
+  
     })
   }
 
   self.delete = function(callback) {
     async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.remove, function(err) {
-      callback(true);
+      callback(err, true);
     });
   }
 
@@ -146,15 +147,15 @@ mineos.mc = function(server_name, init_args) {
     fs.copy('/var/games/minecraft/profiles/vanilla179/minecraft_server.1.7.9.jar',
             path.join(self.env.cwd, 'minecraft_server.jar'), function(err) {
               if (!err)
-                callback(true, child_process.spawn(binary, args, params));
+                callback(err, child_process.spawn(binary, args, params));
               else
-                callback(false, null);
+                callback(err, null);
             });
   }
 
   self.kill = function(callback) {
     process.kill(mineos.server_pids_up()[self.server_name].java);
-    callback(true);
+    callback(null, true);
   }
 
   self.stuff = function(msg, callback) {
@@ -164,14 +165,14 @@ mineos.mc = function(server_name, init_args) {
       gid: 1001
     }
 
-    self.property('up', function(up) {
+    self.property('up', function(err, up) {
       if (up)
-        callback(true, child_process.spawn('/usr/bin/screen', 
+        callback(err, child_process.spawn('/usr/bin/screen', 
                        ['-S', 'mc-{0}'.format(self.server_name), 
                         '-p', '0', '-X', 'eval', 'stuff "{0}\012"'.format(msg)], 
                        params));
       else
-        callback(false, null);
+        callback(err, false);
     })
   }
 
@@ -186,7 +187,7 @@ mineos.mc = function(server_name, init_args) {
       gid: 1001
     }
 
-    callback(true, child_process.spawn(binary, args, params));
+    callback(null, child_process.spawn(binary, args, params));
   }
 
   self.backup = function(callback) {
@@ -198,7 +199,7 @@ mineos.mc = function(server_name, init_args) {
       gid: 1001
     }
 
-    callback(true, child_process.spawn(binary, args, params));
+    callback(null, child_process.spawn(binary, args, params));
   }
 
   self.restore = function(step, callback) {
@@ -208,31 +209,53 @@ mineos.mc = function(server_name, init_args) {
       cwd: self.env.bwd
     }
 
-    callback(true, child_process.spawn(binary, args, params));
+    callback(null, child_process.spawn(binary, args, params));
   }
 
   self.property = function(property, callback) {
     switch(property) {
+      case 'exists': 
+        fs.exists(self.env.sp, function(exists) {
+          callback(null, exists);
+        });
+        break;
+      case '!exists': 
+        fs.exists(self.env.sp, function(exists) {
+          callback(null, !exists);
+        });
+        break;
       case 'up':
         var pids = mineos.server_pids_up();
-        callback(self.server_name in pids);
+        callback(null, self.server_name in pids);
+        break;
+      case '!up':
+        var pids = mineos.server_pids_up();
+        callback(null, !(self.server_name in pids));
         break;
       case 'java_pid':
         var pids = mineos.server_pids_up();
-        callback(pids[self.server_name]['java']);
+        try {
+          callback(null, pids[self.server_name]['java']);
+        } catch (e) {
+          callback(true, null);
+        }
         break;
       case 'screen_pid':
         var pids = mineos.server_pids_up();
-        callback(pids[self.server_name]['screen']);
+        try {
+          callback(null, pids[self.server_name]['screen']);
+        } catch (e) {
+          callback(true, null);
+        }
         break;
       case 'server-port':
-        var sp = self.sp(function(dict) {
-          callback(dict['server-port']);
+        var sp = self.sp(function(err, dict) {
+          callback(err, dict['server-port']);
         })
         break;
       case 'server-ip':
-        var sp = self.sp(function(dict) {
-          callback(dict['server-ip']);
+        var sp = self.sp(function(err, dict) {
+          callback(err, dict['server-ip']);
         })
         break;
       case 'memory':
@@ -241,20 +264,20 @@ mineos.mc = function(server_name, init_args) {
           var procfs = require('procfs-stats');
           var ps = procfs(pids[self.server_name]['java']);
           ps.status(function(err, data){
-            callback(data);
+            callback(err, data);
           })
         } else {
-          callback({});
+          callback(null, {});
         }
         break;
       case 'ping':
         var pids = mineos.server_pids_up();
         if (self.server_name in pids) {
-          self.ping(null, null, function(ping){
-            callback(ping);
+          self.ping(function(ping){
+            callback(null, ping);
           })
         } else {
-          callback({
+          callback(null, {
             protocol: null,
             server_version: null,
             motd: null,
@@ -264,6 +287,12 @@ mineos.mc = function(server_name, init_args) {
         }
         break;
     }
+  }
+
+  self.verify = function(tests, callback) {
+    async.map(tests, self.property, function(err, result) {
+      callback(result.every(function(val) { return !!val === true })); //double '!' converts any value to bool
+    })
   }
 
   self.ping = function(callback) {
@@ -297,7 +326,7 @@ mineos.mc = function(server_name, init_args) {
       socket.on('data', function(data) {
         socket.end();
         var split = swapBytes(data.slice(3)).toString('ucs2').split('\u0000').splice(1);
-        callback({
+        callback(null, {
           protocol: parseInt(parseInt(split[0])),
           server_version: split[1],
           motd: split[2],
@@ -311,7 +340,7 @@ mineos.mc = function(server_name, init_args) {
       })
     }
 
-    self.sp(function(dict) {
+    self.sp(function(err, dict) {
       send_query_packet(dict['server-port']);
     })  
   }

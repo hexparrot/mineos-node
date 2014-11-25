@@ -30,8 +30,9 @@ test.server_list = function (test) {
   var servers = mineos.server_list(BASE_DIR);
   var instance = new mineos.mc('testing', init_args);
 
-  instance.create(function(did_create) {
+  instance.create(function(err, did_create) {
     servers = mineos.server_list(BASE_DIR);
+    test.ifError(err);
     test.ok(servers instanceof Array, "server returns an array");
     test.done();
   })
@@ -54,23 +55,26 @@ test.is_server = function(test) {
 
   async.series([
     function(callback) {
-      instance.is_server(function(is_server) {
-        test.ok(!is_server);
-        callback(null);
+      instance.property('!exists', function(err, result) {
+        test.ifError(err);
+        test.ok(result);
+        callback(err);
       })
     },
     function(callback) {
-      instance.create(function(did_create) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
         test.ok(did_create);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
-      instance.is_server(function(is_server) {
-        test.ok(is_server);
-        callback(null);
+      instance.property('exists', function(err, result) {
+        test.ifError(err);
+        test.ok(result);
+        callback(err);
       })
-    }
+    },
   ], function(err, results) {
     test.done();
   })
@@ -86,7 +90,8 @@ test.create_server = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(function(did_create){
+      instance.create(function(err, did_create){
+        test.ifError(err);
         test.ok(did_create);
 
         test.ok(fs.existsSync(instance.env.cwd));
@@ -120,27 +125,31 @@ test.delete_server = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(function(did_create) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
         test.ok(did_create);
         callback(null);
       })
     },
     function(callback) {
-      instance.is_server(function(is_server) {
-        test.ok(is_server);
-        callback(null);
+      instance.property('exists', function(err, result) {
+        test.ifError(err);
+        test.ok(result);
+        callback(err);
       })
     },
     function(callback) {
-      instance.delete(function(did_delete) {
+      instance.delete(function(err, did_delete) {
+        test.ifError(err);
         test.ok(did_delete);
         callback(null);
       })
     },
     function(callback) {
-      instance.is_server(function(is_server) {
-        test.ok(!is_server);
-        callback(null);
+      instance.property('!exists', function(err, result) {
+        test.ifError(err);
+        test.ok(result);
+        callback(err);
       })
     }
   ], function(err, results) {
@@ -194,57 +203,62 @@ test.start = function(test) {
 
   async.series([
     function(callback) {
-      instance.stuff('stop', function(did_stuff, proc) {
-        test.ok(!did_stuff);
+      instance.stuff('stop', function(err, proc) {
+        test.ifError(err);
         callback(null);
       })
     },
     function(callback) {
-      instance.create(function(did_create) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
         test.ok(did_create);
         callback(null);
       })
     },
     function(callback) {
-      instance.start(function(did_start, proc) {
-        test.ok(did_start);
+      instance.start(function(err, proc) {
+        test.ifError(err);
         proc.once('close', function(code) {
           callback(null);
         })
       })
     },
     function(callback) {
-      instance.property('screen_pid', function(pid) {
+      instance.property('screen_pid', function(err, pid) {
+        test.ifError(err);
         test.equal(typeof(pid), 'number');
         test.ok(pid > 0);
         callback(null);
       })
     },
     function(callback) {
-      instance.property('java_pid', function(pid) {
+      instance.property('java_pid', function(err, pid) {
+        test.ifError(err);
         test.equal(typeof(pid), 'number');
         test.ok(pid > 0);
         callback(null);
       })
     },
     function(callback) {
-      instance.stuff('stop', function(did_stuff, proc) {
+      instance.stuff('stop', function(err, proc) {
+        test.ifError(err);
         proc.once('close', function(code) {
-          test.ok(did_stuff);
           callback(null);
         })
       })
     },
     function(callback) {
-      instance.delete(function(did_delete) {
+      instance.delete(function(err, did_delete) {
+        test.ifError(err);
         test.ok(did_delete);
         callback(null);
       })
     },
     function(callback) {
-      instance.is_server(function(is_server) {
-        test.ok(!is_server);
-        callback(null);
+      instance.property('!exists', function(err, result) {
+        test.ifError(err);
+        test.ok(result);
+        callback(err);
       })
     }
   ], function(err, results) {
@@ -258,14 +272,15 @@ test.archive = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(function(did_create) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
         test.ok(did_create);
         callback(null);
       })
     },
     function(callback) {
-      instance.archive(function(did_archve, proc) {
-        test.ok(did_archve);
+      instance.archive(function(err, proc) {
+        test.ifError(err);
         proc.once('close', function(code) {
           setTimeout(function() {
             test.equal(fs.readdirSync(instance.env.awd).length, 1);
@@ -286,14 +301,15 @@ test.backup = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(function(did_create) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
         test.ok(did_create);
         callback(null);
       })
     },
     function(callback) {
-      instance.backup(function(did_backup, proc) {
-        test.ok(did_backup);
+      instance.backup(function(err, proc) {
+        test.ifError(err);
         proc.once('close', function(code) {
           setTimeout(function() {
             test.equal(fs.readdirSync(instance.env.bwd).length, 2);
@@ -313,14 +329,15 @@ test.restore = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(function(did_create) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
         test.ok(did_create);
         callback(null);
       })
     },
     function(callback) {
-      instance.backup(function(did_backup, proc) {
-        test.ok(did_backup);
+      instance.backup(function(err, proc) {
+        test.ifError(err);
         proc.once('close', function(code) {
           setTimeout(function() {
             test.equal(fs.readdirSync(instance.env.bwd).length, 2);
@@ -331,14 +348,15 @@ test.restore = function(test) {
     },
     function(callback) {
       fs.removeSync(instance.env.cwd);
-      instance.is_server(function(is_server) {
-        test.ok(!is_server);
-        callback(null);
+      instance.property('!exists', function(err, result) {
+        test.ifError(err);
+        test.ok(result);
+        callback(err);
       })
     },
     function(callback) {
-      instance.restore('now', function(did_restore, proc) {
-        test.ok(did_restore);
+      instance.restore('now', function(err, proc) {
+        test.ifError(err);
         proc.once('close', function(code) {
           setTimeout(function() {
             test.equal(fs.readdirSync(instance.env.cwd).length, 1);
@@ -358,25 +376,28 @@ test.sp = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(function(did_create) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
         test.ok(did_create);
         callback(null);
       })
     },
     function(callback) {
-      instance.sp(function(dict) {
+      instance.sp(function(err, dict) {
+        test.ifError(err);
         test.equal(dict['server-port'], '25565');
         callback(null);
       })
     },
     function(callback) {
       instance._sp.modify('server-port', '25570', function(err) {
-        test.ok(!err);
+        test.ifError(err);
         callback(null);
       })
     },
     function(callback) {
-      instance.sp(function(dict) {
+      instance.sp(function(err, dict) {
+        test.ifError(err);
         test.equal(dict['server-port'], '25570');
         callback(null);
       })
@@ -392,37 +413,71 @@ test.properties = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(function(did_create) {
+      instance.property('exists', function(err, does_exist) {
+        test.ifError(err);
+        test.ok(!does_exist);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('java_pid', function(err, java_pid) {
+        test.ok(err); //looking for positive error
+        test.equal(java_pid, null);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('screen_pid', function(err, screen_pid) {
+        test.ok(err); //looking for positive error
+        test.equal(screen_pid, null);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
         test.ok(did_create);
         callback(null);
       })
     },
     function(callback) {
-      instance.property('up', function(up) {
+      instance.property('exists', function(err, does_exist) {
+        test.ifError(err);
+        test.ok(does_exist);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('up', function(err, up) {
+        test.ifError(err);
         test.equal(up, false);
         callback(null);
       })
     },
     function(callback) {
-      instance.property('server-port', function(port) {
+      instance.property('server-port', function(err, port) {
+        test.ifError(err);
         test.equal(port, 25565);
         callback(null);
       })
     },
     function(callback) {
-      instance.property('server-ip', function(ip) {
+      instance.property('server-ip', function(err, ip) {
+        test.ifError(err);
         test.equal(ip, '0.0.0.0');
         callback(null);
       })
     },
     function(callback) {
-      instance.property('memory', function(memory) {
+      instance.property('memory', function(err, memory) {
+        test.ifError(err);
         test.equal(Object.keys(memory).length, 0);
         callback(null);
       })
     },
     function(callback) {
-      instance.property('ping', function(ping) {
+      instance.property('ping', function(err, ping) {
+        test.ifError(err);
         test.equal(Object.keys(ping).length, 5);
 
         test.equal(ping.protocol, null);
@@ -439,6 +494,74 @@ test.properties = function(test) {
   })
 }
 
+test.verify = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+  
+  async.series([
+    function(callback) {
+      instance.verify(['!exists', '!up'], function(result) {
+        test.ok(result);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.verify(['exists'], function(result) {
+        test.ok(!result);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.verify(['up'], function(result) {
+        test.ok(!result);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.verify(['exists', 'up'], function(result) {
+        test.ok(!result);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
+        test.ok(did_create);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.verify(['exists', '!up'], function(result) {
+        test.ok(result);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.start(function(err, proc) {
+        test.ifError(err);
+        proc.once('close', function(code) {
+          callback(null);
+        })
+      })
+    },
+    function(callback) {
+      instance.verify(['exists', 'up'], function(result) {
+        test.ok(result);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.kill(function(err, did_kill) {
+        test.ifError(err);
+        if (did_kill)
+          callback(null);
+      })
+    }
+  ], function(err, results) {
+    test.done();
+  })
+}
+
 test.ping = function(test) {
   /* skipping for time-saving */
   test.done();
@@ -447,14 +570,15 @@ test.ping = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(function(did_create) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
         test.ok(did_create);
         callback(null);
       })
     },
     function(callback) {
-      instance.start(function(did_start, proc) {
-        test.ok(did_start);
+      instance.start(function(err, proc) {
+        test.ifError(err);
         proc.once('close', function(code) {
           callback(null);
         })
@@ -462,7 +586,8 @@ test.ping = function(test) {
     },
     function(callback) {
       setTimeout(function() {
-        instance.ping(function(pingback) {
+        instance.ping(function(err, pingback) {
+          test.ifError(err);
           test.equal(pingback.protocol, 127);
           test.equal(pingback.server_version, '1.7.9');
           test.equal(pingback.motd, 'A Minecraft Server');
@@ -473,9 +598,10 @@ test.ping = function(test) {
       }, 15000)
     },
     function(callback) {
-      instance.kill(function(did_kill) {
+      instance.kill(function(err, did_kill) {
+        test.ifError(err);
         if (did_kill)
-          callback(null);
+          setTimeout(function() { callback(null) }, 1000);
       })
     }
   ], function(err, results) {
@@ -490,27 +616,36 @@ test.memory = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(function(did_create) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
         test.ok(did_create);
         callback(null);
       })
     },
     function(callback) {
-      instance.start(function(did_start, proc) {
-        test.ok(did_start);
+      instance.start(function(err, proc) {
+        test.ifError(err);
         proc.once('close', function(code) {
           callback(null);
         })
       })
     },
     function(callback) {
-      instance.property('memory', function(memory_obj) {
+      instance.property('memory', function(err, memory_obj) {
+        test.ifError(err);
         test.equal(memory_obj.Name, 'java');
         test.ok(memory_regex.test(memory_obj.VmPeak));
         test.ok(memory_regex.test(memory_obj.VmSize));
         test.ok(memory_regex.test(memory_obj.VmRSS));
         test.ok(memory_regex.test(memory_obj.VmSwap));
         callback(null);
+      })
+    },
+    function(callback) {
+      instance.kill(function(err, did_kill) {
+        test.ifError(err);
+        if (did_kill)
+          callback(null);
       })
     }
   ], function(err, results) {
