@@ -220,9 +220,23 @@ mineos.mc = function(server_name, base_dir) {
 
   self.property = function(property, callback) {
     switch(property) {
+      case 'exists': 
+        self.is_server(function(err, exists) {
+          callback(null, exists);
+        })
+        break;
+      case '!exists': 
+        self.is_server(function(err, exists) {
+          callback(null, !exists);
+        })
+        break;
       case 'up':
         var pids = mineos.server_pids_up();
         callback(null, self.server_name in pids);
+        break;
+      case '!up':
+        var pids = mineos.server_pids_up();
+        callback(null, !(self.server_name in pids));
         break;
       case 'java_pid':
         var pids = mineos.server_pids_up();
@@ -279,6 +293,12 @@ mineos.mc = function(server_name, base_dir) {
         }
         break;
     }
+  }
+
+  self.verify = function(tests, callback) {
+    async.map(tests, self.property, function(err, result) {
+      callback(err, result.every(function(val) { return !!val === true })); //double '!' converts any value to bool
+    })
   }
 
   self.ping = function(callback) {

@@ -407,6 +407,13 @@ test.properties = function(test) {
 
   async.series([
     function(callback) {
+      instance.property('exists', function(err, does_exist) {
+        test.ifError(err);
+        test.ok(!does_exist);
+        callback(null);
+      })
+    },
+    function(callback) {
       instance.property('java_pid', function(err, java_pid) {
         test.ok(err); //looking for positive error
         test.equal(java_pid, null);
@@ -424,6 +431,13 @@ test.properties = function(test) {
       instance.create(function(err, did_create) {
         test.ifError(err);
         test.ok(did_create);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('exists', function(err, does_exist) {
+        test.ifError(err);
+        test.ok(does_exist);
         callback(null);
       })
     },
@@ -554,4 +568,65 @@ test.memory = function(test) {
   ], function(err, results) {
     test.done();
   })  
+}
+
+test.verify = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+  
+  async.series([
+    function(callback) {
+      instance.verify(['!exists', '!up'], function(err, result) {
+        test.equal(result, true);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.verify(['exists'], function(err, result) {
+        test.equal(result, false);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.verify(['up'], function(err, result) {
+        test.equal(result, false);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.verify(['exists', 'up'], function(err, result) {
+        test.equal(result, false);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
+        test.ok(did_create);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.verify(['exists', '!up'], function(err, result) {
+        test.equal(result, true);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.start(function(err, proc) {
+        test.ifError(err);
+        proc.once('close', function(code) {
+          callback(null);
+        })
+      })
+    },
+    function(callback) {
+      instance.verify(['exists', 'up'], function(err, result) {
+        test.equal(result, true);
+        callback(null);
+      })
+    },
+  ], function(err, results) {
+    test.done();
+  })
 }
