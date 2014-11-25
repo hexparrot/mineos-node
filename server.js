@@ -260,8 +260,9 @@ server.backend = function(base_dir, socket_emitter) {
 
     }
 
-    instance.is_server(function(err, is_server) {
-      setup();
+    instance.property('exists', function(err, result) {
+      if (result)
+        setup();
     })
   }
 

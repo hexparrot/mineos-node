@@ -49,9 +49,9 @@ test.is_server = function(test) {
 
   async.series([
     function(callback) {
-      instance.is_server(function(err, is_server) {
+      instance.property('!exists', function(err, result) {
         test.ifError(err);
-        test.ok(!is_server);
+        test.ok(result);
         callback(err);
       })
     },
@@ -63,12 +63,12 @@ test.is_server = function(test) {
       })
     },
     function(callback) {
-      instance.is_server(function(err, is_server) {
+      instance.property('exists', function(err, result) {
         test.ifError(err);
-        test.ok(is_server);
+        test.ok(result);
         callback(err);
       })
-    }
+    },
   ], function(err, results) {
     test.done();
   })
@@ -126,10 +126,10 @@ test.delete_server = function(test) {
       })
     },
     function(callback) {
-      instance.is_server(function(err, is_server) {
+      instance.property('exists', function(err, result) {
         test.ifError(err);
-        test.ok(is_server);
-        callback(null);
+        test.ok(result);
+        callback(err);
       })
     },
     function(callback) {
@@ -140,10 +140,10 @@ test.delete_server = function(test) {
       })
     },
     function(callback) {
-      instance.is_server(function(err, is_server) {
+      instance.property('!exists', function(err, result) {
         test.ifError(err);
-        test.ok(!is_server);
-        callback(null);
+        test.ok(result);
+        callback(err);
       })
     }
   ], function(err, results) {
@@ -249,10 +249,10 @@ test.start = function(test) {
       })
     },
     function(callback) {
-      instance.is_server(function(err, is_server) {
+      instance.property('!exists', function(err, result) {
         test.ifError(err);
-        test.ok(!is_server);
-        callback(null);
+        test.ok(result);
+        callback(err);
       })
     }
   ], function(err, results) {
@@ -342,10 +342,10 @@ test.restore = function(test) {
     },
     function(callback) {
       fs.removeSync(instance.env.cwd);
-      instance.is_server(function(err, is_server) {
+      instance.property('!exists', function(err, result) {
         test.ifError(err);
-        test.ok(!is_server);
-        callback(null);
+        test.ok(result);
+        callback(err);
       })
     },
     function(callback) {

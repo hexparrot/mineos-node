@@ -100,12 +100,6 @@ mineos.mc = function(server_name, base_dir) {
 
   self._sp = new cf.config_file(self.env.sp);
 
-  self.is_server = function(callback) {
-    fs.exists(self.env.sp, function(exists) {
-      callback(null, exists);
-    });
-  }
-
   self.sp = function(callback) {
     self._sp.load(function(err) {
       callback(err, self._sp.props);
@@ -221,14 +215,14 @@ mineos.mc = function(server_name, base_dir) {
   self.property = function(property, callback) {
     switch(property) {
       case 'exists': 
-        self.is_server(function(err, exists) {
+        fs.exists(self.env.sp, function(exists) {
           callback(null, exists);
-        })
+        });
         break;
       case '!exists': 
-        self.is_server(function(err, exists) {
+        fs.exists(self.env.sp, function(exists) {
           callback(null, !exists);
-        })
+        });
         break;
       case 'up':
         var pids = mineos.server_pids_up();

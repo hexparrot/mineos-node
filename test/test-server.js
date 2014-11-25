@@ -55,9 +55,9 @@ test.backend_cleanup = function(test) {
       })
     },
     function(callback) {
-      instance.is_server(function(err, is_server) {
+      instance.property('exists', function(err, result) {
         test.ifError(err);
-        test.ok(is_server);
+        test.ok(result);
         callback(err);
       })
     },
