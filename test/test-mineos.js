@@ -488,6 +488,74 @@ test.properties = function(test) {
   })
 }
 
+test.verify = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+  
+  async.series([
+    function(callback) {
+      instance.verify(['!exists', '!up'], function(result) {
+        test.ok(result);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.verify(['exists'], function(result) {
+        test.ok(!result);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.verify(['up'], function(result) {
+        test.ok(!result);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.verify(['exists', 'up'], function(result) {
+        test.ok(!result);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
+        test.ok(did_create);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.verify(['exists', '!up'], function(result) {
+        test.ok(result);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.start(function(err, proc) {
+        test.ifError(err);
+        proc.once('close', function(code) {
+          callback(null);
+        })
+      })
+    },
+    function(callback) {
+      instance.verify(['exists', 'up'], function(result) {
+        test.ok(result);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.kill(function(err, did_kill) {
+        test.ifError(err);
+        if (did_kill)
+          callback(null);
+      })
+    }
+  ], function(err, results) {
+    test.done();
+  })
+}
+
 test.ping = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -564,69 +632,15 @@ test.memory = function(test) {
         test.ok(memory_regex.test(memory_obj.VmSwap));
         callback(null);
       })
+    },
+    function(callback) {
+      instance.kill(function(err, did_kill) {
+        test.ifError(err);
+        if (did_kill)
+          callback(null);
+      })
     }
   ], function(err, results) {
     test.done();
   })  
-}
-
-test.verify = function(test) {
-  var server_name = 'testing';
-  var instance = new mineos.mc(server_name, BASE_DIR);
-  
-  async.series([
-    function(callback) {
-      instance.verify(['!exists', '!up'], function(err, result) {
-        test.equal(result, true);
-        callback(null);
-      })
-    },
-    function(callback) {
-      instance.verify(['exists'], function(err, result) {
-        test.equal(result, false);
-        callback(null);
-      })
-    },
-    function(callback) {
-      instance.verify(['up'], function(err, result) {
-        test.equal(result, false);
-        callback(null);
-      })
-    },
-    function(callback) {
-      instance.verify(['exists', 'up'], function(err, result) {
-        test.equal(result, false);
-        callback(null);
-      })
-    },
-    function(callback) {
-      instance.create(function(err, did_create) {
-        test.ifError(err);
-        test.ok(did_create);
-        callback(null);
-      })
-    },
-    function(callback) {
-      instance.verify(['exists', '!up'], function(err, result) {
-        test.equal(result, true);
-        callback(null);
-      })
-    },
-    function(callback) {
-      instance.start(function(err, proc) {
-        test.ifError(err);
-        proc.once('close', function(code) {
-          callback(null);
-        })
-      })
-    },
-    function(callback) {
-      instance.verify(['exists', 'up'], function(err, result) {
-        test.equal(result, true);
-        callback(null);
-      })
-    },
-  ], function(err, results) {
-    test.done();
-  })
 }
