@@ -107,22 +107,29 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.create = function(owner, callback) {
-    async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.mkdirs, function(async_err) {
-      if (!async_err) {
+    async.series([
+      function(cb) {
+        async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.mkdirs, function(async_err) {
+          cb(async_err);
+        })
+      },
+      function(cb) {
         self._sp.write(mineos.SP_DEFAULTS, function(err) {
-          if (!err) {
-            var dest = [self.env.cwd, self.env.bwd, self.env.awd, self.env.sp];
-            for (var i=0; i < dest.length; i++) {
-              fs.chown(dest[i], owner['uid'], owner['gid']);
-            }
-            callback(null, true);
-          } else {
-            callback(true, false);
-          }
-        });
-      } else {
-        callback(true, false);
+          cb(err);
+        })
+      },
+      function(cb) {
+        var dest = [self.env.cwd, self.env.bwd, self.env.awd, self.env.sp];
+        for (var i=0; i < dest.length; i++) 
+          fs.chown(dest[i], owner['uid'], owner['gid']);
+        cb(null);
       }
+
+    ], function(err, results) {
+      if (!err)
+        callback(null, true);
+      else
+        callback(err, false);
     })
   }
 
@@ -142,16 +149,24 @@ mineos.mc = function(server_name, base_dir) {
     var orig_filepath = '/var/games/minecraft/profiles/vanilla179/minecraft_server.1.7.9.jar';
     var dest_filename = 'minecraft_server.jar';
 
-    fs.copy(orig_filepath, path.join(self.env.cwd, dest_filename), function(err) {
-      if (!err) {
+    async.series([
+      function(cb) {
+        fs.copy(orig_filepath, path.join(self.env.cwd, dest_filename), function(err) {
+          cb(err);
+        });
+      },
+      function(cb) {
         self.property('owner', function(err, result) {
           params['uid'] = result['uid'];
           params['gid'] = result['gid'];
-          callback(err, child_process.spawn(binary, args, params));
+          cb(err);
         })
-      } else {
-        callback(err, null);
       }
+    ], function(err, results) {
+      if (!err)
+        callback(null, child_process.spawn(binary, args, params));
+      else
+        callback(err, null);
     });
   }
 
@@ -163,20 +178,28 @@ mineos.mc = function(server_name, base_dir) {
   self.stuff = function(msg, callback) {
     var params = { cwd: self.env.cwd };
 
-    self.property('up', function(err, up) {
-      if (up) {
+    async.series([
+      function(cb) {
+        self.property('up', function(err, up) {
+          cb(err);
+        })
+      },
+      function(cb) {
         self.property('owner', function(err, result) {
           params['uid'] = result['uid'];
           params['gid'] = result['gid'];
-          callback(err, child_process.spawn('/usr/bin/screen', 
-                         ['-S', 'mc-{0}'.format(self.server_name), 
-                          '-p', '0', '-X', 'eval', 'stuff "{0}\012"'.format(msg)], 
-                         params));
+          cb(err);
         })
-      } else {
-        callback(err, false);
       }
-    })
+    ], function(err, results) {
+      if (!err)
+        callback(err, child_process.spawn('/usr/bin/screen', 
+                       ['-S', 'mc-{0}'.format(self.server_name), 
+                        '-p', '0', '-X', 'eval', 'stuff "{0}\012"'.format(msg)], 
+                       params));
+      else
+        callback(err, null);
+    });
   }
 
   self.archive = function(callback) {
@@ -186,21 +209,41 @@ mineos.mc = function(server_name, base_dir) {
     var args = ['czf', path.join(self.env.awd, filename), self.env.cwd];
 
     var params = { cwd: self.env.awd }; //awd!
-    self.property('owner', function(err, result) {
-      params['uid'] = result['uid'];
-      params['gid'] = result['gid'];
-      callback(null, child_process.spawn(binary, args, params));
-    })
+
+    async.series([
+      function(cb) {
+        self.property('owner', function(err, result) {
+          params['uid'] = result['uid'];
+          params['gid'] = result['gid'];
+          cb(err);
+        })
+      }
+    ], function(err, results) {
+      if (!err)
+        callback(err, child_process.spawn(binary, args, params));
+      else
+        callback(err, null);
+    });
   }
 
   self.backup = function(callback) {
     var binary = '/usr/bin/rdiff-backup';
     var args = ['{0}/'.format(self.env.cwd), self.env.bwd];
     var params = { cwd: self.env.bwd } //bwd!
-    self.property('owner', function(err, result) {
-      params['uid'] = result['uid'];
-      params['gid'] = result['gid'];
-      callback(null, child_process.spawn(binary, args, params));
+
+    async.series([
+      function(cb) {
+        self.property('owner', function(err, result) {
+          params['uid'] = result['uid'];
+          params['gid'] = result['gid'];
+          cb(err);
+        })
+      }
+    ], function(err, results) {
+      if (!err)
+        callback(null, child_process.spawn(binary, args, params));
+      else
+        callback(err, null);
     })
   }
 
