@@ -139,18 +139,20 @@ mineos.mc = function(server_name, base_dir) {
                 '-jar',  'minecraft_server.jar', 'nogui'];
 
     var params = { cwd: self.env.cwd };
-    self.property('owner', function(err, result) {
-      params['uid'] = result['uid'];
-      params['gid'] = result['gid'];
-    })
+    var orig_filepath = '/var/games/minecraft/profiles/vanilla179/minecraft_server.1.7.9.jar';
+    var dest_filename = 'minecraft_server.jar';
 
-    fs.copy('/var/games/minecraft/profiles/vanilla179/minecraft_server.1.7.9.jar',
-            path.join(self.env.cwd, 'minecraft_server.jar'), function(err) {
-              if (!err)
-                callback(err, child_process.spawn(binary, args, params));
-              else
-                callback(err, null);
-            });
+    fs.copy(orig_filepath, path.join(self.env.cwd, dest_filename), function(err) {
+      if (!err) {
+        self.property('owner', function(err, result) {
+          params['uid'] = result['uid'];
+          params['gid'] = result['gid'];
+          callback(err, child_process.spawn(binary, args, params));
+        })
+      } else {
+        callback(err, null);
+      }
+    });
   }
 
   self.kill = function(callback) {
@@ -160,19 +162,20 @@ mineos.mc = function(server_name, base_dir) {
 
   self.stuff = function(msg, callback) {
     var params = { cwd: self.env.cwd };
-    self.property('owner', function(err, result) {
-      params['uid'] = result['uid'];
-      params['gid'] = result['gid'];
-    })
 
     self.property('up', function(err, up) {
-      if (up)
-        callback(err, child_process.spawn('/usr/bin/screen', 
-                       ['-S', 'mc-{0}'.format(self.server_name), 
-                        '-p', '0', '-X', 'eval', 'stuff "{0}\012"'.format(msg)], 
-                       params));
-      else
+      if (up) {
+        self.property('owner', function(err, result) {
+          params['uid'] = result['uid'];
+          params['gid'] = result['gid'];
+          callback(err, child_process.spawn('/usr/bin/screen', 
+                         ['-S', 'mc-{0}'.format(self.server_name), 
+                          '-p', '0', '-X', 'eval', 'stuff "{0}\012"'.format(msg)], 
+                         params));
+        })
+      } else {
         callback(err, false);
+      }
     })
   }
 
@@ -186,9 +189,8 @@ mineos.mc = function(server_name, base_dir) {
     self.property('owner', function(err, result) {
       params['uid'] = result['uid'];
       params['gid'] = result['gid'];
+      callback(null, child_process.spawn(binary, args, params));
     })
-
-    callback(null, child_process.spawn(binary, args, params));
   }
 
   self.backup = function(callback) {
@@ -198,9 +200,8 @@ mineos.mc = function(server_name, base_dir) {
     self.property('owner', function(err, result) {
       params['uid'] = result['uid'];
       params['gid'] = result['gid'];
+      callback(null, child_process.spawn(binary, args, params));
     })
-
-    callback(null, child_process.spawn(binary, args, params));
   }
 
   self.restore = function(step, callback) {
