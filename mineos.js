@@ -90,6 +90,11 @@ mineos.mc = function(server_name, base_dir) {
   self.server_name = server_name;
   self.ev = new events.EventEmitter();
 
+  self.cred = {
+    uid: 1000,
+    gid: 1001
+  }
+
   self.env = {
     base_dir: base_dir,
     cwd: path.join(base_dir, mineos.DIRS['servers'], server_name),
@@ -113,7 +118,7 @@ mineos.mc = function(server_name, base_dir) {
           if (!err) {
             var dest = [self.env.cwd, self.env.bwd, self.env.awd, self.env.sp];
             for (var i=0; i < dest.length; i++) {
-              fs.chown(dest[i], 1000, 1001);
+              fs.chown(dest[i], self.cred['uid'], self.cred['gid']);
             }
             callback(null, true);
           } else {
@@ -140,8 +145,8 @@ mineos.mc = function(server_name, base_dir) {
                 '-jar',  'minecraft_server.jar', 'nogui'];
     var params = {
         cwd: self.env.cwd,
-        uid: 1000,
-        gid: 1001
+        uid: self.cred['uid'],
+        gid: self.cred['gid']
       }
 
     fs.copy('/var/games/minecraft/profiles/vanilla179/minecraft_server.1.7.9.jar',
@@ -161,8 +166,8 @@ mineos.mc = function(server_name, base_dir) {
   self.stuff = function(msg, callback) {
     var params = {
       cwd: self.env.cwd,
-      uid: 1000,
-      gid: 1001
+      uid: self.cred['uid'],
+      gid: self.cred['gid']
     }
 
     self.property('up', function(err, up) {
@@ -183,8 +188,8 @@ mineos.mc = function(server_name, base_dir) {
     var args = ['czf', path.join(self.env.awd, filename), self.env.cwd];
     var params = {
       cwd: self.env.awd,
-      uid: 1000,
-      gid: 1001
+      uid: self.cred['uid'],
+      gid: self.cred['gid']
     }
 
     callback(null, child_process.spawn(binary, args, params));
@@ -195,8 +200,8 @@ mineos.mc = function(server_name, base_dir) {
     var args = ['{0}/'.format(self.env.cwd), self.env.bwd];
     var params = {
       cwd: self.env.bwd,
-      uid: 1000,
-      gid: 1001
+      uid: self.cred['uid'],
+      gid: self.cred['gid']
     }
 
     callback(null, child_process.spawn(binary, args, params));
