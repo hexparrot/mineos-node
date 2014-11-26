@@ -123,14 +123,12 @@ mineos.mc = function(server_name, base_dir) {
         ], cb)
       }
     ], function(err, results) {
-      callback(err, !err);
+      callback(err);
     })
   }
 
   self.delete = function(callback) {
-    async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.remove, function(err) {
-      callback(err, !err);
-    });
+    async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.remove, callback);
   }
 
   self.start = function(callback) {
@@ -161,7 +159,7 @@ mineos.mc = function(server_name, base_dir) {
 
   self.kill = function(callback) {
     process.kill(mineos.server_pids_up()[self.server_name].java);
-    callback(null, true);
+    callback(null);
   }
 
   self.stuff = function(msg, callback) {

@@ -171,10 +171,9 @@ test.delete_server = function(test) {
       })
     },
     function(callback) {
-      instance.delete(function(err, did_delete) {
+      instance.delete(function(err) {
         test.ifError(err);
-        test.ok(did_delete);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
@@ -280,10 +279,9 @@ test.start = function(test) {
       })
     },
     function(callback) {
-      instance.delete(function(err, did_delete) {
+      instance.delete(function(err) {
         test.ifError(err);
-        test.ok(did_delete);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
@@ -577,10 +575,9 @@ test.verify = function(test) {
       })
     },
     function(callback) {
-      instance.kill(function(err, did_kill) {
+      instance.kill(function(err) {
         test.ifError(err);
-        if (did_kill)
-          callback(null);
+        callback(err);
       })
     }
   ], function(err, results) {
@@ -621,10 +618,9 @@ test.ping = function(test) {
       }, 15000)
     },
     function(callback) {
-      instance.kill(function(err, did_kill) {
+      instance.kill(function(err) {
         test.ifError(err);
-        if (did_kill)
-          setTimeout(function() { callback(null) }, 1000);
+        setTimeout(function() { callback(err) }, 1000);
       })
     }
   ], function(err, results) {
@@ -664,10 +660,9 @@ test.memory = function(test) {
       })
     },
     function(callback) {
-      instance.kill(function(err, did_kill) {
+      instance.kill(function(err) {
         test.ifError(err);
-        if (did_kill)
-          callback(null);
+        callback(err);
       })
     }
   ], function(err, results) {

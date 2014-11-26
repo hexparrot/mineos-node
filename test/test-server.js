@@ -52,9 +52,8 @@ test.backend_cleanup = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(owner, function(err, did_create) {
+      instance.create(owner, function(err) {
         test.ifError(err);
-        test.ok(did_create);
         callback(err);
       })
     },
