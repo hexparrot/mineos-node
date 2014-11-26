@@ -100,11 +100,6 @@ mineos.mc = function(server_name, base_dir) {
 
   self._sp = new cf.config_file(self.env.sp);
 
-  //memoized funcs
-  self.memoized_fn = {
-    'fs_stat': async.memoize(fs.stat)
-  }
-
   self.sp = function(callback) {
     self._sp.load(function(err) {
       callback(err, self._sp.props);
@@ -219,7 +214,7 @@ mineos.mc = function(server_name, base_dir) {
   self.property = function(property, callback) {
     switch(property) {
       case 'owner':
-        self.memoized_fn['fs_stat'](self.env.cwd, function(err, stat_info) {
+        fs.stat(self.env.cwd, function(err, stat_info) {
           callback(err, {
             uid: stat_info['uid'],
             gid: stat_info['gid']
@@ -227,12 +222,12 @@ mineos.mc = function(server_name, base_dir) {
         })
         break;
       case 'owner_uid':
-        self.memoized_fn['fs_stat'](self.env.cwd, function(err, stat_info) {
+        fs.stat(self.env.cwd, function(err, stat_info) {
           callback(err, stat_info['uid']);
         })
         break;
       case 'owner_gid':
-        self.memoized_fn['fs_stat'](self.env.cwd, function(err, stat_info) {
+        fs.stat(self.env.cwd, function(err, stat_info) {
           callback(err, stat_info['gid']);
         })
         break;
