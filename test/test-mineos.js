@@ -113,7 +113,42 @@ test.create_server = function(test) {
   })
 }
 
-test.delete_server = function(test) {
+test.server_ownership = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+  var owner = {
+    uid: 1000,
+    gid: 1001
+  }
+
+  async.series([
+    function(callback) {
+      instance.create(function(err, did_create) {
+        test.ifError(err);
+        test.ok(did_create);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('owner_uid', function(err, result) {
+        test.ifError(err);
+        test.equal(result, owner['uid']);
+        callback(err);
+      })
+    },
+    function(callback) {
+      instance.property('owner_gid', function(err, result) {
+        test.ifError(err);
+        test.equal(result, owner['gid']);
+        callback(err);
+      })
+    }
+  ], function(err, results) {
+    test.done();
+  })
+}
+
+/*test.delete_server = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
@@ -644,3 +679,4 @@ test.memory = function(test) {
     test.done();
   })  
 }
+*/

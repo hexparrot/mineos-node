@@ -219,6 +219,16 @@ mineos.mc = function(server_name, base_dir) {
 
   self.property = function(property, callback) {
     switch(property) {
+      case 'owner_uid':
+        fs.stat(self.env.cwd, function(err, stat_info) {
+          callback(err, stat_info['uid']);
+        })
+        break;
+      case 'owner_gid':
+        fs.stat(self.env.cwd, function(err, stat_info) {
+          callback(err, stat_info['gid']);
+        })
+        break;
       case 'exists': 
         fs.exists(self.env.sp, function(exists) {
           callback(null, exists);
