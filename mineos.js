@@ -218,6 +218,14 @@ mineos.mc = function(server_name, base_dir) {
 
   self.property = function(property, callback) {
     switch(property) {
+      case 'owner':
+        fs.stat(self.env.cwd, function(err, stat_info) {
+          callback(err, {
+            uid: stat_info['uid'],
+            gid: stat_info['gid']
+          });
+        })
+        break;
       case 'owner_uid':
         fs.stat(self.env.cwd, function(err, stat_info) {
           callback(err, stat_info['uid']);

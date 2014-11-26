@@ -141,6 +141,14 @@ test.server_ownership = function(test) {
         test.equal(result, OWNER_CREDS['gid']);
         callback(err);
       })
+    },
+    function(callback) {
+      instance.property('owner', function(err, result) {
+        test.ifError(err);
+        test.equal(result['uid'], OWNER_CREDS['uid']);
+        test.equal(result['gid'], OWNER_CREDS['gid']);
+        callback(err);
+      })
     }
   ], function(err, results) {
     test.done();
