@@ -123,16 +123,13 @@ mineos.mc = function(server_name, base_dir) {
         ], cb)
       }
     ], function(err, results) {
-      if (!err)
-        callback(null, true);
-      else
-        callback(err, false);
+      callback(err, !err);
     })
   }
 
   self.delete = function(callback) {
     async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.remove, function(err) {
-      callback(err, true);
+      callback(err, !err);
     });
   }
 
@@ -158,10 +155,7 @@ mineos.mc = function(server_name, base_dir) {
         })
       }
     ], function(err, results) {
-      if (!err)
-        callback(null, child_process.spawn(binary, args, params));
-      else
-        callback(err, null);
+      callback(err, (err ? null : child_process.spawn(binary, args, params) ));
     });
   }
 
@@ -212,10 +206,7 @@ mineos.mc = function(server_name, base_dir) {
         })
       }
     ], function(err, results) {
-      if (!err)
-        callback(err, child_process.spawn(binary, args, params));
-      else
-        callback(err, null);
+      callback(err, (err ? null : child_process.spawn(binary, args, params) ));
     });
   }
 
@@ -233,10 +224,7 @@ mineos.mc = function(server_name, base_dir) {
         })
       }
     ], function(err, results) {
-      if (!err)
-        callback(null, child_process.spawn(binary, args, params));
-      else
-        callback(err, null);
+      callback(err, (err ? null : child_process.spawn(binary, args, params) ));
     })
   }
 
