@@ -109,22 +109,19 @@ mineos.mc = function(server_name, base_dir) {
   self.create = function(owner, callback) {
     async.series([
       function(cb) {
-        async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.mkdirs, function(async_err) {
-          cb(async_err);
-        })
+        async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.mkdirs, cb)
       },
       function(cb) {
-        self._sp.write(mineos.SP_DEFAULTS, function(err) {
-          cb(err);
-        })
+        self._sp.write(mineos.SP_DEFAULTS, cb)
       },
       function(cb) {
-        var dest = [self.env.cwd, self.env.bwd, self.env.awd, self.env.sp];
-        for (var i=0; i < dest.length; i++) 
-          fs.chown(dest[i], owner['uid'], owner['gid']);
-        cb(null);
+        async.parallel([
+          async.apply(fs.chown, self.env.cwd, owner['uid'], owner['gid']),
+          async.apply(fs.chown, self.env.bwd, owner['uid'], owner['gid']),
+          async.apply(fs.chown, self.env.awd, owner['uid'], owner['gid']),
+          async.apply(fs.chown, self.env.sp, owner['uid'], owner['gid'])
+        ], cb)
       }
-
     ], function(err, results) {
       if (!err)
         callback(null, true);
@@ -151,9 +148,7 @@ mineos.mc = function(server_name, base_dir) {
 
     async.series([
       function(cb) {
-        fs.copy(orig_filepath, path.join(self.env.cwd, dest_filename), function(err) {
-          cb(err);
-        });
+        fs.copy(orig_filepath, path.join(self.env.cwd, dest_filename), cb);
       },
       function(cb) {
         self.property('owner', function(err, result) {
@@ -180,9 +175,7 @@ mineos.mc = function(server_name, base_dir) {
 
     async.series([
       function(cb) {
-        self.property('up', function(err, up) {
-          cb(err);
-        })
+        self.property('up', cb)
       },
       function(cb) {
         self.property('owner', function(err, result) {
