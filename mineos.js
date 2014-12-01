@@ -169,7 +169,12 @@ mineos.mc = function(server_name, base_dir) {
 
     async.series([
       function(cb) {
-        self.property('up', cb)
+        self.property('up', function(err, is_up) {
+          if (err || !is_up) // if error or server down, do not continue
+            cb(true, false);
+          else
+            cb(null, is_up);
+        })
       },
       function(cb) {
         self.property('owner', function(err, result) {
