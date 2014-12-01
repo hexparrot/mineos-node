@@ -2,6 +2,7 @@ var fs = require('fs-extra');
 var path = require('path');
 var events = require('events');
 var async = require('async');
+var which = require('which');
 var cf = require('./config_file');
 var child_process = require('child_process');
 var mineos = exports;
@@ -132,9 +133,10 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.start = function(callback) {
-    var binary = '/usr/bin/screen';
+    var binary = which.sync('screen');
+    var java_binary = which.sync('java');
     var args = ['-dmS', 'mc-{0}'.format(self.server_name), 
-                '/usr/bin/java', '-server', '-Xmx256M', '-Xms256M',
+                java_binary, '-server', '-Xmx256M', '-Xms256M',
                 '-jar',  'minecraft_server.jar', 'nogui'];
 
     var params = { cwd: self.env.cwd };
@@ -177,19 +179,21 @@ mineos.mc = function(server_name, base_dir) {
         })
       }
     ], function(err, results) {
-      if (!err)
-        callback(err, child_process.spawn('/usr/bin/screen', 
+      if (!err) {
+        var binary = which.sync('screen');
+        callback(err, child_process.spawn(binary, 
                        ['-S', 'mc-{0}'.format(self.server_name), 
                         '-p', '0', '-X', 'eval', 'stuff "{0}\012"'.format(msg)], 
                        params));
-      else
+      } else {
         callback(err, null);
+      }
     });
   }
 
   self.archive = function(callback) {
     var strftime = require('strftime');
-    var binary = '/bin/tar';
+    var binary = which.sync('tar');
     var filename = 'server-{0}_{1}.tgz'.format(self.server_name, strftime('%Y-%m-%d_%H:%M:%S'));
     var args = ['czf', path.join(self.env.awd, filename), self.env.cwd];
 
@@ -209,7 +213,7 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.backup = function(callback) {
-    var binary = '/usr/bin/rdiff-backup';
+    var binary = which.sync('rdiff-backup');
     var args = ['{0}/'.format(self.env.cwd), self.env.bwd];
     var params = { cwd: self.env.bwd } //bwd!
 
@@ -227,7 +231,7 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.restore = function(step, callback) {
-    var binary = '/usr/bin/rdiff-backup';
+    var binary = which.sync('rdiff-backup');
     var args = ['--restore-as-of', step, self.env.bwd, self.env.cwd];
     var params = { cwd: self.env.bwd };
 

@@ -25,6 +25,7 @@
     "uuid": "1.4.x",
     "fs-extra": "0.11.x",
     "async": "0.9.x",
+    "which": "1.0.x",
     "ini": "1.2.x"
   },
   "devDependencies": {
