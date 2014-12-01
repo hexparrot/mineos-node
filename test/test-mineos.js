@@ -497,23 +497,83 @@ test.properties = function(test) {
     },
     function(callback) {
       instance.property('memory', function(err, memory) {
-        test.ifError(err);
-        test.equal(Object.keys(memory).length, 0);
+        test.ok(err);
+        test.equal(memory, null);
         callback(null);
       })
     },
     function(callback) {
       instance.property('ping', function(err, ping) {
-        test.ifError(err);
-        test.equal(Object.keys(ping).length, 5);
-
-        test.equal(ping.protocol, null);
-        test.equal(ping.server, null);
-        test.equal(ping.motd, null);
-        test.equal(ping.players_online, null);
-        test.equal(ping.players_max, null);
-
+        test.ok(err);
+        test.equal(ping, null)
         callback(null);
+      })
+    },
+    function(callback) {
+      // SERVER BEING STARTED HERE
+      instance.start(function(err, proc) {
+        test.ifError(err);
+        proc.once('close', function(code) {
+          setTimeout(function() {
+            callback(null);
+          }, 1000)
+        })
+      })
+    },
+    function(callback) {
+      instance.property('java_pid', function(err, java_pid) {
+        test.ifError(err);
+        test.equal(typeof(java_pid), 'number');
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('screen_pid', function(err, screen_pid) {
+        test.ifError(err);
+        test.equal(typeof(screen_pid), 'number');
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('exists', function(err, does_exist) {
+        test.ifError(err);
+        test.ok(does_exist);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('up', function(err, up) {
+        test.ifError(err);
+        test.equal(up, true);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('server-port', function(err, port) {
+        test.ifError(err);
+        test.equal(port, 25565);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('server-ip', function(err, ip) {
+        test.ifError(err);
+        test.equal(ip, '0.0.0.0');
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('memory', function(err, memory) {
+        test.ifError(err);
+        test.ok(memory);
+        test.ok('VmRSS' in memory);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.kill(function(err) {
+        test.ifError(err);
+        setTimeout(function() { callback(err) }, 1000);
       })
     }
   ], function(err, results) {
@@ -579,7 +639,7 @@ test.verify = function(test) {
     function(callback) {
       instance.kill(function(err) {
         test.ifError(err);
-        callback(err);
+        setTimeout(function() { callback(err) }, 1000);
       })
     }
   ], function(err, results) {
@@ -664,7 +724,7 @@ test.memory = function(test) {
     function(callback) {
       instance.kill(function(err) {
         test.ifError(err);
-        callback(err);
+        setTimeout(function() { callback(err) }, 1000);
       })
     }
   ], function(err, results) {

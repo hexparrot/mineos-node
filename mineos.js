@@ -316,7 +316,7 @@ mineos.mc = function(server_name, base_dir) {
             callback(err, data);
           })
         } else {
-          callback(null, {});
+          callback(true, null);
         }
         break;
       case 'ping':
@@ -326,13 +326,7 @@ mineos.mc = function(server_name, base_dir) {
             callback(null, ping);
           })
         } else {
-          callback(null, {
-            protocol: null,
-            server_version: null,
-            motd: null,
-            players_online: null,
-            players_max: null
-          })
+          callback(true, null);
         }
         break;
     }
@@ -386,6 +380,7 @@ mineos.mc = function(server_name, base_dir) {
 
       socket.on('error', function(err) {
         console.error('error:', err);
+        callback(err, null);
       })
     }
 
