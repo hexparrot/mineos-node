@@ -116,7 +116,7 @@ mineos.mc = function(server_name, base_dir) {
         self._sp.write(mineos.SP_DEFAULTS, cb)
       },
       function(cb) {
-        async.parallel([
+        async.series([
           async.apply(fs.chown, self.env.cwd, owner['uid'], owner['gid']),
           async.apply(fs.chown, self.env.bwd, owner['uid'], owner['gid']),
           async.apply(fs.chown, self.env.awd, owner['uid'], owner['gid']),
