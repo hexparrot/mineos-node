@@ -61,9 +61,8 @@ test.is_server = function(test) {
       })
     },
     function(callback) {
-      instance.create(OWNER_CREDS, function(err, did_create) {
+      instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
-        test.ok(did_create);
         callback(err);
       })
     },
@@ -87,9 +86,8 @@ test.create_server = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(OWNER_CREDS, function(err, did_create){
+      instance.create(OWNER_CREDS, function(err){
         test.ifError(err);
-        test.ok(did_create);
 
         test.ok(fs.existsSync(instance.env.cwd));
         test.ok(fs.existsSync(instance.env.bwd));
@@ -108,7 +106,7 @@ test.create_server = function(test) {
 
         test.equal(mineos.server_list(BASE_DIR)[0], server_name);
         test.equal(mineos.server_list(BASE_DIR).length, 1);
-        callback(null);
+        callback(err);
       })
     }
   ], function(err, results) {
@@ -122,10 +120,9 @@ test.server_ownership = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(OWNER_CREDS, function(err, did_create) {
+      instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
-        test.ok(did_create);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
@@ -161,10 +158,9 @@ test.delete_server = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(OWNER_CREDS, function(err, did_create) {
+      instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
-        test.ok(did_create);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
@@ -175,10 +171,9 @@ test.delete_server = function(test) {
       })
     },
     function(callback) {
-      instance.delete(function(err, did_delete) {
+      instance.delete(function(err) {
         test.ifError(err);
-        test.ok(did_delete);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
@@ -246,10 +241,9 @@ test.start = function(test) {
       })
     },*/  //valid test. suppressing temporarily to continue dev on auth branch
     function(callback) {
-      instance.create(OWNER_CREDS, function(err, did_create) {
+      instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
-        test.ok(did_create);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
@@ -285,10 +279,9 @@ test.start = function(test) {
       })
     },
     function(callback) {
-      instance.delete(function(err, did_delete) {
+      instance.delete(function(err) {
         test.ifError(err);
-        test.ok(did_delete);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
@@ -309,10 +302,9 @@ test.archive = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(OWNER_CREDS, function(err, did_create) {
+      instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
-        test.ok(did_create);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
@@ -338,10 +330,9 @@ test.backup = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(OWNER_CREDS, function(err, did_create) {
+      instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
-        test.ok(did_create);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
@@ -366,10 +357,9 @@ test.restore = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(OWNER_CREDS, function(err, did_create) {
+      instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
-        test.ok(did_create);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
@@ -413,10 +403,9 @@ test.sp = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(OWNER_CREDS, function(err, did_create) {
+      instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
-        test.ok(did_create);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
@@ -471,10 +460,9 @@ test.properties = function(test) {
       })
     },
     function(callback) {
-      instance.create(OWNER_CREDS, function(err, did_create) {
+      instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
-        test.ok(did_create);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
@@ -561,10 +549,9 @@ test.verify = function(test) {
       })
     },
     function(callback) {
-      instance.create(OWNER_CREDS, function(err, did_create) {
+      instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
-        test.ok(did_create);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
@@ -588,10 +575,9 @@ test.verify = function(test) {
       })
     },
     function(callback) {
-      instance.kill(function(err, did_kill) {
+      instance.kill(function(err) {
         test.ifError(err);
-        if (did_kill)
-          callback(null);
+        callback(err);
       })
     }
   ], function(err, results) {
@@ -605,10 +591,9 @@ test.ping = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(OWNER_CREDS, function(err, did_create) {
+      instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
-        test.ok(did_create);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
@@ -633,10 +618,9 @@ test.ping = function(test) {
       }, 15000)
     },
     function(callback) {
-      instance.kill(function(err, did_kill) {
+      instance.kill(function(err) {
         test.ifError(err);
-        if (did_kill)
-          setTimeout(function() { callback(null) }, 1000);
+        setTimeout(function() { callback(err) }, 1000);
       })
     }
   ], function(err, results) {
@@ -651,10 +635,9 @@ test.memory = function(test) {
 
   async.series([
     function(callback) {
-      instance.create(OWNER_CREDS, function(err, did_create) {
+      instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
-        test.ok(did_create);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
@@ -677,10 +660,9 @@ test.memory = function(test) {
       })
     },
     function(callback) {
-      instance.kill(function(err, did_kill) {
+      instance.kill(function(err) {
         test.ifError(err);
-        if (did_kill)
-          callback(null);
+        callback(err);
       })
     }
   ], function(err, results) {
