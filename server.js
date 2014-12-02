@@ -58,10 +58,10 @@ server.backend = function(base_dir, socket_emitter) {
       console.info('Discovered server: {0}'.format(server_name));
       self.front_end.emit('track_server', server_name);
       make_tail('logs/latest.log');
-      make_watch('server.properties', function(rel_filepath) {
+      make_watch('server.properties', function() {
         instance.sp(function(err, sp_data) {
           console.info('[{0}] server.properties changed'.format(server_name));
-          nsp.in(rel_filepath).emit('server.properties', sp_data);
+          nsp.in('server.properties').emit('server.properties', sp_data);
         })
       });
 
@@ -249,7 +249,7 @@ server.backend = function(base_dir, socket_emitter) {
       try {
         var watcher = chokidar.watch(abs_filepath, {persistent: true});
         watcher.on('change', function(fp) {
-          callback(rel_filepath);
+          callback();
         })
         console.info('[{0}] Started watch on {1}'.format(server_name, rel_filepath));
         self.servers[server_name].watches[rel_filepath] = watcher;

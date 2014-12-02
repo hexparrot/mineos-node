@@ -89,7 +89,6 @@ mineos.extract_server_name = function(base_dir, server_path) {
 mineos.mc = function(server_name, base_dir) {
   var self = this;
   self.server_name = server_name;
-  self.ev = new events.EventEmitter();
 
   self.env = {
     base_dir: base_dir,
