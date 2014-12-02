@@ -7,7 +7,7 @@ var tail = require('tail').Tail;
 var uuid = require('node-uuid');
 var server = exports;
 
-server.backend = function(base_dir, socket_emitter) {
+server.backend = function(base_dir, socket_emitter, dir_owner) {
   var self = this;
 
   self.servers = {}
@@ -302,7 +302,7 @@ server.backend = function(base_dir, socket_emitter) {
             console.error('Ignored attempt to create server "{0}"; Servername already in use.'.format(args.server_name));
           } else {
             var instance = new mineos.mc(args.server_name, base_dir);
-            instance.create(function(err, did_create) {
+            instance.create(dir_owner, function(err, did_create) {
               if (did_create) {
                 //self.front_end.emit('track_server', args.server_name); //inexplicably not working. try:
                 //global.emit('command', {command: 'create', 'server_name': 'aaa'})

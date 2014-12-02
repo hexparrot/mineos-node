@@ -7,7 +7,12 @@ var io = require('socket.io')(http);
 var BASE_DIR = '/var/games/minecraft';
 var response_options = {root: __dirname};
 
-var be = server.backend(BASE_DIR, io);
+var OWNER_CREDS = {
+  uid: 1000,
+  gid: 1001
+}
+
+var be = server.backend(BASE_DIR, io, OWNER_CREDS);
 
 app.get('/', function(req, res){
   res.sendFile('index.html', response_options);
