@@ -13,7 +13,7 @@ var be = server.backend(BASE_DIR, io);
 
 app.use(express.static(path.join(__dirname, 'html')));
 app.get('/', function(req, res){
-	  res.sendfile('./html/login.html');
+	  res.sendFile(path.join(__dirname,'/html/login.html'));
 	});
 
 process.on('SIGINT', function() {
