@@ -92,7 +92,7 @@
                                 <div class="control-group">
                                     <div class="controls">
                                         <span>
-                                            <label style="margin-left:1.6em;" class="checkbox styled pull-left">
+                                            <label class="checkbox styled pull-left">
                                                 <input type="checkbox" name="hide"><span data-bind="mask"></span> 
                                             </label><span data-bind="text: mask" class="checkbox styled pull-left"></span>
                                             <a class="pull-left" href="http://www.nngroup.com/articles/stop-password-masking/">&nbsp;(?)</a>
@@ -196,14 +196,27 @@
 		
 		// Activates knockout.js
 		ko.applyBindings(new LoginViewModel(lang));
-   	
-		$('input[name=hide]').bind('change',function(){ 
-			if($('input[name=hide]').is(':checked')){
-				$('input[name=password]').attr("type","password");
-			} else {
-				$('input[name=password]').attr("type","text");
-			}
-		});
+   		
+		$(document).ready(function () {
+	        try {
+	          $('input[name=password]').attr('type', 'textbox');
+	          $('input[name=hide]').on('ifChanged', function () {
+	            if ($(this).is(':checked'))
+	              $('input[name=password]').attr('type', 'password');
+	            else
+	              $('input[name=password]').attr('type', 'textbox');
+	          })
+	        } catch (e) {
+	          $('input[name=password]').attr('type', 'password');
+	        }
+
+	        $.getJSON('/webui_config', function(data) {
+	          if (data.mask_password)
+	            $('input[name=hide]').iCheck('check');
+	        })
+	        
+	      })
+		
 		
     </script>
 

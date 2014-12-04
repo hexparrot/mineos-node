@@ -12,6 +12,9 @@ var response_options = {root: __dirname};
 var be = server.backend(BASE_DIR, io);
 
 app.use(express.static(path.join(__dirname, 'html')));
+app.get('/', function(req, res){
+	  res.sendfile('./html/login.html');
+	});
 
 process.on('SIGINT', function() {
   console.log("Caught interrupt signal; closing webui....");
