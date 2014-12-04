@@ -89,7 +89,7 @@
                                 </div><!--/ Password -->
 
                                 <!-- Checkbox -->
-                                <div class="control-group">
+                                <div class="control-group" style="margin-bottom:20px;">
                                     <div class="controls">
                                         <span>
                                             <label class="checkbox styled pull-left">
@@ -175,17 +175,17 @@
 	   
     <script type="text/javascript">
 	   	
+    	// assigns the values
 		var Language = function(language) {
-			this.name = ko.observable(language.name);
 			this.username = ko.observable(language.username);
 			this.password = ko.observable(language.password);
 			this.submit = ko.observable(language.submit);
 			this.mask = ko.observable(language.mask);
 			this.info = ko.observable(language.info);
 			this.header = ko.observable(language.header);
-		
 		}
 		
+		// allows the dropdown box to be filled
 		var LoginViewModel = function(data) {
 			var self = this;
 			self.languages = ko.observableArray(
@@ -198,6 +198,8 @@
 		// Activates knockout.js
 		ko.applyBindings(new LoginViewModel(lang));
    		
+		
+		// mask the password on click
 		$(document).ready(function () {
 	        try {
 	          $('input[name=password]').attr('type', 'textbox');
