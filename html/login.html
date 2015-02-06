@@ -41,8 +41,11 @@
     <script src="/assets/modernizr/js/modernizr-2.6.2.min.js"></script>
     <!--/ Javascript(Modernizr) -->
     <!--/ END JAVASCRIPT SECTION -->
+    
 </head>
 <body>
+
+
     <!-- START Template Wrapper -->
     <!-- If you want to enable the fixed header, just add `.fixed-header` class to the `#wrapper` div below -->
     <div id="wrapper">
@@ -57,8 +60,9 @@
                     <p>&nbsp;</p>
                     <form class="widget stacked teal widget-login" name="login" method="post" action="/auth/login">
                     	<input type="hidden" name="from_page" value="%(from_page)s" />
-                        <section class="body">
-                            <div class="body-inner">
+                        <select data-bind="options:languages, optionsText: 'name', value: selectedLanguage" style="display: none;"></select>
+                        <section data-bind="with: selectedLanguage" class="body">
+                            <div  class="body-inner" >
                                 <!-- START Logo -->
                                 <div class="logo" align="center">
                                     <img src="/img/logo-dark.png">
@@ -67,30 +71,30 @@
                                 
                                 <!-- Avatar -->
                                 <div class="">
-                                    <h5 align="center">Web User Interface Login</h5>
+                                    <h5 data-bind="text: header" align="center"></h5>
                                 </div><!--/ Avatar -->
 
                                 <!-- Username -->
                                 <div class="control-group">
                                     <div class="controls">
-                                        <input type="text" name="username" autocomplete="off" placeholder="Username" class="span12"><i class="icon-user input-icon"></i>
+                                        <input type="text" data-bind="attr: {placeholder: username}" name="username" autocomplete="off" class="span12"><i class="icon-user input-icon"></i>
                                     </div>
                                 </div><!--/ Username -->
 
                                 <!-- Password -->
                                 <div class="control-group">
                                     <div class="controls">
-                                        <input type="password" name="password" autocomplete="off" placeholder="Password" class="span12"><i class="icon-lock input-icon"></i>
+                                        <input type="text" data-bind="attr: {placeholder: password}" name="password" autocomplete="off" class="span12"><i class="icon-lock input-icon"></i>
                                     </div>
                                 </div><!--/ Password -->
 
                                 <!-- Checkbox -->
-                                <div class="control-group">
+                                <div class="control-group" style="margin-bottom:20px;">
                                     <div class="controls">
                                         <span>
                                             <label class="checkbox styled pull-left">
-                                                <input type="checkbox" name="hide"> Hide password 
-                                            </label>
+                                                <input type="checkbox" name="hide"><span data-bind="mask"></span> 
+                                            </label><span data-bind="text: mask" class="checkbox styled pull-left"></span>
                                             <a class="pull-left" href="http://www.nngroup.com/articles/stop-password-masking/">&nbsp;(?)</a>
                                         </span>
 
@@ -100,11 +104,11 @@
                             <!-- Form Action -->
                             <!-- Place out form `.body-inner` -->
                             <div class="form-actions">
-                                <button type="submit" class="btn btn-primary span12">Login</button>
+                                <button data-bind="text: submit" type="submit" class="btn btn-primary span12"></button>
                             </div>
                             <!--/ Form Action -->
 
-                            <p align="center">The web user interface authenticates on your SSH username/password.</p>
+                            <p align="center" data-bind="text: info"></p>
                         </section>
                     </form>
                     <!--/ END Login Widget Form -->
@@ -157,30 +161,66 @@
     <script src="/js/plugins.js"></script>
     <script src="/js/application.js"></script>
 
-    <script src="/js/knockout-min.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.0.0.js"></script>
     <script src="/js/scriptin.js"></script>
     <!--/ Javascript (Application) -->
-
+	   
+	<!-- Language file -->
+	<script src="/lang/English.js"></script>
     <script type="text/javascript">
-      $(document).ready(function () {
-        try {
-          $('input[name=password]').attr('type', 'textbox');
-          $('input[name=hide]').on('ifChanged', function () {
-            if ($(this).is(':checked'))
-              $('input[name=password]').attr('type', 'password');
-            else
-              $('input[name=password]').attr('type', 'textbox');
-          })
-        } catch (e) {
-          $('input[name=password]').attr('type', 'password');
-        }
+    	// this is the name of the variable in the language.js file
+    	var lang = English;
+	</script>	
+    <!--/ Language file -->   
+	   
+    <script type="text/javascript">
+	   	
+    	// assigns the values
+		var Language = function(language) {
+			this.username = ko.observable(language.username);
+			this.password = ko.observable(language.password);
+			this.submit = ko.observable(language.submit);
+			this.mask = ko.observable(language.mask);
+			this.info = ko.observable(language.info);
+			this.header = ko.observable(language.header);
+		}
+		
+		// allows the dropdown box to be filled
+		var LoginViewModel = function(data) {
+			var self = this;
+			self.languages = ko.observableArray(
+			ko.utils.arrayMap(data, function(i) {
+				return new Language(i);
+		    }));
+			self.selectedLanguage = ko.observable();
+		}  
+		
+		// Activates knockout.js
+		ko.applyBindings(new LoginViewModel(lang));
+   		
+		
+		// mask the password on click
+		$(document).ready(function () {
+	        try {
+	          $('input[name=password]').attr('type', 'textbox');
+	          $('input[name=hide]').on('ifChanged', function () {
+	            if ($(this).is(':checked'))
+	              $('input[name=password]').attr('type', 'password');
+	            else
+	              $('input[name=password]').attr('type', 'textbox');
+	          })
+	        } catch (e) {
+	          $('input[name=password]').attr('type', 'password');
+	        }
 
-        $.getJSON('/webui_config', function(data) {
-          if (data.mask_password)
-            $('input[name=hide]').iCheck('check');
-        })
-        
-      })
+	        $.getJSON('/webui_config', function(data) {
+	          if (data.mask_password)
+	            $('input[name=hide]').iCheck('check');
+	        })
+	        
+	      })
+		
+		
     </script>
 
     </body>

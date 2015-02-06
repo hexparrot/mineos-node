@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html lang="en" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html lang="en" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html lang="en" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
+<head>
+    <!-- START META SECTION -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>MineOS - Web User Interface</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, user-scalable=0, initial-scale=1.0">
+    <meta http-equiv="Content-Language" content="en" />
+    <!--/ END META SECTION -->
+
+    <!-- START STYLESHEET SECTION -->
+    <!-- IMPORTANT! : This is for demo purpose only. All the available plugin will be loaded at once -->
+    <!-- Stylesheet(Bootstrap) -->
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap-responsive.min.css">
+    <!--/ Stylesheet(Bootstrap) -->
+
+    <!-- Stylesheet(Application) -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/custom.css">
+    <link rel="stylesheet" id="base-color" href="css/color/serene.css"><!-- Base Theme Color -->
+    <link rel="stylesheet" id="base-bg" href="css/background/bg1.css"><!-- Boxed Background -->
+    <!--/ Stylesheet(Application) -->
+
+    <!-- Stylesheet(Plugins) -->
+    <link rel="stylesheet" href="assets/jui/css/jquery-ui-1.10.3.min.css">
+    <link rel="stylesheet" href="assets/icheck/css/jquery.icheck.min.css">
+    <link rel="stylesheet" href="assets/daterangepicker/css/daterangepicker.min.css">
+    <link rel="stylesheet" href="assets/formvalidation/validationengine/css/jquery.validationEngine.min.css">
+    <link rel="stylesheet" href="assets/tagit/css/jquery.tagit.min.css">
+    <link rel="stylesheet" href="assets/gritter/css/jquery.gritter.min.css">
+    <!--/ Stylesheet(Plugins) -->
+    <!--/ END STYLESHEET SECTION -->
+
+    <!-- START JAVASCRIPT SECTION - Load only modernizr script here -->
+    <!-- Javascript(Modernizr) -->
+    <script src="assets/modernizr/js/modernizr-2.6.2.min.js"></script>
+    <!--/ Javascript(Modernizr) -->
+    <!--/ END JAVASCRIPT SECTION -->
+</head>
+<body>
+    <!-- START Template Wrapper -->
+    <!-- If you want to enable the fixed sidebar or fixed header, just add `.fixed-sidebar` or `.fixed-header` class to the `#wrapper` div below -->
+    <!-- IMPORTANT! : fixed sidebar will automatically add `.fixed-header` class to the `#wrapper` div -->
+    <!-- If you want to enable the boxed layout, just add `.boxed-layout` class to the `#wrapper` div below -->
+    <div id="wrapper" class="boxed-layout fixed-sidebar fixed-header">
+        <!-- START Template Canvas -->
+        <div id="canvas">
+
+            <!-- START Template Header -->
+            <header id="header">
+                <!-- START Logo -->
+                <div class="logo hidden-phone hidden-tablet">
+                    <a href="#"><img src="img/logo-white.png" alt=""></a>
+                    <small class="version"></small>
+                </div>
+                <!--/ END Logo -->
+
+                <!-- START Mobile Sidebar Toggler -->
+                <a href="#" class="toggler" data-toggle="sidebar"><span class="icon icone-reorder"></span></a>
+                <!--/ END Mobile Sidebar Toggler -->
+
+                <!-- START Toolbar -->
+                <ul class="toolbar" id="toolbar">
+                    <li>
+                        <a></a>
+                    </li>
+                    <!-- START Profile -->
+                    <li class="profile">
+                        <a href="#" data-toggle="dropdown">
+                            <span class="avatar"><img src="img/avatar/avatar.png" alt=""></span>
+                            <span class="text"><span>&nbsp;</span><span class="role">&nbsp;</span></span>
+                            <span class="arrow icone-caret-down"></span>
+                        </a>
+                        <!-- START Dropdown Menu -->
+                        <div class="dropdown-menu" role="menu">
+                            <ul class="body">
+                                <li>
+                                    <a class="text"><span class="icon icon-th-large"></span> <span></span></a>
+                                    <span class="action show"><a href="" class="label"></a></span>
+                                </li>
+                            </ul>
+                            <footer>
+                                <a data-bind="text: logoff" href="/auth/logout" class="text"><span class="icon icone-off"></span></a>
+                            </footer>
+                        </div>
+                        <!--/ END Dropdown Menu -->
+                    </li>
+                    <!--/ END Profile -->
+                </ul>
+                <!--/ END Toolbar -->
+            </header>
+            <!--/ END Template Header -->
+
+            <!-- START Template Sidebar -->
+            <aside id="sidebar">
+                <!-- START Sidebar Content -->
+                <div class="sidebar-content">
+                    <!-- START Tab Content -->
+                    <div class="tab-content">
+                        <!-- START Tab Pane(menu) -->
+                        <div class="tab-pane active" id="tab-menu">
+                            <!-- START Sidebar Menu -->
+                            <nav id="nav" class="accordion">
+                                <ul id="navigation">
+                                    <!-- START Menu Divider -->
+                                    <li data-bind="text: host"  class="divider"></li>
+                                    <!--/ END Menu Divider -->
+
+                                    <!-- START Menu -->
+                                    <li class="accordion-group">
+                                        <a data-bind="click: show_page" data-page="dashboard">
+                                            <span class="icon icone-dashboard"></span>
+                                            <span class="text" data-bind="text: dash"></span>
+                                            <span class=""></span>
+                                        </a>
+                                    </li>
+                                    <!--/ END Menu -->
+
+                                    <!-- START Menu -->
+                                    <li class="accordion-group">
+                                        <a data-bind="click: show_page" data-page="profiles">
+                                            <span class="icon icone-tags"></span>
+                                            <span class="text" data-bind="text: mngProf" ></span>
+                                            <span class=""></span>
+                                        </a>
+                                    </li>
+                                    <!--/ END Menu -->
+
+                                    <!-- START Menu -->
+                                    <li class="accordion-group">
+                                        <a data-bind="click: show_page" data-page="create_server">
+                                            <span class="icon icone-share"></span>
+                                            <span class="text" data-bind="text: crtNew"></span>
+                                            <span class=""></span>
+                                        </a>
+                                    </li>
+                                    <!--/ END Menu -->
+
+                                    <!-- START Menu -->
+                                    <li class="accordion-group">
+                                        <a data-bind="click: show_page" data-page="importable">
+                                            <span class="icon icone-share"></span>
+                                            <span class="text" data-bind="text: crtNewArc"></span>
+                                            <span class=""></span>
+                                        </a>
+                                    </li>
+                                    <!--/ END Menu -->
+
+                                    <!-- START Menu Divider -->
+                                    <li class="divider" data-bind="text: srvSet"></li>
+                                    <!--/ END Menu Divider -->
+
+                                    <!-- START Menu -->
+                                    <li class="accordion-group">
+                                        <a data-bind="click: show_page" data-page="server_status">
+                                            <span class="icon icone-globe"></span>
+                                            <span class="text" data-bind="text: srvStat"></span>
+                                            <span class="label label-inverse"></span>
+                                        </a>
+                                    </li>
+                                    <!--/ END Menu -->
+                                    
+                                    <!-- START Menu -->
+                                    <li class="accordion-group">
+                                        <a data-bind="click: show_page" data-page="backup_list">
+                                            <span class="icon icone-hdd"></span>
+                                            <span class="text" data-bind="text:rstPnt"></span>
+                                        </a>
+                                    </li>
+                                    <!--/ END Menu -->
+
+                                    <!-- START Menu -->
+                                    <li class="accordion-group">
+                                        <a data-bind="click: show_page" data-page="archive_list">
+                                            <span class="icon icone-hdd"></span>
+                                            <span class="text" data-bind="text: arch"></span>
+                                        </a>
+                                    </li>
+                                    <!--/ END Menu -->
+                                    
+                                    <!-- START Menu -->
+                                    <li class="accordion-group">
+                                        <a data-bind="click: show_page" data-page="server_properties">
+                                            <span class="icon iconm-pencil-5"></span>
+                                            <span class="text" data-bind="srvProp"></span>
+                                        </a>
+                                    </li>
+                                    <!--/ END Menu -->
+
+                                    <!-- START Menu -->
+                                    <li class="accordion-group">
+                                        <a data-bind="click: show_page" data-page="server_config">
+                                            <span class="icon iconm-pencil-5"></span>
+                                            <span class="text" data-bind="srvCfg"></span>
+                                        </a>
+                                    </li>
+                                    <!--/ END Menu -->
+
+                                    <!-- START Menu -->
+                                    <li class="accordion-group">
+                                        <a data-bind="click: show_page" data-page="console">
+                                            <span class="icon icone-desktop"></span>
+                                            <span class="text" data-bind="cons"></span>
+                                        </a>
+                                    </li>
+                                    <!--/ END Menu -->
+                                </ul>
+                            </nav>
+                            <!--/ END Sidebar Menu -->
+                        </div>
+                        <!--/ END Tab Pane(menu) -->
+                    </div>
+                    <!--/ END Tab Content -->
+                </div>
+                <!--/ END Sidebar Content -->
+            </aside>
+            <!--/ END Template Sidebar -->
+
+            <!-- START Template Main Content -->
+            <section id="main">
+                <!-- START Bootstrap Navbar -->
+                <div class="navbar navbar-static-top">
+                    <div class="navbar-inner">
+                        <!-- Breadcrumb -->
+                        <ul class="breadcrumb">
+                            <li data-bind="text: currSel"><strong><a data-page="server_status"></a></strong>
+                        </ul>
+                        <!--/ Breadcrumb -->
+                    </div>
+                    <div class="navbar-outer">
+                        <div class="alert alert-success">
+                            <button type="button" class="close" data-dismiss="alert">×</button>
+                            <strong data-bind="currLog1"></strong><p style="display:inline;" data-bind="text: currLog2"></p><strong data-bind="text: currLog3"></strong><p style="display:inline;" data-bind="text: currLog4"></p>
+                        </div>
+                        <div class="alert">
+                            <button type="button" class="close" data-dismiss="alert">×</button>
+                            <p  style="display:inline;" data-bind="text: rights1"></p><strong data-bind="text: rights2"></strong><p  style="display:inline;" data-bind="text: rights3"></p>
+                        </div>
+                        <div class="alert alert-error">
+                            <button type="button" class="close" data-dismiss="alert">×</button>
+                            <p  style="display:inline;" data-bind="text: srvConf1"></p><strong data-bind="text: srvConf2"></strong><p  style="display:inline;" data-bind="text: srvConf3"></p>
+                        </div>
+                        <div class="alert alert-error">
+                            <button type="button" class="close" data-dismiss="alert">×</button>
+                            <p  style="display:inline;" data-bind="text: eula1"></p><strong data-bind="text: eula2"></strong><p  style="display:inline;" data-bind="text: eula3"></p><a href="https://account.mojang.com/documents/minecraft_eula" data-bind="text: eula4"></a><p  style="display:inline;" data-bind="text: eula5"></p>
+                        </div>
+                    </div>
+                </div>
+                <!--/ END Bootstrap Navbar -->
+
+                <!-- START Content -->
+                <div id="dashboard" class="container-fluid">
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Line Chart - Filled -->
+                        <div class="span12 widget">
+                            <header>
+                                <h4 class="title" data-bind="text: hstStat"></h4>
+                                <!-- START Toolbar -->
+                                <ul class="toolbar pull-right">
+                                    <li>
+                                        <a href="#" class="link" data-toggle="dropdown">
+                                            <span class="icon"></span>
+                                        </a>
+                                    </li>
+                                </ul>
+                                <!--/ END Toolbar -->
+                            </header>
+                            <section class="body">
+                                <div class="body-inner">
+                                    <div class="span12 pull-left">
+                                        <!-- START Summary -->
+                                        <figure class="stats summary">
+                                            <div class="icon circle green"><span class="icone-ok"></span></div>
+                                            <figcaption>
+                                                <h3><span></span><small data-bind="text: running"></small></h3>
+                                            </figcaption>
+                                        </figure>
+                                        <!--/ END Summary -->
+
+                                        <!-- START Summary -->
+                                        <figure class="stats summary">
+                                            <div class="icon circle lime"><span class="icone-time"></span></div>
+                                            <figcaption>
+                                                <h3><span></span><small data-bind="text: upTime"></small></h3>
+                                            </figcaption>
+                                        </figure>
+                                        <!--/ END Summary -->
+
+                                        <!-- START Summary -->
+                                        <figure class="stats summary">
+                                            <div class="icon circle teal"><span class="icone-ticket"></span></div>
+                                            <figcaption>
+                                                <h3><span></span><small data-bind="text: ramFree"></small></h3>
+                                            </figcaption>
+                                        </figure>
+                                        <!--/ END Summary -->
+
+                                        <!-- START Circular 1 -->
+                                        <figure class="stats circular">
+                                            <div class="gauge" data-percent="">
+                                                <span><span class="text"></span>%</span>
+                                            </div>
+                                            <figcaption>
+                                                <h4><span></span><span>%</span><small data-bind="text: hddUsed"></small></h4>
+                                            </figcaption>
+                                        </figure>
+                                        <!--/ END Circular 1 -->
+
+                                    </div>
+
+                                    <!-- START Auto Update Chart -->
+                                    <div class="span11 pull-left widget">
+                                        <header>
+                                            <h4 class="title" data-bind="text: loadAvg"></h4>
+                                        </header>
+                                        <div class="flot" id="load_averages"></div>
+                                    </div>
+                                    <!--/ END Auto Update Chart -->
+
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Line Chart - Filled -->
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <table id="table_status" class="table table-hover">
+                          <thead>
+                            <tr>
+                              <th scope="col" data-bind="text: srvName"></th>
+                              <th scope="col" data-bind="text: srvProf"></th>
+                              <th scope="col" data-bind="text: srvPort"></th>
+                              <th scope="col" data-bind="text: srvStat"></th>
+                              <th scope="col" data-bind="text: srvOn"></th>
+                              <th scope="col" data-bind="text: srvMem"></th>
+                            </tr>
+                          </thead>
+                          <tbody data-bind="foreach: servers">
+                            <tr>
+                              <td data-bind="text: server_name"></td>
+                              <td></td>
+                              <td></td>
+                              <td><span class="label"></span></td>
+                              <td></td>
+                              <td></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                    </div>
+                    <!--/ END Row -->
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content -->
+                <div id="server_status" class="container-fluid">
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Page/Section header -->
+                        <div class="span12">
+                            <div class="page-header line1">
+                                <h4><span></span><small></small></h4>
+                            </div>
+                        </div>
+                        <!--/ END Page/Section header -->
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Circular Summary -->
+                        <div class="span12 widget">
+                            <header><h4 class="title" data-bind="text: srvGlance"></h4></header>
+                            <section class="body">
+                                <div class="body-inner">
+                                    <!-- START Summary -->
+                                    <figure class="stats summary pull-left">
+                                        <div class="icon circle"><span></span></div>
+                                        <figcaption>
+                                            <h3><span></span><small></small></h3>
+                                        </figcaption>
+                                    </figure>
+                                    <!--/ END Summary -->
+
+                                    <!-- START Circular 1 -->
+                                    <figure class="stats circular stacked">
+                                        <div class="gauge" data-percent="">
+                                            <span><span class="text"></span>%</span>
+                                        </div>
+                                        <figcaption>
+                                            <h4><span></span><small data-bind="text: playersOn"></small></h4>
+                                        </figcaption>
+                                    </figure><!--/ END Circular 1 -->
+
+                                    <!-- START Circular 2 -->
+                                    <figure class="stats circular stacked">
+                                        <div class="gauge" data-percent="">
+                                            <span class="text"></span>
+                                        </div>
+                                        <figcaption>
+                                            <h4><span></span><small data-bind="text: heap"></small></h4>
+                                        </figcaption>
+                                    </figure><!--/ END Circular 2 -->
+
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Circular Summary -->
+                    </div>
+                    <!--/ END Row -->
+         
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <button data-required="server_name" data-cmd="start" type="button" class="btn btn-success span2" data-refresh="5000" data-bind="text: start"></button> 
+                        <button data-required="server_name" data-cmd="accept_eula" type="button" class="btn btn-info span2" data-refresh="1000" data-bind="text: accept"></button> 
+                        <!-- Button Dropdown -->
+                        <div class="btn-group">
+                            <button class="btn btn-danger dropdown-toggle" data-toggle="dropdown" data-bind="text: stop"><span class="caret"></span></button>
+                            <ul class="dropdown-menu">
+                                <li><a data-required="server_name" data-cmd="stop" data-refresh="2000" data-bind="text: stop"></a></li>
+                                <li><a data-required="server_name" data-cmd="stop_and_backup" data-refresh="2000" data-bind="text: stopBack"></a></li> 
+                                <li><a data-required="server_name" data-cmd="kill" data-refresh="2000" data-bind="text: kill"></a></li>
+                            </ul>
+                        </div><!--/ Button Dropdown -->
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Default Widget -->
+                        <div class="span6 widget">
+                            <header>
+                              <h4 class="title" data-page="backup_list"><span class="icon icone-bookmark" data-bind="text: restore"></span></h4>
+                                <!-- START Toolbar -->
+                                <ul class="toolbar pull-right">
+                                    <li><a class="link" data-widget="refresh" data-required="server_name" data-cmd="backup"><span class="icon icone-plus-sign"></span></a></li>
+                                </ul>
+                                <!--/ END Toolbar -->
+                                <span class="label label-success pull-right"></span>
+                            </header>
+                            <section class="body">
+                                <div class="body-inner">
+                                  <p data-bind="text: oldest"><strong></strong></p>
+                                    <p data-bind="text: recent"><strong></strong></p>
+                                    <p data-bind="text: space"><strong></strong></p>
+                                    <p><a class="link pointer" data-widget="refresh" data-required="server_name" data-cmd="backup" data-bind="text: create"></a></p>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Default Widget -->
+
+                        <!-- START Default Widget -->
+                        <div class="span6 widget">
+                            <header>
+                                <h4 class="title" data-page="archive_list" data-bind="text: archives"><span class="icon icone-bookmark"></span></h4>
+                                <!-- START Toolbar -->
+                                <ul class="toolbar pull-right">
+                                    <li><a class="link" data-widget="refresh" data-required="server_name" data-cmd="archive"><span class="icon icone-plus-sign"></span></a></li>
+                                </ul>
+                                <!--/ END Toolbar -->
+                                <span class="label label-success pull-right"></span>
+                            </header>
+                            <section class="body">
+                                <div class="body-inner">
+                                  <p data-bind="text: oldestA"><strong></strong></p>
+                                    <p data-bind="text: recentA"><strong></strong></p>
+                                    <p data-bind="text: spaceA"><strong></strong></p>
+                                    <p data-bind="text: createA"><a class="link pointer" data-widget="refresh" data-required="server_name" data-cmd="archive"></a></p>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Default Widget -->
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Default Widget -->
+                        <div class="span6 widget">
+                            <header>
+                                <h4 class="title" data-bind="text: ownerAnddisk"><span class="icon icone-bookmark"></span></h4>
+                            </header>
+                            <section class="body">
+                                <div class="body-inner">
+                                    <p data-bind="text: Sowner"><strong></strong></p>
+                                    <p data-bind="text: Gowner"><select id="available_groups"></select></p>
+                                    <p data-bind="text: Sspace"><strong></strong></p>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Default Widget -->
+                        <!-- START Default Widget -->
+                        <div id="delete_server" class="span6 widget">
+                            <header>
+                                <h4 class="title" data-bind="text: Sdelete"><span class="icon icone-bookmark"></span></h4>
+                            </header>
+                            <section class="body">
+                                <div class="body-inner">
+                                    <div class="controls" id="delete_confirmations">
+                                        <label class="checkbox">
+                                            <input type="checkbox" value="true"> Delete <span></span>/servers/<span></span>
+                                        </label>
+                                        <label class="checkbox">
+                                            <input type="checkbox" value="true"> Delete <span></span>/backup/<span></span>
+                                        </label>
+                                        <label class="checkbox">
+                                            <input type="checkbox" value="true"> Delete <span></span>/archive/<span></span>
+                                        </label>
+                                        <button class="btn btn-warning btn-mini" data-bind="text: Bdelete"></button>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Default Widget -->
+                    </div>
+                    <!--/ END Row -->
+
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content -->
+                <div id="backup_list" class="container-fluid">
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <div class="control-group">
+                            <label class="control-label">Remove restore points older than:</label>
+                            <div class="controls">
+                                <input type="text" id="prune_increment_input" data-bind="attr: {placeholder: pickDate}"> <button type="button" class="btn btn-danger" data-bind="text: BpruneR"><span class="icone-remove-circle"></span></button>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Icon Statistic - Circle -->
+                        <div class="span12 widget">
+                            <header><h4 class="title" data-bind="text: removeSum"></h4></header>
+                            <section class="body">
+                                <div class="body-inner" style="">
+                                    <!-- START Summary 1 -->
+                                    <figure class="stats summary shadowed">
+                                        <div class="icon circle lime"><span class="icone-folder-close"></span></div>
+                                        <figcaption>
+                                            <h3 data-bind="text: restoreP"><span></span><small></small></h3>
+                                        </figcaption>
+                                    </figure><!--/ END Summary 1 -->
+
+                                    <!-- START Summary 2 -->
+                                    <figure class="stats summary shadowed">
+                                        <div class="icon circle purple"><span class="icone-shopping-cart"></span></div>
+                                        <figcaption>
+                                            <h3 data-bind="text: reclaimed"><span></span><small></small></h3>
+                                        </figcaption>
+                                    </figure><!--/ END Summary 2 -->
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Icon Summary - Circle -->
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <table class="table table-hover">
+                          <thead>
+                            <tr>
+                              <th scope="col" data-bind="text: step"></th>
+                              <th scope="col" data-bind="text: timestamp"></th>
+                              <th scope="col" data-bind="text: increment"></th>
+                              <th scope="col" data-bind="text: cumulative"></th>
+                              <th scope="col"></th>
+                            </tr>
+                          </thead>
+                          <tfoot>
+                          </tfoot>
+                          <tbody>
+                            <tr>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td><button data-required="server_name,step,force" data-cmd="restore" class="btn btn-success btn-mini" data-bind="text: restore"></button></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                    </div>
+                    <!--/ END Row -->
+
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content -->
+                <div id="archive_list" class="container-fluid">
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <div class="control-group">
+                            <label class="control-label" data-bind="text: removeA"></label>
+                            <div class="controls">
+                                <input type="text" id="prune_archive_input" data-bind="attr: {placeholder: pDate}"> <button type="button" class="btn btn-danger" data-bind="text: pArchive"><span class="icone-remove-circle"></span></button>
+                            </div>
+                        </div>
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Icon Statistic - Circle -->
+                        <div class="span12 widget">
+                            <header><h4 class="title" data-bind="text: removeSum"></h4></header>
+                            <section class="body">
+                                <div class="body-inner" style="">
+                                    <!-- START Summary 1 -->
+                                    <figure class="stats summary shadowed">
+                                        <div class="icon circle lime"><span class="icone-folder-close"></span></div>
+                                        <figcaption>
+                                            <h3 data-bind="text: archives"><span></span><small></small></h3>
+                                        </figcaption>
+                                    </figure><!--/ END Summary 1 -->
+
+                                    <!-- START Summary 2 -->
+                                    <figure class="stats summary shadowed">
+                                        <div class="icon circle purple"><span class="icone-shopping-cart"></span></div>
+                                        <figcaption>
+                                            <h3 data-bind="text: reclaimed"><span></span><small></small></h3>
+                                        </figcaption>
+                                    </figure><!--/ END Summary 2 -->
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Icon Summary - Circle -->
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <table class="table table-hover">
+                          <thead>
+                            <tr>
+                              <th scope="col" data-bind="text: timestamp"></th>
+                              <th scope="col" data-bind="text: increment"></th>
+                              <th scope="col" data-bind="text: filename"></th>
+                              <th scope="col"></th>
+                            </tr>
+                          </thead>
+                          <tfoot>
+                          </tfoot>
+                          <tbody>
+                            <tr>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td>
+                                <div class="btn-group">
+                                    <button class="btn dropdown-toggle" data-toggle="dropdown" data-bind="text: action"><span class="caret"></span></button>
+                                    <ul class="dropdown-menu">
+                                        <li><a data-toggle="modal" data-target="#import_server_modal" data-bind="text: cServer"></a></li>
+                                        <li>&nbsp;</li>
+                                        <li><a data-required="server_name,filename" data-cmd="prune_archives" data-bind="text: delete"></a></li>
+                                    </ul>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                    </div>
+                    <!--/ END Row -->
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content -->
+                <div id="importable" class="container-fluid">
+
+                    <div class="row-fluid">
+                        <!-- START General Elements -->
+                        <div class="">
+                            <header>
+                                <h4 class="title" data-bind="text: CserverA"></h4>
+                            </header>
+                            <section class="body">
+                                <div class="body-inner">
+                                    <p data-bind="text: CrunS"></p>
+                                    <p data-bind="text: CuserC"></p>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END General Elements -->
+
+                        <div class="widget">
+                            <section class="body">
+                                <div class="body-inner">
+                                    <pre class="bash" data-bind="text: cUser">
+                                    </pre>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Syntax Highlighter -->
+                    </div>
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <header>
+                            <h4 class="title">Create Server from an Archive</h4>
+                        </header>
+                        <section class="body">
+                            <div class="body-inner">
+                                <p>The files listed below are those located in the <strong class="text-success" data-placement="top" title="" rel="tooltip" data-original-title="Acceptable archives are .tar, .tar.gz, .tgz, and .zip"><span></span>/import</strong> directory of your Minecraft data files.</p>
+                            </div>
+                        </section>
+                        <table id="table_importable" class="table table-hover">
+                          <thead>
+                            <tr>
+                              <th scope="col">Filename</th>
+                              <th scope="col"></th>
+                            </tr>
+                          </thead>
+                          <tfoot>
+                          </tfoot>
+                          <tbody>
+                            <tr>
+                              <td></td>
+                              <td>
+                                <button class="btn btn-success btn-mini" data-toggle="modal" data-target="#import_server_modal">Create Server From </button>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                    </div>
+                    <!--/ END Row -->
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content -->
+                <div id="profiles" class="container-fluid">
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Page/Section header -->
+                        <div class="span12">
+                            <div class="page-header line1">
+                                <h4>Server Profiles</h4>
+                            </div>
+                        </div>
+                        <!--/ END Page/Section header -->
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <table id="table_profiles_view" class="table table-hover">
+                          <thead>
+                            <tr>
+                              <th scope="col">Profile</th>
+                              <th scope="col">Runnable Jar</th>
+                              <th scope="col">URL</th>
+                              <th scope="col">OK</th>
+                              <th scope="col"></th>
+                            </tr>
+                          </thead>
+                          <tfoot>
+                          </tfoot>
+                          <tbody>
+                            <tr>
+                                <td class="pointer"></td>
+                                <td></td>
+                                <td></td>
+                                <td><span class="icon"></span></td>
+                                <td>
+                                  <button class="btn btn-success btn-mini" data-required="profile" data-refresh="500" data-cmd="update_profile">Update </button>
+                                    <button class="btn btn-warning btn-mini" data-toggle="modal" data-target="#remove_profile_modal">Remove </button>
+                                </td>
+                            </tr>
+                          </tbody>
+                          <tfoot>
+                            <tr>
+                              <td colspan="6">
+                                <button class="btn" data-toggle="dropdown" data-page="define_profile">Create Custom Profile</button>
+                                <div class="btn-group">
+                                    <button class="btn dropdown-toggle" data-toggle="dropdown">Create Stock Profile <span class="caret"></span></button>
+                                    <ul class="dropdown-menu">
+                                        <li><a data-required="profile" data-cmd="stock_profile"></a></li>
+                                    </ul>
+                                </div>
+                              </td>
+                            </tr>
+                          </tfoot>
+                        </table>
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <section class="body">
+                            <div class="body-inner">
+                                <p>Server profiles may be prototyped by any user, but may only be updated by a user with write permissions on <strong class="text-success" data-placement="top" title="" rel="tooltip" data-original-title="chmod g+w profile.config">profile.config</strong>.
+                                <span>The <strong>root</strong> user may extend these privileges to additional users by assigning <strong><span></span>/profiles/profile.config</strong> to a new group and then adding authorized users to this group.</span>
+                                <span>You may share this privilege with additional users by assigning <strong><span></span>/profiles/profile.config</strong> to a new group and then adding authorized users to this group.</span></p>
+                                Members of this group may update and remove profiles: 
+                                <select id="pc_group" name="pc_group"></select>
+                                <strong></strong>
+                            </div>
+                        </section>
+                    </div>
+                    <!--/ END Row -->
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content -->
+                <div id="profile_view" class="container-fluid">
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Line Chart - Filled -->
+                        <div class="span12 widget">
+                            <header>
+                                <h4 class="title">Profile Definition</h4>
+                                <!-- START Toolbar -->
+                                <!--/ END Toolbar -->
+                            </header>
+                            <section class="body">
+                                <div class="body-inner">
+                                    <div class="span12 pull-left">
+                                        <!-- START Summary -->
+                                        <figure class="stats summary pull-left">
+                                            <div class="icon circle"><span></span></div>
+                                            <figcaption>
+                                                <h3><span></span><small><a class="pointer" data-required="profile" data-refresh="500" data-cmd="update_profile">Download Now</a></small></h3>
+                                            </figcaption>
+                                        </figure>
+                                        <!--/ END Summary -->
+
+                                        <!-- START Summary -->
+                                        <figure class="stats summary">
+                                            <div class="icon circle lime"><span class="icone-time"></span></div>
+                                            <figcaption>
+                                                <h3><span></span><small></small></h3>
+                                            </figcaption>
+                                        </figure>
+                                        <!--/ END Summary -->
+
+                                        <!-- START Summary -->
+                                        <figure class="stats summary">
+                                            <div class="icon circle teal"><span class="icone-trophy"></span></div>
+                                            <figcaption>
+                                                <h3><span></span><small>Detected Version</small></h3>
+                                            </figcaption>
+                                        </figure>
+                                        <!--/ END Summary -->
+
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Line Chart - Filled -->
+                    </div>
+                    <!--/ END Row -->
+
+                    <div class="row-fluid">
+                        <!-- START General Elements -->
+                        <div class="span12 widget dark">
+                            <header>
+                                <h4 class="title"><span class="icon icone-keyboard"></span> Profile Notes</h4>
+                            </header>
+                            <section class="body">
+                                <div class="body-inner">
+                                    <!-- Autosize Textarea -->
+                                    <div class="control-group">
+                                        <div class="controls">
+                                            <textarea class="span12 autosize" rows="4" style="overflow: hidden; word-wrap: break-word; resize: horizontal; height: 90px;"></textarea>
+                                        </div>
+                                    </div><!--/ Autosize Textarea -->
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END General Elements -->
+                    </div>
+
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content -->
+                <div id="create_server" class="container-fluid">
+
+                    <div class="row-fluid">
+                        <!-- START General Elements -->
+                        <div class="">
+                            <header>
+                                <h4 class="title">Create a Server</h4>
+                            </header>
+                            <section class="body">
+                                <div class="body-inner">
+                                    <p>Creating and running a server should be done strictly as an unprivileged user to contain potential damage from server exploits, faulty plugins or java secuirty issues.</p>
+                                    <p>You can create a user from the command line using <strong>adduser</strong></p>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END General Elements -->
+
+                        <div class="widget">
+                            <section class="body">
+                                <div class="body-inner">
+                                    <pre class="bash">
+root@core ~# adduser will
+Adding user `will' ...
+Adding new group `will' (1001) ...
+Adding new user `will' (1000) with group `will' ...
+Creating home directory `/home/will' ...
+Copying files from `/etc/skel' ...
+Enter new UNIX password:
+Retype new UNIX password:
+passwd: password updated successfully
+Changing the user information for will
+Enter the new value, or press ENTER for the default
+Full Name []:
+Room Number []:
+Work Phone []:
+Home Phone []:
+Other []:
+Is the information correct? [Y/n]
+
+                                    </pre>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Syntax Highlighter -->
+                    </div>
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Form Wizard With Validation -->
+                        <form class="span12 widget dark shadowed form-horizontal bordered" id="createnewserver">
+                            <header><h4 class="title">Create a New Server</h4></header>
+                            <section class="body">
+                                <div class="body-inner">
+                                    <fieldset class="step" id="step1">
+                                        <div class="step-title">
+                                            <span class="icon icone-lock lime"></span>
+                                            <h5>
+                                                STEP 1<br/>
+                                                <small>Ownership Information</small>
+                                            </h5>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">Server Name:</label>
+                                            <div class="controls">
+                                                <input type="text" name="server_name" class="input-medium required" required>
+                                            </div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">Group Ownership:</label>
+                                            <div class="controls">
+                                                <select name="group"></select>
+                                                <span class="help-block">Other members of this group will have full control of the server</span>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                    <fieldset id="step2" class="step">
+                                        <div class="step-title">
+                                            <span class="icon icone-lightbulb yellow"></span>
+                                            <h5>
+                                                STEP 2<br/>
+                                                <small>server.properties</small>
+                                            </h5>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">server-port</label>
+                                            <div class="controls"><input type="text" name="server-port" class="input-medium" placeholder="25565"></div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">server-ip</label>
+                                            <div class="controls">
+                                                <input type="text" name="server-ip" class="input-medium" placeholder="0.0.0.0">
+                                                <span class="help-block">The default "0.0.0.0" means the server will listen on all available network interfaces</span>
+                                            </div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">max-players</label>
+                                            <div class="controls"><input type="text" name="max-players" class="input-medium" placeholder="20"></div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">level-name</label>
+                                            <div class="controls"><input type="text" name="level-name" class="input-medium" placeholder="world"></div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">level-seed</label>
+                                            <div class="controls">
+                                                <input type="text" name="level-seed" class="input-medium" placeholder="">
+                                                <span class="help-block">level-seed must be entered before the server is started for the first time</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="control-group">
+                                            <label class="control-label">difficulty</label>
+                                            <div class="controls">
+                                            <select class="input-medium" name="difficulty">
+                                                <option value="0">Peaceful</option><option value="1">Easy</option><option value="2">Normal</option><option value="3">Hard</option>
+                                            </select></div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">gamemode</label>
+                                            <div class="controls">
+                                            <select class="input-medium" name="gamemode">
+                                                <option value="0">Survival</option><option value="1">Creative</option><option value="2">Adventure</option>
+                                            </select></div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">level-type</label>
+                                            <div class="controls">
+                                            <select class="input-medium" name="level-type">
+                                                <option value="DEFAULT">DEFAULT</option><option value="FLAT">FLAT</option><option value="LARGEBIOMES">LARGEBIOMES</option>
+                                            </select></div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">Generate Structures</label>
+                                            <div class="controls">
+                                                <label class="checkbox">
+                                                    <input type="checkbox" name="generate-structures" value="true" checked>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+
+                                    <fieldset id="step3" class="step">
+                                        <div class="step-title">
+                                            <span class="icon icone-lightbulb yellow"></span>
+                                            <h5>
+                                                STEP 3<br/>
+                                                <small>server.config</small>
+                                            </h5>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">profile</label>
+                                            <div class="controls">
+                                                <select class="input-medium" data-section="minecraft" name="profile" required>
+                                                    <option></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">java_xmx</label>
+                                            <div class="controls">
+                                                <input type="text" data-section="java" name="java_xmx" class="input-medium" placeholder="256">
+                                                <span class="help-block">Maximum memory heap available exclusively to Minecraft (not including overhead)</span>
+                                            </div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">java_xms</label>
+                                            <div class="controls">
+                                                <input type="text" data-section="java" name="java_xms" class="input-medium" placeholder="256">
+                                                <span class="help-block">Minimum heapsize Minecraft will allocate (recommended same as java_xmx)</span>
+                                            </div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">java_tweaks</label>
+                                            <div class="controls">
+                                                <input type="text" data-section="java" name="java_tweaks" class="input-medium" placeholder="">
+                                                <span class="help-block">Additional java command-line arguments</span>
+                                            </div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">Archive Interval</label>
+                                            <div class="controls">
+                                            <select class="input-medium" data-section="crontabs" name="archive_interval">
+                                                <option value="">Skip</option>
+                                                <option value="30">Every 30 minutes</option>
+                                                <option value="60">1 Hour</option>
+                                                <option value="120">2 Hours</option>
+                                                <option value="180">3 Hours</option>
+                                                <option value="360">6 Hours</option>
+                                                <option value="720">12 Hours</option>
+                                                <option value="0">24 Hours</option>
+                                            </select></div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">Backup Interval</label>
+                                            <div class="controls">
+                                            <select class="input-medium" data-section="crontabs" name="backup_interval">
+                                                <option value="">Skip</option>
+                                                <option value="30">Every 30 minutes</option>
+                                                <option value="60">1 Hour</option>
+                                                <option value="120">2 Hours</option>
+                                                <option value="180">3 Hours</option>
+                                                <option value="360">6 Hours</option>
+                                                <option value="720">12 Hours</option>
+                                                <option value="0">24 Hours</option>
+                                            </select></div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">Start Server on Boot</label>
+                                            <div class="controls">
+                                                <label class="checkbox">
+                                                    <input data-section="onreboot" type="checkbox" name="start" value="true">
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                    
+                                    <div class="form-actions">
+                                        <input class="btn" id="back-1" value="Back" type="reset">
+                                        <input type="submit" class="btn btn-primary" id="next-1" value="Next">
+                                    </div>
+                                </div>
+                            </section>
+                        </form>
+                        <!--/ END Form Wizard With Validation -->
+                    </div>
+                    <!--/ END Row -->
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content -->
+                <div id="server_properties" class="container-fluid">
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Page/Section header -->
+                        <div class="span12">
+                            <div class="page-header line1">
+                                <h4>server.properties</h4>
+                            </div>
+                        </div>
+                        <!--/ END Page/Section header -->
+                    </div>
+                    <!--/ END Row -->
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <table id="table_properties" class="table table-hover">
+                          <thead>
+                            <tr>
+                              <th scope="col" class="span4">Option</th>
+                              <th scope="col">Value</th>
+                            </tr>
+                          </thead>
+                          <tfoot>
+                            <tr>
+                              <td><button class="btn btn-primary" data-config="sp"><span class="icone-edit"></span> New Property</button></td>
+                            </tr>
+                          </tfoot>
+                          <tbody>
+                            <tr>
+                              <td>
+                                <div class="">
+                                  <span class=""></span>
+                                  <input type="text" class="input-large">
+                                </div>
+                              </td>
+                              <td>
+                                <div class="control-group">
+                                    <div class="controls">
+                                        <input type="text" class="input-large">
+                                        <span>
+                                            <input type="checkbox" class="truefalse">
+                                        </span>
+                                    </div>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                    </div>
+                    <!--/ END Row -->
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content -->
+                <div id="server_config" class="container-fluid">
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Page/Section header -->
+                        <div class="span12">
+                            <div class="page-header line1">
+                                <h4>server.config</h4>
+                            </div>
+                        </div>
+                        <!--/ END Page/Section header -->
+                    </div>
+                    <!--/ END Row -->
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <table id="table_config" class="table table-hover">
+                          <thead>
+                            <tr>
+                              <th scope="col" class="span3">Section</th>
+                              <th scope="col" class="span4">Option</th>
+                              <th scope="col">Value</th>
+                            </tr>
+                          </thead>
+                          <tfoot>
+                            <tr>
+                              <td><button class="btn btn-primary" data-config="sc"><span class="icone-edit"></span> New Property</button></td>
+                            </tr>
+                          </tfoot>
+                          <tbody>
+                            <tr>
+                              <td><span></span>
+                                  <input type="text" class="input-large">
+                              </td>
+                              <td><span class=""></span>
+                                  <input type="text" class="input-large">
+                              </td>
+                              <td>
+                                <div class="control-group">
+                                    <div class="controls">
+                                        <input type="text" class="input-large">
+                                        <span>
+                                            <input type="checkbox" class="truefalse">
+                                        </span>
+                                        <span>
+                                            <select class="input-medium">
+                                                <option value="">Skip</option>
+                                                <option value="30">Every 30 minutes</option>
+                                                <option value="60">1 Hour</option>
+                                                <option value="120">2 Hours</option>
+                                                <option value="180">3 Hours</option>
+                                                <option value="240">4 Hours</option>
+                                                <option value="360">6 Hours</option>
+                                                <option value="720">12 Hours</option>
+                                                <option value="0">24 Hours</option>
+                                            </select>
+                                        </span>
+                                    </div>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                    </div>
+                    <!--/ END Row -->
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content -->
+                <div id="define_profile" class="container-fluid">
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Form Wizard With Validation -->
+                        <form class="span12 widget dark shadowed form-horizontal bordered" id="definenewprofile">
+                            <header><h4 class="title">Create a New Server Profile</h4></header>
+                            <section class="body">
+                                <div class="body-inner">
+
+                                    <fieldset id="step1" class="step">
+                                        <div class="control-group">
+                                            <label class="control-label">profile name</label>
+                                            <div class="controls">
+                                                <input type="text" name="name" class="input-medium required" placeholder="vanilla162">
+                                            </div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">type</label>
+                                            <div class="controls">
+                                                <select class="input-xlarge" name="type">
+                                                    <option value="standard_jar">Standalone, runnable JAR</option>
+                                                    <option value="archived_jar">Archive containing runnable JAR</option>
+                                                    <option value="unmanaged">Unmanaged</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">Download URL</label>
+                                            <div class="controls">
+                                                <input type="text" name="url" class="input-xlarge" placeholder="http://dl.bukkit.org/latest-rb/craftbukkit.jar">
+                                                <span class="help-block">Preferably enter a direct URL rather than a server-side redirected URL</span>
+                                            </div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">Save download as</label>
+                                            <div class="controls">
+                                                <input type="text" name="save_as" class="input-xlarge" placeholder="craftbukkit.jar">
+                                                <span class="help-block">Be sure <em>only</em> the filename is here</span>
+                                            </div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">Jarfile to run</label>
+                                            <div class="controls">
+                                            <input type="text" name="run_as" class="input-xlarge" placeholder="craftbukkit.jar" required>
+                                                <span class="help-block">In most cases, this will match the above line 'save download as'.</span>
+                                                <span class="help-block">The name of the server jar within the archive file to execute.</span>
+                                                <span class="help-block">Manually place this file directly in the <strong class="text-success" data-placement="top" title="" rel="tooltip" data-original-title=".../servers/servername/jarfile.jar">server's directory</strong>.</span>
+                                            </div>
+                                        </div>
+                                      <div class="control-group">
+                                            <label class="control-label">Jarfile arguments</label>
+                                            <div class="controls">
+                                            <input type="text" name="jar_args" class="input-xlarge" placeholder="nogui">
+                                                <span class="help-block"></span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Tags -->
+                                        <div class="control-group">
+                                            <label class="control-label">Files to not process</label>
+                                            <div class="controls">
+                                                <ul class="input-xlarge" id="ignore_files">
+                                                </ul>
+                                                <span class="help-block">Files that <strong class="text-success" data-placement="top" title="" rel="tooltip" data-original-title="Some archives may come with default configs, e.g., server.properties. Ignore-list these files to preserve user configs">should not</strong> be copied from the archive to the server directory.</span>
+                                            </div>
+                                        </div><!--/ Tags -->
+                                    </fieldset>
+
+                                    <div class="form-actions">
+                                        <input type="submit" class="btn btn-primary" value="Next">
+                                    </div>
+                                </div>
+                            </section>
+                        </form>
+                        <!--/ END Form Wizard With Validation -->
+                    </div>
+                    <!--/ END Row -->
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content -->
+                <div id="console" class="container-fluid">
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Line Chart - Filled -->
+                        <div class="span12 widget">
+                            <header>
+                                <h4 class="title">Server Logs</h4>
+                            </header>
+                        </div>
+                        <!--/ END Line Chart - Filled -->
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Line Chart - Filled -->
+                        <div class="span12">
+                            <form>
+                                <input type="text" name="console_command" class="span12" placeholder="send command to console">
+                            </form>
+                        </div>
+                        <!--/ END Line Chart - Filled -->
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Datatable 1 -->
+                        <div class="span12 widget stacked">
+                            <section class="body">
+                                <div class="body-inner no-padding">
+                                    <table class="table table-bordered table-striped table-hover" id="logs">
+                                        <thead>
+                                            <tr>
+                                                <th>Entry
+                                                    <div class="btn-group pull-right">
+                                                        <a href="#" class="btn btn-small">Reverse Order</a>
+                                                        <!--<a href="#" class="btn btn-small" data-bind="click: reset_logs">Show most recent 100 lines</a>-->
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                              <td></td>
+                                            </tr>
+                                        </tbody>
+                                        <tbody>
+                                            <tr>
+                                              <td></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Datatable 1 -->
+                    </div>
+                    <!--/ END Row -->
+
+                </div>
+                <!--/ END Content -->
+
+                <div id="import_server_modal" class="modal hide fade" style="display: none;" aria-hidden="true">
+                    <div class="modal-header">
+                        <h4 id="myModalLabel">Create a new server from an existing archive</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong></strong> will be extracted.</p>
+                        <p>Please enter the name of the new server to create:</p>
+                        <input type="text" name="newname" class="input-medium required" placeholder="server_name">
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+                        <button data-dismiss="modal" class="btn btn-success">Create new Server</button>
+                    </div>
+                </div>
+
+                <div id="remove_profile_modal" class="modal hide fade" style="display: none;" aria-hidden="true">
+                    <div class="modal-header">
+                        <h4>Remove <span></span> from available profiles?</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>All downloaded files for this profile will be deleted.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn" data-dismiss="modal" aria-hidden="true">Keep this Profile</button>
+                        <button data-dismiss="modal" class="btn btn-danger">Remove Profile</button>
+                    </div>
+                </div>
+
+            </section>
+            <!--/ END Template Main Content -->
+
+            <!-- START Template Footer -->
+            <footer id="footer" class="">
+                <div><span><a href="http://minecraft.codeemo.com">MineOS</a> created and maintained by <a href="mailto:wdchromium@gmail.com">William Dizon</a></span> 
+                - <span>Released via <a href="http://www.gnu.org/licenses/gpl-3.0.html">GNU GPL v3.0</a></span> - 
+                    <span>MineOS is free; show your support through Paypal!
+                        <form id="donate" action="https://www.paypal.com/cgi-bin/webscr" method="post">
+                          <input type="hidden" name="cmd" value="_s-xclick">
+                          <input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----MIIHPwYJKoZIhvcNAQcEoIIHMDCCBywCAQExggEwMIIBLAIBADCBlDCBjjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtQYXlQYWwgSW5jLjETMBEGA1UECxQKbGl2ZV9jZXJ0czERMA8GA1UEAxQIbGl2ZV9hcGkxHDAaBgkqhkiG9w0BCQEWDXJlQHBheXBhbC5jb20CAQAwDQYJKoZIhvcNAQEBBQAEgYBRScWc9zfX0apUl0Np08elgF0JArg07bc2GeK3JA/6lG9oenLG2Q1soVTl/u8F92EqRqTsgTuxsv2t26qQGSapq8zdjnHrD9WXw6Dk04vGUCNZtaC1ir93Dd/XobfUsr5RxukvYny9a6to5/uGlhENvz5qR/mIlYIsahc3lU3WUzELMAkGBSsOAwIaBQAwgbwGCSqGSIb3DQEHATAUBggqhkiG9w0DBwQIRsucaFJx6LKAgZhao5meFlIEmKLdjPebD/SkKXR79LjLkjMdAkRPlN6AtjT5jJm4CDYC+DCCi+TKW+CTLNrFEMiqOnIic1qBaqtpzV+U3mmsXMQHlbw7ZAW0Mert2fpWbxH4XyeXs0hg0nsB4lriNcCR1yXuNSnzdo33Y2XSGoUeWTvUeZAgtvegEBoOM6ba3fnTSjI5i0M9zBW6HgEhkGKoZ6CCA4cwggODMIIC7KADAgECAgEAMA0GCSqGSIb3DQEBBQUAMIGOMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFjAUBgNVBAcTDU1vdW50YWluIFZpZXcxFDASBgNVBAoTC1BheVBhbCBJbmMuMRMwEQYDVQQLFApsaXZlX2NlcnRzMREwDwYDVQQDFAhsaXZlX2FwaTEcMBoGCSqGSIb3DQEJARYNcmVAcGF5cGFsLmNvbTAeFw0wNDAyMTMxMDEzMTVaFw0zNTAyMTMxMDEzMTVaMIGOMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0ExFjAUBgNVBAcTDU1vdW50YWluIFZpZXcxFDASBgNVBAoTC1BheVBhbCBJbmMuMRMwEQYDVQQLFApsaXZlX2NlcnRzMREwDwYDVQQDFAhsaXZlX2FwaTEcMBoGCSqGSIb3DQEJARYNcmVAcGF5cGFsLmNvbTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAwUdO3fxEzEtcnI7ZKZL412XvZPugoni7i7D7prCe0AtaHTc97CYgm7NsAtJyxNLixmhLV8pyIEaiHXWAh8fPKW+R017+EmXrr9EaquPmsVvTywAAE1PMNOKqo2kl4Gxiz9zZqIajOm1fZGWcGS0f5JQ2kBqNbvbg2/Za+GJ/qwUCAwEAAaOB7jCB6zAdBgNVHQ4EFgQUlp98u8ZvF71ZP1LXChvsENZklGswgbsGA1UdIwSBszCBsIAUlp98u8ZvF71ZP1LXChvsENZklGuhgZSkgZEwgY4xCzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzEUMBIGA1UEChMLUGF5UGFsIEluYy4xEzARBgNVBAsUCmxpdmVfY2VydHMxETAPBgNVBAMUCGxpdmVfYXBpMRwwGgYJKoZIhvcNAQkBFg1yZUBwYXlwYWwuY29tggEAMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADgYEAgV86VpqAWuXvX6Oro4qJ1tYVIT5DgWpE692Ag422H7yRIr/9j/iKG4Thia/Oflx4TdL+IFJBAyPK9v6zZNZtBgPBynXb048hsP16l2vi0k5Q2JKiPDsEfBhGI+HnxLXEaUWAcVfCsQFvd2A1sxRr67ip5y2wwBelUecP3AjJ+YcxggGaMIIBlgIBATCBlDCBjjELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRYwFAYDVQQHEw1Nb3VudGFpbiBWaWV3MRQwEgYDVQQKEwtQYXlQYWwgSW5jLjETMBEGA1UECxQKbGl2ZV9jZXJ0czERMA8GA1UEAxQIbGl2ZV9hcGkxHDAaBgkqhkiG9w0BCQEWDXJlQHBheXBhbC5jb20CAQAwCQYFKw4DAhoFAKBdMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTEwMTIyOTAyNTk1OVowIwYJKoZIhvcNAQkEMRYEFPR5aY3Y3NaNcJjSdwdfjTImf9RSMA0GCSqGSIb3DQEBAQUABIGAlXdWb1Dmy1YQmthx17LHN7n4q9T76/pAilWpoAfwaNUwG6BRLNsTKSyHVblUoaRH8NIknnEcq0vKnCpRqp4k8HYl0e+0K8+CR1zkCAQygQabtIzLnnJXQ7NDJes1SqZ8KLKi3RNu0D5FPPyen5ALPlF1wGHmj8FfFAH7MvKyFWk=-----END PKCS7-----
+                        ">
+                          <input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+                          <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
+                        </form>
+                    </span>
+
+                </div>
+
+                <!-- START To Top Scroller -->
+                <a href="#" class="totop"><span class="icon icone-angle-up"></span></a>
+                <!--/ END To Top Scroller -->
+            </footer>
+            <!--/ END Template Footer -->
+        </div>
+        <!--/ END Template Canvas -->
+    </div>
+    <!--/ END Template Wrapper -->
+
+    <!-- START JAVASCRIPT SECTION - Include at the bottom of the page to reduce load time -->
+    <!-- Javascript(Vendors) -->
+    <script src="assets/jquery/js/jquery-2.0.3.min.js"></script>
+    <script src="assets/jui/js/jquery-ui-1.10.3.min.js"></script>
+    <!--/ Javascript(Vendors) -->
+
+    <!-- Javascript(Plugins) -->
+    <!--[if IE 8]><script src="/assets/respond/js/respond.min.js"></script><![endif]-->
+    <script src="assets/autosize/js/jquery.autosize.min.js"></script>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/easypiechart/js/jquery.easypiechart.min.js"></script>
+    <script src="assets/formwizard/js/jquery.formwizard.min.js"></script>
+    <script src="assets/icheck/js/jquery.icheck.min.js"></script>
+    <script src="assets/ie-placeholder/js/jquery.placeholder.min.js"></script>
+    <script src="assets/inputmask/js/jquery.inputmask.min.js"></script>
+    <script src="assets/moment/js/moment.min.js"></script>
+    <script src="assets/mousewheel/js/jquery.mousewheel.min.js"></script>
+    <script src="assets/daterangepicker/js/daterangepicker.min.js"></script>
+    <script src="assets/tagit/js/tag-it.min.js"></script>
+    <script src="assets/gritter/js/jquery.gritter.min.js"></script>
+
+    <!-- Form Validation -->
+    <script src="assets/formvalidation/bassistance/js/jquery.validate.min.js"></script>
+    <script src="assets/formvalidation/validationengine/js/lang/jquery.validationEngine-en.min.js"></script>
+    <script src="assets/formvalidation/validationengine/js/jquery.validationEngine.min.js"></script>
+
+    <!-- Chart -->
+    <script src="assets/flot/jquery.flot.min.js"></script>
+    <script src="assets/flot/jquery.flot.pie.min.js"></script>
+    <script src="assets/flot/jquery.flot.categories.min.js"></script>
+    <script src="assets/flot/jquery.flot.tooltip.min.js"></script>
+    <script src="assets/flot/jquery.flot.resize.min.js"></script>
+    <script src="assets/flot/excanvas.min.js"></script>
+    <!--/ Javascript(Plugins) -->
+
+    <!-- Javascript (Application) -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/plugins.js"></script>
+    <script src="js/application.js"></script>
+    <script src="js/knockout-min.js"></script>
+    <script src="js/knockout.mapping-latest.js"></script>
+    <script src="js/ansi_up.js"></script>
+    <script src="js/scriptin.js"></script>
+    <!--/ Javascript (Application) -->
+    
+    <script type="text/javascript">
+        var vm = new webui();
+        
+        $(document).ready(function() {
+            ko.applyBindings(vm);
+        });
+
+        /*window.addEventListener('popstate', function(event) {
+            vm.restore_state(event.state);
+        })*/
+
+    </script>
+    <!--/ END JAVASCRIPT SECTION -->
+</body>
+</html>
