@@ -439,7 +439,7 @@
                         <!-- START Default Widget -->
                         <div class="span6 widget">
                             <header>
-                              <h4 class="title" data-page="backup_list"><span class="icon icone-bookmark"></span> Restore Points</h4>
+                              <h4 class="title" data-page="backup_list"><span class="icon icone-bookmark" data-bind="text: restore"></span></h4>
                                 <!-- START Toolbar -->
                                 <ul class="toolbar pull-right">
                                     <li><a class="link" data-widget="refresh" data-required="server_name" data-cmd="backup"><span class="icon icone-plus-sign"></span></a></li>
@@ -449,10 +449,10 @@
                             </header>
                             <section class="body">
                                 <div class="body-inner">
-                                  <p>Oldest restore point: <strong></strong></p>
-                                    <p>Most recent restore point: <strong></strong></p>
-                                    <p>Space used by backups: <strong></strong></p>
-                                    <p><a class="link pointer" data-widget="refresh" data-required="server_name" data-cmd="backup">Create a new Restore Point</a></p>
+                                  <p data-bind="text: oldest"><strong></strong></p>
+                                    <p data-bind="text: recent"><strong></strong></p>
+                                    <p data-bind="text: space"><strong></strong></p>
+                                    <p><a class="link pointer" data-widget="refresh" data-required="server_name" data-cmd="backup" data-bind="text: create"></a></p>
                                 </div>
                             </section>
                         </div>
@@ -461,7 +461,7 @@
                         <!-- START Default Widget -->
                         <div class="span6 widget">
                             <header>
-                                <h4 class="title" data-page="archive_list"><span class="icon icone-bookmark"></span> Archives</h4>
+                                <h4 class="title" data-page="archive_list" data-bind="text: archives"><span class="icon icone-bookmark"></span></h4>
                                 <!-- START Toolbar -->
                                 <ul class="toolbar pull-right">
                                     <li><a class="link" data-widget="refresh" data-required="server_name" data-cmd="archive"><span class="icon icone-plus-sign"></span></a></li>
@@ -471,10 +471,10 @@
                             </header>
                             <section class="body">
                                 <div class="body-inner">
-                                  <p>Oldest archive: <strong></strong></p>
-                                    <p>Most recent archive: <strong></strong></p>
-                                    <p>Space used by archives: <strong></strong></p>
-                                    <p><a class="link pointer" data-widget="refresh" data-required="server_name" data-cmd="archive">Create a new Archive</a></p>
+                                  <p data-bind="text: oldestA"><strong></strong></p>
+                                    <p data-bind="text: recentA"><strong></strong></p>
+                                    <p data-bind="text: spaceA"><strong></strong></p>
+                                    <p data-bind="text: createA"><a class="link pointer" data-widget="refresh" data-required="server_name" data-cmd="archive"></a></p>
                                 </div>
                             </section>
                         </div>
@@ -487,13 +487,13 @@
                         <!-- START Default Widget -->
                         <div class="span6 widget">
                             <header>
-                                <h4 class="title"><span class="icon icone-bookmark"></span> Ownership and Disk Usage</h4>
+                                <h4 class="title" data-bind="text: ownerAnddisk"><span class="icon icone-bookmark"></span></h4>
                             </header>
                             <section class="body">
                                 <div class="body-inner">
-                                    <p>Server Owner: <strong></strong></p>
-                                    <p>Group Owner: <select id="available_groups"></select></p>
-                                    <p>Space used by live server files: <strong></strong></p>
+                                    <p data-bind="text: Sowner"><strong></strong></p>
+                                    <p data-bind="text: Gowner"><select id="available_groups"></select></p>
+                                    <p data-bind="text: Sspace"><strong></strong></p>
                                 </div>
                             </section>
                         </div>
@@ -501,7 +501,7 @@
                         <!-- START Default Widget -->
                         <div id="delete_server" class="span6 widget">
                             <header>
-                                <h4 class="title"><span class="icon icone-bookmark"></span> Delete Server</h4>
+                                <h4 class="title" data-bind="text: Sdelete"><span class="icon icone-bookmark"></span></h4>
                             </header>
                             <section class="body">
                                 <div class="body-inner">
@@ -515,7 +515,7 @@
                                         <label class="checkbox">
                                             <input type="checkbox" value="true"> Delete <span></span>/archive/<span></span>
                                         </label>
-                                        <button class="btn btn-warning btn-mini">Delete </button>
+                                        <button class="btn btn-warning btn-mini" data-bind="text: Bdelete"></button>
                                     </div>
                                 </div>
                             </section>
@@ -534,7 +534,7 @@
                         <div class="control-group">
                             <label class="control-label">Remove restore points older than:</label>
                             <div class="controls">
-                                <input type="text" id="prune_increment_input" placeholder="Pick a date or step"> <button type="button" class="btn btn-danger"><span class="icone-remove-circle"></span> Prune Restore Points</button>
+                                <input type="text" id="prune_increment_input" data-bind="attr: {placeholder: pickDate}"> <button type="button" class="btn btn-danger" data-bind="text: BpruneR"><span class="icone-remove-circle"></span></button>
                             </div>
                         </div>
 
@@ -545,14 +545,14 @@
                     <div class="row-fluid">
                         <!-- START Icon Statistic - Circle -->
                         <div class="span12 widget">
-                            <header><h4 class="title">Removal Summary</h4></header>
+                            <header><h4 class="title" data-bind="text: removeSum"></h4></header>
                             <section class="body">
                                 <div class="body-inner" style="">
                                     <!-- START Summary 1 -->
                                     <figure class="stats summary shadowed">
                                         <div class="icon circle lime"><span class="icone-folder-close"></span></div>
                                         <figcaption>
-                                            <h3><span></span><small>Restore Points</small></h3>
+                                            <h3 data-bind="text: restoreP"><span></span><small></small></h3>
                                         </figcaption>
                                     </figure><!--/ END Summary 1 -->
 
@@ -560,7 +560,7 @@
                                     <figure class="stats summary shadowed">
                                         <div class="icon circle purple"><span class="icone-shopping-cart"></span></div>
                                         <figcaption>
-                                            <h3><span></span><small>MB Reclaimed</small></h3>
+                                            <h3 data-bind="text: reclaimed"><span></span><small></small></h3>
                                         </figcaption>
                                     </figure><!--/ END Summary 2 -->
                                 </div>
@@ -575,10 +575,10 @@
                         <table class="table table-hover">
                           <thead>
                             <tr>
-                              <th scope="col">Step</th>
-                              <th scope="col">Timestamp</th>
-                              <th scope="col">Increment Size</th>
-                              <th scope="col">Cumulative Size</th>
+                              <th scope="col" data-bind="text: step"></th>
+                              <th scope="col" data-bind="text: timestamp"></th>
+                              <th scope="col" data-bind="text: increment"></th>
+                              <th scope="col" data-bind="text: cumulative"></th>
                               <th scope="col"></th>
                             </tr>
                           </thead>
@@ -590,7 +590,7 @@
                               <td></td>
                               <td></td>
                               <td></td>
-                              <td><button data-required="server_name,step,force" data-cmd="restore" class="btn btn-success btn-mini">Restore</button></td>
+                              <td><button data-required="server_name,step,force" data-cmd="restore" class="btn btn-success btn-mini" data-bind="text: restore"></button></td>
                             </tr>
                           </tbody>
                         </table>
@@ -605,9 +605,9 @@
                     <!-- START Row -->
                     <div class="row-fluid">
                         <div class="control-group">
-                            <label class="control-label">Remove archives older than:</label>
+                            <label class="control-label" data-bind="text: removeA"></label>
                             <div class="controls">
-                                <input type="text" id="prune_archive_input" placeholder="Pick a date"> <button type="button" class="btn btn-danger"><span class="icone-remove-circle"></span> Prune Archives</button>
+                                <input type="text" id="prune_archive_input" data-bind="attr: {placeholder: pDate}"> <button type="button" class="btn btn-danger" data-bind="text: pArchive"><span class="icone-remove-circle"></span></button>
                             </div>
                         </div>
                     </div>
@@ -617,14 +617,14 @@
                     <div class="row-fluid">
                         <!-- START Icon Statistic - Circle -->
                         <div class="span12 widget">
-                            <header><h4 class="title">Removal Summary</h4></header>
+                            <header><h4 class="title" data-bind="text: removeSum"></h4></header>
                             <section class="body">
                                 <div class="body-inner" style="">
                                     <!-- START Summary 1 -->
                                     <figure class="stats summary shadowed">
                                         <div class="icon circle lime"><span class="icone-folder-close"></span></div>
                                         <figcaption>
-                                            <h3><span></span><small>Archives</small></h3>
+                                            <h3 data-bind="text: archives"><span></span><small></small></h3>
                                         </figcaption>
                                     </figure><!--/ END Summary 1 -->
 
@@ -632,7 +632,7 @@
                                     <figure class="stats summary shadowed">
                                         <div class="icon circle purple"><span class="icone-shopping-cart"></span></div>
                                         <figcaption>
-                                            <h3><span></span><small>MB Reclaimed</small></h3>
+                                            <h3 data-bind="text: reclaimed"><span></span><small></small></h3>
                                         </figcaption>
                                     </figure><!--/ END Summary 2 -->
                                 </div>
@@ -647,9 +647,9 @@
                         <table class="table table-hover">
                           <thead>
                             <tr>
-                              <th scope="col">Timestamp</th>
-                              <th scope="col">Increment Size</th>
-                              <th scope="col">Filename</th>
+                              <th scope="col" data-bind="text: timestamp"></th>
+                              <th scope="col" data-bind="text: increment"></th>
+                              <th scope="col" data-bind="text: filename"></th>
                               <th scope="col"></th>
                             </tr>
                           </thead>
@@ -662,11 +662,11 @@
                               <td></td>
                               <td>
                                 <div class="btn-group">
-                                    <button class="btn dropdown-toggle" data-toggle="dropdown">Actions <span class="caret"></span></button>
+                                    <button class="btn dropdown-toggle" data-toggle="dropdown" data-bind="text: action"><span class="caret"></span></button>
                                     <ul class="dropdown-menu">
-                                        <li><a data-toggle="modal" data-target="#import_server_modal">Create Server From</a></li>
+                                        <li><a data-toggle="modal" data-target="#import_server_modal" data-bind="text: cServer"></a></li>
                                         <li>&nbsp;</li>
-                                        <li><a data-required="server_name,filename" data-cmd="prune_archives">Delete</a></li>
+                                        <li><a data-required="server_name,filename" data-cmd="prune_archives" data-bind="text: delete"></a></li>
                                     </ul>
                                 </div>
                               </td>
@@ -685,12 +685,12 @@
                         <!-- START General Elements -->
                         <div class="">
                             <header>
-                                <h4 class="title">Create Server from an Archive</h4>
+                                <h4 class="title" data-bind="text: CserverA"></h4>
                             </header>
                             <section class="body">
                                 <div class="body-inner">
-                                    <p>Creating and running a server should be done strictly as an unprivileged user to contain potential damage from server exploits, faulty plugins or java secuirty issues.</p>
-                                    <p>You can create a user from the command line using <strong>adduser</strong></p>
+                                    <p data-bind="text: CrunS"></p>
+                                    <p data-bind="text: CuserC"></p>
                                 </div>
                             </section>
                         </div>
@@ -699,25 +699,7 @@
                         <div class="widget">
                             <section class="body">
                                 <div class="body-inner">
-                                    <pre class="bash">
-root@core ~# adduser will
-Adding user `will' ...
-Adding new group `will' (1001) ...
-Adding new user `will' (1000) with group `will' ...
-Creating home directory `/home/will' ...
-Copying files from `/etc/skel' ...
-Enter new UNIX password:
-Retype new UNIX password:
-passwd: password updated successfully
-Changing the user information for will
-Enter the new value, or press ENTER for the default
-Full Name []:
-Room Number []:
-Work Phone []:
-Home Phone []:
-Other []:
-Is the information correct? [Y/n]
-
+                                    <pre class="bash" data-bind="text: cUser">
                                     </pre>
                                 </div>
                             </section>
