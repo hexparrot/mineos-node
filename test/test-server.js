@@ -47,7 +47,7 @@ test.backend_cleanup = function(test) {
   var instance = new mineos.mc('testing', BASE_DIR);
   var owner = {
     uid: 1000,
-    gid: 1001
+    gid: 1000
   }
 
   async.series([

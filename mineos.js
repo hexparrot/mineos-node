@@ -29,6 +29,8 @@ mineos.SP_DEFAULTS = {
   'server-ip': '0.0.0.0',
 }
 
+var JAR_PATH = process.env['HOME'];
+
 mineos.server_list = function(base_dir) {
   return fs.readdirSync(path.join(base_dir, mineos.DIRS['servers']));
 }
@@ -45,9 +47,14 @@ mineos.server_pids_up = function() {
   var servers_found = {};
 
   for (var i=0; i < pids.length; i++) {
-    cmdline = fs.readFileSync('/proc/{0}/cmdline'.format(pids[i]))
+    try {
+      cmdline = fs.readFileSync('/proc/{0}/cmdline'.format(pids[i]))
                               .toString('ascii')
                               .replace(/\u0000/g, ' ');
+    } catch (e) {
+      continue;
+    }
+
     screen_match = SCREEN_REGEX.exec(cmdline);
 
     if (screen_match) {
@@ -56,9 +63,14 @@ mineos.server_pids_up = function() {
       else
         servers_found[screen_match[1]] = {'screen': parseInt(pids[i])}
     } else {
-      environ = fs.readFileSync('/proc/{0}/environ'.format(pids[i]))
+      try {
+        environ = fs.readFileSync('/proc/{0}/environ'.format(pids[i]))
                                 .toString('ascii')
                                 .replace(/\u0000/g, ' ');
+      } catch (e) {
+        continue;
+      }
+
       java_match = JAVA_REGEX.exec(environ);
 
       if (java_match) {
@@ -139,7 +151,7 @@ mineos.mc = function(server_name, base_dir) {
                 '-jar',  'minecraft_server.jar', 'nogui'];
 
     var params = { cwd: self.env.cwd };
-    var orig_filepath = '/var/games/minecraft/profiles/vanilla179/minecraft_server.1.7.9.jar';
+    var orig_filepath = path.join(JAR_PATH, 'minecraft_server.1.7.9.jar');
     var dest_filename = 'minecraft_server.jar';
 
     async.series([

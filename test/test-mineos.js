@@ -9,7 +9,7 @@ var FS_DELAY_MS = 200;
 
 var OWNER_CREDS = {
   uid: 1000,
-  gid: 1001
+  gid: 1000
 }
 
 test.tearDown = function(callback) {

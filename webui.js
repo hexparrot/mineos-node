@@ -9,7 +9,7 @@ var response_options = {root: __dirname};
 
 var OWNER_CREDS = {
   uid: 1000,
-  gid: 1001
+  gid: 1000
 }
 
 var be = server.backend(BASE_DIR, io, OWNER_CREDS);
