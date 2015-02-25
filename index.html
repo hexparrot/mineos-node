@@ -27,7 +27,8 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
-      var global = io('/');
+      var connect_string = ':3000/';
+      var global = io(connect_string);
       var channels = {};
 
       global.on('server_list', function(servers) {
@@ -50,7 +51,7 @@
           return;
 
         $('#servers').append($('<li>').text(server_name));
-        var c = channels[server_name] = io('/' + server_name);
+        var c = channels[server_name] = io(connect_string + server_name);
 
         c.on('server.properties', function(data) {
           $('#sp').empty();
