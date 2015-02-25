@@ -61,7 +61,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
       make_watch('server.properties', function() {
         instance.sp(function(err, sp_data) {
           console.info('[{0}] server.properties changed'.format(server_name));
-          nsp.in('server.properties').emit('server.properties', sp_data);
+          nsp.in('server.properties').emit('server.properties', {'server_name': server_name, 'payload': sp_data});
         })
       });
 
@@ -214,7 +214,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         console.info('[{0}] Created tail on {1}'.format(server_name, rel_filepath));
         new_tail.on('line', function(data) {
           //console.info('[{0}] {1}: transmitting new tail data'.format(server_name, rel_filepath));
-          nsp.in(rel_filepath).emit('tail_data', data);
+          nsp.in(rel_filepath).emit('tail_data', {'server_name': server_name, 'payload': data});
         })
         self.servers[server_name].tails[rel_filepath] = new_tail;
       } catch (e) {
