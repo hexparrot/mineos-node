@@ -6,9 +6,7 @@ function webui(port) {
   self.servers = ko.observableArray([]);
   self.page = ko.observable();
 
-  self.current = {
-    model: ko.observable({})
-  } 
+  self.current_model = ko.observable({});
 
   self.global.on('server_list', function(servers) {
     var all = [];
@@ -71,7 +69,7 @@ function webui(port) {
   }
 
   self.select_server = function(model) {
-    self.current['model'](model);
+    self.current_model(model);
 
     if (self.page() == 'dashboard')
       self.show_page('server_status');
