@@ -41,7 +41,7 @@ function webui(port) {
       if ('property' in data) {
         switch (data.property) {
           case 'server.properties':
-            container.sp($.map(data.payload, function(k,v) {
+            container.sp($.map(data.payload, function(v,k) {
               return {key: k, value: v}
             }))
             break;
