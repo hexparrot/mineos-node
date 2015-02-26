@@ -349,13 +349,13 @@
                               <th scope="col">Memory</th>
                             </tr>
                           </thead>
-                          <tbody data-bind="foreach: servers">
+                          <tbody data-bind="foreach: { data: servers, as: 'server' }">
                             <tr>
                               <td data-bind="text: server_name, click: $root.select_server"></td>
                               <td></td>
                               <td></td>
                               <td><span class="label"></span></td>
-                              <td></td>
+                              <td data-bind="text: server.dashboard.players_online() + '/' + server.dashboard.players_max()"></td>
                               <td></td>
                             </tr>
                           </tbody>

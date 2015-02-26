@@ -25,6 +25,10 @@ function webui(port) {
       server_name: server_name,
       channel: c,
       sp: ko.observable([]),
+      dashboard: {
+        players_online: ko.observable(0),
+        players_max: ko.observable(0)
+      },
       gamelog: ko.observableArray([])
     }
 
@@ -48,6 +52,15 @@ function webui(port) {
         }
       }
       console.log('RESULT:', data);
+    })
+
+    c.on('property', function(data) {
+      switch (data.property) {
+        case 'ping':
+          container.dashboard['players_online'](data.payload['players_online'])
+          container.dashboard['players_max'](data.payload['players_max'])
+          break;
+      }
     })
 
     c.on('receipt', function(data) {
