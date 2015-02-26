@@ -1171,6 +1171,7 @@ Is the information correct? [Y/n]
                               <td><button class="btn btn-primary" data-config="sp"><span class="icone-edit"></span> New Property</button></td>
                             </tr>
                           </tfoot>
+                          <!-- ko if: 'sp' in current_model() -->
                           <tbody data-bind="foreach: {data: current_model().sp(), as: '_data'}">
                             <tr>
                               <td>
@@ -1185,6 +1186,7 @@ Is the information correct? [Y/n]
                               </td>
                             </tr>
                           </tbody>
+                          <!-- /ko -->
                           
                         </table>
                     </div>
