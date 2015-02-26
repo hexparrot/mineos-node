@@ -17,11 +17,7 @@ function webui(port) {
     }, this),
     sp: ko.pureComputed(function() {
       try {
-        var sp = this.current['model']().sp();
-        var sp_array = [];
-        for (var k in sp)
-          sp_array.push({key: k, value: sp[k]})
-        return sp_array;
+        return this.current['model']().sp();
       } catch (e) {
         return [];
       }
@@ -44,7 +40,7 @@ function webui(port) {
     var container = {
       server_name: server_name,
       channel: c,
-      sp: ko.observable({}),
+      sp: ko.observable([]),
       gamelog: ko.observableArray([])
     }
 
@@ -59,7 +55,9 @@ function webui(port) {
       if ('property' in data) {
         switch (data.property) {
           case 'server.properties':
-            container.sp(data.payload);
+            container.sp($.map(data.payload, function(k,v) {
+              return {key: k, value: v}
+            }))
             break;
           default:
             break;
