@@ -7,9 +7,22 @@ function webui(port) {
   self.page = ko.observable();
 
   self.current_model = ko.observable({});
+
   self.current_tail = ko.pureComputed(function() {
     try {
       return this.current_model().gamelog();
+    } catch (e) {
+      return [];
+    }
+  }, this);
+
+  self.current_sp = ko.pureComputed(function() {
+    try {
+      var sp = this.current_model().sp();
+      var sp_array = [];
+      for (var k in sp)
+        sp_array.push({key: k, value: sp[k]})
+      return sp_array;
     } catch (e) {
       return [];
     }
@@ -31,23 +44,27 @@ function webui(port) {
     var container = {
       server_name: server_name,
       channel: c,
+      sp: ko.observable({}),
       gamelog: ko.observableArray([])
     }
 
     c.emit('watch', 'logs/latest.log');
-
-    c.on('server.properties', function(data) {
-      $('#sp').empty();
-      $.each(data, function(k,v) {
-        $('#sp').append($('<li>').text('{0}:{1}'.format(k,v)));
-      })
-    })
 
     c.on('tail_data', function(data) {
       container.gamelog.push(data.payload);
     })
 
     c.on('result', function(data) {
+      console.log(data)
+      if ('property' in data) {
+        switch (data.property) {
+          case 'server.properties':
+            container.sp(data.payload);
+            break;
+          default:
+            break;
+        }
+      }
       console.log('RESULT:', data);
     })
 

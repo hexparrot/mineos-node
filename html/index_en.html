@@ -1161,22 +1161,16 @@ Is the information correct? [Y/n]
                               <td><button class="btn btn-primary" data-config="sp"><span class="icone-edit"></span> New Property</button></td>
                             </tr>
                           </tfoot>
-                          <tbody>
+                          <tbody data-bind="foreach: {data: current_sp, as: '_data'}">
                             <tr>
                               <td>
                                 <div class="">
-                                  <span class=""></span>
-                                  <input type="text" class="input-large">
+                                  <span data-bind="text: _data.key" class=""></span>
                                 </div>
                               </td>
                               <td>
-                                <div class="control-group">
-                                    <div class="controls">
-                                        <input type="text" class="input-large">
-                                        <span>
-                                            <input type="checkbox" class="truefalse">
-                                        </span>
-                                    </div>
+                                <div class="">
+                                  <input type="text" data-bind="value: _data.value" class="input-large">
                                 </div>
                               </td>
                             </tr>
