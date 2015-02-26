@@ -1,7 +1,8 @@
-function webui() {
+function webui(port) {
   var self = this;
 
-  self.global = io('/');
+  self.connect_string = ':{0}/'.format(port);
+  self.global = io(self.connect_string);
   self.servers = ko.observableArray([]);
   self.page = ko.observable();
 
@@ -17,7 +18,7 @@ function webui() {
   })
 
   self.track_server = function(server_name) {
-    var c = io('/' + server_name);
+    var c = io(self.connect_string + server_name);
     var container = {
       server_name: server_name,
       channel: c,
