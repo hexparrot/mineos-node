@@ -346,7 +346,7 @@
                           </thead>
                           <tbody data-bind="foreach: servers">
                             <tr>
-                              <td data-bind="text: server_name"></td>
+                              <td data-bind="text: server_name, click: $root.select_server"></td>
                               <td></td>
                               <td></td>
                               <td><span class="label"></span></td>
@@ -1378,14 +1378,9 @@ Is the information correct? [Y/n]
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody data-bind="foreach: current_tail">
                                             <tr>
-                                              <td></td>
-                                            </tr>
-                                        </tbody>
-                                        <tbody>
-                                            <tr>
-                                              <td></td>
+                                              <td data-bind="text: $data"></td>
                                             </tr>
                                         </tbody>
                                     </table>

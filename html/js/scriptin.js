@@ -6,6 +6,15 @@ function webui(port) {
   self.servers = ko.observableArray([]);
   self.page = ko.observable();
 
+  self.current_model = ko.observable({});
+  self.current_tail = ko.pureComputed(function() {
+    try {
+      return this.current_model().gamelog();
+    } catch (e) {
+      return [];
+    }
+  }, this);
+
   self.global.on('server_list', function(servers) {
     var all = [];
     for (var s in servers)
@@ -35,8 +44,7 @@ function webui(port) {
     })
 
     c.on('tail_data', function(data) {
-      console.log(data);
-      container.gamelog.push(data);
+      container.gamelog.push(data.payload);
     })
 
     c.on('result', function(data) {
@@ -59,6 +67,13 @@ function webui(port) {
 
     $('.container-fluid').hide();
     $('#{0}'.format(self.page())).show();
+  }
+
+  self.select_server = function(model) {
+    self.current_model(model);
+
+    if (self.page() == 'dashboard')
+      self.show_page('server_status');
   }
 
   self.show_page('dashboard');
