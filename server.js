@@ -50,34 +50,44 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
       nsp = self.front_end.of('/{0}'.format(server_name));
 
       function heartbeat() {
-        async.series([
+        var retval = {};
+
+        async.waterfall([
           function(cb) {
-            instance.verify(['up'], function(is_up) {
-              if (is_up) {
-                instance.property('memory', function(err, data) {
-                  cb(err, [is_up, data['VmRSS']])
-                })
-              } else {
-                cb(null, [is_up, 0]);
-              }
+            instance.property('up', function(err, is_up) {
+              retval['up'] = is_up;
+              cb(err, is_up);
             })
           },
-          function(cb) {
-            instance.sp(function(err, dict) {
-              cb(err, [dict['server-port'], dict['max-players']])
-            })
+          function(is_up, cb) {
+            if (is_up)
+              instance.property('memory', function(err, memdata) {
+                retval['memory'] = memdata;
+                cb(err, is_up);
+              })
+            else {
+              retval['memory'] = {};
+              cb(null, is_up);
+            }
+          },
+          function(is_up, cb) {
+            if (is_up)
+              instance.ping(function(err, pingdata) {
+                retval['ping'] = pingdata;
+                cb(err, is_up)
+              })
+            else {
+              retval['ping'] = {};
+              cb(null, is_up);
+            }
           }
         ], function(err, results) {
           nsp.emit('heartbeat', {
-            'server_name': server_name, 
-            'payload': {
-              'up': results[0][0],
-              'VmRSS': results[0][1],
-              'server-port': results[1][0],
-              'max-players': results[1][1],
-              'timestamp': Date.now()
-            }
+            'server_name': server_name,
+            'timestamp': Date.now(),
+            'payload': retval
           });
+          console.log('[{0}] Heartbeat transmitted.'.format(server_name))
         })
       }
 
