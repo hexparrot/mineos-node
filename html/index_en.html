@@ -232,11 +232,12 @@
                     <div class="navbar-inner">
                         <!-- Breadcrumb -->
                         <ul class="breadcrumb">
-                            <li>Currently Selected Server: <strong><a data-page="server_status"></a></strong>
+                            <li>Currently Selected Server: <strong><a data-page="server_status" data-bind="text: current_model().server_name"></a></strong>
                         </ul>
                         <!--/ Breadcrumb -->
                     </div>
                     <div class="navbar-outer">
+                        <!--
                         <div class="alert alert-success">
                             <button type="button" class="close" data-dismiss="alert">×</button>
                             <strong>You are currently logged in as root.</strong> You may manage all servers as <strong>root</strong>, but creating new ones must be done as an unprivileged user.
@@ -253,6 +254,7 @@
                             <button type="button" class="close" data-dismiss="alert">×</button>
                             Your current selected server requires acceptance of the <strong>Mojang EULA</strong> in order to start. Please review the <a href="https://account.mojang.com/documents/minecraft_eula">terms and conditions</a> within before clicking the 'Accept EULA' button.
                         </div>
+                        -->
                     </div>
                 </div>
                 <!--/ END Bootstrap Navbar -->
