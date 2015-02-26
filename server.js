@@ -48,6 +48,17 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
     function setup() {
       nsp = self.front_end.of('/{0}'.format(server_name));
 
+      setInterval(function(){
+        instance.verify(['up'], function(is_up) {
+          if (is_up) {
+            console.info('[{0}] Ping broadcast transmitted.'.format(server_name))
+            instance.ping(function(err, pingdata) {
+              nsp.emit('property', {server_name: server_name, property: 'ping', payload: pingdata})
+            })
+          }
+        })
+      }, 5000);
+
       self.servers[server_name] = {
         instance: instance,
         nsp: nsp,
