@@ -333,7 +333,7 @@ mineos.mc = function(server_name, base_dir) {
       case 'ping':
         var pids = mineos.server_pids_up();
         if (self.server_name in pids) {
-          self.ping(function(ping){
+          self.ping(function(err, ping){
             callback(null, ping);
           })
         } else {
