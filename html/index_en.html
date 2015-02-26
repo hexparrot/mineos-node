@@ -1161,7 +1161,7 @@ Is the information correct? [Y/n]
                               <td><button class="btn btn-primary" data-config="sp"><span class="icone-edit"></span> New Property</button></td>
                             </tr>
                           </tfoot>
-                          <tbody data-bind="foreach: {data: current_sp, as: '_data'}">
+                          <tbody data-bind="foreach: {data: current.sp, as: '_data'}">
                             <tr>
                               <td>
                                 <div class="">
@@ -1372,7 +1372,7 @@ Is the information correct? [Y/n]
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <tbody data-bind="foreach: current_tail">
+                                        <tbody data-bind="foreach: current.tail">
                                             <tr>
                                               <td data-bind="text: $data"></td>
                                             </tr>

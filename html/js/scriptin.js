@@ -6,27 +6,27 @@ function webui(port) {
   self.servers = ko.observableArray([]);
   self.page = ko.observable();
 
-  self.current_model = ko.observable({});
-
-  self.current_tail = ko.pureComputed(function() {
-    try {
-      return this.current_model().gamelog();
-    } catch (e) {
-      return [];
-    }
-  }, this);
-
-  self.current_sp = ko.pureComputed(function() {
-    try {
-      var sp = this.current_model().sp();
-      var sp_array = [];
-      for (var k in sp)
-        sp_array.push({key: k, value: sp[k]})
-      return sp_array;
-    } catch (e) {
-      return [];
-    }
-  }, this);
+  self.current = {
+    model: ko.observable({}),
+    tail: ko.pureComputed(function() {
+      try {
+        return this.current['model']().gamelog();
+      } catch (e) {
+        return [];
+      }
+    }, this),
+    sp: ko.pureComputed(function() {
+      try {
+        var sp = this.current['model']().sp();
+        var sp_array = [];
+        for (var k in sp)
+          sp_array.push({key: k, value: sp[k]})
+        return sp_array;
+      } catch (e) {
+        return [];
+      }
+    }, this)
+  } 
 
   self.global.on('server_list', function(servers) {
     var all = [];
@@ -87,7 +87,7 @@ function webui(port) {
   }
 
   self.select_server = function(model) {
-    self.current_model(model);
+    self.current['model'](model);
 
     if (self.page() == 'dashboard')
       self.show_page('server_status');
