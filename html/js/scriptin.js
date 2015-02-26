@@ -7,14 +7,7 @@ function webui(port) {
   self.page = ko.observable();
 
   self.current = {
-    model: ko.observable({}),
-    tail: ko.pureComputed(function() {
-      try {
-        return this.current['model']().gamelog();
-      } catch (e) {
-        return [];
-      }
-    }, this)
+    model: ko.observable({})
   } 
 
   self.global.on('server_list', function(servers) {

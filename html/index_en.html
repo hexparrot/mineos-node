@@ -156,6 +156,7 @@
                                     <li class="divider">Server Settings</li>
                                     <!--/ END Menu Divider -->
 
+                                    <!-- ko if: Object.keys(current.model()).length -->
                                     <!-- START Menu -->
                                     <li class="accordion-group">
                                         <a data-bind="click: show_page" data-page="server_status">
@@ -210,6 +211,8 @@
                                         </a>
                                     </li>
                                     <!--/ END Menu -->
+
+                                    <!-- /ko -->
                                 </ul>
                             </nav>
                             <!--/ END Sidebar Menu -->
@@ -361,6 +364,7 @@
                 <!--/ END Content -->
 
                 <!-- START Content -->
+                <!-- ko if: Object.keys(current.model()).length -->
                 <div id="server_status" class="container-fluid">
 
                     <!-- START Row -->
@@ -525,9 +529,11 @@
                     <!--/ END Row -->
 
                 </div>
+                <!-- /ko -->
                 <!--/ END Content -->
 
                 <!-- START Content -->
+                <!-- ko if: Object.keys(current.model()).length -->
                 <div id="backup_list" class="container-fluid">
                     <!-- START Row -->
                     <div class="row-fluid">
@@ -598,9 +604,11 @@
                     <!--/ END Row -->
 
                 </div>
+                <!-- /ko -->
                 <!--/ END Content -->
 
                 <!-- START Content -->
+                <!-- ko if: Object.keys(current.model()).length -->
                 <div id="archive_list" class="container-fluid">
                     <!-- START Row -->
                     <div class="row-fluid">
@@ -676,6 +684,7 @@
                     </div>
                     <!--/ END Row -->
                 </div>
+                <!-- /ko -->
                 <!--/ END Content -->
 
                 <!-- START Content -->
@@ -1135,6 +1144,7 @@ Is the information correct? [Y/n]
                 <!--/ END Content -->
 
                 <!-- START Content -->
+                <!-- ko if: Object.keys(current.model()).length -->
                 <div id="server_properties" class="container-fluid">
                     <!-- START Row -->
                     <div class="row-fluid">
@@ -1161,7 +1171,6 @@ Is the information correct? [Y/n]
                               <td><button class="btn btn-primary" data-config="sp"><span class="icone-edit"></span> New Property</button></td>
                             </tr>
                           </tfoot>
-                          <!-- ko if: Object.keys(current.model()).length -->
                           <tbody data-bind="foreach: {data: current.model().sp(), as: '_data'}">
                             <tr>
                               <td>
@@ -1176,14 +1185,16 @@ Is the information correct? [Y/n]
                               </td>
                             </tr>
                           </tbody>
-                          <!-- /ko -->
+                          
                         </table>
                     </div>
                     <!--/ END Row -->
                 </div>
+                <!-- /ko -->
                 <!--/ END Content -->
 
                 <!-- START Content -->
+                <!-- ko if: Object.keys(current.model()).length -->
                 <div id="server_config" class="container-fluid">
                     <!-- START Row -->
                     <div class="row-fluid">
@@ -1248,6 +1259,7 @@ Is the information correct? [Y/n]
                     </div>
                     <!--/ END Row -->
                 </div>
+                <!-- /ko -->
                 <!--/ END Content -->
 
                 <!-- START Content -->
@@ -1332,6 +1344,7 @@ Is the information correct? [Y/n]
                 <!--/ END Content -->
 
                 <!-- START Content -->
+                <!-- ko if: Object.keys(current.model()).length -->
                 <div id="console" class="container-fluid">
                     <!-- START Row -->
                     <div class="row-fluid">
@@ -1388,6 +1401,7 @@ Is the information correct? [Y/n]
                     <!--/ END Row -->
 
                 </div>
+                <!-- /ko -->
                 <!--/ END Content -->
 
                 <div id="import_server_modal" class="modal hide fade" style="display: none;" aria-hidden="true">
