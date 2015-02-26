@@ -25,9 +25,11 @@ function webui(port) {
       server_name: server_name,
       channel: c,
       sp: ko.observable([]),
-      dashboard: {
-        players_online: ko.observable(0),
-        players_max: ko.observable(0)
+      heartbeat: {
+        'up': ko.observable(),
+        'players_online': ko.observable(),
+        'players_max': ko.observable(),
+        'VmRSS': ko.observable()
       },
       gamelog: ko.observableArray([])
     }
@@ -54,12 +56,26 @@ function webui(port) {
       console.log('RESULT:', data);
     })
 
-    c.on('property', function(data) {
-      switch (data.property) {
-        case 'ping':
-          container.dashboard['players_online'](data.payload['players_online'])
-          container.dashboard['players_max'](data.payload['players_max'])
-          break;
+    c.on('heartbeat', function(data) {
+      container.heartbeat['up'](data.payload.up);
+      container.heartbeat['VmRSS']( ('VmRSS' in data.payload.memory ? data.payload.memory.VmRSS : 0) );
+      container.heartbeat['players_online']( (data.payload.up ? data.payload.ping.players_online: 0) );
+
+      if (data.payload.up)
+        container.heartbeat['players_max'](data.payload.ping.players_max);
+      else {
+        var attrs = container['sp']();
+        if (attrs === undefined || (attrs.length == 0)) {
+          container.heartbeat['players_max']('--');
+          container.channel.emit('property', {property: 'server.properties'});
+          console.log('client requesting server.properties for server: ', server_name)
+        } else {
+          for (var i in attrs)
+            if (attrs[i]['key'] == 'max-players') {
+              container.heartbeat['players_max'](attrs[i]['value']);
+              break;
+            }
+        }
       }
     })
 

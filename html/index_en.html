@@ -354,8 +354,8 @@
                               <td data-bind="text: server_name, click: $root.select_server"></td>
                               <td></td>
                               <td></td>
-                              <td><span class="label"></span></td>
-                              <td data-bind="text: server.dashboard.players_online() + '/' + server.dashboard.players_max()"></td>
+                              <td><span class="label" data-bind="text: server.heartbeat.up"></span></td>
+                              <td data-bind="text: server.heartbeat.players_online() + '/' + server.heartbeat.players_max()"></td>
                               <td></td>
                             </tr>
                           </tbody>
