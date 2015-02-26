@@ -1,17 +1,22 @@
 var mineos = require('./mineos');
 var server = require('./server');
-var path = require('path');
-var express = require('express');
-var app = express();
+var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 var BASE_DIR = '/var/games/minecraft';
 var response_options = {root: __dirname};
 
-var be = server.backend(BASE_DIR, io);
+var OWNER_CREDS = {
+  uid: 1000,
+  gid: 1000
+}
 
-app.use(express.static(path.join(__dirname, 'html')));
+var be = server.backend(BASE_DIR, io, OWNER_CREDS);
+
+app.get('/', function(req, res){
+  res.sendFile('index.html', response_options);
+});
 
 process.on('SIGINT', function() {
   console.log("Caught interrupt signal; closing webui....");

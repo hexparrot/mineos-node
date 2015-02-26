@@ -45,18 +45,23 @@ test.backend_cleanup = function(test) {
   test.equal(Object.keys(be.servers).length, 0);
 
   var instance = new mineos.mc('testing', BASE_DIR);
+  var owner = {
+    uid: 1000,
+    gid: 1000
+  }
 
   async.series([
     function(callback) {
-      instance.create(function(did_create) {
-        test.ok(did_create);
-        callback(null);
+      instance.create(owner, function(err) {
+        test.ifError(err);
+        callback(err);
       })
     },
     function(callback) {
-      instance.is_server(function(is_server) {
-        test.ok(is_server);
-        callback(null);
+      instance.property('exists', function(err, result) {
+        test.ifError(err);
+        test.ok(result);
+        callback(err);
       })
     },
     function(callback) {

@@ -1,0 +1,45 @@
+{
+  "name": "mineos-node",
+  "description": "A Minecraft server manager and web user interface",
+  "version": "0.7.0",
+  "author": {
+        "name": "William Dion",
+        "email": "wdchromium@gmail.com",
+        "url": "http://minecraft.codeemo.com/"
+  },
+  "licenses": [
+    {
+      "type": "GNU GPL v3",
+      "url": "http://www.gnu.org/copyleft/gpl.html"
+    }
+  ],
+  "keywords": [
+    "mineos",
+    "minecraft"
+  ],
+  "dependencies": {
+    "chokidar": "1.0.0-rc3",
+    "path": "0.4.x",
+    "introspect": "0.0.x",
+    "tail": "0.4.x",
+    "uuid": "1.4.x",
+    "fs-extra": "0.11.x",
+    "async": "0.9.x",
+    "which": "1.0.x",
+    "ini": "1.3.x",
+    "strftime": "0.8.x",
+    "procfs-stats": "0.0.x"
+  },
+  "devDependencies": {
+    "fs-extra": "0.11.x"
+  },
+  "engine": "node >= 0.10.32",
+  "homepage": "https://github.com/hexparrot/mineos-node",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hexparrot/mineos-node.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hexparrot/mineos-node/issues"
+  }
+}
