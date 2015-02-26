@@ -1,4 +1,5 @@
 var mineos = require('./mineos');
+var async = require('async');
 var chokidar = require('chokidar');
 var path = require('path');
 var events = require('events');
@@ -39,7 +40,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
   })();
 
   function track_server(server_name) {
-    /* when evoked, creates a permanant 'mc' instance, namespace, and place for file tails/watches. 
+    /* when evoked, creates a permanent 'mc' instance, namespace, and place for file tails/watches. 
        track_server should only happen in response to the above chokidar watcher.
     */
     var instance = new mineos.mc(server_name, base_dir),
@@ -48,16 +49,49 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
     function setup() {
       nsp = self.front_end.of('/{0}'.format(server_name));
 
-      setInterval(function(){
-        instance.verify(['up'], function(is_up) {
-          if (is_up) {
-            console.info('[{0}] Ping broadcast transmitted.'.format(server_name))
-            instance.ping(function(err, pingdata) {
-              nsp.emit('property', {server_name: server_name, property: 'ping', payload: pingdata})
+      function heartbeat() {
+        var retval = {};
+
+        async.waterfall([
+          function(cb) {
+            instance.property('up', function(err, is_up) {
+              retval['up'] = is_up;
+              cb(err, is_up);
             })
+          },
+          function(is_up, cb) {
+            if (is_up)
+              instance.property('memory', function(err, memdata) {
+                retval['memory'] = memdata;
+                cb(err, is_up);
+              })
+            else {
+              retval['memory'] = {};
+              cb(null, is_up);
+            }
+          },
+          function(is_up, cb) {
+            if (is_up)
+              instance.ping(function(err, pingdata) {
+                retval['ping'] = pingdata;
+                cb(err, is_up)
+              })
+            else {
+              retval['ping'] = {};
+              cb(null, is_up);
+            }
           }
+        ], function(err, results) {
+          nsp.emit('heartbeat', {
+            'server_name': server_name,
+            'timestamp': Date.now(),
+            'payload': retval
+          });
+          console.log('[{0}] Heartbeat transmitted.'.format(server_name))
         })
-      }, 5000);
+      }
+
+      setInterval(heartbeat, 5000);
 
       self.servers[server_name] = {
         instance: instance,
