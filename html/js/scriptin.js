@@ -14,13 +14,6 @@ function webui(port) {
       } catch (e) {
         return [];
       }
-    }, this),
-    sp: ko.pureComputed(function() {
-      try {
-        return this.current['model']().sp();
-      } catch (e) {
-        return [];
-      }
     }, this)
   } 
 
