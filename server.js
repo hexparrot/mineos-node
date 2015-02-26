@@ -78,10 +78,10 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           /* can put a tail/watch on any file, and joins a room for all future communication */
           if (rel_filepath in self.servers[server_name].tails) {
             socket.join(rel_filepath);
-            console.info('[{0}] user following tail: {1}'.format(server_name, rel_filepath));
+            console.info('[{0}] client following tail: {1}'.format(server_name, rel_filepath));
           } else if (rel_filepath in self.servers[server_name].watches) { 
             socket.join(rel_filepath);
-            console.info('[{0}] user watching file: {1}'.format(server_name, rel_filepath));
+            console.info('[{0}] client watching file: {1}'.format(server_name, rel_filepath));
           } else {
             console.error('no room by found for', rel_filepath);
           }
@@ -91,20 +91,28 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           /* removes a tail/watch for a given file, and leaves the room */
           if (rel_filepath in self.servers[server_name].tails) {
             socket.leave(rel_filepath);
-            console.info('[{0}] user dropping tail: {1}'.format(server_name, rel_filepath));
+            console.info('[{0}] client dropping tail: {1}'.format(server_name, rel_filepath));
           } else if (rel_filepath in self.servers[server_name].watches) {
             socket.leave(rel_filepath);
-            console.info('[{0}] user stopped watching file: {1}'.format(server_name, rel_filepath));
+            console.info('[{0}] client stopped watching file: {1}'.format(server_name, rel_filepath));
           } else {
             console.error('no room by found for', rel_filepath);
           }
         }
 
-        console.info('User connected to namespace: {0}'.format(server_name));
+        function get_prop(requested) {
+          console.info('[{0}] client requesting property: {1}'.format(server_name, requested.property));
+          instance.property(requested.property, function(err, retval) {
+            console.info('[{0}] returned to client: {1}'.format(server_name, retval));
+            nsp.emit('result', {'server_name': server_name, 'property': requested.property, 'payload': retval});
+          })
+        }
+
+        console.info('Client connected to namespace: {0}'.format(server_name));
         socket.on('command', produce_receipt);
         socket.on('watch', start_watch);
         socket.on('unwatch', unwatch);
-
+        socket.on('property', get_prop);
       })
     }
 

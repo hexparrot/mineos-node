@@ -340,6 +340,11 @@ mineos.mc = function(server_name, base_dir) {
           callback(true, null);
         }
         break;
+      case 'server.properties':
+        self.sp(function(err, dict) {
+          callback(err, dict);
+        })
+        break;
     }
   }
 
