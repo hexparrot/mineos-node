@@ -2,14 +2,16 @@ var fs = require('fs-extra');
 var path = require('path');
 var async = require('async');
 var mineos = require('../mineos');
+var userid = require('userid');
+var whoami = require('whoami');
 var test = exports;
 
 var BASE_DIR = '/var/games/minecraft';
 var FS_DELAY_MS = 200;
 
 var OWNER_CREDS = {
-  uid: 1000,
-  gid: 1000
+  uid: userid.uid(whoami),
+  gid: userid.gid(whoami)
 }
 
 test.tearDown = function(callback) {
@@ -273,24 +275,146 @@ test.start = function(test) {
       })
     },
     function(callback) {
-      instance.stuff('stop', function(err, proc) {
-        test.ifError(err);
+      process.kill(mineos.server_pids_up()[server_name].java);
+      callback(null);
+    }
+  ], function(err, results) {
+    test.done();
+  })
+}
+
+test.stop = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    function(callback) {
+      instance.create(OWNER_CREDS, function(err) {
+        //test.iferror(err);
+        callback(err);
+      })
+    },
+    function(callback) {
+      instance.start(function(err, proc) {
+        //test.iferror(err);
         proc.once('close', function(code) {
           callback(null);
         })
       })
     },
     function(callback) {
-      instance.delete(function(err) {
+      instance.property('screen_pid', function(err, pid) {
         test.ifError(err);
+        test.ok(pid > 0);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.stop(function(err, died) {
+        test.ifError(err);
+        test.ok(died);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('!up', function(err, result) {
+        test.ifError(err);
+        test.ok(result);
+        callback(err);
+      })
+    }
+  ], function(err, results) {
+    test.done();
+  })
+}
+
+test.stop = function(test) {
+  var server_name = 'testingiz';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    function(callback) {
+      instance.create(OWNER_CREDS, function(err) {
+        //test.iferror(err);
         callback(err);
       })
     },
     function(callback) {
-      instance.property('!exists', function(err, result) {
+      instance.start(function(err, proc) {
+        //test.iferror(err);
+        proc.once('close', function(code) {
+          callback(null);
+        })
+      })
+    },
+    function(callback) {
+      instance.property('screen_pid', function(err, pid) {
+        test.ifError(err);
+        test.ok(pid > 0);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.stop(function(err, died) {
+        test.ifError(err);
+        test.ok(died);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('!up', function(err, result) {
         test.ifError(err);
         test.ok(result);
         callback(err);
+      })
+    }
+  ], function(err, results) {
+    test.done();
+  })
+}
+
+test.stop_and_backup = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    function(callback) {
+      instance.create(OWNER_CREDS, function(err) {
+        //test.iferror(err);
+        callback(err);
+      })
+    },
+    function(callback) {
+      instance.start(function(err, proc) {
+        //test.iferror(err);
+        proc.once('close', function(code) {
+          callback(null);
+        })
+      })
+    },
+    function(callback) {
+      instance.stop(function(err, died) {
+        test.ifError(err);
+        test.ok(died);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('!up', function(err, result) {
+        test.ifError(err);
+        test.ok(result);
+        callback(err);
+      })
+    },
+    function(callback) {
+      instance.backup(function(err, proc) {
+        test.ifError(err);
+        proc.once('close', function(code) {
+          setTimeout(function() {
+            test.ok(fs.readdirSync(instance.env.bwd).length > 2);
+            callback(null);
+          }, FS_DELAY_MS)
+        })
       })
     }
   ], function(err, results) {

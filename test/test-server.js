@@ -1,6 +1,8 @@
 var path = require('path');
 var fs = require('fs-extra');
 var async = require('async');
+var userid = require('userid');
+var whoami = require('whoami');
 var mineos = require('../mineos');
 var server = require('../server');
 var events = require('events');
@@ -46,8 +48,8 @@ test.backend_cleanup = function(test) {
 
   var instance = new mineos.mc('testing', BASE_DIR);
   var owner = {
-    uid: 1000,
-    gid: 1000
+    uid: userid.uid(whoami),
+    gid: userid.gid(whoami)
   }
 
   async.series([

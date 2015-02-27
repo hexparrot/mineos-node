@@ -4,14 +4,15 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var path = require('path');
+var userid = require('userid');
+var whoami = require('whoami');
 
 var BASE_DIR = '/var/games/minecraft';
 var response_options = {root: __dirname};
 
 var OWNER_CREDS = {
-  uid: 1000,
-  gid: 1000
+  uid: userid.uid(whoami),
+  gid: userid.gid(whoami)
 }
 
 var be = server.backend(BASE_DIR, io, OWNER_CREDS);

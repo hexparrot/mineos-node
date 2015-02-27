@@ -28,7 +28,9 @@
     "which": "1.0.x",
     "ini": "1.3.x",
     "strftime": "0.8.x",
-    "procfs-stats": "0.0.x"
+    "procfs-stats": "0.0.x",
+    "whoami": "0.0.x",
+    "userid": "0.1.x"
   },
   "devDependencies": {
     "fs-extra": "0.11.x"
