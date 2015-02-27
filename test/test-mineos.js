@@ -273,21 +273,49 @@ test.start = function(test) {
       })
     },
     function(callback) {
-      instance.stuff('stop', function(err, proc) {
-        test.ifError(err);
+      process.kill(mineos.server_pids_up()[server_name].java);
+      callback(null);
+    }
+  ], function(err, results) {
+    test.done();
+  })
+}
+
+test.stop = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    function(callback) {
+      instance.create(OWNER_CREDS, function(err) {
+        //test.iferror(err);
+        callback(err);
+      })
+    },
+    function(callback) {
+      instance.start(function(err, proc) {
+        //test.iferror(err);
         proc.once('close', function(code) {
           callback(null);
         })
       })
     },
     function(callback) {
-      instance.delete(function(err) {
+      instance.property('screen_pid', function(err, pid) {
         test.ifError(err);
-        callback(err);
+        test.ok(pid > 0);
+        callback(null);
       })
     },
     function(callback) {
-      instance.property('!exists', function(err, result) {
+      instance.stop(function(err, died) {
+        test.ifError(err);
+        test.ok(died);
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('!up', function(err, result) {
         test.ifError(err);
         test.ok(result);
         callback(err);
