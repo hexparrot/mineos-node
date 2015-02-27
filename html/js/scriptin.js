@@ -19,6 +19,10 @@ function webui(port) {
     self.servers.push(self.track_server(server_name));
   })
 
+  self.dashboard = {
+
+  }
+
   self.track_server = function(server_name) {
     var c = io(self.connect_string + server_name);
     var container = {
@@ -26,10 +30,12 @@ function webui(port) {
       channel: c,
       sp: ko.observable([]),
       heartbeat: {
-        'up': ko.observable(),
-        'players_online': ko.observable(),
-        'players_max': ko.observable(),
-        'VmRSS': ko.observable()
+        'up': ko.observable(false),
+        'players_online': ko.observable("-"),
+        'players_max': ko.observable("-"),
+        'VmRSS': ko.observable("-"),
+        'port': ko.observable("-"),
+        'heapsize': ko.observable(0)
       },
       gamelog: ko.observableArray([])
     }
@@ -49,6 +55,7 @@ function webui(port) {
             container.sp($.map(data.payload, function(v,k) {
               return {key: k, value: v}
             }))
+            container.heartbeat.port(data.payload['server-port']);
             break;
           default:
             break;
@@ -59,8 +66,8 @@ function webui(port) {
 
     c.on('heartbeat', function(data) {
       container.heartbeat['up'](data.payload.up);
-      container.heartbeat['VmRSS']( ('VmRSS' in data.payload.memory ? data.payload.memory.VmRSS : 0) );
-      container.heartbeat['players_online']( (data.payload.up ? data.payload.ping.players_online: 0) );
+      container.heartbeat['VmRSS']( ('VmRSS' in data.payload.memory ? data.payload.memory.VmRSS : "-") );
+      container.heartbeat['players_online']( (data.payload.up ? data.payload.ping.players_online: "-") );
 
       if (data.payload.up)
         container.heartbeat['players_max'](data.payload.ping.players_max);

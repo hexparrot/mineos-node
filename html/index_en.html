@@ -350,13 +350,13 @@
                             </tr>
                           </thead>
                           <tbody data-bind="foreach: { data: servers, as: 'server' }">
-                            <tr>
-                              <td data-bind="text: server_name, click: $root.select_server"></td>
+                            <tr data-bind="with: server.heartbeat">
+                              <td data-bind="text: $parent.server_name, click: $root.select_server"></td>
                               <td></td>
-                              <td></td>
-                              <td><span class="label" data-bind="text: server.heartbeat.up"></span></td>
-                              <td data-bind="text: server.heartbeat.players_online() + '/' + server.heartbeat.players_max()"></td>
-                              <td></td>
+                              <td data-bind="text: port"></td>
+                              <td><span class="label" data-bind="text: (up() ? 'up' : 'down'), css: {'label-success': up(), 'label-important': !up()}"></span></td>
+                              <td data-bind="text: players_online() + '/' + players_max()"></td>
+                              <td data-bind="text: VmRSS()"></td>
                             </tr>
                           </tbody>
                         </table>
