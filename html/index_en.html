@@ -392,7 +392,7 @@
                                     <figure class="stats summary pull-left" data-bind="with: current_model().heartbeat">
                                         <div data-bind="css: {'green': up, 'red': !up}" class="icon circle"><span data-bind="css: {'icone-ok': up, 'icone-off': !up}"></span></div>
                                         <figcaption>
-                                            <h3><span data-bind=""></span><small></small></h3>
+                                            <h3><span data-bind="text: (up ? 'online' : 'offline')"></span><small data-bind="text: port"></small></h3>
                                         </figcaption>
                                     </figure>
                                     <!--/ END Summary -->
@@ -403,7 +403,7 @@
                                             <span><span class="text"></span>%</span>
                                         </div>
                                         <figcaption>
-                                            <h4><span></span><small>Players Online</small></h4>
+                                            <h4><span data-bind="text: current_model().heartbeat['players_online']()"></span><small>Players Online</small></h4>
                                         </figcaption>
                                     </figure><!--/ END Circular 1 -->
 
@@ -413,7 +413,7 @@
                                             <span class="text"></span>
                                         </div>
                                         <figcaption>
-                                            <h4><span></span><small>Heap Usage</small></h4>
+                                            <h4><span data-bind="text: current_model().heartbeat['VmRSS']()"></span><small>Heap Usage</small></h4>
                                         </figcaption>
                                     </figure><!--/ END Circular 2 -->
 
