@@ -390,9 +390,9 @@
                                 <div class="body-inner">
                                     <!-- START Summary -->
                                     <figure class="stats summary pull-left" data-bind="with: current_model().heartbeat">
-                                        <div data-bind="css: {'green': up, 'red': !up}" class="icon circle"><span data-bind="css: {'icone-ok': up, 'icone-off': !up}"></span></div>
+                                        <div data-bind="css: {'green': up(), 'red': !up()}" class="icon circle"><span data-bind="css: {'icone-ok': up(), 'icone-off': !up()}"></span></div>
                                         <figcaption>
-                                            <h3><span data-bind="text: (up ? 'online' : 'offline')"></span><small data-bind="text: port"></small></h3>
+                                            <h3><span data-bind="text: (up() ? 'online' : 'offline')"></span><small data-bind="text: port"></small></h3>
                                         </figcaption>
                                     </figure>
                                     <!--/ END Summary -->
@@ -426,15 +426,15 @@
          
                     <!-- START Row -->
                     <div class="row-fluid">
-                        <button data-required="server_name" data-cmd="start" type="button" class="btn btn-success span2" data-refresh="5000">Start</button> 
-                        <button data-required="server_name" data-cmd="accept_eula" type="button" class="btn btn-info span2" data-refresh="1000">Accept EULA</button> 
+                        <button data-bind="click: $root.command" data-cmd="start" type="button" class="btn btn-success span2">Start</button> 
+                        <button data-bind="click: $root.command" data-cmd="accept_eula" type="button" class="btn btn-info span2">Accept EULA</button> 
                         <!-- Button Dropdown -->
                         <div class="btn-group">
                             <button class="btn btn-danger dropdown-toggle" data-toggle="dropdown">Stop <span class="caret"></span></button>
                             <ul class="dropdown-menu">
-                                <li><a data-required="server_name" data-cmd="stop" data-refresh="2000">Stop</a></li>
-                                <li><a data-required="server_name" data-cmd="stop_and_backup" data-refresh="2000">Stop and Backup</a></li> 
-                                <li><a data-required="server_name" data-cmd="kill" data-refresh="2000">Kill</a></li>
+                                <li><a data-bind="click: $root.command" data-cmd="stop">Stop</a></li>
+                                <li><a data-bind="click: $root.command" data-cmd="stop_and_backup">Stop and Backup</a></li> 
+                                <li><a data-bind="click: $root.command" data-cmd="kill">Kill</a></li>
                             </ul>
                         </div><!--/ Button Dropdown -->
                     </div>

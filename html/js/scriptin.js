@@ -101,6 +101,11 @@ function webui(port) {
     return container;
   }
 
+  self.command = function(vm, eventobj) {
+    var cmd = $(eventobj.currentTarget).data('cmd');
+    self.current_model().channel.emit('command', {'command': cmd})
+  }
+
   self.show_page = function(vm, event) {
     try {
       self.page($(event.currentTarget).data('page'));
@@ -113,7 +118,6 @@ function webui(port) {
   }
 
   self.select_server = function(model) {
-    console.log(model)
     self.current_model(model);
 
     if (self.page() == 'dashboard')
