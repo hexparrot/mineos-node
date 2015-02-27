@@ -284,7 +284,7 @@
                                         <figure class="stats summary">
                                             <div class="icon circle green"><span class="icone-ok"></span></div>
                                             <figcaption>
-                                                <h3><span></span><small>Running Servers</small></h3>
+                                                <h3><span data-bind="text: dashboard['servers-running']"></span><small>Servers Running</small></h3>
                                             </figcaption>
                                         </figure>
                                         <!--/ END Summary -->
@@ -350,13 +350,13 @@
                             </tr>
                           </thead>
                           <tbody data-bind="foreach: { data: servers, as: 'server' }">
-                            <tr data-bind="with: server.heartbeat">
-                              <td data-bind="text: $parent.server_name, click: $root.select_server"></td>
+                            <tr>
+                              <td data-bind="text: server_name, click: $root.select_server"></td>
                               <td></td>
-                              <td data-bind="text: port"></td>
-                              <td><span class="label" data-bind="text: (up() ? 'up' : 'down'), css: {'label-success': up(), 'label-important': !up()}"></span></td>
-                              <td data-bind="text: players_online() + '/' + players_max()"></td>
-                              <td data-bind="text: VmRSS()"></td>
+                              <td data-bind="text: server.heartbeat.port()"></td>
+                              <td><span class="label" data-bind="text: (server.heartbeat.up() ? 'up' : 'down'), css: {'label-success': server.heartbeat.up(), 'label-important': !server.heartbeat.up()}"></span></td>
+                              <td data-bind="text: server.heartbeat.players_online() + '/' + server.heartbeat.players_max()"></td>
+                              <td data-bind="text: server.heartbeat.VmRSS()"></td>
                             </tr>
                           </tbody>
                         </table>
@@ -389,8 +389,8 @@
                             <section class="body">
                                 <div class="body-inner">
                                     <!-- START Summary -->
-                                    <figure class="stats summary pull-left">
-                                        <div class="icon circle"><span></span></div>
+                                    <figure class="stats summary pull-left" data-bind="with: current_model().heartbeat">
+                                        <div data-bind="css: {'green': up, 'red': !up}" class="icon circle"><span data-bind="css: {'icone-ok': up, 'icone-off': !up}"></span></div>
                                         <figcaption>
                                             <h3><span data-bind=""></span><small></small></h3>
                                         </figcaption>

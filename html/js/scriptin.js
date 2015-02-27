@@ -20,7 +20,11 @@ function webui(port) {
   })
 
   self.dashboard = {
-
+    'servers-running': ko.pureComputed(function() {
+      return vm.servers().filter(function(v) {
+        return v.heartbeat.up();
+      }).length
+    })
   }
 
   self.track_server = function(server_name) {
@@ -109,6 +113,7 @@ function webui(port) {
   }
 
   self.select_server = function(model) {
+    console.log(model)
     self.current_model(model);
 
     if (self.page() == 'dashboard')
