@@ -87,7 +87,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
             'timestamp': Date.now(),
             'payload': retval
           });
-          console.log('[{0}] Heartbeat transmitted.'.format(server_name))
+          //console.log('[{0}] Heartbeat transmitted.'.format(server_name))
         })
       }
 
@@ -128,7 +128,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
             socket.join(rel_filepath);
             console.info('[{0}] client watching file: {1}'.format(server_name, rel_filepath));
           } else {
-            console.error('no room by found for', rel_filepath);
+            console.error('no existing room found for', rel_filepath);
           }
         }
 
@@ -141,7 +141,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
             socket.leave(rel_filepath);
             console.info('[{0}] client stopped watching file: {1}'.format(server_name, rel_filepath));
           } else {
-            console.error('no room by found for', rel_filepath);
+            console.error('no existing room found for', rel_filepath);
           }
         }
 
@@ -346,27 +346,27 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
       self.untrack_server(s);
   }
 
-  self.front_end.on('connection', function(socket) {
-    function webui_dispatcher(args) {
-      console.info('[WEBUI] Received emit command', args);
-      switch (args.command) {
-        case 'create':
-          if (args.server_name in self.servers) {
-            console.error('Ignored attempt to create server "{0}"; Servername already in use.'.format(args.server_name));
-          } else {
-            var instance = new mineos.mc(args.server_name, base_dir);
-            instance.create(dir_owner, function(err, did_create) {
-              if (err)
-                console.log(err)
-            })
-          }
-          break;
-      }
+  self.webui_dispatcher = function(args) {
+    console.info('[WEBUI] Received emit command', args);
+    switch (args.command) {
+      case 'create':
+        if (args.server_name in self.servers) {
+          console.error('Ignored attempt to create server "{0}"; Servername already in use.'.format(args.server_name));
+        } else {
+          var instance = new mineos.mc(args.server_name, base_dir);
+          instance.create(dir_owner, function(err, did_create) {
+            if (err)
+              console.log(err)
+          })
+        }
+        break;
     }
+  }
 
+  self.front_end.on('connection', function(socket) {
     console.info('User connected to webui');
     self.front_end.emit('server_list', Object.keys(self.servers));
-    socket.on('command', webui_dispatcher);
+    socket.on('command', self.webui_dispatcher);
   })
 
   return self;
