@@ -34,6 +34,7 @@ function webui(port) {
       gamelog: ko.observableArray([])
     }
 
+    container.channel.emit('property', {property: 'server.properties'});
     c.emit('watch', 'logs/latest.log');
 
     c.on('tail_data', function(data) {
@@ -66,6 +67,9 @@ function webui(port) {
       else {
         var attrs = container['sp']();
         if (attrs === undefined || (attrs.length == 0)) {
+          /* since sp is requested upon start of tracking, this shouldn't really ever happen.
+          this fallback code will remain though in the even that the returned sp
+          from the earlier call is not fulfilled by the time the first heartbeat arrives. */
           container.heartbeat['players_max']('--');
           container.channel.emit('property', {property: 'server.properties'});
           console.log('client requesting server.properties for server: ', server_name)
