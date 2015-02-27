@@ -2,14 +2,16 @@ var fs = require('fs-extra');
 var path = require('path');
 var async = require('async');
 var mineos = require('../mineos');
+var userid = require('userid');
+var whoami = require('whoami');
 var test = exports;
 
 var BASE_DIR = '/var/games/minecraft';
 var FS_DELAY_MS = 200;
 
 var OWNER_CREDS = {
-  uid: 1000,
-  gid: 1000
+  uid: userid.uid(whoami),
+  gid: userid.gid(whoami)
 }
 
 test.tearDown = function(callback) {
@@ -367,7 +369,6 @@ test.stop = function(test) {
       })
     }
   ], function(err, results) {
-    console.log(err, results)
     test.done();
   })
 }
