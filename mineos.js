@@ -170,6 +170,23 @@ mineos.mc = function(server_name, base_dir) {
     });
   }
 
+  self.stop = function(callback) {
+    self.stuff('stop', function(err, proc) {
+      async.whilst(
+        function() { return (self.server_name in mineos.server_pids_up()) },
+        function(callback) {
+          setTimeout(callback, 200);
+        },
+        function(ignored_err) {
+          if (self.server_name in mineos.server_pids_up())
+            callback(true, false); //error, stop succeeded: false
+          else
+            callback(null, true); //no error, stop succeeded: true
+        }
+      );  
+    })
+  }
+
   self.kill = function(callback) {
     process.kill(mineos.server_pids_up()[self.server_name].java);
     callback(null);
