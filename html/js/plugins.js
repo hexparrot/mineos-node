@@ -102,9 +102,19 @@ $(function () {
 $(function(){
     if(jQuery().formwizard) {
         $(".form-horizontal").formwizard({ 
+            formPluginEnabled: true,
             disableUIStyles: true,
             focusFirstInput : true,
-            validationEnabled: true
+            validationEnabled: true,
+            formOptions: {
+                url: '/create_server',
+                type: 'POST',
+                success: function (data) {
+                    console.log('create_server request successfully transmitted');
+                },
+                dataType: 'json',
+                resetForm: true
+            }
         });
     }
 });
