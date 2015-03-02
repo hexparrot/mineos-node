@@ -328,51 +328,6 @@ test.stop = function(test) {
   })
 }
 
-test.stop = function(test) {
-  var server_name = 'testingiz';
-  var instance = new mineos.mc(server_name, BASE_DIR);
-
-  async.series([
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        //test.iferror(err);
-        callback(err);
-      })
-    },
-    function(callback) {
-      instance.start(function(err, proc) {
-        //test.iferror(err);
-        proc.once('close', function(code) {
-          callback(null);
-        })
-      })
-    },
-    function(callback) {
-      instance.property('screen_pid', function(err, pid) {
-        test.ifError(err);
-        test.ok(pid > 0);
-        callback(null);
-      })
-    },
-    function(callback) {
-      instance.stop(function(err, died) {
-        test.ifError(err);
-        test.ok(died);
-        callback(null);
-      })
-    },
-    function(callback) {
-      instance.property('!up', function(err, result) {
-        test.ifError(err);
-        test.ok(result);
-        callback(err);
-      })
-    }
-  ], function(err, results) {
-    test.done();
-  })
-}
-
 test.stop_and_backup = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -393,9 +348,9 @@ test.stop_and_backup = function(test) {
       })
     },
     function(callback) {
-      instance.stop(function(err, died) {
+      instance.stop_and_backup(function(err, success) {
         test.ifError(err);
-        test.ok(died);
+        test.ok(success);
         callback(null);
       })
     },
@@ -407,15 +362,48 @@ test.stop_and_backup = function(test) {
       })
     },
     function(callback) {
-      instance.backup(function(err, proc) {
-        test.ifError(err);
+      setTimeout(function() {
+        test.ok(fs.readdirSync(instance.env.bwd).length > 2);
+        callback(null);
+      }, FS_DELAY_MS)
+    }
+  ], function(err, results) {
+    test.done();
+  })
+}
+
+test.kill = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    function(callback) {
+      instance.create(OWNER_CREDS, function(err) {
+        //test.iferror(err);
+        callback(err);
+      })
+    },
+    function(callback) {
+      instance.kill(function(err) {
+        test.ok(err); //this should throw an error
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.start(function(err, proc) {
+        //test.iferror(err);
         proc.once('close', function(code) {
-          setTimeout(function() {
-            test.ok(fs.readdirSync(instance.env.bwd).length > 2);
-            callback(null);
-          }, FS_DELAY_MS)
+          callback(null);
         })
       })
+    },
+    function(callback) {
+      setTimeout(function() {
+        instance.kill(function(err) {
+          test.ok(!err);
+          callback(null);
+        })
+      }, 200)
     }
   ], function(err, results) {
     test.done();
@@ -695,6 +683,26 @@ test.properties = function(test) {
       })
     },
     function(callback) {
+      instance.property('du_awd', function(err, bytes) {
+        test.ifError(err);
+        test.ok(!isNaN(bytes));
+        callback(null);
+      })
+    },function(callback) {
+      instance.property('du_bwd', function(err, bytes) {
+        test.ifError(err);
+        test.ok(!isNaN(bytes));
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('du_cwd', function(err, bytes) {
+        test.ifError(err);
+        test.ok(!isNaN(bytes));
+        callback(null);
+      })
+    },
+    function(callback) {
       instance.kill(function(err) {
         test.ifError(err);
         setTimeout(function() { callback(err) }, 1000);
@@ -849,6 +857,62 @@ test.memory = function(test) {
       instance.kill(function(err) {
         test.ifError(err);
         setTimeout(function() { callback(err) }, 1000);
+      })
+    }
+  ], function(err, results) {
+    test.done();
+  })  
+}
+
+test.list_increments = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    function(callback) {
+      instance.create(OWNER_CREDS, function(err) {
+        test.ifError(err);
+        callback(err);
+      })
+    },
+    function(callback) {
+      instance.backup(function(err, proc) {
+        test.ifError(err);
+        proc.once('close', function(code) {
+          callback(null);
+        })
+      })
+    },
+    function(callback) {
+      instance.start(function(err, proc) {
+        test.ifError(err);
+        proc.once('close', function(code) {
+          callback(null);
+        })
+      })
+    },
+    function(callback) {
+      instance.backup(function(err, proc) {
+        test.ifError(err);
+        proc.once('close', function(code) {
+          callback(null);
+        })
+      })
+    },
+    function(callback) {
+      instance.kill(function(err) {
+        test.ifError(err);
+        setTimeout(function() { callback(err) }, 1000);
+      })
+    },
+    function(callback) {
+      instance.list_increments(function(err, increments) {
+        for (var i in increments) {
+          test.ok('time' in increments[i]);
+          test.ok('size' in increments[i]);
+          test.ok('cum' in increments[i]);
+        }
+        callback(null)
       })
     }
   ], function(err, results) {

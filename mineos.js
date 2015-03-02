@@ -187,9 +187,28 @@ mineos.mc = function(server_name, base_dir) {
     })
   }
 
+  self.stop_and_backup = function(callback) {
+    async.series([
+      function(cb) {
+        self.stop(cb);
+      },
+      function(cb) {
+        self.backup(cb);
+      }
+    ], function(err, results) {
+      callback(err, results[0] && results[1]);
+    })
+  }
+
   self.kill = function(callback) {
-    process.kill(mineos.server_pids_up()[self.server_name].java);
-    callback(null);
+    var pids = mineos.server_pids_up();
+
+    if (self.server_name in pids) {
+      process.kill(pids[self.server_name].java);
+      callback(null);
+    } else {
+      callback(true);
+    }
   }
 
   self.stuff = function(msg, callback) {
@@ -269,6 +288,37 @@ mineos.mc = function(server_name, base_dir) {
     var params = { cwd: self.env.bwd };
 
     callback(null, child_process.spawn(binary, args, params));
+  }
+
+  self.list_increments = function(callback) {
+    var binary = which.sync('rdiff-backup');
+    var args = ['--list-increment-sizes', self.env.bwd];
+    var params = { cwd: self.env.bwd };
+    var regex = /^(\w.*?) {3,}(.*?) {2,}([^ ]+ \w*)/
+    var increment_lines = [];
+
+    var rdiff = child_process.spawn(binary, args, params);
+
+    rdiff.stdout.on('data', function(data) {
+      var buffer = new Buffer(data, 'ascii');
+      var lines = buffer.toString('ascii').split('\n');
+
+      for (var i=0; i < lines.length; i++) {
+        var match = lines[i].match(regex);
+        if (match)
+          increment_lines.push({
+            time: match[1],
+            size: match[2],
+            cum: match[3]
+          });
+      }
+
+      rdiff.on('close', function(code) {
+        callback(null, increment_lines);
+      });
+    });
+
+    
   }
 
   self.property = function(property, callback) {
@@ -360,6 +410,24 @@ mineos.mc = function(server_name, base_dir) {
       case 'server.properties':
         self.sp(function(err, dict) {
           callback(err, dict);
+        })
+        break;
+      case 'du_awd':
+        var du = require('du');
+        du(self.env.awd, { disk: true }, function (err, size) {
+          callback(err, size);
+        })
+        break;
+      case 'du_bwd':
+        var du = require('du');
+        du(self.env.bwd, { disk: true }, function (err, size) {
+          callback(err, size);
+        })
+        break;
+      case 'du_cwd':
+        var du = require('du');
+        du(self.env.cwd, { disk: true }, function (err, size) {
+          callback(err, size);
         })
         break;
     }
