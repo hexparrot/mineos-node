@@ -269,8 +269,9 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         console.info('[{0}] Created tail on {1}'.format(server_name, rel_filepath));
         new_tail.on('line', function(data) {
           //console.info('[{0}] {1}: transmitting new tail data'.format(server_name, rel_filepath));
-          nsp.in(rel_filepath).emit('tail_data', {'server_name': server_name, 'payload': data});
+          nsp.in(rel_filepath).emit('tail_data', {'filepath': rel_filepath, 'payload': data});
         })
+        nsp.emit('new_tail', rel_filepath);
         self.servers[server_name].tails[rel_filepath] = new_tail;
       } catch (e) {
         console.error('[{0}] Create tail on {1} failed'.format(server_name, rel_filepath));

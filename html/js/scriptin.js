@@ -47,8 +47,17 @@ function webui(port) {
     container.channel.emit('property', {property: 'server.properties'});
     c.emit('watch', 'logs/latest.log');
 
+    c.on('new_tail', function(filepath) {
+      c.emit('watch', filepath);
+    })
+
     c.on('tail_data', function(data) {
-      container.gamelog.push(data.payload);
+      switch (data.filepath) {
+        default:
+          container.gamelog.push(data.payload);
+          break;
+      }
+      
     })
 
     c.on('result', function(data) {
