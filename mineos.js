@@ -201,8 +201,14 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.kill = function(callback) {
-    process.kill(mineos.server_pids_up()[self.server_name].java);
-    callback(null);
+    var pids = mineos.server_pids_up();
+
+    if (self.server_name in pids) {
+      process.kill(pids[self.server_name].java);
+      callback(null);
+    } else {
+      callback(true);
+    }
   }
 
   self.stuff = function(msg, callback) {

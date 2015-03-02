@@ -372,6 +372,44 @@ test.stop_and_backup = function(test) {
   })
 }
 
+test.kill = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    function(callback) {
+      instance.create(OWNER_CREDS, function(err) {
+        //test.iferror(err);
+        callback(err);
+      })
+    },
+    function(callback) {
+      instance.kill(function(err) {
+        test.ok(err); //this should throw an error
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.start(function(err, proc) {
+        //test.iferror(err);
+        proc.once('close', function(code) {
+          callback(null);
+        })
+      })
+    },
+    function(callback) {
+      setTimeout(function() {
+        instance.kill(function(err) {
+          test.ok(!err);
+          callback(null);
+        })
+      }, 200)
+    }
+  ], function(err, results) {
+    test.done();
+  })
+}
+
 test.archive = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
