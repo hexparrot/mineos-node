@@ -351,14 +351,29 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
     switch (args.command) {
       case 'create':
         if (args.server_name in self.servers) {
-          console.error('Ignored attempt to create server "{0}"; Servername already in use.'.format(args.server_name));
+          var ERROR = '[{0}] Ignored attempt to create server -- server name already exists.'.format(args.server_name)
+          console.error(ERROR);
+          self.front_end.emit('error', ERROR);
         } else {
           var instance = new mineos.mc(args.server_name, base_dir);
-          instance.create(dir_owner, function(err, did_create) {
-            if (err)
-              console.log(err)
+
+          async.series([
+            function(cb) {
+              instance.create(dir_owner, cb)
+            },
+            function(cb) {
+              instance._sp.overlay(args.properties, cb);
+            }
+          ], function(err, results) {
+            if (err) {
+              var ERROR = '[{0}] Attempt to create server failed in the backend.'.format(args.server_name);
+              console.error(ERROR);
+              self.front_end.emit('error', ERROR);
+            }
           })
         }
+        break;
+      default:
         break;
     }
   }

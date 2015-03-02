@@ -23,11 +23,15 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 })); 
 
 app.post('/create_server', function(req, res) {
+	var server_name = req.body['server_name'];
+	delete req.body['server_name'];
+
 	be.webui_dispatcher({
 		'command': 'create',
-		'server_name': req.body['server_name']
+		'server_name': server_name,
+		'properties': req.body
 	});
-    console.log(req.body);
+
     res.sendStatus(200); // equivalent to res.status(200).send('OK')
 });
 
