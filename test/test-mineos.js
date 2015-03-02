@@ -683,6 +683,26 @@ test.properties = function(test) {
       })
     },
     function(callback) {
+      instance.property('du_awd', function(err, bytes) {
+        test.ifError(err);
+        test.ok(!isNaN(bytes));
+        callback(null);
+      })
+    },function(callback) {
+      instance.property('du_bwd', function(err, bytes) {
+        test.ifError(err);
+        test.ok(!isNaN(bytes));
+        callback(null);
+      })
+    },
+    function(callback) {
+      instance.property('du_cwd', function(err, bytes) {
+        test.ifError(err);
+        test.ok(!isNaN(bytes));
+        callback(null);
+      })
+    },
+    function(callback) {
       instance.kill(function(err) {
         test.ifError(err);
         setTimeout(function() { callback(err) }, 1000);

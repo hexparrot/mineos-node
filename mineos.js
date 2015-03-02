@@ -381,6 +381,24 @@ mineos.mc = function(server_name, base_dir) {
           callback(err, dict);
         })
         break;
+      case 'du_awd':
+        var du = require('du');
+        du(self.env.awd, { disk: true }, function (err, size) {
+          callback(err, size);
+        })
+        break;
+      case 'du_bwd':
+        var du = require('du');
+        du(self.env.bwd, { disk: true }, function (err, size) {
+          callback(err, size);
+        })
+        break;
+      case 'du_cwd':
+        var du = require('du');
+        du(self.env.cwd, { disk: true }, function (err, size) {
+          callback(err, size);
+        })
+        break;
     }
   }
 
