@@ -290,6 +290,37 @@ mineos.mc = function(server_name, base_dir) {
     callback(null, child_process.spawn(binary, args, params));
   }
 
+  self.list_increments = function(callback) {
+    var binary = which.sync('rdiff-backup');
+    var args = ['--list-increment-sizes', self.env.bwd];
+    var params = { cwd: self.env.bwd };
+    var regex = /^(\w.*?) {3,}(.*?) {2,}([^ ]+ \w*)/
+    var increment_lines = [];
+
+    var rdiff = child_process.spawn(binary, args, params);
+
+    rdiff.stdout.on('data', function(data) {
+      var buffer = new Buffer(data, 'ascii');
+      var lines = buffer.toString('ascii').split('\n');
+
+      for (var i=0; i < lines.length; i++) {
+        var match = lines[i].match(regex);
+        if (match)
+          increment_lines.push({
+            time: match[1],
+            size: match[2],
+            cum: match[3]
+          });
+      }
+
+      rdiff.on('close', function(code) {
+        callback(null, increment_lines);
+      });
+    });
+
+    
+  }
+
   self.property = function(property, callback) {
     switch(property) {
       case 'owner':

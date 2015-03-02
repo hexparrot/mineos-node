@@ -863,3 +863,59 @@ test.memory = function(test) {
     test.done();
   })  
 }
+
+test.list_increments = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    function(callback) {
+      instance.create(OWNER_CREDS, function(err) {
+        test.ifError(err);
+        callback(err);
+      })
+    },
+    function(callback) {
+      instance.backup(function(err, proc) {
+        test.ifError(err);
+        proc.once('close', function(code) {
+          callback(null);
+        })
+      })
+    },
+    function(callback) {
+      instance.start(function(err, proc) {
+        test.ifError(err);
+        proc.once('close', function(code) {
+          callback(null);
+        })
+      })
+    },
+    function(callback) {
+      instance.backup(function(err, proc) {
+        test.ifError(err);
+        proc.once('close', function(code) {
+          callback(null);
+        })
+      })
+    },
+    function(callback) {
+      instance.kill(function(err) {
+        test.ifError(err);
+        setTimeout(function() { callback(err) }, 1000);
+      })
+    },
+    function(callback) {
+      instance.list_increments(function(err, increments) {
+        for (var i in increments) {
+          test.ok('time' in increments[i]);
+          test.ok('size' in increments[i]);
+          test.ok('cum' in increments[i]);
+        }
+        callback(null)
+      })
+    }
+  ], function(err, results) {
+    test.done();
+  })  
+}
