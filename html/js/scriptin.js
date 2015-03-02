@@ -57,7 +57,6 @@ function webui(port) {
           container.gamelog.push(data.payload);
           break;
       }
-      
     })
 
     c.on('result', function(data) {
@@ -69,6 +68,17 @@ function webui(port) {
               return {key: k, value: v}
             }))
             container.heartbeat.port(data.payload['server-port']);
+            break;
+          default:
+            break;
+        }
+      } else {
+        switch (data.command) {
+          case 'delete':
+            if (data.success) {
+              self.show_page('dashboard');
+              self.current_model(null);
+            }
             break;
           default:
             break;

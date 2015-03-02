@@ -156,7 +156,7 @@
                                     <li class="divider">Server Settings</li>
                                     <!--/ END Menu Divider -->
 
-                                    <!-- ko if: Object.keys(current_model()).length -->
+                                    <!-- ko ifnot: $.isEmptyObject(current_model()) -->
                                     <!-- START Menu -->
                                     <li class="accordion-group">
                                         <a data-bind="click: show_page" data-page="server_status">
@@ -232,7 +232,7 @@
                     <div class="navbar-inner">
                         <!-- Breadcrumb -->
                         <ul class="breadcrumb">
-                            <li>Currently Selected Server: <strong><a data-page="server_status" data-bind="text: current_model().server_name"></a></strong>
+                            <li>Currently Selected Server: <strong data-bind="ifnot: $.isEmptyObject(current_model())"><a data-page="server_status" data-bind="text: current_model().server_name"></a></strong>
                         </ul>
                         <!--/ Breadcrumb -->
                     </div>
@@ -366,7 +366,7 @@
                 <!--/ END Content -->
 
                 <!-- START Content -->
-                <!-- ko if: Object.keys(current_model()).length -->
+                <!-- ko ifnot: $.isEmptyObject(current_model()) -->
                 <div id="server_status" class="container-fluid">
 
                     <!-- START Row -->
@@ -535,7 +535,7 @@
                 <!--/ END Content -->
 
                 <!-- START Content -->
-                <!-- ko if: Object.keys(current_model()).length -->
+                <!-- ko ifnot: $.isEmptyObject(current_model()) -->
                 <div id="backup_list" class="container-fluid">
                     <!-- START Row -->
                     <div class="row-fluid">
@@ -610,7 +610,7 @@
                 <!--/ END Content -->
 
                 <!-- START Content -->
-                <!-- ko if: Object.keys(current_model()).length -->
+                <!-- ko ifnot: $.isEmptyObject(current_model()) -->
                 <div id="archive_list" class="container-fluid">
                     <!-- START Row -->
                     <div class="row-fluid">
@@ -1148,7 +1148,7 @@ Is the information correct? [Y/n]
                 <!--/ END Content -->
 
                 <!-- START Content -->
-                <!-- ko if: Object.keys(current_model()).length -->
+                <!-- ko ifnot: $.isEmptyObject(current_model()) -->
                 <div id="server_properties" class="container-fluid">
                     <!-- START Row -->
                     <div class="row-fluid">
@@ -1200,7 +1200,7 @@ Is the information correct? [Y/n]
                 <!--/ END Content -->
 
                 <!-- START Content -->
-                <!-- ko if: Object.keys(current_model()).length -->
+                <!-- ko ifnot: $.isEmptyObject(current_model()) -->
                 <div id="server_config" class="container-fluid">
                     <!-- START Row -->
                     <div class="row-fluid">
@@ -1350,7 +1350,7 @@ Is the information correct? [Y/n]
                 <!--/ END Content -->
 
                 <!-- START Content -->
-                <!-- ko if: Object.keys(current_model()).length -->
+                <!-- ko ifnot: $.isEmptyObject(current_model()) -->
                 <div id="console" class="container-fluid">
                     <!-- START Row -->
                     <div class="row-fluid">
