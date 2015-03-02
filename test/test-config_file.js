@@ -59,6 +59,26 @@ test.change_property = function(test) {
   })
 }
 
+test.overlay = function(test) {
+  var file_path = 'new.file';
+  var config = new cf.config_file(file_path);
+
+  test.expect(3);
+
+  config.write({'level-name':'world', 'something-else': 'valuetwo'}, function(err) {
+    if (!err) {
+      config.overlay({'level-name':'wasteland', 'thirdkey': 'valuethree'}, function(err) {
+        if (!err) {
+          test.equal(config.props['level-name'], 'wasteland');
+          test.equal(config.props['something-else'], 'valuetwo');
+          test.equal(config.props['thirdkey'], 'valuethree');
+          test.done();
+        }
+      })
+    }
+  })
+}
+
 test.load_existing = function(test) {
   var file_path = 'new.file';
   var config = new cf.config_file(file_path);

@@ -25,6 +25,15 @@ cf.config_file = function(file_path) {
     })
   }
 
+  self.overlay = function(dict, callback) {
+    for (var key in dict)
+      self.props[key] = dict[key];
+
+    fs.writeFile(self.file_path, ini.stringify(self.props), 'utf8', function(err) {
+      callback(err);
+    })
+  }
+
   self.load = function(callback) {
     fs.readFile(file_path, 'utf8', function(err, data) {
       if (!err) {
