@@ -111,9 +111,11 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
       });
 
       nsp.on('connection', function(socket) {
+        var ip_address = socket.request.connection.remoteAddress;
+
         function produce_receipt(args) {
           /* when a command is received, immediately respond to client it has been received */
-          console.info('command received', args.command)
+          console.info('[{0}] {1} issued command : "{2}"'.format(server_name, ip_address, args.command))
           args.uuid = uuid.v1();
           nsp.emit('receipt', args)
           server_dispatcher(args);
@@ -123,12 +125,12 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           /* can put a tail/watch on any file, and joins a room for all future communication */
           if (rel_filepath in self.servers[server_name].tails) {
             socket.join(rel_filepath);
-            console.info('[{0}] client following tail: {1}'.format(server_name, rel_filepath));
+            console.info('[{0}] {1} requesting tail: {2}'.format(server_name, ip_address, rel_filepath));
           } else if (rel_filepath in self.servers[server_name].watches) { 
             socket.join(rel_filepath);
-            console.info('[{0}] client watching file: {1}'.format(server_name, rel_filepath));
+            console.info('[{0}] {1} watching file: {2}'.format(server_name, ip_address, rel_filepath));
           } else {
-            console.error('no existing room found for', rel_filepath);
+            console.error('[{0}] {1} requesting tail: {2} (failed: not yet created)'.format(server_name, ip_address, rel_filepath));
           }
         }
 
@@ -136,24 +138,24 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           /* removes a tail/watch for a given file, and leaves the room */
           if (rel_filepath in self.servers[server_name].tails) {
             socket.leave(rel_filepath);
-            console.info('[{0}] client dropping tail: {1}'.format(server_name, rel_filepath));
+            console.info('[{0}] {1} dropping tail: {2}'.format(server_name, ip_address, rel_filepath));
           } else if (rel_filepath in self.servers[server_name].watches) {
             socket.leave(rel_filepath);
-            console.info('[{0}] client stopped watching file: {1}'.format(server_name, rel_filepath));
+            console.info('[{0}] {1} stopped watching file: {1}'.format(server_name, ip_address, rel_filepath));
           } else {
-            console.error('no existing room found for', rel_filepath);
+            //console.error('[{0}] no existing room found for {1}'.format(server_name, rel_filepath));
           }
         }
 
         function get_prop(requested) {
-          console.info('[{0}] client requesting property: {1}'.format(server_name, requested.property));
+          console.info('[{0}] {1} requesting property: {2}'.format(server_name, ip_address, requested.property));
           instance.property(requested.property, function(err, retval) {
-            console.info('[{0}] returned to client: {1}'.format(server_name, retval));
+            console.info('[{0}] returned to {1}: {2}'.format(server_name, ip_address, retval));
             nsp.emit('result', {'server_name': server_name, 'property': requested.property, 'payload': retval});
           })
         }
 
-        console.info('Client connected to namespace: {0}'.format(server_name));
+        console.info('[{0}] {1} connected to namespace'.format(server_name, ip_address));
         socket.on('command', produce_receipt);
         socket.on('watch', start_watch);
         socket.on('unwatch', unwatch);
@@ -379,7 +381,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
   }
 
   self.front_end.on('connection', function(socket) {
-    console.info('User connected to webui');
+    console.info('[WEBUI] User connected from', socket.request.connection.remoteAddress);
     self.front_end.emit('server_list', Object.keys(self.servers));
     socket.on('command', self.webui_dispatcher);
   })
