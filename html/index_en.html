@@ -162,7 +162,7 @@
                                         <a data-bind="click: show_page" data-page="server_status">
                                             <span class="icon icone-globe"></span>
                                             <span class="text">Server Status</span>
-                                            <span class="label label-inverse"></span>
+                                            <span class="label label-inverse" data-bind="text: (current_model().heartbeat.up() ? 'up' : 'down')"></span>
                                         </a>
                                     </li>
                                     <!--/ END Menu -->
@@ -448,7 +448,7 @@
                               <h4 class="title" data-page="backup_list"><span class="icon icone-bookmark"></span> Restore Points</h4>
                                 <!-- START Toolbar -->
                                 <ul class="toolbar pull-right">
-                                    <li><a class="link" data-widget="refresh" data-required="server_name" data-cmd="backup"><span class="icon icone-plus-sign"></span></a></li>
+                                    <li><a class="link" data-bind="click: $root.command" data-cmd="backup"><span class="icon icone-plus-sign"></span></a></li>
                                 </ul>
                                 <!--/ END Toolbar -->
                                 <span class="label label-success pull-right"></span>
@@ -458,7 +458,7 @@
                                   <p>Oldest restore point: <strong></strong></p>
                                     <p>Most recent restore point: <strong></strong></p>
                                     <p>Space used by backups: <strong></strong></p>
-                                    <p><a class="link pointer" data-widget="refresh" data-required="server_name" data-cmd="backup">Create a new Restore Point</a></p>
+                                    <p><a class="link pointer" data-bind="click: $root.command" data-cmd="backup">Create a new Restore Point</a></p>
                                 </div>
                             </section>
                         </div>
@@ -470,7 +470,7 @@
                                 <h4 class="title" data-page="archive_list"><span class="icon icone-bookmark"></span> Archives</h4>
                                 <!-- START Toolbar -->
                                 <ul class="toolbar pull-right">
-                                    <li><a class="link" data-widget="refresh" data-required="server_name" data-cmd="archive"><span class="icon icone-plus-sign"></span></a></li>
+                                    <li><a class="link" data-bind="click: $root.command" data-cmd="archive"><span class="icon icone-plus-sign"></span></a></li>
                                 </ul>
                                 <!--/ END Toolbar -->
                                 <span class="label label-success pull-right"></span>
@@ -480,7 +480,7 @@
                                   <p>Oldest archive: <strong></strong></p>
                                     <p>Most recent archive: <strong></strong></p>
                                     <p>Space used by archives: <strong></strong></p>
-                                    <p><a class="link pointer" data-widget="refresh" data-required="server_name" data-cmd="archive">Create a new Archive</a></p>
+                                    <p><a class="link pointer" data-bind="click: $root.command" data-cmd="archive">Create a new Archive</a></p>
                                 </div>
                             </section>
                         </div>
@@ -521,7 +521,7 @@
                                         <label class="checkbox">
                                             <input type="checkbox" value="true"> Delete <span></span>/archive/<span></span>
                                         </label>
-                                        <button class="btn btn-warning btn-mini">Delete </button>
+                                        <button class="btn btn-warning btn-mini" data-bind="click: $root.command" data-cmd="delete">Delete </button>
                                     </div>
                                 </div>
                             </section>

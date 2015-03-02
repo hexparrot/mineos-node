@@ -205,7 +205,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
                 console.warn('Ignored attempt to start already-started server: {0}'.format(server_name));
               } else {
                 fn.apply(instance, arg_array);
-                console.info('{0} received request {1}'.format(server_name, args.command))
+                console.info('[{0}] received request "{1}"'.format(server_name, args.command))
               }
             })
           break;
@@ -214,7 +214,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
             self.servers[server_name].instance.property('up', function(err, is_up) {
               if (is_up) {
                 fn.apply(instance, arg_array);
-                console.info('{0} received request {1}'.format(server_name, args.command))
+                console.info('[{0}] received request "{1}"'.format(server_name, args.command))
               } else {
                 console.warn('Ignored attempt to send command to downed server: {0}'.format(server_name));
               }
@@ -231,7 +231,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
               self.servers[server_name].watches[w].close();
 
             fn.apply(instance, arg_array);
-            console.info('{0} received request {1}'.format(server_name, args.command))
+            console.info('[{0}] received request "{1}"'.format(server_name, args.command))
           } else {
             console.warn('Ignored attempt to delete previously-deleted server: {0}'.format(server_name));
             //this will occur if the socket item exists on the client-side
@@ -244,7 +244,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           //default fallback. all named commands from this switch() must manually invoke the
           //following lines where appropriate.
           fn.apply(instance, arg_array);
-          console.info('{0} received request {1}'.format(server_name, args.command))
+          console.info('[{0}] received request "{1}"'.format(server_name, args.command))
           break;
       }
     }
@@ -371,6 +371,8 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
               var ERROR = '[{0}] Attempt to create server failed in the backend.'.format(args.server_name);
               console.error(ERROR);
               self.front_end.emit('error', ERROR);
+            } else {
+              console.info('[{0}] Server created in filesystem.'.format(args.server_name))
             }
           })
         }
