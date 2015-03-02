@@ -328,51 +328,6 @@ test.stop = function(test) {
   })
 }
 
-test.stop = function(test) {
-  var server_name = 'testingiz';
-  var instance = new mineos.mc(server_name, BASE_DIR);
-
-  async.series([
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        //test.iferror(err);
-        callback(err);
-      })
-    },
-    function(callback) {
-      instance.start(function(err, proc) {
-        //test.iferror(err);
-        proc.once('close', function(code) {
-          callback(null);
-        })
-      })
-    },
-    function(callback) {
-      instance.property('screen_pid', function(err, pid) {
-        test.ifError(err);
-        test.ok(pid > 0);
-        callback(null);
-      })
-    },
-    function(callback) {
-      instance.stop(function(err, died) {
-        test.ifError(err);
-        test.ok(died);
-        callback(null);
-      })
-    },
-    function(callback) {
-      instance.property('!up', function(err, result) {
-        test.ifError(err);
-        test.ok(result);
-        callback(err);
-      })
-    }
-  ], function(err, results) {
-    test.done();
-  })
-}
-
 test.stop_and_backup = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -393,9 +348,9 @@ test.stop_and_backup = function(test) {
       })
     },
     function(callback) {
-      instance.stop(function(err, died) {
+      instance.stop_and_backup(function(err, success) {
         test.ifError(err);
-        test.ok(died);
+        test.ok(success);
         callback(null);
       })
     },
@@ -407,15 +362,10 @@ test.stop_and_backup = function(test) {
       })
     },
     function(callback) {
-      instance.backup(function(err, proc) {
-        test.ifError(err);
-        proc.once('close', function(code) {
-          setTimeout(function() {
-            test.ok(fs.readdirSync(instance.env.bwd).length > 2);
-            callback(null);
-          }, FS_DELAY_MS)
-        })
-      })
+      setTimeout(function() {
+        test.ok(fs.readdirSync(instance.env.bwd).length > 2);
+        callback(null);
+      }, FS_DELAY_MS)
     }
   ], function(err, results) {
     test.done();

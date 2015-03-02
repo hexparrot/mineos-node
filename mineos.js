@@ -187,6 +187,19 @@ mineos.mc = function(server_name, base_dir) {
     })
   }
 
+  self.stop_and_backup = function(callback) {
+    async.series([
+      function(cb) {
+        self.stop(cb);
+      },
+      function(cb) {
+        self.backup(cb);
+      }
+    ], function(err, results) {
+      callback(err, results[0] && results[1]);
+    })
+  }
+
   self.kill = function(callback) {
     process.kill(mineos.server_pids_up()[self.server_name].java);
     callback(null);
