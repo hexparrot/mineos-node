@@ -49,7 +49,11 @@ function webui(port) {
         'newest_incr': ko.pureComputed(function() {
           return container.server_status.increments()[0];
         }),
-        'du': ko.observable({})
+        'du': {
+          'awd': ko.observable(0),
+          'bwd': ko.observable(0),
+          'cwd': ko.observable(0)
+        }
       },
       gamelog: ko.observableArray([])
     }
@@ -70,8 +74,11 @@ function webui(port) {
     })
 
     c.on('server_at_a_glance', function(data) {
-      container.server_status.increments(data.increments);
-      container.server_status.du(data.du);
+      var cc = container.server_status;
+      cc.increments(data.increments);
+      cc.du['awd'](data.du_awd);
+      cc.du['bwd'](data.du_bwd);
+      cc.du['cwd'](data.du_cwd);
     })
 
     c.on('result', function(data) {

@@ -441,9 +441,9 @@
                     <!--/ END Row -->
 
                     <!-- START Row -->
-                    <div class="row-fluid">
+                    <div class="row-fluid" data-bind="with: current_model().server_status">
                         <!-- START Default Widget -->
-                        <div class="span6 widget" data-bind="with: current_model().server_status">
+                        <div class="span6 widget">
                             <header>
                               <h4 class="title" data-page="backup_list"><span class="icon icone-bookmark"></span> Restore Points</h4>
                                 <!-- START Toolbar -->
@@ -459,7 +459,7 @@
                                 <div class="body-inner">
                                   <p>Oldest restore point: <!-- ko if: increments().length > 0 --><strong data-bind="text: oldest_incr().time"></strong><!-- /ko --></p> 
                                     <p>Most recent restore point: <!-- ko if: increments().length > 0 --><strong data-bind="text: newest_incr().time"></strong><!-- /ko --></p> 
-                                    <p>Space used by backups: <!-- ko if: 'du_bwd' in du() --><strong data-bind="text: bytes_to_mb(du().du_bwd)"></strong><!-- /ko --></p>
+                                    <p>Space used by backups: <strong data-bind="text: bytes_to_mb(du.bwd())"></strong><!-- /ko --></p>
                                     <p><a class="link pointer" data-bind="click: $root.command" data-cmd="backup">Create a new Restore Point</a></p>
                                 </div>
                             </section>
@@ -481,7 +481,7 @@
                                 <div class="body-inner">
                                   <p>Oldest archive: <strong></strong></p>
                                     <p>Most recent archive: <strong></strong></p>
-                                    <p>Space used by archives: <strong></strong></p>
+                                    <p>Space used by archives: <strong data-bind="text: bytes_to_mb(du.awd())"></strong></p>
                                     <p><a class="link pointer" data-bind="click: $root.command" data-cmd="archive">Create a new Archive</a></p>
                                 </div>
                             </section>
@@ -501,7 +501,7 @@
                                 <div class="body-inner">
                                     <p>Server Owner: <strong></strong></p>
                                     <p>Group Owner: <select id="available_groups"></select></p>
-                                    <p>Space used by live server files: <strong></strong></p>
+                                    <p>Space used by live server files: <strong data-bind="text: bytes_to_mb(current_model().server_status.du.cwd())"></strong></p>
                                 </div>
                             </section>
                         </div>
@@ -515,13 +515,13 @@
                                 <div class="body-inner">
                                     <div class="controls" id="delete_confirmations" data-bind="with: current_model()">
                                         <label class="checkbox">
-                                            <input type="checkbox" value="true"> Delete <span></span>/servers/<span data-bind="text: server_name"></span>
+                                            <input type="checkbox" value="true"> Delete <span></span>servers/<span data-bind="text: server_name"></span>
                                         </label>
                                         <label class="checkbox">
-                                            <input type="checkbox" value="true"> Delete <span></span>/backup/<span data-bind="text: server_name"></span>
+                                            <input type="checkbox" value="true"> Delete <span></span>backup/<span data-bind="text: server_name"></span>
                                         </label>
                                         <label class="checkbox">
-                                            <input type="checkbox" value="true"> Delete <span></span>/archive/<span data-bind="text: server_name"></span>
+                                            <input type="checkbox" value="true"> Delete <span></span>archive/<span data-bind="text: server_name"></span>
                                         </label>
                                         <button class="btn btn-warning btn-mini" data-bind="click: $root.command" data-cmd="delete">Delete </button>
                                     </div>

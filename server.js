@@ -164,9 +164,19 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
                 callback(null, incr_data);
               });
             },
-            du: function(callback) {
+            du_awd: function(callback) {
+              instance.property('du_awd', function(err, size) {
+                callback(null, size);
+              })
+            },
+            du_bwd: function(callback) {
               instance.property('du_bwd', function(err, size) {
-                callback(null, {'du_bwd': size});
+                callback(null, size);
+              })
+            },
+            du_cwd: function(callback) {
+              instance.property('du_cwd', function(err, size) {
+                callback(null, size);
               })
             }
           }, function(err, results) {
