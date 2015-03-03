@@ -155,11 +155,26 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           })
         }
 
+        function get_server_status() {
+          console.info('[{0}] {1} requesting server at a glance info'.format(server_name, ip_address));
+
+          async.parallel({
+            increments: function(callback) {
+              instance.list_increments(function(err, incr_data) {
+                callback(null, incr_data);
+              });
+            }
+          }, function(err, results) {
+            nsp.emit('server_at_a_glance', results);
+          })
+        }
+
         console.info('[{0}] {1} connected to namespace'.format(server_name, ip_address));
         socket.on('command', produce_receipt);
         socket.on('watch', start_watch);
         socket.on('unwatch', unwatch);
         socket.on('property', get_prop);
+        socket.on('server_at_a_glance', get_server_status);
       })
     }
 

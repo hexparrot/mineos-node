@@ -451,12 +451,12 @@
                                     <li><a class="link" data-bind="click: $root.command" data-cmd="backup"><span class="icon icone-plus-sign"></span></a></li>
                                 </ul>
                                 <!--/ END Toolbar -->
-                                <span class="label label-success pull-right"></span>
+                                    <span class="label label-success pull-right"><span>
                             </header>
                             <section class="body">
                                 <div class="body-inner">
-                                  <p>Oldest restore point: <strong></strong></p>
-                                    <p>Most recent restore point: <strong></strong></p>
+                                  <p>Oldest restore point: <!-- ko if: current_model().server_status.increments().length > 0 --><strong data-bind="text: current_model().server_status.oldest_incr().time"></strong><!-- /ko --></p> 
+                                    <p>Most recent restore point: <!-- ko if: current_model().server_status.increments().length > 0 --><strong data-bind="text: current_model().server_status.newest_incr().time"></strong><!-- /ko --></p> 
                                     <p>Space used by backups: <strong></strong></p>
                                     <p><a class="link pointer" data-bind="click: $root.command" data-cmd="backup">Create a new Restore Point</a></p>
                                 </div>
@@ -511,15 +511,15 @@
                             </header>
                             <section class="body">
                                 <div class="body-inner">
-                                    <div class="controls" id="delete_confirmations">
+                                    <div class="controls" id="delete_confirmations" data-bind="with: current_model()">
                                         <label class="checkbox">
-                                            <input type="checkbox" value="true"> Delete <span></span>/servers/<span></span>
+                                            <input type="checkbox" value="true"> Delete <span></span>/servers/<span data-bind="text: server_name"></span>
                                         </label>
                                         <label class="checkbox">
-                                            <input type="checkbox" value="true"> Delete <span></span>/backup/<span></span>
+                                            <input type="checkbox" value="true"> Delete <span></span>/backup/<span data-bind="text: server_name"></span>
                                         </label>
                                         <label class="checkbox">
-                                            <input type="checkbox" value="true"> Delete <span></span>/archive/<span></span>
+                                            <input type="checkbox" value="true"> Delete <span></span>/archive/<span data-bind="text: server_name"></span>
                                         </label>
                                         <button class="btn btn-warning btn-mini" data-bind="click: $root.command" data-cmd="delete">Delete </button>
                                     </div>
@@ -592,12 +592,12 @@
                           </thead>
                           <tfoot>
                           </tfoot>
-                          <tbody>
+                          <tbody data-bind="foreach: {data: current_model().server_status.increments(), as: '_data'}">
                             <tr>
                               <td></td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
+                              <td data-bind="text: _data.time"></td>
+                              <td data-bind="text: _data.size"></td>
+                              <td data-bind="text: _data.cum"></td>
                               <td><button data-required="server_name,step,force" data-cmd="restore" class="btn btn-success btn-mini">Restore</button></td>
                             </tr>
                           </tbody>

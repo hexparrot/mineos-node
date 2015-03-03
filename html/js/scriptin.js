@@ -41,6 +41,15 @@ function webui(port) {
         'port': ko.observable("-"),
         'heapsize': ko.observable(0)
       },
+      server_status: {
+        'increments': ko.observableArray([]),
+        'oldest_incr': ko.pureComputed(function() {
+          return container.server_status.increments()[container.server_status.increments().length - 1];
+        }),
+        'newest_incr': ko.pureComputed(function() {
+          return container.server_status.increments()[0];
+        })
+      },
       gamelog: ko.observableArray([])
     }
 
@@ -57,6 +66,10 @@ function webui(port) {
           container.gamelog.push(data.payload);
           break;
       }
+    })
+
+    c.on('server_at_a_glance', function(data) {
+      container.server_status.increments(data.increments);
     })
 
     c.on('result', function(data) {
@@ -130,6 +143,14 @@ function webui(port) {
       self.page($(event.currentTarget).data('page'));
     } catch (e) {
       self.page(vm);
+    }
+
+    switch(self.page()) {
+      case 'server_status':
+        self.current_model().channel.emit('server_at_a_glance');
+        break;
+      default:
+        break;
     }
 
     $('.container-fluid').hide();
