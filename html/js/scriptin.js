@@ -48,7 +48,8 @@ function webui(port) {
         }),
         'newest_incr': ko.pureComputed(function() {
           return container.server_status.increments()[0];
-        })
+        }),
+        'du': ko.observable({})
       },
       gamelog: ko.observableArray([])
     }
@@ -70,6 +71,7 @@ function webui(port) {
 
     c.on('server_at_a_glance', function(data) {
       container.server_status.increments(data.increments);
+      container.server_status.du(data.du);
     })
 
     c.on('result', function(data) {
@@ -174,3 +176,17 @@ String.prototype.format = String.prototype.f = function() {
   while (i--) { s = s.replace(new RegExp('\\{' + i + '\\}', 'gm'), arguments[i]);}
   return s;
 };
+
+function bytes_to_mb(bytes){
+  //http://stackoverflow.com/a/18650828
+  if (bytes == 0)
+    return '0B';
+  else if (bytes < 1024)
+    return bytes + 'B';
+
+  var k = 1024;
+  var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  var i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return (bytes / Math.pow(k, i)).toPrecision(3) + sizes[i];
+}

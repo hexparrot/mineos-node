@@ -163,6 +163,11 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
               instance.list_increments(function(err, incr_data) {
                 callback(null, incr_data);
               });
+            },
+            du: function(callback) {
+              instance.property('du_bwd', function(err, size) {
+                callback(null, {'du_bwd': size});
+              })
             }
           }, function(err, results) {
             nsp.emit('server_at_a_glance', results);
