@@ -870,6 +870,12 @@ test.list_increments = function(test) {
 
   async.series([
     function(callback) {
+      instance.list_increments(function(err, increments) {
+        test.ok(err);
+        callback(null);
+      })
+    },
+    function(callback) {
       instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
         callback(err);
@@ -912,7 +918,7 @@ test.list_increments = function(test) {
           test.ok('size' in increments[i]);
           test.ok('cum' in increments[i]);
         }
-        callback(null)
+        callback(null);
       })
     }
   ], function(err, results) {

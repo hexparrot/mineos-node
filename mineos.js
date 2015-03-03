@@ -318,7 +318,9 @@ mineos.mc = function(server_name, base_dir) {
       });
     });
 
-    
+    rdiff.stderr.on('data', function(data) {
+      callback(true, []);
+    })
   }
 
   self.property = function(property, callback) {
