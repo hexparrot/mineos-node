@@ -105,8 +105,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
       make_tail('logs/latest.log');
       make_watch('server.properties', function() {
         instance.sp(function(err, sp_data) {
-          console.info('[{0}] server.properties changed'.format(server_name));
-          nsp.in('server.properties').emit('server.properties', {'server_name': server_name, 'payload': sp_data});
+          nsp.emit('result', {'server_name': server_name, 'property': 'server.properties', 'payload': sp_data});
         })
       });
 
@@ -155,33 +154,50 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           })
         }
 
-        function get_server_status() {
-          console.info('[{0}] {1} requesting server at a glance info'.format(server_name, ip_address));
+        function get_page_data(page) {
+          switch (page) {
+            case 'server_status':
+              console.info('[{0}] {1} requesting server at a glance info'.format(server_name, ip_address));
 
-          async.parallel({
-            increments: function(callback) {
-              instance.list_increments(function(err, incr_data) {
-                callback(null, incr_data);
-              });
-            },
-            du_awd: function(callback) {
-              instance.property('du_awd', function(err, size) {
-                callback(null, size);
+              async.parallel({
+                increments: function(callback) {
+                  instance.list_increments(function(err, incr_data) {
+                    for (var i=0; i < incr_data.length; i++)
+                      incr_data[i]['step'] = '{0}B'.format(i);
+                    callback(null, incr_data);
+                  });
+                },
+                du_awd: function(callback) {
+                  instance.property('du_awd', function(err, size) {
+                    callback(null, size);
+                  })
+                },
+                du_bwd: function(callback) {
+                  instance.property('du_bwd', function(err, size) {
+                    callback(null, size);
+                  })
+                },
+                du_cwd: function(callback) {
+                  instance.property('du_cwd', function(err, size) {
+                    callback(null, size);
+                  })
+                },
+                owner: function(callback) {
+                  var userid = require('userid');
+                  instance.property('owner', function(err, owner) {
+                    owner['username'] = userid.username(owner.uid);
+                    owner['groupname'] = userid.groupname(owner.gid);
+                    callback(null, owner);
+                  })
+                }
+              }, function(err, results) {
+                nsp.emit('page_data', {page: page, payload: results});
               })
-            },
-            du_bwd: function(callback) {
-              instance.property('du_bwd', function(err, size) {
-                callback(null, size);
-              })
-            },
-            du_cwd: function(callback) {
-              instance.property('du_cwd', function(err, size) {
-                callback(null, size);
-              })
-            }
-          }, function(err, results) {
-            nsp.emit('server_at_a_glance', results);
-          })
+              break;
+            default:
+              nsp.emit('page_data', {page: page});
+              break;
+          }
         }
 
         console.info('[{0}] {1} connected to namespace'.format(server_name, ip_address));
@@ -189,7 +205,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         socket.on('watch', start_watch);
         socket.on('unwatch', unwatch);
         socket.on('property', get_prop);
-        socket.on('server_at_a_glance', get_server_status);
+        socket.on('page_data', get_page_data);
       })
     }
 

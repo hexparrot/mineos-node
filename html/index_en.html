@@ -156,20 +156,20 @@
                                     <li class="divider">Server Settings</li>
                                     <!--/ END Menu Divider -->
 
-                                    <!-- ko ifnot: $.isEmptyObject(current_model()) -->
+                                    <!-- ko if: current() -->
                                     <!-- START Menu -->
                                     <li class="accordion-group">
                                         <a data-bind="click: show_page" data-page="server_status">
                                             <span class="icon icone-globe"></span>
                                             <span class="text">Server Status</span>
-                                            <span class="label label-inverse" data-bind="text: (current_model().heartbeat.up() ? 'up' : 'down')"></span>
+                                            <span class="label label-inverse" data-bind="text: (current().heartbeat.up() ? 'up' : 'down')"></span>
                                         </a>
                                     </li>
                                     <!--/ END Menu -->
                                     
                                     <!-- START Menu -->
                                     <li class="accordion-group">
-                                        <a data-bind="click: show_page" data-page="backup_list">
+                                        <a data-bind="click: show_page" data-page="restore_points">
                                             <span class="icon icone-hdd"></span>
                                             <span class="text">Restore Points</span>
                                         </a>
@@ -211,8 +211,8 @@
                                         </a>
                                     </li>
                                     <!--/ END Menu -->
-
                                     <!-- /ko -->
+
                                 </ul>
                             </nav>
                             <!--/ END Sidebar Menu -->
@@ -227,745 +227,13 @@
 
             <!-- START Template Main Content -->
             <section id="main">
-                <!-- START Bootstrap Navbar -->
-                <div class="navbar navbar-static-top">
-                    <div class="navbar-inner">
-                        <!-- Breadcrumb -->
-                        <ul class="breadcrumb">
-                            <li>Currently Selected Server: <strong data-bind="ifnot: $.isEmptyObject(current_model())"><a data-page="server_status" data-bind="text: current_model().server_name"></a></strong>
-                        </ul>
-                        <!--/ Breadcrumb -->
-                    </div>
-                    <div class="navbar-outer">
-                        <!--
-                        <div class="alert alert-success">
-                            <button type="button" class="close" data-dismiss="alert">×</button>
-                            <strong>You are currently logged in as root.</strong> You may manage all servers as <strong>root</strong>, but creating new ones must be done as an unprivileged user.
-                        </div>
-                        <div class="alert">
-                            <button type="button" class="close" data-dismiss="alert">×</button>
-                            You do not have rights on <strong>/profiles/profile.config</strong>, so you may prototype a profile but not update it.
-                        </div>
-                        <div class="alert alert-error">
-                            <button type="button" class="close" data-dismiss="alert">×</button>
-                            The <strong>server.config</strong> for this server does not contain a valid, positive integer for the maximum java heapsize (java_xmx).
-                        </div>
-                        <div class="alert alert-error">
-                            <button type="button" class="close" data-dismiss="alert">×</button>
-                            Your current selected server requires acceptance of the <strong>Mojang EULA</strong> in order to start. Please review the <a href="https://account.mojang.com/documents/minecraft_eula">terms and conditions</a> within before clicking the 'Accept EULA' button.
-                        </div>
-                        -->
-                    </div>
-                </div>
-                <!--/ END Bootstrap Navbar -->
 
-                <!-- START Content -->
-                <div id="dashboard" class="container-fluid">
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <!-- START Line Chart - Filled -->
-                        <div class="span12 widget">
-                            <header>
-                                <h4 class="title">Host Status</h4>
-                                <!-- START Toolbar -->
-                                <ul class="toolbar pull-right">
-                                    <li>
-                                        <a href="#" class="link" data-toggle="dropdown">
-                                            <span class="icon"></span>
-                                        </a>
-                                    </li>
-                                </ul>
-                                <!--/ END Toolbar -->
-                            </header>
-                            <section class="body">
-                                <div class="body-inner">
-                                    <div class="span12 pull-left">
-                                        <!-- START Summary -->
-                                        <figure class="stats summary">
-                                            <div class="icon circle green"><span class="icone-ok"></span></div>
-                                            <figcaption>
-                                                <h3><span data-bind="text: dashboard['servers-running']"></span><small>Servers Running</small></h3>
-                                            </figcaption>
-                                        </figure>
-                                        <!--/ END Summary -->
 
-                                        <!-- START Summary -->
-                                        <figure class="stats summary">
-                                            <div class="icon circle lime"><span class="icone-time"></span></div>
-                                            <figcaption>
-                                                <h3><span></span><small>Uptime</small></h3>
-                                            </figcaption>
-                                        </figure>
-                                        <!--/ END Summary -->
 
-                                        <!-- START Summary -->
-                                        <figure class="stats summary">
-                                            <div class="icon circle teal"><span class="icone-ticket"></span></div>
-                                            <figcaption>
-                                                <h3><span></span><small>MB RAM Free</small></h3>
-                                            </figcaption>
-                                        </figure>
-                                        <!--/ END Summary -->
 
-                                        <!-- START Circular 1 -->
-                                        <figure class="stats circular">
-                                            <div class="gauge" data-percent="">
-                                                <span><span class="text"></span>%</span>
-                                            </div>
-                                            <figcaption>
-                                                <h4><span></span><span>%</span><small>HDD Used</small></h4>
-                                            </figcaption>
-                                        </figure>
-                                        <!--/ END Circular 1 -->
 
-                                    </div>
-
-                                    <!-- START Auto Update Chart -->
-                                    <div class="span11 pull-left widget">
-                                        <header>
-                                            <h4 class="title">Load averages over last minute</h4>
-                                        </header>
-                                        <div class="flot" id="load_averages"></div>
-                                    </div>
-                                    <!--/ END Auto Update Chart -->
-
-                                </div>
-                            </section>
-                        </div>
-                        <!--/ END Line Chart - Filled -->
-                    </div>
-                    <!--/ END Row -->
-
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <table id="table_status" class="table table-hover">
-                          <thead>
-                            <tr>
-                              <th scope="col">Name</th>
-                              <th scope="col">Profile</th>
-                              <th scope="col">Port</th>
-                              <th scope="col">Status</th>
-                              <th scope="col">Online</th>
-                              <th scope="col">Memory</th>
-                            </tr>
-                          </thead>
-                          <tbody data-bind="foreach: { data: servers, as: 'server' }">
-                            <tr>
-                              <td data-bind="text: server_name, click: $root.select_server"></td>
-                              <td></td>
-                              <td data-bind="text: server.heartbeat.port()"></td>
-                              <td><span class="label" data-bind="text: (server.heartbeat.up() ? 'up' : 'down'), css: {'label-success': server.heartbeat.up(), 'label-important': !server.heartbeat.up()}"></span></td>
-                              <td data-bind="text: server.heartbeat.players_online() + '/' + server.heartbeat.players_max()"></td>
-                              <td data-bind="text: server.heartbeat.VmRSS()"></td>
-                            </tr>
-                          </tbody>
-                        </table>
-                    </div>
-                    <!--/ END Row -->
-                </div>
-                <!--/ END Content -->
-
-                <!-- START Content -->
-                <!-- ko ifnot: $.isEmptyObject(current_model()) -->
-                <div id="server_status" class="container-fluid">
-
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <!-- START Page/Section header -->
-                        <div class="span12">
-                            <div class="page-header line1">
-                                <h4><span></span><small></small></h4>
-                            </div>
-                        </div>
-                        <!--/ END Page/Section header -->
-                    </div>
-                    <!--/ END Row -->
-
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <!-- START Circular Summary -->
-                        <div class="span12 widget">
-                            <header><h4 class="title">Server at a Glance</h4></header>
-                            <section class="body">
-                                <div class="body-inner">
-                                    <!-- START Summary -->
-                                    <figure class="stats summary pull-left" data-bind="with: current_model().heartbeat">
-                                        <div data-bind="css: {'green': up(), 'red': !up()}" class="icon circle"><span data-bind="css: {'icone-ok': up(), 'icone-off': !up()}"></span></div>
-                                        <figcaption>
-                                            <h3><span data-bind="text: (up() ? 'online' : 'offline')"></span><small data-bind="text: port"></small></h3>
-                                        </figcaption>
-                                    </figure>
-                                    <!--/ END Summary -->
-
-                                    <!-- START Circular 1 -->
-                                    <figure class="stats circular stacked">
-                                        <div class="gauge" data-percent="">
-                                            <span><span class="text"></span>%</span>
-                                        </div>
-                                        <figcaption>
-                                            <h4><span data-bind="text: current_model().heartbeat['players_online']()"></span><small>Players Online</small></h4>
-                                        </figcaption>
-                                    </figure><!--/ END Circular 1 -->
-
-                                    <!-- START Circular 2 -->
-                                    <figure class="stats circular stacked">
-                                        <div class="gauge" data-percent="">
-                                            <span class="text"></span>
-                                        </div>
-                                        <figcaption>
-                                            <h4><span data-bind="text: current_model().heartbeat['VmRSS']()"></span><small>Heap Usage</small></h4>
-                                        </figcaption>
-                                    </figure><!--/ END Circular 2 -->
-
-                                </div>
-                            </section>
-                        </div>
-                        <!--/ END Circular Summary -->
-                    </div>
-                    <!--/ END Row -->
-         
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <button data-bind="click: $root.command" data-cmd="start" type="button" class="btn btn-success span2">Start</button> 
-                        <button data-bind="click: $root.command" data-cmd="accept_eula" type="button" class="btn btn-info span2">Accept EULA</button> 
-                        <!-- Button Dropdown -->
-                        <div class="btn-group">
-                            <button class="btn btn-danger dropdown-toggle" data-toggle="dropdown">Stop <span class="caret"></span></button>
-                            <ul class="dropdown-menu">
-                                <li><a data-bind="click: $root.command" data-cmd="stop">Stop</a></li>
-                                <li><a data-bind="click: $root.command" data-cmd="stop_and_backup">Stop and Backup</a></li> 
-                                <li><a data-bind="click: $root.command" data-cmd="kill">Kill</a></li>
-                            </ul>
-                        </div><!--/ Button Dropdown -->
-                    </div>
-                    <!--/ END Row -->
-
-                    <!-- START Row -->
-                    <div class="row-fluid" data-bind="with: current_model().server_status">
-                        <!-- START Default Widget -->
-                        <div class="span6 widget">
-                            <header>
-                              <h4 class="title" data-page="backup_list"><span class="icon icone-bookmark"></span> Restore Points</h4>
-                                <!-- START Toolbar -->
-                                <ul class="toolbar pull-right">
-                                    <li><a class="link" data-bind="click: $root.command" data-cmd="backup"><span class="icon icone-plus-sign"></span></a></li>
-                                </ul>
-                                <!--/ END Toolbar -->
-                                <!-- ko if: increments().length > 0 -->
-                                    <span class="label label-success pull-right" data-bind="text: increments.length"></span>
-                                <!-- /ko -->
-                            </header>
-                            <section class="body">
-                                <div class="body-inner">
-                                  <p>Oldest restore point: <!-- ko if: increments().length > 0 --><strong data-bind="text: oldest_incr().time"></strong><!-- /ko --></p> 
-                                    <p>Most recent restore point: <!-- ko if: increments().length > 0 --><strong data-bind="text: newest_incr().time"></strong><!-- /ko --></p> 
-                                    <p>Space used by backups: <strong data-bind="text: bytes_to_mb(du.bwd())"></strong><!-- /ko --></p>
-                                    <p><a class="link pointer" data-bind="click: $root.command" data-cmd="backup">Create a new Restore Point</a></p>
-                                </div>
-                            </section>
-                        </div>
-                        <!--/ END Default Widget -->
-
-                        <!-- START Default Widget -->
-                        <div class="span6 widget">
-                            <header>
-                                <h4 class="title" data-page="archive_list"><span class="icon icone-bookmark"></span> Archives</h4>
-                                <!-- START Toolbar -->
-                                <ul class="toolbar pull-right">
-                                    <li><a class="link" data-bind="click: $root.command" data-cmd="archive"><span class="icon icone-plus-sign"></span></a></li>
-                                </ul>
-                                <!--/ END Toolbar -->
-                                <span class="label label-success pull-right"></span>
-                            </header>
-                            <section class="body">
-                                <div class="body-inner">
-                                  <p>Oldest archive: <strong></strong></p>
-                                    <p>Most recent archive: <strong></strong></p>
-                                    <p>Space used by archives: <strong data-bind="text: bytes_to_mb(du.awd())"></strong></p>
-                                    <p><a class="link pointer" data-bind="click: $root.command" data-cmd="archive">Create a new Archive</a></p>
-                                </div>
-                            </section>
-                        </div>
-                        <!--/ END Default Widget -->
-                    </div>
-                    <!--/ END Row -->
-
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <!-- START Default Widget -->
-                        <div class="span6 widget">
-                            <header>
-                                <h4 class="title"><span class="icon icone-bookmark"></span> Ownership and Disk Usage</h4>
-                            </header>
-                            <section class="body">
-                                <div class="body-inner">
-                                    <p>Server Owner: <strong></strong></p>
-                                    <p>Group Owner: <select id="available_groups"></select></p>
-                                    <p>Space used by live server files: <strong data-bind="text: bytes_to_mb(current_model().server_status.du.cwd())"></strong></p>
-                                </div>
-                            </section>
-                        </div>
-                        <!--/ END Default Widget -->
-                        <!-- START Default Widget -->
-                        <div id="delete_server" class="span6 widget">
-                            <header>
-                                <h4 class="title"><span class="icon icone-bookmark"></span> Delete Server</h4>
-                            </header>
-                            <section class="body">
-                                <div class="body-inner">
-                                    <div class="controls" id="delete_confirmations" data-bind="with: current_model()">
-                                        <label class="checkbox">
-                                            <input type="checkbox" value="true"> Delete <span></span>servers/<span data-bind="text: server_name"></span>
-                                        </label>
-                                        <label class="checkbox">
-                                            <input type="checkbox" value="true"> Delete <span></span>backup/<span data-bind="text: server_name"></span>
-                                        </label>
-                                        <label class="checkbox">
-                                            <input type="checkbox" value="true"> Delete <span></span>archive/<span data-bind="text: server_name"></span>
-                                        </label>
-                                        <button class="btn btn-warning btn-mini" data-bind="click: $root.command" data-cmd="delete">Delete </button>
-                                    </div>
-                                </div>
-                            </section>
-                        </div>
-                        <!--/ END Default Widget -->
-                    </div>
-                    <!--/ END Row -->
-
-                </div>
-                <!-- /ko -->
-                <!--/ END Content -->
-
-                <!-- START Content -->
-                <!-- ko ifnot: $.isEmptyObject(current_model()) -->
-                <div id="backup_list" class="container-fluid">
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <div class="control-group">
-                            <label class="control-label">Remove restore points older than:</label>
-                            <div class="controls">
-                                <input type="text" id="prune_increment_input" placeholder="Pick a date or step"> <button type="button" class="btn btn-danger"><span class="icone-remove-circle"></span> Prune Restore Points</button>
-                            </div>
-                        </div>
-
-                    </div>
-                    <!--/ END Row -->
-
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <!-- START Icon Statistic - Circle -->
-                        <div class="span12 widget">
-                            <header><h4 class="title">Removal Summary</h4></header>
-                            <section class="body">
-                                <div class="body-inner" style="">
-                                    <!-- START Summary 1 -->
-                                    <figure class="stats summary shadowed">
-                                        <div class="icon circle lime"><span class="icone-folder-close"></span></div>
-                                        <figcaption>
-                                            <h3><span></span><small>Restore Points</small></h3>
-                                        </figcaption>
-                                    </figure><!--/ END Summary 1 -->
-
-                                    <!-- START Summary 2 -->
-                                    <figure class="stats summary shadowed">
-                                        <div class="icon circle purple"><span class="icone-shopping-cart"></span></div>
-                                        <figcaption>
-                                            <h3><span></span><small>MB Reclaimed</small></h3>
-                                        </figcaption>
-                                    </figure><!--/ END Summary 2 -->
-                                </div>
-                            </section>
-                        </div>
-                        <!--/ END Icon Summary - Circle -->
-                    </div>
-                    <!--/ END Row -->
-
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <table class="table table-hover">
-                          <thead>
-                            <tr>
-                              <th scope="col">Step</th>
-                              <th scope="col">Timestamp</th>
-                              <th scope="col">Increment Size</th>
-                              <th scope="col">Cumulative Size</th>
-                              <th scope="col"></th>
-                            </tr>
-                          </thead>
-                          <tfoot>
-                          </tfoot>
-                          <tbody data-bind="foreach: {data: current_model().server_status.increments(), as: '_data'}">
-                            <tr>
-                              <td></td>
-                              <td data-bind="text: _data.time"></td>
-                              <td data-bind="text: _data.size"></td>
-                              <td data-bind="text: _data.cum"></td>
-                              <td><button data-required="server_name,step,force" data-cmd="restore" class="btn btn-success btn-mini">Restore</button></td>
-                            </tr>
-                          </tbody>
-                        </table>
-                    </div>
-                    <!--/ END Row -->
-
-                </div>
-                <!-- /ko -->
-                <!--/ END Content -->
-
-                <!-- START Content -->
-                <!-- ko ifnot: $.isEmptyObject(current_model()) -->
-                <div id="archive_list" class="container-fluid">
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <div class="control-group">
-                            <label class="control-label">Remove archives older than:</label>
-                            <div class="controls">
-                                <input type="text" id="prune_archive_input" placeholder="Pick a date"> <button type="button" class="btn btn-danger"><span class="icone-remove-circle"></span> Prune Archives</button>
-                            </div>
-                        </div>
-                    </div>
-                    <!--/ END Row -->
-
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <!-- START Icon Statistic - Circle -->
-                        <div class="span12 widget">
-                            <header><h4 class="title">Removal Summary</h4></header>
-                            <section class="body">
-                                <div class="body-inner" style="">
-                                    <!-- START Summary 1 -->
-                                    <figure class="stats summary shadowed">
-                                        <div class="icon circle lime"><span class="icone-folder-close"></span></div>
-                                        <figcaption>
-                                            <h3><span></span><small>Archives</small></h3>
-                                        </figcaption>
-                                    </figure><!--/ END Summary 1 -->
-
-                                    <!-- START Summary 2 -->
-                                    <figure class="stats summary shadowed">
-                                        <div class="icon circle purple"><span class="icone-shopping-cart"></span></div>
-                                        <figcaption>
-                                            <h3><span></span><small>MB Reclaimed</small></h3>
-                                        </figcaption>
-                                    </figure><!--/ END Summary 2 -->
-                                </div>
-                            </section>
-                        </div>
-                        <!--/ END Icon Summary - Circle -->
-                    </div>
-                    <!--/ END Row -->
-
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <table class="table table-hover">
-                          <thead>
-                            <tr>
-                              <th scope="col">Timestamp</th>
-                              <th scope="col">Increment Size</th>
-                              <th scope="col">Filename</th>
-                              <th scope="col"></th>
-                            </tr>
-                          </thead>
-                          <tfoot>
-                          </tfoot>
-                          <tbody>
-                            <tr>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                              <td>
-                                <div class="btn-group">
-                                    <button class="btn dropdown-toggle" data-toggle="dropdown">Actions <span class="caret"></span></button>
-                                    <ul class="dropdown-menu">
-                                        <li><a data-toggle="modal" data-target="#import_server_modal">Create Server From</a></li>
-                                        <li>&nbsp;</li>
-                                        <li><a data-required="server_name,filename" data-cmd="prune_archives">Delete</a></li>
-                                    </ul>
-                                </div>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                    </div>
-                    <!--/ END Row -->
-                </div>
-                <!-- /ko -->
-                <!--/ END Content -->
-
-                <!-- START Content -->
-                <div id="importable" class="container-fluid">
-
-                    <div class="row-fluid">
-                        <!-- START General Elements -->
-                        <div class="">
-                            <header>
-                                <h4 class="title">Create Server from an Archive</h4>
-                            </header>
-                            <section class="body">
-                                <div class="body-inner">
-                                    <p>Creating and running a server should be done strictly as an unprivileged user to contain potential damage from server exploits, faulty plugins or java secuirty issues.</p>
-                                    <p>You can create a user from the command line using <strong>adduser</strong></p>
-                                </div>
-                            </section>
-                        </div>
-                        <!--/ END General Elements -->
-
-                        <div class="widget">
-                            <section class="body">
-                                <div class="body-inner">
-                                    <pre class="bash">
-root@core ~# adduser will
-Adding user `will' ...
-Adding new group `will' (1001) ...
-Adding new user `will' (1000) with group `will' ...
-Creating home directory `/home/will' ...
-Copying files from `/etc/skel' ...
-Enter new UNIX password:
-Retype new UNIX password:
-passwd: password updated successfully
-Changing the user information for will
-Enter the new value, or press ENTER for the default
-Full Name []:
-Room Number []:
-Work Phone []:
-Home Phone []:
-Other []:
-Is the information correct? [Y/n]
-
-                                    </pre>
-                                </div>
-                            </section>
-                        </div>
-                        <!--/ END Syntax Highlighter -->
-                    </div>
-
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <header>
-                            <h4 class="title">Create Server from an Archive</h4>
-                        </header>
-                        <section class="body">
-                            <div class="body-inner">
-                                <p>The files listed below are those located in the <strong class="text-success" data-placement="top" title="" rel="tooltip" data-original-title="Acceptable archives are .tar, .tar.gz, .tgz, and .zip"><span></span>/import</strong> directory of your Minecraft data files.</p>
-                            </div>
-                        </section>
-                        <table id="table_importable" class="table table-hover">
-                          <thead>
-                            <tr>
-                              <th scope="col">Filename</th>
-                              <th scope="col"></th>
-                            </tr>
-                          </thead>
-                          <tfoot>
-                          </tfoot>
-                          <tbody>
-                            <tr>
-                              <td></td>
-                              <td>
-                                <button class="btn btn-success btn-mini" data-toggle="modal" data-target="#import_server_modal">Create Server From </button>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                    </div>
-                    <!--/ END Row -->
-                </div>
-                <!--/ END Content -->
-
-                <!-- START Content -->
-                <div id="profiles" class="container-fluid">
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <!-- START Page/Section header -->
-                        <div class="span12">
-                            <div class="page-header line1">
-                                <h4>Server Profiles</h4>
-                            </div>
-                        </div>
-                        <!--/ END Page/Section header -->
-                    </div>
-                    <!--/ END Row -->
-
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <table id="table_profiles_view" class="table table-hover">
-                          <thead>
-                            <tr>
-                              <th scope="col">Profile</th>
-                              <th scope="col">Runnable Jar</th>
-                              <th scope="col">URL</th>
-                              <th scope="col">OK</th>
-                              <th scope="col"></th>
-                            </tr>
-                          </thead>
-                          <tfoot>
-                          </tfoot>
-                          <tbody>
-                            <tr>
-                                <td class="pointer"></td>
-                                <td></td>
-                                <td></td>
-                                <td><span class="icon"></span></td>
-                                <td>
-                                  <button class="btn btn-success btn-mini" data-required="profile" data-refresh="500" data-cmd="update_profile">Update </button>
-                                    <button class="btn btn-warning btn-mini" data-toggle="modal" data-target="#remove_profile_modal">Remove </button>
-                                </td>
-                            </tr>
-                          </tbody>
-                          <tfoot>
-                            <tr>
-                              <td colspan="6">
-                                <button class="btn" data-toggle="dropdown" data-page="define_profile">Create Custom Profile</button>
-                                <div class="btn-group">
-                                    <button class="btn dropdown-toggle" data-toggle="dropdown">Create Stock Profile <span class="caret"></span></button>
-                                    <ul class="dropdown-menu">
-                                        <li><a data-required="profile" data-cmd="stock_profile"></a></li>
-                                    </ul>
-                                </div>
-                              </td>
-                            </tr>
-                          </tfoot>
-                        </table>
-                    </div>
-                    <!--/ END Row -->
-
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <section class="body">
-                            <div class="body-inner">
-                                <p>Server profiles may be prototyped by any user, but may only be updated by a user with write permissions on <strong class="text-success" data-placement="top" title="" rel="tooltip" data-original-title="chmod g+w profile.config">profile.config</strong>.
-                                <span>The <strong>root</strong> user may extend these privileges to additional users by assigning <strong><span></span>/profiles/profile.config</strong> to a new group and then adding authorized users to this group.</span>
-                                <span>You may share this privilege with additional users by assigning <strong><span></span>/profiles/profile.config</strong> to a new group and then adding authorized users to this group.</span></p>
-                                Members of this group may update and remove profiles: 
-                                <select id="pc_group" name="pc_group"></select>
-                                <strong></strong>
-                            </div>
-                        </section>
-                    </div>
-                    <!--/ END Row -->
-                </div>
-                <!--/ END Content -->
-
-                <!-- START Content -->
-                <div id="profile_view" class="container-fluid">
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <!-- START Line Chart - Filled -->
-                        <div class="span12 widget">
-                            <header>
-                                <h4 class="title">Profile Definition</h4>
-                                <!-- START Toolbar -->
-                                <!--/ END Toolbar -->
-                            </header>
-                            <section class="body">
-                                <div class="body-inner">
-                                    <div class="span12 pull-left">
-                                        <!-- START Summary -->
-                                        <figure class="stats summary pull-left">
-                                            <div class="icon circle"><span></span></div>
-                                            <figcaption>
-                                                <h3><span></span><small><a class="pointer" data-required="profile" data-refresh="500" data-cmd="update_profile">Download Now</a></small></h3>
-                                            </figcaption>
-                                        </figure>
-                                        <!--/ END Summary -->
-
-                                        <!-- START Summary -->
-                                        <figure class="stats summary">
-                                            <div class="icon circle lime"><span class="icone-time"></span></div>
-                                            <figcaption>
-                                                <h3><span></span><small></small></h3>
-                                            </figcaption>
-                                        </figure>
-                                        <!--/ END Summary -->
-
-                                        <!-- START Summary -->
-                                        <figure class="stats summary">
-                                            <div class="icon circle teal"><span class="icone-trophy"></span></div>
-                                            <figcaption>
-                                                <h3><span></span><small>Detected Version</small></h3>
-                                            </figcaption>
-                                        </figure>
-                                        <!--/ END Summary -->
-
-                                    </div>
-                                </div>
-                            </section>
-                        </div>
-                        <!--/ END Line Chart - Filled -->
-                    </div>
-                    <!--/ END Row -->
-
-                    <div class="row-fluid">
-                        <!-- START General Elements -->
-                        <div class="span12 widget dark">
-                            <header>
-                                <h4 class="title"><span class="icon icone-keyboard"></span> Profile Notes</h4>
-                            </header>
-                            <section class="body">
-                                <div class="body-inner">
-                                    <!-- Autosize Textarea -->
-                                    <div class="control-group">
-                                        <div class="controls">
-                                            <textarea class="span12 autosize" rows="4" style="overflow: hidden; word-wrap: break-word; resize: horizontal; height: 90px;"></textarea>
-                                        </div>
-                                    </div><!--/ Autosize Textarea -->
-                                </div>
-                            </section>
-                        </div>
-                        <!--/ END General Elements -->
-                    </div>
-
-                </div>
-                <!--/ END Content -->
-
-                <!-- START Content -->
-                <div id="create_server" class="container-fluid">
-
-                    <div class="row-fluid">
-                        <!-- START General Elements -->
-                        <!--<div class="">
-                            <header>
-                                <h4 class="title">Create a Server</h4>
-                            </header>
-                            <section class="body">
-                                <div class="body-inner">
-                                    <p>Creating and running a server should be done strictly as an unprivileged user to contain potential damage from server exploits, faulty plugins or java secuirty issues.</p>
-                                    <p>You can create a user from the command line using <strong>adduser</strong></p>
-                                </div>
-                            </section>
-                        </div>
-                        -->
-                        <!--/ END General Elements -->
-
-                        <!--<div class="widget">
-                            <section class="body">
-                                <div class="body-inner">
-                                    <pre class="bash">
-root@core ~# adduser will
-Adding user `will' ...
-Adding new group `will' (1001) ...
-Adding new user `will' (1000) with group `will' ...
-Creating home directory `/home/will' ...
-Copying files from `/etc/skel' ...
-Enter new UNIX password:
-Retype new UNIX password:
-passwd: password updated successfully
-Changing the user information for will
-Enter the new value, or press ENTER for the default
-Full Name []:
-Room Number []:
-Work Phone []:
-Home Phone []:
-Other []:
-Is the information correct? [Y/n]
-
-                                    </pre>
-                                </div>
-                            </section>
-                        </div>
-                        -->
-                        <!--/ END Syntax Highlighter -->
-                    </div>
-
+            <!-- START Content -->
+                <div id="create_server" class="container-fluid" data-bind="visible: page() == 'create_server'">
                     <!-- START Row -->
                     <div class="row-fluid">
                         <!-- START Form Wizard With Validation -->
@@ -1149,8 +417,376 @@ Is the information correct? [Y/n]
                 </div>
                 <!--/ END Content -->
 
+
+
                 <!-- START Content -->
-                <!-- ko ifnot: $.isEmptyObject(current_model()) -->
+                <!-- ko if: page() == 'dashboard' -->
+                <div id="dashboard" class="container-fluid" data-bind="">
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Line Chart - Filled -->
+                        <div class="span12 widget">
+                            <header>
+                                <h4 class="title">Host Status</h4>
+                                <!-- START Toolbar -->
+                                <ul class="toolbar pull-right">
+                                    <li>
+                                        <a href="#" class="link" data-toggle="dropdown">
+                                            <span class="icon"></span>
+                                        </a>
+                                    </li>
+                                </ul>
+                                <!--/ END Toolbar -->
+                            </header>
+                            <section class="body">
+                                <div class="body-inner">
+                                    <div class="span12 pull-left">
+                                        <!-- START Summary -->
+                                        <figure class="stats summary">
+                                            <div class="icon circle green"><span class="icone-ok"></span></div>
+                                            <figcaption>
+                                                <h3><span data-bind=""></span><small>Servers Running</small></h3>
+                                            </figcaption>
+                                        </figure>
+                                        <!--/ END Summary -->
+
+                                        <!-- START Summary -->
+                                        <figure class="stats summary">
+                                            <div class="icon circle lime"><span class="icone-time"></span></div>
+                                            <figcaption>
+                                                <h3><span></span><small>Uptime</small></h3>
+                                            </figcaption>
+                                        </figure>
+                                        <!--/ END Summary -->
+
+                                        <!-- START Summary -->
+                                        <figure class="stats summary">
+                                            <div class="icon circle teal"><span class="icone-ticket"></span></div>
+                                            <figcaption>
+                                                <h3><span></span><small>MB RAM Free</small></h3>
+                                            </figcaption>
+                                        </figure>
+                                        <!--/ END Summary -->
+
+                                        <!-- START Circular 1 -->
+                                        <figure class="stats circular">
+                                            <div class="gauge" data-percent="">
+                                                <span><span class="text"></span>%</span>
+                                            </div>
+                                            <figcaption>
+                                                <h4><span></span><span>%</span><small>HDD Used</small></h4>
+                                            </figcaption>
+                                        </figure>
+                                        <!--/ END Circular 1 -->
+
+                                    </div>
+
+                                    <!-- START Auto Update Chart -->
+                                    <div class="span11 pull-left widget">
+                                        <header>
+                                            <h4 class="title">Load averages over last minute</h4>
+                                        </header>
+                                        <div class="flot" id="load_averages"></div>
+                                    </div>
+                                    <!--/ END Auto Update Chart -->
+
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Line Chart - Filled -->
+                    </div>
+                    <!--/ END Row -->
+                    
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <table id="table_status" class="table table-hover">
+                          <thead>
+                            <tr>
+                              <th scope="col">Name</th>
+                              <th scope="col">Profile</th>
+                              <th scope="col">Port</th>
+                              <th scope="col">Status</th>
+                              <th scope="col">Online</th>
+                              <th scope="col">Memory</th>
+                            </tr>
+                          </thead>
+                          <tbody data-bind="foreach: { data: servers, as: '_s' }">
+                            <tr>
+                              <td data-bind="text: _s.server_name, click: $root.select_server"></td>
+                              <td></td>
+                              <td data-bind="text: _s.heartbeat.port()"></td>
+                              <td><span class="label" data-bind="text: (_s.heartbeat.up() ? 'up' : 'down'), css: {'label-success': _s.heartbeat.up(), 'label-important': !_s.heartbeat.up()}"></span></td>
+                              <td><span data-bind="text: !isNaN(_s.heartbeat.players_online()) ? _s.heartbeat.players_online() : '--'"></span> / <span data-bind="text: _s.heartbeat.players_max() ? _s.heartbeat.players_max() : '--'"></span></td>
+                              <td data-bind="text: _s.heartbeat.VmRSS() ? _s.heartbeat.VmRSS() : '--'"></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                    </div>
+                    <!--/ END Row -->
+                </div>
+                <!-- /ko -->
+                <!--/ END Content -->
+
+
+
+
+
+
+                <!-- START Content -->
+                <!-- ko if: page() == 'server_status' -->
+                <div id="server_status" class="container-fluid">
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Page/Section header -->
+                        <div class="span12">
+                            <div class="page-header line1">
+                                <h4><span></span><small></small></h4>
+                            </div>
+                        </div>
+                        <!--/ END Page/Section header -->
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Circular Summary -->
+                        <div class="span12 widget">
+                            <header><h4 class="title">Server at a Glance</h4></header>
+                            <section class="body">
+                                <div class="body-inner">
+                                    <!-- START Summary -->
+                                    <figure class="stats summary pull-left" data-bind="with: current().heartbeat">
+                                        <div data-bind="css: {'green': up(), 'red': !up()}" class="icon circle"><span data-bind="css: {'icone-ok': up(), 'icone-off': !up()}"></span></div>
+                                        <figcaption>
+                                            <h3><span data-bind="text: (up() ? 'online' : 'offline')"></span><small data-bind="text: port"></small></h3>
+                                        </figcaption>
+                                    </figure>
+                                    <!--/ END Summary -->
+
+                                    <!-- START Circular 1 -->
+                                    <figure class="stats circular stacked">
+                                        <div class="gauge" data-percent="0">
+                                            <span><span class="text"></span>%</span>
+                                        </div>
+                                        <figcaption>
+                                            <h4><span data-bind="text: current().heartbeat['players_online']()"></span><small>Players Online</small></h4>
+                                        </figcaption>
+                                    </figure><!--/ END Circular 1 -->
+
+                                    <!-- START Circular 2 -->
+                                    <figure class="stats circular stacked">
+                                        <div class="gauge" data-percent="0">
+                                            <span class="text"></span>
+                                        </div>
+                                        <figcaption>
+                                            <h4><span data-bind="text: current().heartbeat['VmRSS']()"></span><small>Heap Usage</small></h4>
+                                        </figcaption>
+                                    </figure><!--/ END Circular 2 -->
+
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Circular Summary -->
+                    </div>
+                    <!--/ END Row -->
+         
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <button data-bind="click: $root.command" data-cmd="start" type="button" class="btn btn-success span2">Start</button> 
+                        <button data-bind="click: $root.command" data-cmd="accept_eula" type="button" class="btn btn-info span2">Accept EULA</button> 
+                        <!-- Button Dropdown -->
+                        <div class="btn-group">
+                            <button class="btn btn-danger dropdown-toggle" data-toggle="dropdown">Stop <span class="caret"></span></button>
+                            <ul class="dropdown-menu">
+                                <li><a data-bind="click: $root.command" data-cmd="stop">Stop</a></li>
+                                <li><a data-bind="click: $root.command" data-cmd="stop_and_backup">Stop and Backup</a></li> 
+                                <li><a data-bind="click: $root.command" data-cmd="kill">Kill</a></li>
+                            </ul>
+                        </div><!--/ Button Dropdown -->
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid" data-bind="with: current">
+                        <!-- START Default Widget -->
+                        <div class="span6 widget">
+                            <header>
+                              <h4 class="title" data-page="backup_list"><span class="icon icone-bookmark"></span> Restore Points</h4>
+                                <!-- START Toolbar -->
+                                <ul class="toolbar pull-right">
+                                    <li><a class="link" data-bind="click: $root.command" data-cmd="backup"><span class="icon icone-plus-sign"></span></a></li>
+                                </ul>
+                                <!--/ END Toolbar -->
+                                    <span class="label label-success pull-right" data-bind="text: server_status.increments().length"></span>
+                            </header>
+                            <section class="body">
+                                <div class="body-inner">
+                                  <p>Oldest restore point: <strong data-bind="text: server_status.oldest_incr().time"></strong></p> 
+                                    <p>Most recent restore point: <strong data-bind="text: server_status.newest_incr().time"></strong></p> 
+                                    <p>Space used by backups: <strong data-bind="text: bytes_to_mb(server_status.du_bwd())"></strong></p>
+                                    <p><a class="link pointer" data-bind="click: $root.command" data-cmd="backup">Create a new Restore Point</a></p>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Default Widget -->
+
+                        <!-- START Default Widget -->
+                        <div class="span6 widget">
+                            <header>
+                                <h4 class="title" data-page="archive_list"><span class="icon icone-bookmark"></span> Archives</h4>
+                                <!-- START Toolbar -->
+                                <ul class="toolbar pull-right">
+                                    <li><a class="link" data-bind="click: $root.command" data-cmd="archive"><span class="icon icone-plus-sign"></span></a></li>
+                                </ul>
+                                <!--/ END Toolbar -->
+                                <span class="label label-success pull-right"></span>
+                            </header>
+                            <section class="body">
+                                <div class="body-inner">
+                                  <p>Oldest archive: <strong></strong></p>
+                                    <p>Most recent archive: <strong></strong></p>
+                                    <p>Space used by archives: <strong data-bind="text: bytes_to_mb(server_status.du_awd())"></strong></p>
+                                    <p><a class="link pointer" data-bind="click: $root.command" data-cmd="archive">Create a new Archive</a></p>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Default Widget -->
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid" data-bind="with: current">
+                        <!-- START Default Widget -->
+                        <div class="span6 widget">
+                            <header>
+                                <h4 class="title"><span class="icon icone-bookmark"></span> Ownership and Disk Usage</h4>
+                            </header>
+                            <section class="body">
+                                <div class="body-inner" data-bind="with: server_status">
+                                    <p data-bind="with: owner">Server Owner: <strong data-bind="text: username() + ' (' + uid() + ')'"></strong></p>
+                                    <p data-bind="with: owner">Group Owner: <select id="available_groups"><option data-bind="text: groupname() + ' (' + gid() + ')', value: gid()"></option></select></p>
+                                    <p>Space used by live server files: <strong data-bind="text: bytes_to_mb(du_cwd())"></strong></p>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Default Widget -->
+                        <!-- START Default Widget -->
+                        <div id="delete_server" class="span6 widget">
+                            <header>
+                                <h4 class="title"><span class="icon icone-bookmark"></span> Delete Server</h4>
+                            </header>
+                            <section class="body">
+                                <div class="body-inner">
+                                    <div class="controls" id="delete_confirmations" data-bind="">
+                                        <label class="checkbox">
+                                            <input type="checkbox" value="true"> Delete <span></span>servers/<span data-bind="text: server_name"></span>
+                                        </label>
+                                        <label class="checkbox">
+                                            <input type="checkbox" value="true"> Delete <span></span>backup/<span data-bind="text: server_name"></span>
+                                        </label>
+                                        <label class="checkbox">
+                                            <input type="checkbox" value="true"> Delete <span></span>archive/<span data-bind="text: server_name"></span>
+                                        </label>
+                                        <button class="btn btn-warning btn-mini" data-bind="click: $root.command" data-cmd="delete">Delete </button>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Default Widget -->
+                    </div>
+                    <!--/ END Row -->
+
+                </div>
+                <!-- /ko -->
+                <!--/ END Content -->
+
+
+
+
+
+
+
+                <!-- START Content -->
+                <!-- ko if: page() == 'restore_points' -->
+                <div id="backup_list" class="container-fluid">
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <div class="control-group">
+                            <label class="control-label">Remove restore points older than:</label>
+                            <div class="controls">
+                                <input type="text" id="prune_increment_input" placeholder="Pick a date or step"> <button type="button" class="btn btn-danger"><span class="icone-remove-circle"></span> Prune Restore Points</button>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Icon Statistic - Circle -->
+                        <div class="span12 widget">
+                            <header><h4 class="title">Removal Summary</h4></header>
+                            <section class="body">
+                                <div class="body-inner" style="">
+                                    <!-- START Summary 1 -->
+                                    <figure class="stats summary shadowed">
+                                        <div class="icon circle lime"><span class="icone-folder-close"></span></div>
+                                        <figcaption>
+                                            <h3><span></span><small>Restore Points</small></h3>
+                                        </figcaption>
+                                    </figure><!--/ END Summary 1 -->
+
+                                    <!-- START Summary 2 -->
+                                    <figure class="stats summary shadowed">
+                                        <div class="icon circle purple"><span class="icone-shopping-cart"></span></div>
+                                        <figcaption>
+                                            <h3><span></span><small>MB Reclaimed</small></h3>
+                                        </figcaption>
+                                    </figure><!--/ END Summary 2 -->
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Icon Summary - Circle -->
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <table class="table table-hover">
+                          <thead>
+                            <tr>
+                              <th scope="col">Step</th>
+                              <th scope="col">Timestamp</th>
+                              <th scope="col">Increment Size</th>
+                              <th scope="col">Cumulative Size</th>
+                              <th scope="col"></th>
+                            </tr>
+                          </thead>
+                          <tfoot>
+                          </tfoot>
+                          <tbody data-bind="foreach: {data: current().server_status.increments(), as: '_data'}">
+                            <tr>
+                              <td data-bind="text: _data.step"></td>
+                              <td data-bind="text: _data.time"></td>
+                              <td data-bind="text: _data.size"></td>
+                              <td data-bind="text: _data.cum"></td>
+                              <td><button data-cmd="restore" data-bind="click: $root.command" class="btn btn-success btn-mini">Restore</button></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                    </div>
+                    <!--/ END Row -->
+
+                </div>
+                <!-- /ko -->
+                <!--/ END Content -->
+
+                
+
+
+                <!-- START Content -->
+                <!-- ko if: page() == 'server_properties' -->
                 <div id="server_properties" class="container-fluid">
                     <!-- START Row -->
                     <div class="row-fluid">
@@ -1177,8 +813,7 @@ Is the information correct? [Y/n]
                               <td><button class="btn btn-primary" data-config="sp"><span class="icone-edit"></span> New Property</button></td>
                             </tr>
                           </tfoot>
-                          <!-- ko if: 'sp' in current_model() -->
-                          <tbody data-bind="foreach: {data: current_model().sp(), as: '_data'}">
+                          <tbody data-bind="foreach: {data: current().sp(), as: '_data'}">
                             <tr>
                               <td>
                                 <div class="">
@@ -1187,78 +822,7 @@ Is the information correct? [Y/n]
                               </td>
                               <td>
                                 <div class="">
-                                  <input type="text" data-bind="value: _data.value" class="input-large">
-                                </div>
-                              </td>
-                            </tr>
-                          </tbody>
-                          <!-- /ko -->
-                          
-                        </table>
-                    </div>
-                    <!--/ END Row -->
-                </div>
-                <!-- /ko -->
-                <!--/ END Content -->
-
-                <!-- START Content -->
-                <!-- ko ifnot: $.isEmptyObject(current_model()) -->
-                <div id="server_config" class="container-fluid">
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <!-- START Page/Section header -->
-                        <div class="span12">
-                            <div class="page-header line1">
-                                <h4>server.config</h4>
-                            </div>
-                        </div>
-                        <!--/ END Page/Section header -->
-                    </div>
-                    <!--/ END Row -->
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <table id="table_config" class="table table-hover">
-                          <thead>
-                            <tr>
-                              <th scope="col" class="span3">Section</th>
-                              <th scope="col" class="span4">Option</th>
-                              <th scope="col">Value</th>
-                            </tr>
-                          </thead>
-                          <tfoot>
-                            <tr>
-                              <td><button class="btn btn-primary" data-config="sc"><span class="icone-edit"></span> New Property</button></td>
-                            </tr>
-                          </tfoot>
-                          <tbody>
-                            <tr>
-                              <td><span></span>
-                                  <input type="text" class="input-large">
-                              </td>
-                              <td><span class=""></span>
-                                  <input type="text" class="input-large">
-                              </td>
-                              <td>
-                                <div class="control-group">
-                                    <div class="controls">
-                                        <input type="text" class="input-large">
-                                        <span>
-                                            <input type="checkbox" class="truefalse">
-                                        </span>
-                                        <span>
-                                            <select class="input-medium">
-                                                <option value="">Skip</option>
-                                                <option value="30">Every 30 minutes</option>
-                                                <option value="60">1 Hour</option>
-                                                <option value="120">2 Hours</option>
-                                                <option value="180">3 Hours</option>
-                                                <option value="240">4 Hours</option>
-                                                <option value="360">6 Hours</option>
-                                                <option value="720">12 Hours</option>
-                                                <option value="0">24 Hours</option>
-                                            </select>
-                                        </span>
-                                    </div>
+                                  <input type="text" data-bind="textInput: _data.value, valueUpdate: 'afterkeydown', event: {keypress: $root.update_prop}" class="input-large">
                                 </div>
                               </td>
                             </tr>
@@ -1270,89 +834,19 @@ Is the information correct? [Y/n]
                 <!-- /ko -->
                 <!--/ END Content -->
 
-                <!-- START Content -->
-                <div id="define_profile" class="container-fluid">
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <!-- START Form Wizard With Validation -->
-                        <form class="span12 widget dark shadowed form-horizontal bordered" id="definenewprofile">
-                            <header><h4 class="title">Create a New Server Profile</h4></header>
-                            <section class="body">
-                                <div class="body-inner">
+                
 
-                                    <fieldset id="step1" class="step">
-                                        <div class="control-group">
-                                            <label class="control-label">profile name</label>
-                                            <div class="controls">
-                                                <input type="text" name="name" class="input-medium required" placeholder="vanilla162">
-                                            </div>
-                                        </div>
-                                        <div class="control-group">
-                                            <label class="control-label">type</label>
-                                            <div class="controls">
-                                                <select class="input-xlarge" name="type">
-                                                    <option value="standard_jar">Standalone, runnable JAR</option>
-                                                    <option value="archived_jar">Archive containing runnable JAR</option>
-                                                    <option value="unmanaged">Unmanaged</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="control-group">
-                                            <label class="control-label">Download URL</label>
-                                            <div class="controls">
-                                                <input type="text" name="url" class="input-xlarge" placeholder="http://dl.bukkit.org/latest-rb/craftbukkit.jar">
-                                                <span class="help-block">Preferably enter a direct URL rather than a server-side redirected URL</span>
-                                            </div>
-                                        </div>
-                                        <div class="control-group">
-                                            <label class="control-label">Save download as</label>
-                                            <div class="controls">
-                                                <input type="text" name="save_as" class="input-xlarge" placeholder="craftbukkit.jar">
-                                                <span class="help-block">Be sure <em>only</em> the filename is here</span>
-                                            </div>
-                                        </div>
-                                        <div class="control-group">
-                                            <label class="control-label">Jarfile to run</label>
-                                            <div class="controls">
-                                            <input type="text" name="run_as" class="input-xlarge" placeholder="craftbukkit.jar" required>
-                                                <span class="help-block">In most cases, this will match the above line 'save download as'.</span>
-                                                <span class="help-block">The name of the server jar within the archive file to execute.</span>
-                                                <span class="help-block">Manually place this file directly in the <strong class="text-success" data-placement="top" title="" rel="tooltip" data-original-title=".../servers/servername/jarfile.jar">server's directory</strong>.</span>
-                                            </div>
-                                        </div>
-                                      <div class="control-group">
-                                            <label class="control-label">Jarfile arguments</label>
-                                            <div class="controls">
-                                            <input type="text" name="jar_args" class="input-xlarge" placeholder="nogui">
-                                                <span class="help-block"></span>
-                                            </div>
-                                        </div>
-                                        
-                                        <!-- Tags -->
-                                        <div class="control-group">
-                                            <label class="control-label">Files to not process</label>
-                                            <div class="controls">
-                                                <ul class="input-xlarge" id="ignore_files">
-                                                </ul>
-                                                <span class="help-block">Files that <strong class="text-success" data-placement="top" title="" rel="tooltip" data-original-title="Some archives may come with default configs, e.g., server.properties. Ignore-list these files to preserve user configs">should not</strong> be copied from the archive to the server directory.</span>
-                                            </div>
-                                        </div><!--/ Tags -->
-                                    </fieldset>
 
-                                    <div class="form-actions">
-                                        <input type="submit" class="btn btn-primary" value="Next">
-                                    </div>
-                                </div>
-                            </section>
-                        </form>
-                        <!--/ END Form Wizard With Validation -->
-                    </div>
-                    <!--/ END Row -->
-                </div>
-                <!--/ END Content -->
+
+
+
+
+
+
+
 
                 <!-- START Content -->
-                <!-- ko ifnot: $.isEmptyObject(current_model()) -->
+                <!-- ko if: page() == 'console' -->
                 <div id="console" class="container-fluid">
                     <!-- START Row -->
                     <div class="row-fluid">
@@ -1370,9 +864,9 @@ Is the information correct? [Y/n]
                     <div class="row-fluid">
                         <!-- START Line Chart - Filled -->
                         <div class="span12">
-                            <form>
-                                <input type="text" name="console_command" class="span12" placeholder="send command to console">
-                            </form>
+                          <form data-bind="submit: stuff">
+                            <input type="text" name="console_command" class="span12" placeholder="send command to console" data-bind="textInput: current().console_input">
+                          </form>
                         </div>
                         <!--/ END Line Chart - Filled -->
                     </div>
@@ -1395,13 +889,11 @@ Is the information correct? [Y/n]
                                                 </th>
                                             </tr>
                                         </thead>
-                                        <!-- ko with: current_model -->
-                                        <tbody data-bind="foreach: gamelog">
+                                        <tbody data-bind="foreach: {data: current().tails.console(), as: '_line'}">
                                             <tr>
-                                              <td data-bind="text: $data"></td>
+                                              <td data-bind="text: _line"></td>
                                             </tr>
                                         </tbody>
-                                        <!-- /ko -->
                                     </table>
                                 </div>
                             </section>
@@ -1414,33 +906,38 @@ Is the information correct? [Y/n]
                 <!-- /ko -->
                 <!--/ END Content -->
 
-                <div id="import_server_modal" class="modal hide fade" style="display: none;" aria-hidden="true">
-                    <div class="modal-header">
-                        <h4 id="myModalLabel">Create a new server from an existing archive</h4>
-                    </div>
-                    <div class="modal-body">
-                        <p><strong></strong> will be extracted.</p>
-                        <p>Please enter the name of the new server to create:</p>
-                        <input type="text" name="newname" class="input-medium required" placeholder="server_name">
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-                        <button data-dismiss="modal" class="btn btn-success">Create new Server</button>
-                    </div>
-                </div>
 
-                <div id="remove_profile_modal" class="modal hide fade" style="display: none;" aria-hidden="true">
-                    <div class="modal-header">
-                        <h4>Remove <span></span> from available profiles?</h4>
-                    </div>
-                    <div class="modal-body">
-                        <p>All downloaded files for this profile will be deleted.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn" data-dismiss="modal" aria-hidden="true">Keep this Profile</button>
-                        <button data-dismiss="modal" class="btn btn-danger">Remove Profile</button>
-                    </div>
-                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             </section>
             <!--/ END Template Main Content -->
@@ -1482,8 +979,8 @@ Is the information correct? [Y/n]
     <script src="assets/autosize/js/jquery.autosize.min.js"></script>
     <script src="assets/bootstrap/js/bootstrap.min.js"></script>
     <script src="assets/easypiechart/js/jquery.easypiechart.min.js"></script>
-    <script src="assets/formwizard/js/jquery.formwizard.min.js"></script>
     <script src="assets/form/jquery.form.min.js"></script>
+    <script src="assets/formwizard/js/jquery.formwizard.min.js"></script>
     <script src="assets/icheck/js/jquery.icheck.min.js"></script>
     <script src="assets/ie-placeholder/js/jquery.placeholder.min.js"></script>
     <script src="assets/inputmask/js/jquery.inputmask.min.js"></script>
@@ -1516,7 +1013,8 @@ Is the information correct? [Y/n]
     <script src="js/ansi_up.js"></script>
     <script src="js/scriptin.js"></script>
     <!--/ Javascript (Application) -->
-    
+
+  
     <script type="text/javascript">
         var vm = new webui(3000);
         
