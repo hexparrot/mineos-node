@@ -118,6 +118,12 @@ mineos.mc = function(server_name, base_dir) {
     })
   }
 
+  self.modify_sp = function(property, new_value, callback) {
+    self._sp.modify(property, new_value, function(err) {
+      callback(err);
+    }) 
+  }
+
   self.create = function(owner, callback) {
     async.series([
       function(cb) {

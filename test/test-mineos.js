@@ -925,3 +925,39 @@ test.list_increments = function(test) {
     test.done();
   })  
 }
+
+test.modify_sp = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    function(callback) {
+      instance.create(OWNER_CREDS, function(err) {
+        test.ifError(err);
+        callback(err);
+      })
+    },
+    function(callback) {
+      instance.sp(function(err, props) {
+        test.ifError(err);
+        test.equal(props['server-port'], 25565);
+        callback(err);
+      })
+    },
+    function(callback) {
+      instance.modify_sp('server-port', 25570, function(err) {
+        test.ifError(err);
+        callback(err);
+      })
+    },
+    function(callback) {
+      instance.sp(function(err, props) {
+        test.ifError(err);
+        test.equal(props['server-port'], 25570);
+        callback(err);
+      })
+    },
+  ], function(err, results) {
+    test.done();
+  })  
+}
