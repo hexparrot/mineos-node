@@ -398,13 +398,27 @@ test.kill = function(test) {
       })
     },
     function(callback) {
+      instance.property('up', function(err, result) {
+        test.ifError(err);
+        test.ok(result);
+        callback(err);
+      })
+    },
+    function(callback) {
       setTimeout(function() {
         instance.kill(function(err) {
           test.ok(!err);
           callback(null);
         })
       }, 200)
-    }
+    },
+    function(callback) {
+      instance.property('up', function(err, result) {
+        test.ifError(err);
+        test.ok(!result);
+        callback(err);
+      })
+    },
   ], function(err, results) {
     test.done();
   })
