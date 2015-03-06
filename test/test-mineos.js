@@ -251,11 +251,9 @@ test.start = function(test) {
       })
     },
     function(callback) {
-      instance.start(function(err, proc) {
+      instance.start(function(err) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          callback(null);
-        })
+        callback(null);
       })
     },
     function(callback) {
@@ -275,8 +273,12 @@ test.start = function(test) {
       })
     },
     function(callback) {
-      process.kill(mineos.server_pids_up()[server_name].java);
-      callback(null);
+      setTimeout(function() {
+        instance.kill(function(err) {
+          test.ifError(err);
+          callback(null);
+        })
+      }, 200)
     }
   ], function(err, results) {
     test.done();
@@ -295,11 +297,9 @@ test.stop = function(test) {
       })
     },
     function(callback) {
-      instance.start(function(err, proc) {
-        //test.iferror(err);
-        proc.once('close', function(code) {
-          callback(null);
-        })
+      instance.start(function(err) {
+        test.ifError(err);
+        callback(null);
       })
     },
     function(callback) {
@@ -340,11 +340,9 @@ test.stop_and_backup = function(test) {
       })
     },
     function(callback) {
-      instance.start(function(err, proc) {
-        //test.iferror(err);
-        proc.once('close', function(code) {
-          callback(null);
-        })
+      instance.start(function(err) {
+        test.ifError(err);
+        callback(null);
       })
     },
     function(callback) {
@@ -390,11 +388,9 @@ test.kill = function(test) {
       })
     },
     function(callback) {
-      instance.start(function(err, proc) {
-        //test.iferror(err);
-        proc.once('close', function(code) {
-          callback(null);
-        })
+      instance.start(function(err) {
+        test.ifError(err);
+        callback(null);
       })
     },
     function(callback) {
@@ -636,14 +632,9 @@ test.properties = function(test) {
       })
     },
     function(callback) {
-      // SERVER BEING STARTED HERE
-      instance.start(function(err, proc) {
+      instance.start(function(err) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          setTimeout(function() {
-            callback(null);
-          }, 1000)
-        })
+        callback(null);
       })
     },
     function(callback) {
@@ -717,10 +708,12 @@ test.properties = function(test) {
       })
     },
     function(callback) {
-      instance.kill(function(err) {
-        test.ifError(err);
-        setTimeout(function() { callback(err) }, 1000);
-      })
+      setTimeout(function() {
+        instance.kill(function(err) {
+          test.ifError(err);
+          callback(null);
+        })
+      }, 200)
     }
   ], function(err, results) {
     test.done();
@@ -769,11 +762,9 @@ test.verify = function(test) {
       })
     },
     function(callback) {
-      instance.start(function(err, proc) {
+      instance.start(function(err) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          callback(null);
-        })
+        callback(null);
       })
     },
     function(callback) {
@@ -783,10 +774,12 @@ test.verify = function(test) {
       })
     },
     function(callback) {
-      instance.kill(function(err) {
-        test.ifError(err);
-        setTimeout(function() { callback(err) }, 1000);
-      })
+      setTimeout(function() {
+        instance.kill(function(err) {
+          test.ifError(err);
+          callback(null);
+        })
+      }, 200)
     }
   ], function(err, results) {
     test.done();
@@ -805,11 +798,9 @@ test.ping = function(test) {
       })
     },
     function(callback) {
-      instance.start(function(err, proc) {
+      instance.start(function(err) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          callback(null);
-        })
+        callback(null);
       })
     },
     function(callback) {
@@ -826,10 +817,12 @@ test.ping = function(test) {
       }, 15000)
     },
     function(callback) {
-      instance.kill(function(err) {
-        test.ifError(err);
-        setTimeout(function() { callback(err) }, 1000);
-      })
+      setTimeout(function() {
+        instance.kill(function(err) {
+          test.ifError(err);
+          callback(null);
+        })
+      }, 200)
     }
   ], function(err, results) {
     test.done();
@@ -849,11 +842,9 @@ test.memory = function(test) {
       })
     },
     function(callback) {
-      instance.start(function(err, proc) {
+      instance.start(function(err) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          callback(null);
-        })
+        callback(null);
       })
     },
     function(callback) {
@@ -868,10 +859,12 @@ test.memory = function(test) {
       })
     },
     function(callback) {
-      instance.kill(function(err) {
-        test.ifError(err);
-        setTimeout(function() { callback(err) }, 1000);
-      })
+      setTimeout(function() {
+        instance.kill(function(err) {
+          test.ifError(err);
+          callback(null);
+        })
+      }, 200)
     }
   ], function(err, results) {
     test.done();
@@ -904,11 +897,9 @@ test.list_increments = function(test) {
       })
     },
     function(callback) {
-      instance.start(function(err, proc) {
+      instance.start(function(err) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          callback(null);
-        })
+        callback(null);
       })
     },
     function(callback) {
@@ -920,10 +911,12 @@ test.list_increments = function(test) {
       })
     },
     function(callback) {
-      instance.kill(function(err) {
-        test.ifError(err);
-        setTimeout(function() { callback(err) }, 1000);
-      })
+      setTimeout(function() {
+        instance.kill(function(err) {
+          test.ifError(err);
+          callback(null);
+        })
+      }, 200)
     },
     function(callback) {
       instance.list_increments(function(err, increments) {
