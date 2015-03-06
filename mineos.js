@@ -170,9 +170,15 @@ mineos.mc = function(server_name, base_dir) {
           params['gid'] = result['gid'];
           cb(err);
         })
+      },
+      function(cb) {
+        var proc = child_process.spawn(binary, args, params);
+        proc.once('close', function(code) {
+          callback(code);
+        })
       }
     ], function(err, results) {
-      callback(err, (err ? null : child_process.spawn(binary, args, params) ));
+      callback(err);
     });
   }
 
@@ -185,9 +191,9 @@ mineos.mc = function(server_name, base_dir) {
         },
         function(ignored_err) {
           if (self.server_name in mineos.server_pids_up())
-            callback(true, false); //error, stop succeeded: false
+            callback(true); //error, stop succeeded: false
           else
-            callback(null, true); //no error, stop succeeded: true
+            callback(null); //no error, stop succeeded: true
         }
       );  
     })
@@ -202,18 +208,32 @@ mineos.mc = function(server_name, base_dir) {
         self.backup(cb);
       }
     ], function(err, results) {
-      callback(err, results[0] && results[1]);
+      callback(err);
     })
   }
 
   self.kill = function(callback) {
     var pids = mineos.server_pids_up();
 
-    if (self.server_name in pids) {
-      process.kill(pids[self.server_name].java);
-      callback(null);
-    } else {
+    if (!(self.server_name in pids)) {
       callback(true);
+    } else {
+      process.kill(pids[self.server_name].java);
+
+      async.doWhilst(
+        function(callback) {
+          setTimeout(callback, 100);
+        },
+        function() { 
+          return (self.server_name in mineos.server_pids_up())
+        },
+        function(ignored_err) {
+          if (self.server_name in mineos.server_pids_up())
+            callback(true); //error, stop succeeded: false
+          else
+            callback(null); //no error, stop succeeded: true
+        }
+      ) 
     }
   }
 
@@ -264,9 +284,15 @@ mineos.mc = function(server_name, base_dir) {
           params['gid'] = result['gid'];
           cb(err);
         })
+      },
+      function(cb) {
+        var proc = child_process.spawn(binary, args, params);
+        proc.once('close', function(code) {
+          callback(code);
+        })
       }
     ], function(err, results) {
-      callback(err, (err ? null : child_process.spawn(binary, args, params) ));
+      callback(err);
     });
   }
 
@@ -282,9 +308,15 @@ mineos.mc = function(server_name, base_dir) {
           params['gid'] = result['gid'];
           cb(err);
         })
+      },
+      function(cb) {
+        var proc = child_process.spawn(binary, args, params);
+        proc.once('close', function(code) {
+          callback(code);
+        })
       }
     ], function(err, results) {
-      callback(err, (err ? null : child_process.spawn(binary, args, params) ));
+      callback(err);
     })
   }
 
@@ -293,7 +325,11 @@ mineos.mc = function(server_name, base_dir) {
     var args = ['--restore-as-of', step, self.env.bwd, self.env.cwd];
     var params = { cwd: self.env.bwd };
 
-    callback(null, child_process.spawn(binary, args, params));
+
+    var proc = child_process.spawn(binary, args, params);
+    proc.once('close', function(code) {
+      callback(code);
+    })
   }
 
   self.list_increments = function(callback) {

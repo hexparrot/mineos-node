@@ -8,6 +8,7 @@ var test = exports;
 
 var BASE_DIR = '/var/games/minecraft';
 var FS_DELAY_MS = 200;
+var PROC_START_DELAY_MS = 200;
 
 var OWNER_CREDS = {
   uid: userid.uid(whoami),
@@ -76,6 +77,8 @@ test.is_server = function(test) {
       })
     },
   ], function(err, results) {
+    test.ifError(err);
+    test.expect(6);
     test.done();
   })
 }
@@ -112,6 +115,8 @@ test.create_server = function(test) {
       })
     }
   ], function(err, results) {
+    test.ifError(err);
+    test.expect(17);
     test.done();
   })
 }
@@ -150,6 +155,8 @@ test.server_ownership = function(test) {
       })
     }
   ], function(err, results) {
+    test.ifError(err);
+    test.expect(9);
     test.done();
   })
 }
@@ -186,6 +193,8 @@ test.delete_server = function(test) {
       })
     }
   ], function(err, results) {
+    test.ifError(err);
+    test.expect(7);
     test.done();
   })
 }
@@ -238,10 +247,7 @@ test.start = function(test) {
     function(callback) {
       instance.stuff('stop', function(err, proc) {
         test.ok(err); //looking for positive error
-        if (err)
-          callback(null);
-        else
-          callback(true);
+        callback(!err);
       })
     },
     function(callback) {
@@ -251,11 +257,9 @@ test.start = function(test) {
       })
     },
     function(callback) {
-      instance.start(function(err, proc) {
+      instance.start(function(err) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          callback(null);
-        })
+        callback(err);
       })
     },
     function(callback) {
@@ -263,7 +267,7 @@ test.start = function(test) {
         test.ifError(err);
         test.equal(typeof(pid), 'number');
         test.ok(pid > 0);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
@@ -271,14 +275,20 @@ test.start = function(test) {
         test.ifError(err);
         test.equal(typeof(pid), 'number');
         test.ok(pid > 0);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
-      process.kill(mineos.server_pids_up()[server_name].java);
-      callback(null);
+      setTimeout(function() {
+        instance.kill(function(err) {
+          test.ifError(err);
+          callback(err);
+        })
+      }, PROC_START_DELAY_MS)
     }
   ], function(err, results) {
+    test.ifError(err);
+    test.expect(11);
     test.done();
   })
 }
@@ -287,34 +297,34 @@ test.stop = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
+
   async.series([
     function(callback) {
       instance.create(OWNER_CREDS, function(err) {
-        //test.iferror(err);
+        test.ifError(err);
         callback(err);
       })
     },
     function(callback) {
-      instance.start(function(err, proc) {
-        //test.iferror(err);
-        proc.once('close', function(code) {
-          callback(null);
-        })
+      instance.start(function(err) {
+        test.ifError(err);
+        callback(err);
       })
     },
     function(callback) {
       instance.property('screen_pid', function(err, pid) {
         test.ifError(err);
         test.ok(pid > 0);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
-      instance.stop(function(err, died) {
-        test.ifError(err);
-        test.ok(died);
-        callback(null);
-      })
+      setTimeout(function() {
+        instance.stop(function(err) {
+          test.ifError(err);
+          callback(err);
+        })
+      }, PROC_START_DELAY_MS)
     },
     function(callback) {
       instance.property('!up', function(err, result) {
@@ -324,6 +334,8 @@ test.stop = function(test) {
       })
     }
   ], function(err, results) {
+    test.ifError(err);
+    test.expect(8);
     test.done();
   })
 }
@@ -335,23 +347,20 @@ test.stop_and_backup = function(test) {
   async.series([
     function(callback) {
       instance.create(OWNER_CREDS, function(err) {
-        //test.iferror(err);
+        test.ifError(err);
         callback(err);
       })
     },
     function(callback) {
-      instance.start(function(err, proc) {
-        //test.iferror(err);
-        proc.once('close', function(code) {
-          callback(null);
-        })
+      instance.start(function(err) {
+        test.ifError(err);
+        callback(err);
       })
     },
     function(callback) {
-      instance.stop_and_backup(function(err, success) {
+      instance.stop_and_backup(function(err) {
         test.ifError(err);
-        test.ok(success);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
@@ -368,6 +377,8 @@ test.stop_and_backup = function(test) {
       }, FS_DELAY_MS)
     }
   ], function(err, results) {
+    test.ifError(err);
+    test.expect(7);
     test.done();
   })
 }
@@ -379,33 +390,47 @@ test.kill = function(test) {
   async.series([
     function(callback) {
       instance.create(OWNER_CREDS, function(err) {
-        //test.iferror(err);
+        test.ifError(err);
         callback(err);
       })
     },
     function(callback) {
       instance.kill(function(err) {
         test.ok(err); //this should throw an error
-        callback(null);
+        callback(!err);
       })
     },
     function(callback) {
-      instance.start(function(err, proc) {
-        //test.iferror(err);
-        proc.once('close', function(code) {
-          callback(null);
-        })
+      instance.start(function(err) {
+        test.ifError(err);
+        callback(err);
+      })
+    },
+    function(callback) {
+      instance.property('up', function(err, result) {
+        test.ifError(err);
+        test.ok(result);
+        callback(err);
       })
     },
     function(callback) {
       setTimeout(function() {
         instance.kill(function(err) {
-          test.ok(!err);
-          callback(null);
+          test.ifError(err);
+          callback(err);
         })
       }, 200)
-    }
+    },
+    function(callback) {
+      instance.property('up', function(err, result) {
+        test.ifError(err);
+        test.ok(!result);
+        callback(err);
+      })
+    },
   ], function(err, results) {
+    test.ifError(err);
+    test.expect(9);
     test.done();
   })
 }
@@ -424,16 +449,16 @@ test.archive = function(test) {
     function(callback) {
       instance.archive(function(err, proc) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          setTimeout(function() {
-            test.equal(fs.readdirSync(instance.env.awd).length, 1);
-            callback(null);
-          }, FS_DELAY_MS)
-        })
-        
+        setTimeout(function() { callback(err) }, FS_DELAY_MS)
       })
+    },
+    function(callback) {
+      test.equal(fs.readdirSync(instance.env.awd).length, 1);
+      callback(null);
     }
   ], function(err, results) {
+    test.ifError(err);
+    test.expect(4);
     test.done();
   })
 }
@@ -450,17 +475,18 @@ test.backup = function(test) {
       })
     },
     function(callback) {
-      instance.backup(function(err, proc) {
+      instance.backup(function(err) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          setTimeout(function() {
-            test.equal(fs.readdirSync(instance.env.bwd).length, 2);
-            callback(null);
-          }, FS_DELAY_MS)
-        })
+        callback(err);
       })
+    },
+    function(callback) {
+      test.equal(fs.readdirSync(instance.env.bwd).length, 2);
+      callback(null);
     }
   ], function(err, results) {
+    test.ifError(err);
+    test.expect(4);
     test.done();
   })
 }
@@ -477,14 +503,9 @@ test.restore = function(test) {
       })
     },
     function(callback) {
-      instance.backup(function(err, proc) {
+      instance.backup(function(err) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          setTimeout(function() {
-            test.equal(fs.readdirSync(instance.env.bwd).length, 2);
-            callback(null);
-          }, FS_DELAY_MS)
-        })
+        callback(err);
       })
     },
     function(callback) {
@@ -496,17 +517,18 @@ test.restore = function(test) {
       })
     },
     function(callback) {
-      instance.restore('now', function(err, proc) {
+      instance.restore('now', function(err) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          setTimeout(function() {
-            test.equal(fs.readdirSync(instance.env.cwd).length, 1);
-            callback(null);
-          }, FS_DELAY_MS)
-        })
+        callback(err)
       })
+    },
+    function(callback) {
+      test.equal(fs.readdirSync(instance.env.cwd).length, 1);
+      callback(null);
     }
   ], function(err, results) {
+    test.ifError(err);
+    test.expect(7);
     test.done();
   })
 }
@@ -526,23 +548,25 @@ test.sp = function(test) {
       instance.sp(function(err, dict) {
         test.ifError(err);
         test.equal(dict['server-port'], '25565');
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
       instance._sp.modify('server-port', '25570', function(err) {
         test.ifError(err);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
       instance.sp(function(err, dict) {
         test.ifError(err);
         test.equal(dict['server-port'], '25570');
-        callback(null);
+        callback(err);
       })
     }
   ], function(err, results) {
+    test.ifError(err);
+    test.expect(7);
     test.done();
   })
 }
@@ -556,21 +580,21 @@ test.properties = function(test) {
       instance.property('exists', function(err, does_exist) {
         test.ifError(err);
         test.ok(!does_exist);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
       instance.property('java_pid', function(err, java_pid) {
         test.ok(err); //looking for positive error
         test.equal(java_pid, null);
-        callback(null);
+        callback(!err);
       })
     },
     function(callback) {
       instance.property('screen_pid', function(err, screen_pid) {
         test.ok(err); //looking for positive error
         test.equal(screen_pid, null);
-        callback(null);
+        callback(!err);
       })
     },
     function(callback) {
@@ -583,95 +607,90 @@ test.properties = function(test) {
       instance.property('exists', function(err, does_exist) {
         test.ifError(err);
         test.ok(does_exist);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
       instance.property('up', function(err, up) {
         test.ifError(err);
         test.equal(up, false);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
       instance.property('server-port', function(err, port) {
         test.ifError(err);
         test.equal(port, 25565);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
       instance.property('server-ip', function(err, ip) {
         test.ifError(err);
         test.equal(ip, '0.0.0.0');
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
       instance.property('memory', function(err, memory) {
-        test.ok(err);
+        test.ok(err); //testing for error
         test.equal(memory, null);
-        callback(null);
+        callback(!err);
       })
     },
     function(callback) {
       instance.property('ping', function(err, ping) {
-        test.ok(err);
+        test.ok(err); //testing for error
         test.equal(ping, null)
-        callback(null);
+        callback(!err);
       })
     },
     function(callback) {
-      // SERVER BEING STARTED HERE
-      instance.start(function(err, proc) {
+      instance.start(function(err) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          setTimeout(function() {
-            callback(null);
-          }, 1000)
-        })
+        setTimeout(function() {callback(err)}, PROC_START_DELAY_MS)
       })
     },
     function(callback) {
       instance.property('java_pid', function(err, java_pid) {
         test.ifError(err);
         test.equal(typeof(java_pid), 'number');
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
       instance.property('screen_pid', function(err, screen_pid) {
         test.ifError(err);
         test.equal(typeof(screen_pid), 'number');
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
       instance.property('exists', function(err, does_exist) {
         test.ifError(err);
         test.ok(does_exist);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
       instance.property('up', function(err, up) {
         test.ifError(err);
         test.equal(up, true);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
       instance.property('server-port', function(err, port) {
         test.ifError(err);
         test.equal(port, 25565);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
       instance.property('server-ip', function(err, ip) {
         test.ifError(err);
         test.equal(ip, '0.0.0.0');
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
@@ -679,36 +698,40 @@ test.properties = function(test) {
         test.ifError(err);
         test.ok(memory);
         test.ok('VmRSS' in memory);
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
       instance.property('du_awd', function(err, bytes) {
         test.ifError(err);
         test.ok(!isNaN(bytes));
-        callback(null);
+        callback(err);
       })
     },function(callback) {
       instance.property('du_bwd', function(err, bytes) {
         test.ifError(err);
         test.ok(!isNaN(bytes));
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
       instance.property('du_cwd', function(err, bytes) {
         test.ifError(err);
         test.ok(!isNaN(bytes));
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
-      instance.kill(function(err) {
-        test.ifError(err);
-        setTimeout(function() { callback(err) }, 1000);
-      })
+      setTimeout(function() {
+        instance.kill(function(err) {
+          test.ifError(err);
+          callback(err);
+        })
+      }, 200)
     }
   ], function(err, results) {
+    test.ifError(err);
+    test.expect(43);
     test.done();
   })
 }
@@ -755,11 +778,9 @@ test.verify = function(test) {
       })
     },
     function(callback) {
-      instance.start(function(err, proc) {
+      instance.start(function(err) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          callback(null);
-        })
+        callback(null);
       })
     },
     function(callback) {
@@ -769,12 +790,15 @@ test.verify = function(test) {
       })
     },
     function(callback) {
-      instance.kill(function(err) {
-        test.ifError(err);
-        setTimeout(function() { callback(err) }, 1000);
-      })
+      setTimeout(function() {
+        instance.kill(function(err) {
+          test.ifError(err);
+          callback(null);
+        })
+      }, 200)
     }
   ], function(err, results) {
+    test.expect(9);
     test.done();
   })
 }
@@ -791,11 +815,9 @@ test.ping = function(test) {
       })
     },
     function(callback) {
-      instance.start(function(err, proc) {
+      instance.start(function(err) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          callback(null);
-        })
+        callback(err);
       })
     },
     function(callback) {
@@ -807,17 +829,21 @@ test.ping = function(test) {
           test.equal(pingback.motd, 'A Minecraft Server');
           test.equal(pingback.players_online, 0);
           test.equal(pingback.players_max, 20);
-          callback(null);
+          callback(err);
         })
       }, 15000)
     },
     function(callback) {
-      instance.kill(function(err) {
-        test.ifError(err);
-        setTimeout(function() { callback(err) }, 1000);
-      })
+      setTimeout(function() {
+        instance.kill(function(err) {
+          test.ifError(err);
+          callback(err);
+        })
+      }, 200)
     }
   ], function(err, results) {
+    test.ifError(err);
+    test.expect(10);
     test.done();
   })
 }
@@ -835,11 +861,11 @@ test.memory = function(test) {
       })
     },
     function(callback) {
-      instance.start(function(err, proc) {
+      instance.start(function(err) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          callback(null);
-        })
+        setTimeout(function() {
+          callback(err);
+        }, PROC_START_DELAY_MS) 
       })
     },
     function(callback) {
@@ -850,16 +876,18 @@ test.memory = function(test) {
         test.ok(memory_regex.test(memory_obj.VmSize));
         test.ok(memory_regex.test(memory_obj.VmRSS));
         test.ok(memory_regex.test(memory_obj.VmSwap));
-        callback(null);
+        callback(err);
       })
     },
     function(callback) {
       instance.kill(function(err) {
         test.ifError(err);
-        setTimeout(function() { callback(err) }, 1000);
+        callback(err);
       })
     }
   ], function(err, results) {
+    test.ifError(err);
+    test.expect(10);
     test.done();
   })  
 }
@@ -871,44 +899,32 @@ test.list_increments = function(test) {
   async.series([
     function(callback) {
       instance.list_increments(function(err, increments) {
-        test.ok(err);
-        callback(null);
+        test.ok(err); // testing for error
+        callback(!err);
       })
     },
     function(callback) {
       instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
-        callback(err);
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*2);
       })
     },
     function(callback) {
-      instance.backup(function(err, proc) {
+      instance.backup(function(err) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          callback(null);
-        })
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*2);
       })
     },
     function(callback) {
-      instance.start(function(err, proc) {
+      instance.modify_sp('server-port', 25570, function(err) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          callback(null);
-        })
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*3);
       })
     },
     function(callback) {
-      instance.backup(function(err, proc) {
+      instance.backup(function(err) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          callback(null);
-        })
-      })
-    },
-    function(callback) {
-      instance.kill(function(err) {
-        test.ifError(err);
-        setTimeout(function() { callback(err) }, 1000);
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*3);
       })
     },
     function(callback) {
@@ -918,10 +934,12 @@ test.list_increments = function(test) {
           test.ok('size' in increments[i]);
           test.ok('cum' in increments[i]);
         }
-        callback(null);
+        callback(err);
       })
     }
   ], function(err, results) {
+    test.ifError(err);
+    test.expect(12);
     test.done();
   })  
 }
@@ -958,6 +976,8 @@ test.modify_sp = function(test) {
       })
     },
   ], function(err, results) {
+    test.ifError(err);
+    test.expect(7);
     test.done();
   })  
 }
