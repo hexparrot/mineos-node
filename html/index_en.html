@@ -457,7 +457,7 @@
                                         <figure class="stats summary">
                                             <div class="icon circle green"><span class="icone-ok"></span></div>
                                             <figcaption>
-                                                <h3><span data-bind=""></span><small>Servers Running</small></h3>
+                                                <h3><!-- ko: if 'servers_running' in dashboard() --><span data-bind="text: dashboard.servers_running()"></span><!-- /ko --><small>Servers Running</small></h3>
                                             </figcaption>
                                         </figure>
                                         <!--/ END Summary -->
@@ -466,7 +466,7 @@
                                         <figure class="stats summary">
                                             <div class="icon circle lime"><span class="icone-time"></span></div>
                                             <figcaption>
-                                                <h3><span></span><small>Uptime</small></h3>
+                                                <h3><!-- ko: if 'uptime' in dashboard() --><span data-bind="text: seconds_to_time(dashboard.uptime())"></span><!-- /ko --><small>Uptime</small></h3>
                                             </figcaption>
                                         </figure>
                                         <!--/ END Summary -->
@@ -475,7 +475,7 @@
                                         <figure class="stats summary">
                                             <div class="icon circle teal"><span class="icone-ticket"></span></div>
                                             <figcaption>
-                                                <h3><span></span><small>MB RAM Free</small></h3>
+                                                <h3><!-- ko: if 'uptime' in dashboard() --><span data-bind="text: bytes_to_mb(dashboard.freemem())"></span><!-- /ko --><small>MB RAM Free</small></h3>
                                             </figcaption>
                                         </figure>
                                         <!--/ END Summary -->

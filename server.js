@@ -6,6 +6,7 @@ var events = require('events');
 var introspect = require('introspect');
 var tail = require('tail').Tail;
 var uuid = require('node-uuid');
+var os = require('os');
 var server = exports;
 
 server.backend = function(base_dir, socket_emitter, dir_owner) {
@@ -38,6 +39,15 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           self.untrack_server(server_name);
       })
   })();
+
+  function host_heartbeat() {
+    self.front_end.emit('host_heartbeat', {
+      'uptime': os.uptime(),
+      'freemem': os.freemem()
+    })
+  }
+
+  setInterval(host_heartbeat, 1000);
 
   function track_server(server_name) {
     /* when evoked, creates a permanent 'mc' instance, namespace, and place for file tails/watches. 

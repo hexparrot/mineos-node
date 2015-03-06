@@ -18,15 +18,20 @@ function webui(port) {
 
   self.current = ko.observable();
 
-  /*
-
   self.dashboard = {
-    'servers-running': ko.pureComputed(function() {
+    'servers_running': ko.pureComputed(function() {
       return vm.servers().filter(function(v) {
         return v.heartbeat.up();
       }).length
-    })
-  }*/
+    }),
+    'uptime': ko.observable(0),
+    'freemem': ko.observable(0)
+  }
+
+  self.global.on('host_heartbeat', function(data) {
+    ko.mapping.fromJS(data, {}, self.dashboard);
+  })
+
 
   self.track_server = function(server_name) {
     var c = io(self.connect_string + server_name);
@@ -216,4 +221,22 @@ function bytes_to_mb(bytes){
   var i = Math.floor(Math.log(bytes) / Math.log(k));
 
   return (bytes / Math.pow(k, i)).toPrecision(3) + sizes[i];
+}
+
+function seconds_to_time(seconds) {
+  function zero_pad(number){
+    if (number.toString().length == 1)
+      return '0' + number;
+    else
+      return number;
+  }
+  var hours = Math.floor(seconds / (60 * 60));
+
+  var divisor_for_minutes = seconds % (60 * 60);
+  var minutes = Math.floor(divisor_for_minutes / 60);
+
+  var divisor_for_seconds = divisor_for_minutes % 60;
+  var seconds = Math.ceil(divisor_for_seconds);
+  
+  return '{0}:{1}:{2}'.format(hours, zero_pad(minutes), zero_pad(seconds));
 }
