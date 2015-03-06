@@ -302,9 +302,15 @@ mineos.mc = function(server_name, base_dir) {
           params['gid'] = result['gid'];
           cb(err);
         })
+      },
+      function(cb) {
+        var proc = child_process.spawn(binary, args, params);
+        proc.once('close', function(code) {
+          callback(code);
+        })
       }
     ], function(err, results) {
-      callback(err, (err ? null : child_process.spawn(binary, args, params) ));
+      callback(err);
     })
   }
 

@@ -478,20 +478,18 @@ test.backup = function(test) {
       })
     },
     function(callback) {
-      instance.backup(function(err, proc) {
+      instance.backup(function(err) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          test.equal(code, 0);
-          setTimeout(function() {
-            test.equal(fs.readdirSync(instance.env.bwd).length, 2);
-            callback(err);
-          }, FS_DELAY_MS)
-        })
+        callback(err);
       })
+    },
+    function(callback) {
+      test.equal(fs.readdirSync(instance.env.bwd).length, 2);
+      callback(null);
     }
   ], function(err, results) {
     test.ifError(err);
-    test.expect(5);
+    test.expect(4);
     test.done();
   })
 }
@@ -508,15 +506,9 @@ test.restore = function(test) {
       })
     },
     function(callback) {
-      instance.backup(function(err, proc) {
+      instance.backup(function(err) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          test.equal(code, 0);
-          setTimeout(function() {
-            test.equal(fs.readdirSync(instance.env.bwd).length, 2);
-            callback(err);
-          }, FS_DELAY_MS)
-        })
+        callback(err);
       })
     },
     function(callback) {
@@ -541,7 +533,7 @@ test.restore = function(test) {
     }
   ], function(err, results) {
     test.ifError(err);
-    test.expect(10);
+    test.expect(8);
     test.done();
   })
 }
@@ -919,35 +911,25 @@ test.list_increments = function(test) {
     function(callback) {
       instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
-        setTimeout(function() { callback(err) }, FS_DELAY_MS);
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*2);
       })
     },
     function(callback) {
-      instance.backup(function(err, proc) {
+      instance.backup(function(err) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          callback(err);
-        })
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*2);
       })
     },
     function(callback) {
-      instance.start(function(err) {
+      instance.modify_sp('server-port', 25570, function(err) {
         test.ifError(err);
-        callback(err);
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*3);
       })
     },
     function(callback) {
-      instance.backup(function(err, proc) {
+      instance.backup(function(err) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          callback(err);
-        })
-      })
-    },
-    function(callback) {
-      instance.kill(function(err) {
-        test.ifError(err);
-        setTimeout(function() { callback(err) }, PROC_START_DELAY_MS);
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*3);
       })
     },
     function(callback) {
@@ -962,7 +944,7 @@ test.list_increments = function(test) {
     }
   ], function(err, results) {
     test.ifError(err);
-    test.expect(10);
+    test.expect(12);
     test.done();
   })  
 }
