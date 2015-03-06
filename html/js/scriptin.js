@@ -50,11 +50,6 @@ function webui(port) {
     }
 
     c.emit('property', {property: 'server.properties'});
-    c.emit('watch', 'logs/latest.log');
-
-    c.on('new_tail', function(filepath) {
-      c.emit('watch', filepath);
-    })
 
     c.on('tail_data', function(data) {
       switch (data.filepath) {
