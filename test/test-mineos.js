@@ -449,19 +449,16 @@ test.archive = function(test) {
     function(callback) {
       instance.archive(function(err, proc) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          test.equal(code, 0);
-          setTimeout(function() {
-            test.equal(fs.readdirSync(instance.env.awd).length, 1);
-            callback(err);
-          }, FS_DELAY_MS)
-        })
-        
+        setTimeout(function() { callback(err) }, FS_DELAY_MS)
       })
+    },
+    function(callback) {
+      test.equal(fs.readdirSync(instance.env.awd).length, 1);
+      callback(null);
     }
   ], function(err, results) {
     test.ifError(err);
-    test.expect(5);
+    test.expect(4);
     test.done();
   })
 }
@@ -520,20 +517,18 @@ test.restore = function(test) {
       })
     },
     function(callback) {
-      instance.restore('now', function(err, proc) {
+      instance.restore('now', function(err) {
         test.ifError(err);
-        proc.once('close', function(code) {
-          test.equal(code, 0);
-          setTimeout(function() {
-            test.equal(fs.readdirSync(instance.env.cwd).length, 1);
-            callback(err);
-          }, FS_DELAY_MS)
-        })
+        callback(err)
       })
+    },
+    function(callback) {
+      test.equal(fs.readdirSync(instance.env.cwd).length, 1);
+      callback(null);
     }
   ], function(err, results) {
     test.ifError(err);
-    test.expect(8);
+    test.expect(7);
     test.done();
   })
 }
