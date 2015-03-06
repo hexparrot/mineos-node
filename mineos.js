@@ -191,9 +191,9 @@ mineos.mc = function(server_name, base_dir) {
         },
         function(ignored_err) {
           if (self.server_name in mineos.server_pids_up())
-            callback(true, false); //error, stop succeeded: false
+            callback(true); //error, stop succeeded: false
           else
-            callback(null, true); //no error, stop succeeded: true
+            callback(null); //no error, stop succeeded: true
         }
       );  
     })
@@ -208,7 +208,7 @@ mineos.mc = function(server_name, base_dir) {
         self.backup(cb);
       }
     ], function(err, results) {
-      callback(err, results[0] && results[1]);
+      callback(err);
     })
   }
 
