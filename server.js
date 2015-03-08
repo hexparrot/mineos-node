@@ -236,7 +236,9 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         if (required_args[i] == 'callback') 
           arg_array.push(function(err, payload) {
             args.success = !err;
+            args.err = err;
             nsp.emit('result', args);
+            console.log('sent result', args)
           })
         else if (required_args[i] in args) {
           arg_array.push(args[required_args[i]])
