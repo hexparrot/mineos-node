@@ -176,31 +176,8 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
                   });
                 },
                 archives: function(callback) {
-                  var fs = require('fs');
-                  var awd = instance.env['awd'];
-                  var stat = fs.stat;
-                  var all_info = [];
-
-                  fs.readdir(awd, function(err, files) {
-                    var fullpath = files.map(function(value, index) {
-                      return path.join(awd, value);
-                    });
-
-                    async.map(fullpath, stat, function(err, results){
-                      results.forEach(function(value, index) {
-                        all_info.push({
-                          time: value.mtime,
-                          size: value.size,
-                          filename: files[index]
-                        })
-                      })
-                    }); 
-
-                    all_info.sort(function(a, b) {
-                      return a.time.getTime() - b.time.getTime();
-                    });
-
-                    callback(null, all_info);
+                  instance.list_archives(function(err, archive_data) {
+                    callback(null, archive_data);
                   })
                 },
                 du_awd: function(callback) {
