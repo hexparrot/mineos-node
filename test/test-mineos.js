@@ -611,6 +611,16 @@ test.properties = function(test) {
       })
     },
     function(callback) {
+      instance.property('owner', function(err, owner_info) {
+        test.ifError(err);
+        test.ok('uid' in owner_info);
+        test.ok('gid' in owner_info);
+        test.ok('username' in owner_info);
+        test.ok('groupname' in owner_info);
+        callback(err);
+      })
+    },
+    function(callback) {
       instance.property('up', function(err, up) {
         test.ifError(err);
         test.equal(up, false);
@@ -731,7 +741,7 @@ test.properties = function(test) {
     }
   ], function(err, results) {
     test.ifError(err);
-    test.expect(43);
+    test.expect(48);
     test.done();
   })
 }
