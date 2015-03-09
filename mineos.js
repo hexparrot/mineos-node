@@ -349,6 +349,7 @@ mineos.mc = function(server_name, base_dir) {
         var match = lines[i].match(regex);
         if (match)
           increment_lines.push({
+            step: '{0}B'.format(i),
             time: match[1],
             size: match[2],
             cum: match[3]

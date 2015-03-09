@@ -930,6 +930,7 @@ test.list_increments = function(test) {
     function(callback) {
       instance.list_increments(function(err, increments) {
         for (var i in increments) {
+          test.ok('step' in increments[i]);
           test.ok('time' in increments[i]);
           test.ok('size' in increments[i]);
           test.ok('cum' in increments[i]);
@@ -939,7 +940,7 @@ test.list_increments = function(test) {
     }
   ], function(err, results) {
     test.ifError(err);
-    test.expect(12);
+    test.expect(14);
     test.done();
   })  
 }
