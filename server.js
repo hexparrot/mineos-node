@@ -176,24 +176,16 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
                   });
                 },
                 archives: function(callback) {
-                  instance.list_archives(function(err, archive_data) {
-                    callback(null, archive_data);
-                  })
+                  instance.list_archives(callback);
                 },
                 du_awd: function(callback) {
-                  instance.property('du_awd', function(err, size) {
-                    callback(null, size);
-                  })
+                  instance.property('du_awd', callback)
                 },
                 du_bwd: function(callback) {
-                  instance.property('du_bwd', function(err, size) {
-                    callback(null, size);
-                  })
+                  instance.property('du_bwd', callback)
                 },
                 du_cwd: function(callback) {
-                  instance.property('du_cwd', function(err, size) {
-                    callback(null, size);
-                  })
+                  instance.property('du_cwd', callback)
                 },
                 owner: function(callback) {
                   var userid = require('userid');
