@@ -656,8 +656,8 @@
                             </header>
                             <section class="body">
                                 <div class="body-inner">
-                                  <p>Oldest archive: <strong data-bind="text: server_status.oldest_archive()"></strong></p>
-                                    <p>Most recent archive: <strong data-bind="text: server_status.newest_archive()"></strong></p>
+                                  <p>Oldest archive: <strong data-bind="text: server_status.oldest_archive().time"></strong></p>
+                                    <p>Most recent archive: <strong data-bind="text: server_status.newest_archive().time"></strong></p>
                                     <p>Space used by archives: <strong data-bind="text: bytes_to_mb(server_status.du_awd())"></strong></p>
                                     <p><a class="link pointer" data-bind="click: $root.command" data-cmd="archive">Create a new Archive</a></p>
                                 </div>

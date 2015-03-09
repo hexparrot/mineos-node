@@ -79,10 +79,10 @@ function webui(port) {
             return (ss.increments().length ? ss.increments()[0] : empty_time);
           });
           ss['oldest_archive'] = ko.pureComputed(function() {
-            return (ss.archives().length ? ss.archives()[ss.archives().length - 1] : empty_time);
+            return (ss.archives().length ? ss.archives()[0] : empty_time);
           });
           ss['newest_archive'] = ko.pureComputed(function() {
-            return (ss.archives().length ? ss.archives()[0] : empty_time);
+            return (ss.archives().length ? ss.archives()[ss.archives().length - 1] : empty_time);
           });
           console.log(ss)
           break;
