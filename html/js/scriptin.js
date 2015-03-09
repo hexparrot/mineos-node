@@ -68,20 +68,23 @@ function webui(port) {
       switch(data.page) {
         case 'server_status':
           var ss = container.server_status;
+          var empty_time = {time: '', size: '', cum: ''};
           ko.mapping.fromJS(data.payload, {}, ss);
+
           ss['oldest_incr'] = ko.pureComputed(function() {
-            if (ss.increments().length)
-              return ss.increments()[ss.increments().length - 1];
-            else
-              return {time: '', size: '', cum: ''};
+            return (ss.increments().length ? ss.increments()[ss.increments().length - 1] : empty_time);
           });
           ss['newest_incr'] = ko.pureComputed(function() {
-            if (ss.increments().length)
-              return ss.increments()[0];
-            else
-              return {time: '', size: '', cum: ''};
             
+            return (ss.increments().length ? ss.increments()[0] : empty_time);
           });
+          ss['oldest_archive'] = ko.pureComputed(function() {
+            return (ss.archives().length ? ss.archives()[ss.archives().length - 1] : empty_time);
+          });
+          ss['newest_archive'] = ko.pureComputed(function() {
+            return (ss.archives().length ? ss.archives()[0] : empty_time);
+          });
+          console.log(ss)
           break;
         default:
           break;

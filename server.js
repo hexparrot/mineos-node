@@ -175,6 +175,22 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
                     callback(null, incr_data);
                   });
                 },
+                archives: function(callback) {
+                  var fs = require('fs');
+                  var awd = instance.env['awd'];
+                  var stat = fs.stat;
+                  fs.readdir(awd, function(err, files) {
+                    files.sort(function(a, b) {
+                      async.parallel([
+                        async.apply(stat, path.join(awd, a) ),
+                        async.apply(stat, path.join(awd, b) )
+                      ], function(err, results) {
+                        return results[0].mtime.getTime() - results[1].mtime.getTime();
+                      })
+                    });
+                    callback(null, files);
+                  })
+                },
                 du_awd: function(callback) {
                   instance.property('du_awd', function(err, size) {
                     callback(null, size);
