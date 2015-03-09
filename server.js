@@ -6,6 +6,7 @@ var events = require('events');
 var introspect = require('introspect');
 var tail = require('tail').Tail;
 var uuid = require('node-uuid');
+var os = require('os');
 var server = exports;
 
 server.backend = function(base_dir, socket_emitter, dir_owner) {
@@ -38,6 +39,15 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           self.untrack_server(server_name);
       })
   })();
+
+  function host_heartbeat() {
+    self.front_end.emit('host_heartbeat', {
+      'uptime': os.uptime(),
+      'freemem': os.freemem()
+    })
+  }
+
+  setInterval(host_heartbeat, 1000);
 
   function track_server(server_name) {
     /* when evoked, creates a permanent 'mc' instance, namespace, and place for file tails/watches. 
@@ -87,7 +97,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
             'timestamp': Date.now(),
             'payload': retval
           });
-          console.log('[{0}] Heartbeat transmitted.'.format(server_name))
+          //console.log('[{0}] Heartbeat transmitted.'.format(server_name))
         })
       }
 
@@ -105,15 +115,16 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
       make_tail('logs/latest.log');
       make_watch('server.properties', function() {
         instance.sp(function(err, sp_data) {
-          console.info('[{0}] server.properties changed'.format(server_name));
-          nsp.in('server.properties').emit('server.properties', {'server_name': server_name, 'payload': sp_data});
+          nsp.emit('result', {'server_name': server_name, 'property': 'server.properties', 'payload': sp_data});
         })
       });
 
       nsp.on('connection', function(socket) {
+        var ip_address = socket.request.connection.remoteAddress;
+
         function produce_receipt(args) {
           /* when a command is received, immediately respond to client it has been received */
-          console.info('command received', args.command)
+          console.info('[{0}] {1} issued command : "{2}"'.format(server_name, ip_address, args.command))
           args.uuid = uuid.v1();
           nsp.emit('receipt', args)
           server_dispatcher(args);
@@ -122,13 +133,11 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         function start_watch(rel_filepath) {
           /* can put a tail/watch on any file, and joins a room for all future communication */
           if (rel_filepath in self.servers[server_name].tails) {
-            socket.join(rel_filepath);
-            console.info('[{0}] client following tail: {1}'.format(server_name, rel_filepath));
+            console.info('[{0}] {1} requesting tail: {2}'.format(server_name, ip_address, rel_filepath));
           } else if (rel_filepath in self.servers[server_name].watches) { 
-            socket.join(rel_filepath);
-            console.info('[{0}] client watching file: {1}'.format(server_name, rel_filepath));
+            console.info('[{0}] {1} watching file: {2}'.format(server_name, ip_address, rel_filepath));
           } else {
-            console.error('no room by found for', rel_filepath);
+            console.error('[{0}] {1} requesting tail: {2} (failed: not yet created)'.format(server_name, ip_address, rel_filepath));
           }
         }
 
@@ -136,28 +145,49 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           /* removes a tail/watch for a given file, and leaves the room */
           if (rel_filepath in self.servers[server_name].tails) {
             socket.leave(rel_filepath);
-            console.info('[{0}] client dropping tail: {1}'.format(server_name, rel_filepath));
+            console.info('[{0}] {1} dropping tail: {2}'.format(server_name, ip_address, rel_filepath));
           } else if (rel_filepath in self.servers[server_name].watches) {
             socket.leave(rel_filepath);
-            console.info('[{0}] client stopped watching file: {1}'.format(server_name, rel_filepath));
+            console.info('[{0}] {1} stopped watching file: {1}'.format(server_name, ip_address, rel_filepath));
           } else {
-            console.error('no room by found for', rel_filepath);
+            //console.error('[{0}] no existing room found for {1}'.format(server_name, rel_filepath));
           }
         }
 
         function get_prop(requested) {
-          console.info('[{0}] client requesting property: {1}'.format(server_name, requested.property));
+          console.info('[{0}] {1} requesting property: {2}'.format(server_name, ip_address, requested.property));
           instance.property(requested.property, function(err, retval) {
-            console.info('[{0}] returned to client: {1}'.format(server_name, retval));
+            console.info('[{0}] returned to {1}: {2}'.format(server_name, ip_address, retval));
             nsp.emit('result', {'server_name': server_name, 'property': requested.property, 'payload': retval});
           })
         }
 
-        console.info('Client connected to namespace: {0}'.format(server_name));
+        function get_page_data(page) {
+          switch (page) {
+            case 'server_status':
+              console.info('[{0}] {1} requesting server at a glance info'.format(server_name, ip_address));
+
+              async.parallel({
+                'increments': async.apply(instance.list_increments),
+                'archives': async.apply(instance.list_archives),
+                'du_awd': async.apply(instance.property, 'du_awd'),
+                'du_bwd': async.apply(instance.property, 'du_bwd'),
+                'du_cwd': async.apply(instance.property, 'du_cwd'),
+                'owner': async.apply(instance.property, 'owner')
+              }, function(err, results) {
+                nsp.emit('page_data', {page: page, payload: results});
+              })
+              break;
+            default:
+              nsp.emit('page_data', {page: page});
+              break;
+          }
+        }
+
+        console.info('[{0}] {1} connected to namespace'.format(server_name, ip_address));
         socket.on('command', produce_receipt);
-        socket.on('watch', start_watch);
-        socket.on('unwatch', unwatch);
         socket.on('property', get_prop);
+        socket.on('page_data', get_page_data);
       })
     }
 
@@ -182,7 +212,9 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         if (required_args[i] == 'callback') 
           arg_array.push(function(err, payload) {
             args.success = !err;
+            args.err = err;
             nsp.emit('result', args);
+            console.log('sent result', args)
           })
         else if (required_args[i] in args) {
           arg_array.push(args[required_args[i]])
@@ -203,7 +235,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
                 console.warn('Ignored attempt to start already-started server: {0}'.format(server_name));
               } else {
                 fn.apply(instance, arg_array);
-                console.info('{0} received request {1}'.format(server_name, args.command))
+                console.info('[{0}] received request "{1}"'.format(server_name, args.command))
               }
             })
           break;
@@ -212,7 +244,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
             self.servers[server_name].instance.property('up', function(err, is_up) {
               if (is_up) {
                 fn.apply(instance, arg_array);
-                console.info('{0} received request {1}'.format(server_name, args.command))
+                console.info('[{0}] received request "{1}"'.format(server_name, args.command))
               } else {
                 console.warn('Ignored attempt to send command to downed server: {0}'.format(server_name));
               }
@@ -229,7 +261,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
               self.servers[server_name].watches[w].close();
 
             fn.apply(instance, arg_array);
-            console.info('{0} received request {1}'.format(server_name, args.command))
+            console.info('[{0}] received request "{1}"'.format(server_name, args.command))
           } else {
             console.warn('Ignored attempt to delete previously-deleted server: {0}'.format(server_name));
             //this will occur if the socket item exists on the client-side
@@ -242,7 +274,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           //default fallback. all named commands from this switch() must manually invoke the
           //following lines where appropriate.
           fn.apply(instance, arg_array);
-          console.info('{0} received request {1}'.format(server_name, args.command))
+          console.info('[{0}] received request "{1}"'.format(server_name, args.command))
           break;
       }
     }
@@ -267,7 +299,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         console.info('[{0}] Created tail on {1}'.format(server_name, rel_filepath));
         new_tail.on('line', function(data) {
           //console.info('[{0}] {1}: transmitting new tail data'.format(server_name, rel_filepath));
-          nsp.in(rel_filepath).emit('tail_data', {'server_name': server_name, 'payload': data});
+          nsp.emit('tail_data', {'filepath': rel_filepath, 'payload': data});
         })
         self.servers[server_name].tails[rel_filepath] = new_tail;
       } catch (e) {
@@ -346,27 +378,44 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
       self.untrack_server(s);
   }
 
-  self.front_end.on('connection', function(socket) {
-    function webui_dispatcher(args) {
-      console.info('[WEBUI] Received emit command', args);
-      switch (args.command) {
-        case 'create':
-          if (args.server_name in self.servers) {
-            console.error('Ignored attempt to create server "{0}"; Servername already in use.'.format(args.server_name));
-          } else {
-            var instance = new mineos.mc(args.server_name, base_dir);
-            instance.create(dir_owner, function(err, did_create) {
-              if (err)
-                console.log(err)
-            })
-          }
-          break;
-      }
-    }
+  self.webui_dispatcher = function(args) {
+    console.info('[WEBUI] Received emit command', args);
+    switch (args.command) {
+      case 'create':
+        if (args.server_name in self.servers) {
+          var ERROR = '[{0}] Ignored attempt to create server -- server name already exists.'.format(args.server_name)
+          console.error(ERROR);
+          self.front_end.emit('error', ERROR);
+        } else {
+          var instance = new mineos.mc(args.server_name, base_dir);
 
-    console.info('User connected to webui');
+          async.series([
+            function(cb) {
+              instance.create(dir_owner, cb)
+            },
+            function(cb) {
+              instance._sp.overlay(args.properties, cb);
+            }
+          ], function(err, results) {
+            if (err) {
+              var ERROR = '[{0}] Attempt to create server failed in the backend.'.format(args.server_name);
+              console.error(ERROR);
+              self.front_end.emit('error', ERROR);
+            } else {
+              console.info('[{0}] Server created in filesystem.'.format(args.server_name))
+            }
+          })
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  self.front_end.on('connection', function(socket) {
+    console.info('[WEBUI] User connected from', socket.request.connection.remoteAddress);
     self.front_end.emit('server_list', Object.keys(self.servers));
-    socket.on('command', webui_dispatcher);
+    socket.on('command', self.webui_dispatcher);
   })
 
   return self;
