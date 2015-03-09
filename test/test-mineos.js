@@ -981,3 +981,40 @@ test.modify_sp = function(test) {
     test.done();
   })  
 }
+
+test.list_archive = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    function(callback) {
+      instance.create(OWNER_CREDS, function(err) {
+        test.ifError(err);
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*2);
+      })
+    },
+    function(callback) {
+      instance.archive(function(err) {
+        test.ifError(err);
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*5);
+      })
+    },
+    function(callback) {
+      instance.archive(function(err) {
+        test.ifError(err);
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*2);
+      })
+    },
+    function(callback) {
+      instance.list_archives(function(err, archives) {
+        test.ifError(err);
+        test.equal(archives.length, 2);
+        callback(err);
+      })
+    }
+  ], function(err, results) {
+    test.ifError(err);
+    test.expect(6);
+    test.done();
+  })  
+}

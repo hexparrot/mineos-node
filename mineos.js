@@ -365,6 +365,36 @@ mineos.mc = function(server_name, base_dir) {
     })
   }
 
+  self.list_archives = function(callback) {
+    var fs = require('fs');
+    var awd = self.env['awd'];
+    var all_info = [];
+
+    fs.readdir(awd, function(err, files) {
+      var fullpath = files.map(function(value, index) {
+        return path.join(awd, value);
+      });
+
+      var stat = fs.stat;
+      async.map(fullpath, stat, function(inner_err, results){
+        results.forEach(function(value, index) {
+          all_info.push({
+            time: value.mtime,
+            size: value.size,
+            filename: files[index]
+          })
+        })
+
+        all_info.sort(function(a, b) {
+          return a.time.getTime() - b.time.getTime();
+        });
+
+        callback(err || inner_err, all_info);
+      }); 
+    }) 
+  }
+
+
   self.property = function(property, callback) {
     switch(property) {
       case 'owner':
