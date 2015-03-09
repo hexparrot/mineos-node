@@ -168,33 +168,12 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
               console.info('[{0}] {1} requesting server at a glance info'.format(server_name, ip_address));
 
               async.parallel({
-                increments: function(callback) {
-                  instance.list_increments(function(err, incr_data) {
-                    for (var i=0; i < incr_data.length; i++)
-                      incr_data[i]['step'] = '{0}B'.format(i);
-                    callback(null, incr_data);
-                  });
-                },
-                archives: function(callback) {
-                  instance.list_archives(callback);
-                },
-                du_awd: function(callback) {
-                  instance.property('du_awd', callback)
-                },
-                du_bwd: function(callback) {
-                  instance.property('du_bwd', callback)
-                },
-                du_cwd: function(callback) {
-                  instance.property('du_cwd', callback)
-                },
-                owner: function(callback) {
-                  var userid = require('userid');
-                  instance.property('owner', function(err, owner) {
-                    owner['username'] = userid.username(owner.uid);
-                    owner['groupname'] = userid.groupname(owner.gid);
-                    callback(null, owner);
-                  })
-                }
+                'increments': async.apply(instance.list_increments),
+                'archives': async.apply(instance.list_archives),
+                'du_awd': async.apply(instance.property, 'du_awd'),
+                'du_bwd': async.apply(instance.property, 'du_bwd'),
+                'du_cwd': async.apply(instance.property, 'du_cwd'),
+                'owner': async.apply(instance.property, 'owner')
               }, function(err, results) {
                 nsp.emit('page_data', {page: page, payload: results});
               })
