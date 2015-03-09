@@ -798,6 +798,99 @@
 
 
                 <!-- START Content -->
+                <!-- ko if: page() == 'archive_list' -->
+                <div id="archive_list" class="container-fluid">
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <div class="control-group">
+                            <label class="control-label">Remove archives older than:</label>
+                            <div class="controls">
+                                <input type="text" id="prune_archive_input" placeholder="Pick a date"> <button type="button" class="btn btn-danger"><span class="icone-remove-circle"></span> Prune Archives</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Icon Statistic - Circle -->
+                        <div class="span12 widget">
+                            <header><h4 class="title">Removal Summary</h4></header>
+                            <section class="body">
+                                <div class="body-inner" style="">
+                                    <!-- START Summary 1 -->
+                                    <figure class="stats summary shadowed">
+                                        <div class="icon circle lime"><span class="icone-folder-close"></span></div>
+                                        <figcaption>
+                                            <h3><span></span><small>Archives</small></h3>
+                                        </figcaption>
+                                    </figure><!--/ END Summary 1 -->
+
+                                    <!-- START Summary 2 -->
+                                    <figure class="stats summary shadowed">
+                                        <div class="icon circle purple"><span class="icone-shopping-cart"></span></div>
+                                        <figcaption>
+                                            <h3><span></span><small>MB Reclaimed</small></h3>
+                                        </figcaption>
+                                    </figure><!--/ END Summary 2 -->
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Icon Summary - Circle -->
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <table class="table table-hover">
+                          <thead>
+                            <tr>
+                              <th scope="col">Timestamp</th>
+                              <th scope="col">Size</th>
+                              <th scope="col">Filename</th>
+                              <th scope="col"></th>
+                            </tr>
+                          </thead>
+                          <tfoot>
+                          </tfoot>
+                          <tbody data-bind="foreach: {data: current().server_status.archives(), as: '_data'}">
+                            <tr>
+                              <td data-bind="text: _data.time"></td>
+                              <td data-bind="text: bytes_to_mb(_data.size())"></td>
+                              <td data-bind="text: _data.filename"></td>
+                              <td>
+                                <div class="btn-group">
+                                    <button class="btn dropdown-toggle" data-toggle="dropdown">Actions <span class="caret"></span></button>
+                                    <ul class="dropdown-menu">
+                                        <li><a data-toggle="modal" data-target="#import_server_modal">Create Server From</a></li>
+                                        <li>&nbsp;</li>
+                                        <li><a data-required="server_name,filename" data-cmd="prune_archives">Delete</a></li>
+                                    </ul>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                    </div>
+                    <!--/ END Row -->
+                </div>
+                <!-- /ko -->
+                <!--/ END Content -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                <!-- START Content -->
                 <!-- ko if: page() == 'server_properties' -->
                 <div id="server_properties" class="container-fluid">
                     <!-- START Row -->

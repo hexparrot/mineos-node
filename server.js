@@ -190,6 +190,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
                       results.forEach(function(value, index) {
                         all_info.push({
                           time: value.mtime,
+                          size: value.size,
                           filename: files[index]
                         })
                       })
