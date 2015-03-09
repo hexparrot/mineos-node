@@ -9,7 +9,6 @@ Most of the implemented backend is functional all well-tested, which is to say i
 
 - shadow password logins (hardcoded uid/gid)
 - no "profiles" mechanism
-- a web-ui
 - YAML support (as new server.profile format) and editing custom server config files
 
 The following is implemented and working:
@@ -20,3 +19,4 @@ The following is implemented and working:
 - send commands to screen instance, server status ping
 - procfs polling
 - tracking of server addition and deletion for real-time updating in web-ui, as well as server logs
+- a knockout.js based web-ui, which can do all of the above functions except: restore from archive, backup from increment
