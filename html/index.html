@@ -2,7 +2,7 @@
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" ng-app="mineos"> <!--<![endif]-->
 <head>
     <!-- START META SECTION -->
     <meta charset="utf-8">
@@ -53,7 +53,7 @@
     <!--/ Javascript(Modernizr) -->
     <!--/ END JAVASCRIPT SECTION -->
 </head>
-<body>
+<body ng-controller="Webui">
     <!-- START Template Wrapper -->
     <!-- If you want to enable the fixed sidebar or fixed header, just add `.fixed-sidebar` or `.fixed-header` class to the `#wrapper` div below -->
     <!-- IMPORTANT! : fixed sidebar will automatically add `.fixed-header` class to the `#wrapper` div -->
@@ -143,7 +143,7 @@
                                     <span class="action"><a class="close" href="#">&times;</a></span>
                                 </li>
                                 <li>
-                                    <span class="icon"><img src="img/avatar/avatar7.jpg" alt=""></span>
+                                    <span class="icon"><img src="" alt=""></span>
                                     <a href="#" class="text">
                                         <strong>Amelia</strong> comment on your <strong>Photo</strong><br>
                                         <small>43 minutes ago</small>
@@ -167,7 +167,7 @@
                                     <span class="action"><a class="close" href="#">&times;</a></span>
                                 </li>
                                 <li>
-                                    <span class="icon"><img src="img/avatar/avatar6.jpg" alt=""></span>
+                                    <span class="icon"><img src="" alt=""></span>
                                     <a href="#" class="text">
                                         <strong>Albert</strong> comment on your <strong>Status</strong><br>
                                         <small>1 minutes ago</small>
@@ -200,28 +200,28 @@
                             </header>
                             <ul class="body">
                                 <li>
-                                    <span class="avatar"><img src="img/avatar/avatar2.jpg" alt=""></span>
+                                    <span class="avatar"><img src="" alt=""></span>
                                     <a href="#" class="text">
                                         <strong>Jane Anderson</strong><br>Lorem ipsum dolor sit amet<br><small>Today at 12:01AM</small>
                                     </a>
                                     <span class="action"><a class="close" href="#">&times;</a></span>
                                 </li>
                                 <li>
-                                    <span class="avatar"><img src="img/avatar/avatar3.jpg" alt=""></span>
+                                    <span class="avatar"><img src="" alt=""></span>
                                     <a href="#" class="text">
                                         <strong>William</strong><br>Lorem ipsum dolor sit amet<br><small>Yesterday at 03:55AM</small>
                                     </a>
                                     <span class="action"><a class="close" href="#">&times;</a></span>
                                 </li>
                                 <li>
-                                    <span class="avatar"><img src="img/avatar/avatar4.jpg" alt=""></span>
+                                    <span class="avatar"><img src="" alt=""></span>
                                     <a href="#" class="text">
                                         <strong>Albert Khoo</strong><br>Lorem ipsum dolor sit amet<br><small>Monday at 01:15PM</small>
                                     </a>
                                     <span class="action"><a class="close" href="#">&times;</a></span>
                                 </li>
                                 <li>
-                                    <span class="avatar"><img src="img/avatar/avatar5.jpg" alt=""></span>
+                                    <span class="avatar"><img src="" alt=""></span>
                                     <a href="#" class="text">
                                         <strong>Peterson</strong><br>Lorem ipsum dolor sit amet<br><small>12 Jan at 04:45AM</small>
                                     </a>
@@ -304,8 +304,8 @@
                                     <!--/ END Menu Divider -->
 
                                     <!-- START Menu -->
-                                    <li class="accordion-group ">
-                                        <a>
+                                    <li class="accordion-group">
+                                        <a ng-click="page = 'dashboard'">
                                             <span class="icon icone-dashboard"></span>
                                             <span class="text">Dashboard</span>
                                             <span class="label label-inverse">2</span>
@@ -314,8 +314,8 @@
                                     <!--/ END Menu -->
 
                                     <!-- START Menu -->
-                                    <li class="accordion-group ">
-                                        <a>
+                                    <li class="accordion-group">
+                                        <a ng-click="page = 'create_server'">
                                             <span class="icon icone-share"></span>
                                             <span class="text">Create New Server</span>
                                         </a>
@@ -328,8 +328,8 @@
                                     <!--/ END Menu Divider -->
 
                                     <!-- START Menu -->
-                                    <li class="accordion-group ">
-                                        <a>
+                                    <li class="accordion-group">
+                                        <a ng-click="page = 'server_status'">
                                             <span class="icon icone-globe"></span>
                                             <span class="text">Server Status</span>
                                         </a>
@@ -337,53 +337,35 @@
                                     <!--/ END Menu -->
 
                                     <!-- START Menu -->
-                                    <li class="accordion-group ">
-                                        <a>
-                                            <span class="icon icone-hdd"></span>
-                                            <span class="text">Restore Points</span>
-                                        </a>
-                                    </li>
-                                    <!--/ END Menu -->
-
-                                    <!-- START Menu -->
-                                    <li class="accordion-group ">
-                                        <a>
-                                            <span class="icon icone-hdd"></span>
-                                            <span class="text">Archives</span>
-                                        </a>
-                                    </li>
-                                    <!--/ END Menu -->
-
-                                    <!-- START Menu -->
-                                    <li class="accordion-group ">
+                                    <li class="accordion-group">
                                         <a data-toggle="collapse" data-parent="#navigation" href="#submenu0">
-                                            <span class="icon iconm-pencil-5"></span>
+                                            <span class="icon icone-hdd"></span>
                                             <span class="text">Backups and Restores</span>
                                             <span class="arrow icone-caret-down"></span>
                                         </a>
                                         <!-- START Submenu Menu -->
-                                        <ul id="submenu0" class="collapse ">
-                                            <li class=""><a><span class="icon icone-angle-right"></span> Restore Points</a></li>
-                                            <li class=""><a><span class="icon icone-angle-right"></span> Archives</a></li>
-                                            <li class=""><a><span class="icon icone-angle-right"></span> Backup Calendar</a></li>
+                                        <ul id="submenu0" class="collapse">
+                                            <li class=""><a ng-click="page = 'restore_points'"><span class="icon icone-angle-right"></span> Restore Points</a></li>
+                                            <li class=""><a ng-click="page = 'archives'"><span class="icon icone-angle-right"></span> Archives</a></li>
+                                            <li class=""><a ng-click="page = 'scheduling'"><span class="icon icone-angle-right"></span> Scheduling</a></li>
+                                            <li class=""><a ng-click="page = 'calendar'"><span class="icon icone-angle-right"></span> Calendar</a></li>
                                         </ul>
                                         <!--/ END Submenu Menu -->
                                     </li>
                                     <!--/ END Menu -->
 
                                     <!-- START Menu -->
-                                    <li class="accordion-group ">
+                                    <li class="accordion-group">
                                         <a data-toggle="collapse" data-parent="#navigation" href="#submenu1">
                                             <span class="icon iconm-pencil-5"></span>
                                             <span class="text">Configuration</span>
                                             <span class="arrow icone-caret-down"></span>
                                         </a>
                                         <!-- START Submenu Menu -->
-                                        <ul id="submenu1" class="collapse ">
-                                            <li class=""><a><span class="icon icone-angle-right"></span> server.properties</a></li>
-                                            <li class=""><a><span class="icon icone-angle-right"></span> java</a></li>
-                                            <li class=""><a><span class="icon icone-angle-right"></span> backups</a></li>
-                                            <li class=""><a><span class="icon icone-angle-right"></span> game maintenance</a></li>
+                                        <ul id="submenu1" class="collapse">
+                                            <li class=""><a ng-click="page = 'server_properties'"><span class="icon icone-angle-right"></span> server.properties</a></li>
+                                            <li class=""><a ng-click="page = 'java'"><span class="icon icone-angle-right"></span> java</a></li>
+                                            <li class=""><a ng-click="page = 'maintenance'"><span class="icon icone-angle-right"></span> game maintenance</a></li>
                                         </ul>
                                         <!--/ END Submenu Menu -->
                                     </li>
@@ -398,8 +380,8 @@
                                         </a>
                                         <!-- START Submenu Menu -->
                                         <ul id="submenu2" class="collapse ">
-                                            <li class=""><a><span class="icon icone-angle-right"></span> Console</a></li>
-                                            <li class=""><a><span class="icon icone-angle-right"></span> Other Files</a></li>
+                                            <li class=""><a ng-click="page = 'console'"><span class="icon icone-angle-right"></span> Console</a></li>
+                                            <li class=""><a ng-click="page = 'otherfiles'"><span class="icon icone-angle-right"></span> Other Files</a></li>
                                         </ul>
                                         <!--/ END Submenu Menu -->
                                     </li>
@@ -414,7 +396,7 @@
                         <!-- START Tab Pane(overview) -->
                         <div class="tab-pane" id="tab-overview">
                             <!-- START Accound Status -->
-                            <div class="divider">Accound Status</div>
+                            <div class="divider">Account Status</div>
                             <!-- START sparkline 1 -->
                             <figure class="stats sparkline">
                                 <span class="chart sparkline-bar" sparkBarColor="#dc143c">5,6,7,2,9,2,1,4,8</span>
@@ -493,8 +475,15 @@
                 </div>
                 <!--/ END Bootstrap Navbar -->
 
-                                <!-- START Content -->
-                <div class="container-fluid">
+                <!-- START Content - BLANK CONTAINER TEMPLATE -->
+                <div class="container-fluid" ng-show="page == 'blank'">
+
+
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content -->
+                <div class="container-fluid" ng-show="page == 'dashboard'">
                     <!-- START Row -->
                     <div class="row-fluid">
                         <!-- START Page/Section header -->
@@ -628,178 +617,46 @@
                         <!--/ END Basic Table -->
                     </div>
                     <!--/ END Row -->
+                </div>
+                <!--/ END Content -->
 
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <!-- START Basic Table -->
-                        <div class="span6 widget lime">
-                            <header>
-                                <h4 class="title">Task</h4>
-                                <span class="label label-important pull-right">2 Pending</span>
-                            </header>
-                            <section class="body">
-                                <div class="body-inner no-padding">
-                                    <table class="table table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th><input type="checkbox" class="checkall"></th>
-                                                <th>Job List</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><input type="checkbox"></td>
-                                                <td>Lorem ipsum dolor sit amet</td>
-                                                <td><span class="label label-important">Pending</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><input type="checkbox"></td>
-                                                <td>Eos ei tamquam ornatus deleniti</td>
-                                                <td><span class="label label-success">Success</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><input type="checkbox"></td>
-                                                <td>Mei minim saepe sententiae no</td>
-                                                <td><span class="label">Draf</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><input type="checkbox"></td>
-                                                <td>Ius commune elaboraret scripserit te</td>
-                                                <td><span class="label label-success">Success</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><input type="checkbox"></td>
-                                                <td>In ipsum delicata duo, quaeque corpora</td>
-                                                <td><span class="label label-success">Success</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td><input type="checkbox"></td>
-                                                <td>Dissentias deterruisset ne ius</td>
-                                                <td><span class="label label-important">Pending</span></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </section>
-                        </div>
-                        <!--/ END Basic Table -->
-
-                        <!-- START Message Widget -->
-                        <form class="span6 widget stacked widget-message teal">
-                            <header>
-                                <h4 class="title"><span class="icon icone-envelope-alt"></span> Message Widget</h4>
-                                <!-- START Toolbar -->
-                                <ul class="toolbar pull-right">
-                                    <li><a href="#" class="link"><span class="icon icone-cog"></span></a></li>
-                                    <li>
-                                        <a href="#" class="link" data-toggle="dropdown"><span class="icon icone-ellipsis-vertical"></span></a>
-                                        <ul class="dropdown-menu pull-right">
-                                            <li><a href="#"><span class="icon icone-pencil"></span> Edit</a></li>
-                                            <li><a href="#"><span class="icon icone-trash"></span> Delete</a></li>
-                                            <li><a href="#"><span class="icon icone-cog"></span> Setting</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                                <!--/ END Toolbar -->
-                            </header>
-                            <section class="body">
-                                <div class="body-inner scrollable" id="demo2" style="height:200px;">
-                                    <div class="scroll-content">
-                                        <!-- START Message List -->
-                                        <ul>
-                                            <li class="left">
-                                                <figure>
-                                                    <img src="img/avatar/avatar1.jpg">
-                                                    <figcaption>
-                                                        <div class="meta">
-                                                            <a href="#">Albert</a>
-                                                            <small>2.55pm</small>
-                                                        </div>
-                                                        Lorem ipsum dolor sit amet, his ei vitae doming iudicabit, at consul oporteat ius, et eam atomorum torquatos.
-                                                    </figcaption>
-                                                    <div class="action">
-                                                        <a href="#" class="close">&times;</a>
-                                                    </div>
-                                                </figure>
-                                            </li>
-                                            <li class="right">
-                                                <figure>
-                                                    <img src="img/avatar/avatar2.jpg">
-                                                    <figcaption>
-                                                        <div class="meta">
-                                                            <a href="#">Jane</a>
-                                                            <small>10.01am</small>
-                                                        </div>
-                                                        Lorem ipsum dolor sit amet, his ei vitae doming iudicabit, at consul oporteat ius, et eam atomorum torquatos.
-                                                    </figcaption>
-                                                    <div class="action">
-                                                        <a href="#" class="close">&times;</a>
-                                                    </div>
-                                                </figure>
-                                            </li>
-                                            <li class="left">
-                                                <figure>
-                                                    <img src="img/avatar/avatar3.jpg">
-                                                    <figcaption>
-                                                        <div class="meta">
-                                                            <a href="#">Enderson</a>
-                                                            <small>1.05am</small>
-                                                        </div>
-                                                        Lorem ipsum dolor sit amet, his ei vitae doming iudicabit, at consul oporteat ius, et eam atomorum torquatos.
-                                                    </figcaption>
-                                                    <div class="action">
-                                                        <a href="#" class="close">&times;</a>
-                                                    </div>
-                                                </figure>
-                                            </li>
-                                            <li class="right">
-                                                <figure>
-                                                    <img src="img/avatar/avatar4.jpg">
-                                                    <figcaption>
-                                                        <div class="meta">
-                                                            <a href="#">John</a>
-                                                            <small>12.05am</small>
-                                                        </div>
-                                                        Lorem ipsum dolor sit amet, his ei vitae doming iudicabit, at consul oporteat ius, et eam atomorum torquatos.
-                                                    </figcaption>
-                                                    <div class="action">
-                                                        <a href="#" class="close">&times;</a>
-                                                    </div>
-                                                </figure>
-                                            </li>
-                                            <li class="right">
-                                                <figure>
-                                                    <img src="img/avatar/avatar4.jpg">
-                                                    <figcaption>
-                                                        <div class="meta">
-                                                            <a href="#">John</a>
-                                                            <small>1 minute ago</small>
-                                                        </div>
-                                                        Lorem ipsum dolor sit amet, his ei vitae doming iudicabit, at consul oporteat ius, et eam atomorum torquatos.
-                                                    </figcaption>
-                                                    <div class="action">
-                                                        <a href="#" class="close">&times;</a>
-                                                    </div>
-                                                </figure>
-                                            </li>
-                                        </ul>
-                                        <!--/ END Message List -->
-                                    </div>
-                                </div>
-                                <div class="footer">
-                                    <div class="form">
-                                        <input type="text" placeholder="type your message...">
-                                        <button type="submit" class="btn btn-primary"><span class="icon icone-ok"></span> Send</button>
-                                    </div>
-                                </div>
-                            </section>
-                        </form>
-                        <!--/ END Message Widget -->
-                    </div>
-                    <!--/ END Row -->
+                <!-- START Content - CREATE_NEW_SERVER -->
+                <div class="container-fluid" ng-show="page == 'create_server'">
 
 
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content - SERVER_STATUS -->
+                <div class="container-fluid" ng-show="page == 'server_status'">
+
+
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content - RESTORE_POINTS -->
+                <div class="container-fluid" ng-show="page == 'restore_points'">
+
+
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content - ARCHIVES -->
+                <div class="container-fluid" ng-show="page == 'archives'">
+
+
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content - SCHEDULING -->
+                <div class="container-fluid" ng-show="page == 'scheduling'">
+
+
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content - CALENDAR -->
+                <div class="container-fluid" ng-show="page == 'calendar'">
                     <!-- START Row -->
                     <div class="row-fluid">
                         <!-- START Default Calendar -->
@@ -809,9 +666,45 @@
                         <!--/ END Default Calendar -->
                     </div>
                     <!--/ END Row -->
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content - SERVER_PROPERTIES -->
+                <div class="container-fluid" ng-show="page == 'server_properties'">
+
 
                 </div>
                 <!--/ END Content -->
+
+                <!-- START Content - JAVA -->
+                <div class="container-fluid" ng-show="page == 'java'">
+
+
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content - GAME_MAINTENANCE -->
+                <div class="container-fluid" ng-show="page == 'maintenance'">
+
+
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content - CONSOLE -->
+                <div class="container-fluid" ng-show="page == 'console'">
+
+
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content - OTHER_FILES -->
+                <div class="container-fluid" ng-show="page == 'otherfiles'">
+
+
+                </div>
+                <!--/ END Content -->
+
+                
 
             </section>
             <!--/ END Template Main Content -->
@@ -886,6 +779,8 @@
     <!--/ Javascript(Plugins) -->
 
     <!-- Javascript (Application) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+    <script src="js/scriptin.js"></script>
     <script src="js/plugins.js"></script>
     <script src="js/application.js"></script>
     <script src="js/flot.sample.js"></script>
