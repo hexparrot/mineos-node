@@ -1,0 +1,80 @@
+/* Themer */
+.themer {
+    position: absolute;
+    right: 20px;
+    top: 97px;
+    z-index: 10;
+    background-color: #444;
+    opacity: .5;
+}
+.themer:hover { opacity: 1; }
+.themer .header,
+.themer .body,
+.themer .body .color li {
+    display: inline-block;
+    vertical-align: top;
+}
+.themer .header { cursor: pointer; }
+.themer .header .icon {
+    color: #eee;
+    display: block;
+    font-size: 18px;
+    margin: 13px 10px 9px 10px;
+}
+.themer .body {
+    display: none;
+    position: absolute;
+    right: 0px;
+    width: 194px; 
+    background-color: #444;
+    padding: 3px;
+}
+.themer .body hr {
+    margin-top: 0px;
+    border-color: #999;
+}
+.themer .body .background,
+.themer .body .color { margin: 0; }
+.themer .body .background li,
+.themer .body .color li {
+    display: inline-block;
+    position: relative;
+    list-style: none;
+    width: 30px;
+    height: 30px;
+    margin: 5px 3px 5px 3px;
+    cursor: pointer;
+}
+.themer .body .background li.active:before,
+.themer .body .color li.active:before {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 28px;
+    border: 2px solid #333;
+    content: "";
+}
+.themer .body .color li.red { background-color: #dc143c; }
+.themer .body .color li.teal { background-color: #00A0B1; }
+.themer .body .color li.blue { background-color: #2E8DEF; }
+.themer .body .color li.purple { background-color: #A700AE; }
+.themer .body .color li.magenta { background-color: #FF0097; }
+.themer .body .color li.lime { background-color: #8CBF26; }
+.themer .body .color li.brown { background-color: #A05000; }
+.themer .body .color li.pink { background-color: #E671B8; }
+.themer .body .color li.orange { background-color: #F09609; }
+.themer .body .color li.green { background-color: #3A9548; }
+.themer .body .color li.yellow { background-color: #E1B700; }
+
+.themer .body .background li.bg1 { background: url('../img/1-mini.jpg') center no-repeat; }
+.themer .body .background li.bg2 { background: url('../img/2-mini.jpg') center no-repeat; }
+.themer .body .background li.bg3 { background: url('../img/3-mini.jpg') center no-repeat; }
+.themer .body .background li.bg4 { background: url('../img/4-mini.jpg') center no-repeat; }
+.themer .body .background li.bg5 { background: url('../img/5-mini.jpg') center no-repeat; }
+
+.themer .body .header { padding: 5px; }
+.themer .body .header label { color: #eee; }
+
+@media (max-width: 767px) {
+    .themer { right: 10px; }
+}

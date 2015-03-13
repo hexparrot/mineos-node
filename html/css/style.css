@@ -1762,7 +1762,7 @@ ul.check li:last-child {
 #sidebar #nav > ul {
 	display: block;
 	margin: 0;
-	zoom: 1;
+	*zoom: 1;
 }
 #sidebar #nav > ul > li {
 	display: block;
@@ -2922,7 +2922,6 @@ ul.check li:last-child {
 	-webkit-border-radius: 2px;
 	border-radius: 2px;
 	vertical-align: top;
-	min-height: 62px;
 }
 .stats.stats-block { 
 	display: block; 
@@ -2989,10 +2988,6 @@ ul.check li:last-child {
 }
 /* 1.6.2.1 Statistic Icon
 ----------------------------------------------------------------------------- */
-.stats.summary .icon.circle > span[class*='icone-'] {
-	margin-right: 0;
-}
-
 .stats.summary > .icon {
 	position: absolute;
 	top: -1px;
@@ -3016,9 +3011,6 @@ ul.check li:last-child {
 	min-width: 50px;
 	border-right: none;
 	border-radius: 40px;
-	box-sizing: border-box;
-	height: 50px;
-	width: 50px;
 	background-color: #eee;
 	color: #555;
 	font-size: 28px;
@@ -3040,7 +3032,7 @@ ul.check li:last-child {
 }
 /* 1.6.2.3 Statistic Progress
 ----------------------------------------------------------------------------- */
-.stats.prog { padding: 5px 10px 0px 10px; }
+.stats.prog { padding: 5px 10px 0px; 10px; }
 .stats.prog [class^="icone-"], 
 .stats.prog [class*=" icone-"] {
 	font-size: 14px;
@@ -3354,8 +3346,6 @@ ul.check li:last-child {
 	.boxed-layout #sidebar,
 	.nav-open .boxed-layout #sidebar,
 	.boxed-layout #sidebar:before { left: 0; }
-	#sidebar #nav > ul > li > a > .text,
-        #sidebar #nav > ul > li > a > .icon { margin-top: 5px; margin-bottom: 5px; }
 
 	/* Main Content
 	------------------------------------------------------------------------- */
