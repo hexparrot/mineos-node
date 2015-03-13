@@ -7,7 +7,7 @@
     <!-- START META SECTION -->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Cleanizr</title>
+    <title>MineOS Web User Interface</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, user-scalable=0, initial-scale=1.0">
     <!--/ END META SECTION -->
@@ -623,6 +623,127 @@
                 <!-- START Content - CREATE_NEW_SERVER -->
                 <div class="container-fluid" ng-show="page == 'create_server'">
 
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Form Wizard With Validation -->
+                        <form class="span12 widget dark shadowed form-horizontal bordered" id="formwizard2">
+                            <header><h4 class="title">Create a new Server</h4></header>
+                            <section class="body">
+                                <div class="body-inner">
+                                    <fieldset class="step" id="step1">
+                                        <div class="step-title">
+                                            <span class="icon icone-lock lime"></span>
+                                            <h5>
+                                                STEP 1<br/>
+                                                <small>Ownership</small>
+                                            </h5>
+                                        </div>
+                                        <div class="control-group">
+                                            <label class="control-label">Server Name:</label>
+                                            <div class="controls"><input type="text" name="username" class="input-medium required"></div>
+                                        </div>
+                                        <!-- Select -->
+                                        <div class="control-group">
+                                        <label class="control-label">Group Owner:</label>
+                                        <div class="controls">
+                                            <select class="input-medium">
+                                                <option value="1001" selected>will (1001)</option>
+                                            </select>
+                                        </div>
+                                        </div><!--/ Select -->
+                                    </fieldset>
+                                    <fieldset id="step2" class="step">
+                                        <div class="step-title">
+                                            <span class="icon icone-lightbulb yellow"></span>
+                                            <h5>
+                                                STEP 2<br/>
+                                                <small>server.properties</small>
+                                            </h5>
+                                        </div>
+
+                                        <div class="control-group">
+                                            <label class="control-label">server-port</label>
+                                            <div class="controls"><input type="text" name="server-port" class="input-medium" placeholder="25565"></div>
+                                        </div>
+
+                                        <div class="control-group">
+                                            <label class="control-label">server-ip</label>
+                                            <div class="controls"><input type="text" name="server-ip" class="input-medium" placeholder="0.0.0.0"></div>
+                                        </div>
+
+                                        <div class="control-group">
+                                            <label class="control-label">max-players</label>
+                                            <div class="controls"><input type="text" name="max-players" class="input-medium" placeholder="20"></div>
+                                        </div>
+
+                                        <div class="control-group">
+                                            <label class="control-label">level-name</label>
+                                            <div class="controls"><input type="text" name="level-name" class="input-medium" placeholder="world"></div>
+                                        </div>
+
+                                        <div class="control-group">
+                                            <label class="control-label">level-seed</label>
+                                            <div class="controls"><input type="text" name="level-seed" class="input-medium"></div>
+                                        </div>
+
+                                        <!-- Select -->
+                                        <div class="control-group">
+                                        <label class="control-label">difficulty:</label>
+                                        <div class="controls">
+                                            <select class="input-medium input-medium">
+                                                <option value="0" selected>Peaceful</option>
+                                                <option value="1">Easy</option>
+                                                <option value="2">Normal</option>
+                                                <option value="3">Hard</option>
+                                            </select>
+                                        </div>
+                                        </div><!--/ Select -->
+
+                                        <!-- Select -->
+                                        <div class="control-group">
+                                        <label class="control-label">gamemode</label>
+                                        <div class="controls">
+                                            <select class="input-medium input-medium">
+                                                <option value="1" selected>Survival</option>
+                                                <option value="2">Creative</option>
+                                                <option value="3">Adventure</option>
+                                            </select>
+                                        </div>
+                                        </div><!--/ Select -->
+
+                                        <!-- Select -->
+                                        <div class="control-group">
+                                        <label class="control-label">level-type</label>
+                                        <div class="controls">
+                                            <select class="input-medium input-medium">
+                                                <option value="DEFAULT" selected>DEFAULT</option>
+                                                <option value="FLAT">FLAT</option>
+                                                <option value="LARGEBIOMES">LARGEBIOMES</option>
+                                            </select>
+                                        </div>
+                                        </div><!--/ Select -->
+
+                                        <!-- Styled Checkbox -->
+                                        <div class="control-group">
+                                            <label class="control-label">generate-structures</label>
+                                            <div class="controls">
+                                                <label class="checkbox styled">
+                                                    <input type="checkbox" value="generate-structures" checked>
+                                                </label>
+                                            </div>
+                                        </div><!--/ Styled Checkbox -->
+
+                                    </fieldset>
+                                    <div class="form-actions">
+                                        <input class="btn" id="back-1" value="Back" type="reset">
+                                        <input type="submit" class="btn btn-primary" id="next-1" value="Create Server">
+                                    </div>
+                                </div>
+                            </section>
+                        </form>
+                        <!--/ END Form Wizard With Validation -->
+                    </div>
+                    <!--/ END Row -->
 
                 </div>
                 <!--/ END Content -->
