@@ -920,9 +920,15 @@ test.list_increments = function(test) {
       })
     },
     function(callback) {
+      instance.list_increments(function(err, increments) {
+        test.ok(err); // testing for error
+        callback(!err);
+      })
+    },
+    function(callback) {
       instance.backup(function(err) {
         test.ifError(err);
-        setTimeout(function() { callback(err) }, FS_DELAY_MS*2);
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*3);
       })
     },
     function(callback) {
@@ -939,18 +945,20 @@ test.list_increments = function(test) {
     },
     function(callback) {
       instance.list_increments(function(err, increments) {
+        test.equal(increments[0].step, '0B');
+        test.equal(increments[1].step, '1B');
         for (var i in increments) {
           test.ok('step' in increments[i]);
           test.ok('time' in increments[i]);
           test.ok('size' in increments[i]);
           test.ok('cum' in increments[i]);
         }
-        callback(err);
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*3);
       })
     }
   ], function(err, results) {
     test.ifError(err);
-    test.expect(14);
+    test.expect(17);
     test.done();
   })  
 }

@@ -344,16 +344,19 @@ mineos.mc = function(server_name, base_dir) {
     rdiff.stdout.on('data', function(data) {
       var buffer = new Buffer(data, 'ascii');
       var lines = buffer.toString('ascii').split('\n');
+      var incrs = 0;
 
       for (var i=0; i < lines.length; i++) {
         var match = lines[i].match(regex);
-        if (match)
+        if (match) {
           increment_lines.push({
-            step: '{0}B'.format(i),
+            step: '{0}B'.format(incrs),
             time: match[1],
             size: match[2],
             cum: match[3]
           });
+          incrs += 1;
+        }
       }
 
       rdiff.on('close', function(code) {
