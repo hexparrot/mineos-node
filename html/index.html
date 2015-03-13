@@ -629,7 +629,180 @@
 
                 <!-- START Content - SERVER_STATUS -->
                 <div class="container-fluid" ng-show="page == 'server_status'">
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Default Widget -->
+                        <div class="widget borderless">
+                            <header>
+                                <h4 class="title"><span class="icon icone-globe"></span> Server at a Glance</h4>
+                                <!-- START Toolbar -->
+                                <ul class="toolbar pull-right">
+                                    <li><a href="#" class="link" data-widget="refresh"><span class="icon icone-refresh"></span></a></li>
+                                </ul>
+                                <!--/ END Toolbar -->
+                                <span class="label label-important pull-right">10 Message</span>
+                            </header>
+                            <section class="body">
+                                <div class="body-inner">
 
+
+                                    <!-- START Row -->
+                                    <div class="row-fluid">
+                                        <!-- START Circular Summary -->
+                                        <div class="span12 widget borderless">
+                                            <section class="body">
+                                                <div class="body-inner no-padding" style="">
+                                                    <!-- START Summary -->
+                                                    <figure class="stats summary stacked">
+                                                        <div class="icon circle green"><span class="icone-ok"></span></div>
+                                                        <figcaption>
+                                                            <h3>13<small>Servers Running</small></h3>
+                                                        </figcaption>
+                                                    </figure><!--/ END Summary -->
+
+                                                    <!-- START Circular -->
+                                                    <figure class="stats summary stacked circular">
+                                                        <div class="gauge gauge-red" data-percent="70">
+                                                            <span class="icon icone-exchange"></span>
+                                                        </div>
+                                                        <figcaption>
+                                                            <h4>14<small>Players Online</small></h4>
+                                                        </figcaption>
+                                                    </figure><!--/ END Circular -->
+
+                                                    <!-- START Summary -->
+                                                    <figure class="stats summary stacked">
+                                                        <div class="icon circle lime"><span class="icone-time"></span></div>
+                                                        <figcaption>
+                                                            <h3>15:12:06<small>Uptime</small></h3>
+                                                        </figcaption>
+                                                    </figure><!--/ END Summary -->
+
+                                                    <!-- START Circular -->
+                                                    <figure class="stats summary stacked circular">
+                                                        <div class="gauge gauge-teal" data-percent="20">
+                                                            <span class="icon icone-ticket"></span>
+                                                        </div>
+                                                        <figcaption>
+                                                            <h4>20%<small>RAM FREE</small></h4>
+                                                        </figcaption>
+                                                    </figure><!--/ END Circular -->
+                                                </div>
+                                            </section>
+                                        </div>
+                                        <!--/ END Circular Summary -->
+                                    </div>
+                                    <!--/ END Row -->
+                                        
+                                    <!-- START Row -->
+                                    <div class="row-fluid">
+                                        <!-- START Widget Header Badge -->
+                                        <div class="span6 widget">
+                                            <header>
+                                                <h4 class="title"><span class="icon icone-hdd"></span> Restore Points</h4>
+                                                <span class="badge badge-success pull-right">10</span>
+                                            </header>
+                                            <section class="body">
+                                                <div class="body-inner">
+                                                    <p>Most recent restore point: <a href="#" data-placement="top" title="" rel="tooltip" data-original-title="3/12/2015">yesterday</a></p>
+                                                    <p>Oldest restore point: yesterday</p>
+                                                    <p>Space used by restore points: 1.04MB</p>
+                                                    <!-- Alert Error -->
+                                                    <div class="alert alert-success">
+                                                        <button type="button" class="close" data-dismiss="alert">×</button>
+                                                        <strong>Success! </strong> Restore point completed at 11:06 AM.
+                                                    </div><!--/ Alert Error -->
+                                                    <p><a>Create a new restore point now</a></p>
+                                                </div>
+                                            </section>
+                                        </div>
+                                        <!--/ END Widget Header Badge -->
+
+                                        <!-- START Widget Header Badge -->
+                                        <div class="span6 widget">
+                                            <header>
+                                                <h4 class="title"><span class="icon icone-hdd"></span> Archives</h4>
+                                                <span class="badge badge-success pull-right">10</span>
+                                            </header>
+                                            <section class="body">
+                                                <div class="body-inner">
+                                                    <p>Most recent archive: yesterday</p>
+                                                    <p>Oldest archive: yesterday</p>
+                                                    <p>Space used by archives: 1.04MB</p>
+                                                    <!-- Alert Error -->
+                                                    <div class="alert alert-error">
+                                                        <button type="button" class="close" data-dismiss="alert">×</button>
+                                                        <strong>Uh oh! </strong> Archive could not complete with server running.
+                                                    </div><!--/ Alert Error -->
+                                                    <p><a>Create a new archive now</a></p>
+                                                </div>
+                                                
+                                            </section>
+                                        </div>
+                                        <!--/ END Widget Header Badge -->
+                                    </div>
+                                    <!--/ END Row -->
+
+                                    <!-- START Row -->
+                                    <div class="row-fluid">
+                                        <p>&nbsp;</p>
+                                    </div>
+                                    <!--/ END Row -->
+
+                                    <!-- START Row -->
+                                    <div class="row-fluid">
+                                        <!-- START Widget Header Badge -->
+                                        <div class="span6 widget">
+                                            <header>
+                                                <h4 class="title"><span class="icon icone-bookmark"></span> Ownership and Disk Usage</h4>
+                                            </header>
+                                            <section class="body">
+                                                <div class="body-inner">
+                                                    <p>Server Owner: will (1000)</p>
+                                                    <p>Group Owner: will (1001)</p>
+                                                    <p>Space used by live server files: 5.04MB</p>
+                                                </div>
+                                            </section>
+                                        </div>
+                                        <!--/ END Widget Header Badge -->
+
+                                        <!-- START Widget Header Badge -->
+                                        <div class="span6 widget">
+                                            <header>
+                                                <h4 class="title"><span class="icon icone-trash"></span> Delete Server</h4>
+                                            </header>
+                                            <section class="body">
+                                                <div class="body-inner">
+                                                    <!-- Default Checkbox Inline -->
+                                                    <div class="control-group">
+                                                        <div class="controls">
+                                                            <label class="checkbox">
+                                                                <input type="checkbox" value="archive"> archive/aaa
+                                                            </label>
+                                                            <label class="checkbox">
+                                                                <input type="checkbox" value="backup"> backup/aaa
+                                                            </label>
+                                                            <label class="checkbox">
+                                                                <input type="checkbox" value="servers"> servers/aaa
+                                                            </label>
+                                                        </div>
+                                                        <button type="button" class="btn btn-mini btn-warning"><span class="icone-warning-sign"></span> Delete</button>
+                                                    </div><!--/ Default Checkbox Inline -->
+
+                                                </div>
+                                                
+                                            </section>
+                                        </div>
+                                        <!--/ END Widget Header Badge -->
+                                    </div>
+                                    <!--/ END Row -->
+
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Default Widget -->
+                    </div>
+                    <!--/ END Row -->
 
                 </div>
                 <!--/ END Content -->
