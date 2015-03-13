@@ -501,7 +501,7 @@
                         <!-- START Circular Summary -->
                         <div class="span12 widget borderless">
                             <section class="body">
-                                <div class="body-inner no-padding" style="text-align:center;">
+                                <div class="body-inner no-padding" style="">
                                     <!-- START Summary -->
                                     <figure class="stats summary stacked">
                                         <div class="icon circle green"><span class="icone-ok"></span></div>
@@ -971,6 +971,65 @@
                 <!-- START Content - SCHEDULING -->
                 <div class="container-fluid" ng-show="page == 'scheduling'">
 
+                    <!-- START Widget Color - Blue -->
+                    <div class="span5 widget blue">
+                        <header>
+                            <h4 class="title"><span class="icon icone-bookmark"></span> Backup Frequency</h4>
+                        </header>
+                        <section class="body">
+                            <div class="body-inner">
+
+                                <!-- Multiple -->
+                                <div class="control-group">
+                                    <div class="controls">
+                                        <select class="input-xlarge" id="backup_freq" multiple>
+                                            <option value="1">hourly</option>
+                                            <option value="2">every two hours</option>
+                                            <option value="3">every three hours</option>
+                                            <option value="4">every four hours</option>
+                                            <option value="6">every six hours</option>
+                                            <option value="12">every twelve hours</option>
+                                            <option value="24">daily</option>
+                                            <option value="48">every two days</option>
+                                            <option value="72">every three days</option>
+                                            <option value="168">weekly</option>
+                                        </select>
+                                    </div>
+                                </div><!--/ Multiple -->
+
+                            </div>
+                        </section>
+                    </div>
+                    <!--/ END Widget Color - Blue -->
+
+                    <!-- START Widget Color - Green -->
+                    <div class="span5 widget green">
+                        <header>
+                            <h4 class="title">Archive Frequency</h4>
+                        </header>
+                        <section class="body">
+                            <div class="body-inner">
+                                <!-- Multiple -->
+                                <div class="control-group">
+                                    <div class="controls">
+                                        <select class="input-xlarge" id="archive_freq" multiple>
+                                            <option value="1">hourly</option>
+                                            <option value="2">every two hours</option>
+                                            <option value="3">every three hours</option>
+                                            <option value="4">every four hours</option>
+                                            <option value="6">every six hours</option>
+                                            <option value="12">every twelve hours</option>
+                                            <option value="24">daily</option>
+                                            <option value="48">every two days</option>
+                                            <option value="72">every three days</option>
+                                            <option value="168">weekly</option>
+                                        </select>
+                                    </div>
+                                </div><!--/ Multiple -->
+                            </div>
+                        </section>
+                    </div>
+                    <!--/ END Widget Color - Green -->
 
                 </div>
                 <!--/ END Content -->
