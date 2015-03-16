@@ -160,6 +160,9 @@ $(function () {
         $("#select2_4").select2({
             tags: ["red", "green", "blue", "yellow", "purple", "brown"]
         });
+        $(".frequencies").select2({
+            tags: ["1 hour", "2 hours", "3 hours", "4 hours", "6 hours", "12 hours", "1 day", "2 days", "3 days", "7 days"]
+        });
     }
 });
 
