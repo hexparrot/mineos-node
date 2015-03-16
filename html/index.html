@@ -958,11 +958,153 @@
                 <div class="container-fluid" ng-show="page == 'restore_points'">
 
 
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Basic Table -->
+                        <div class="span12 widget">
+                            <header>
+                                <h4 class="title">Available Restore Points</h4>
+                                <!-- START Toolbar -->
+                                <ul class="toolbar pull-right">
+                                    <li><a href="#" class="link"><span class="icon icone-cog"></span></a></li>
+                                    <li>
+                                        <a href="#" class="link" data-toggle="dropdown"><span class="icon icone-ellipsis-vertical"></span></a>
+                                        <ul class="dropdown-menu pull-right">
+                                            <li><a href="#"><span class="icon icone-pencil"></span> Edit</a></li>
+                                            <li><a href="#"><span class="icon icone-trash"></span> Delete</a></li>
+                                            <li><a href="#"><span class="icon icone-cog"></span> Setting</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <!--/ END Toolbar -->
+                            </header>
+                            <section class="body">
+                                <div class="body-inner no-padding">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Step</th>
+                                                <th>Timestamp</th>
+                                                <th>Size</th>
+                                                <th>Cumulative Size</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>0B</td>
+                                                <td>Today</td>
+                                                <td>14.01MB</td>
+                                                <td>14.01MB</td>
+                                                <td>
+                                                    <p>
+                                                        <button type="button" class="btn btn-mini btn-success">Restore</button>
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>1B</td>
+                                                <td>Today</td>
+                                                <td>.01MB</td>
+                                                <td>14.02MB</td>
+                                                <td>
+                                                    <p>
+                                                        <button type="button" class="btn btn-mini btn-success">Restore</button>
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Basic Table -->
+                    </div>
+                    <!--/ END Row -->
+
+
                 </div>
                 <!--/ END Content -->
 
                 <!-- START Content - ARCHIVES -->
                 <div class="container-fluid" ng-show="page == 'archives'">
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Basic Table -->
+                        <div class="span12 widget">
+                            <header>
+                                <h4 class="title">Available Archives</h4>
+                                <!-- START Toolbar -->
+                                <ul class="toolbar pull-right">
+                                    <li><a href="#" class="link"><span class="icon icone-cog"></span></a></li>
+                                    <li>
+                                        <a href="#" class="link" data-toggle="dropdown"><span class="icon icone-ellipsis-vertical"></span></a>
+                                        <ul class="dropdown-menu pull-right">
+                                            <li><a href="#"><span class="icon icone-pencil"></span> Edit</a></li>
+                                            <li><a href="#"><span class="icon icone-trash"></span> Delete</a></li>
+                                            <li><a href="#"><span class="icon icone-cog"></span> Setting</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <!--/ END Toolbar -->
+                            </header>
+                            <section class="body">
+                                <div class="body-inner no-padding">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Timestamp</th>
+                                                <th>Filename</th>
+                                                <th>Size</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Yesterday</td>
+                                                <td>mc-something-datestamp.tar.gz</td>
+                                                <td>14.01MB</td>
+                                                <td>
+                                                    <p>
+                                                        <!-- Button Dropdown -->
+                                                        <div class="btn-group">
+                                                            <button class="btn btn-small dropdown-toggle" data-toggle="dropdown">Actions <span class="caret"></span></button>
+                                                            <ul class="dropdown-menu">
+                                                                <li><a href="#">Delete this Archive</a></li>
+                                                                <li><a href="#"></a></li>
+                                                                <li><a href="#">Create server from Archive</a></li>
+                                                            </ul>
+                                                        </div><!--/ Button Dropdown -->
+                                                        <!-- Button Dropdown -->
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Today</td>
+                                                <td>mc-something-datestamp2.tar.gz</td>
+                                                <td>.01MB</td>
+                                                <td>
+                                                    <p>
+                                                        <!-- Button Dropdown -->
+                                                        <div class="btn-group">
+                                                            <button class="btn btn-small dropdown-toggle" data-toggle="dropdown">Actions <span class="caret"></span></button>
+                                                            <ul class="dropdown-menu">
+                                                                <li><a href="#">Delete this Archive</a></li>
+                                                                <li><a href="#"></a></li>
+                                                                <li><a href="#">Create server from Archive</a></li>
+                                                            </ul>
+                                                        </div><!--/ Button Dropdown -->
+                                                        <!-- Button Dropdown -->
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Basic Table -->
+                    </div>
+                    <!--/ END Row -->
 
 
                 </div>
