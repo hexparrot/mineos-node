@@ -120,7 +120,14 @@ app.controller("Webui", ['$scope', 'socket', function($scope, socket) {
       ]
     }
 
-    var plot = $.plot($("#load_averages"), craft_dataset(), options);
+    var dataset = craft_dataset();
+
+    options.yaxis.max = Math.max(
+      Math.max.apply(Math,dataset[0].data),
+      Math.max.apply(Math,dataset[1].data),
+      Math.max.apply(Math,dataset[2].data)) || 1;
+
+    var plot = $.plot($("#load_averages"), dataset, options);
     plot.draw();
   })
 
