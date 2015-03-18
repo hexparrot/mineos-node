@@ -43,7 +43,8 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
   function host_heartbeat() {
     self.front_end.emit('host_heartbeat', {
       'uptime': os.uptime(),
-      'freemem': os.freemem()
+      'freemem': os.freemem(),
+      'loadavg': os.loadavg()
     })
   }
 

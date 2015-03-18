@@ -78,12 +78,50 @@ app.controller("Webui", ['$scope', 'socket', function($scope, socket) {
     angular.forEach(servers, function(server_name) {
       this[server_name] = new server_model(server_name, socket);
     }, $scope.servers)
-    console.log($scope.servers)
   })
 
+  $scope.loadavg = [];
+
   socket.on('/', 'host_heartbeat', function(data) {
-    console.log(data)
     $scope.host_heartbeat = data;
+    $scope.loadavg.push(data.loadavg);
+
+    while ($scope.loadavg.length > 30)
+      $scope.loadavg.splice(0,1);
+
+    var options = {
+      series: { 
+        lines: {
+          show: true,
+          fill: .5
+        },
+        shadowSize: 0 
+      },
+      yaxis: { min: 0, max: 1 },
+      xaxis: { min: 0, max: 30, show: false },
+      grid: {
+        borderWidth: 0, 
+        hoverable: true 
+      }
+    };
+
+    function get_enumerated_values(column) {
+      var res = [];
+      for (var i = 0; i < $scope.loadavg.length; ++i)
+        res.push([i, $scope.loadavg[i][column]])
+      return res;
+    }
+
+    function craft_dataset() {
+      return [
+        { label: "fifteen", data: get_enumerated_values(2), color: "#0077FF" },
+        { label: "five", data: get_enumerated_values(1), color: "#ED7B00" },
+        { label: "one", data: get_enumerated_values(0), color: "#E8E800" }
+      ]
+    }
+
+    var plot = $.plot($("#load_averages"), craft_dataset(), options);
+    plot.draw();
   })
 
 }]);
