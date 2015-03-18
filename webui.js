@@ -39,6 +39,7 @@ app.get('/', function(req, res){
   res.sendFile('index.html', response_options);
 });
 
+app.use('/angular', express.static(__dirname + '/node_modules/angular'));
 app.use('/admin', express.static(__dirname + '/html'));
 
 process.on('SIGINT', function() {

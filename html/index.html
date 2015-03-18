@@ -468,7 +468,7 @@
                         <!-- Breadcrumb -->
                         <ul class="breadcrumb">
                             <li><a href="#">Currently Selected Server</a> <span class="divider"></span></li>
-                            <li class="active">None</li>
+                            <li class="active">{{ current }}</li>
                         </ul>
                         <!--/ Breadcrumb -->
                     </div>
@@ -506,35 +506,35 @@
                                     <figure class="stats summary stacked">
                                         <div class="icon circle green"><span class="icone-ok"></span></div>
                                         <figcaption>
-                                            <h3>13<small>Servers Running</small></h3>
+                                            <h3>{{ servers_up() }}<small>Servers Running</small></h3>
                                         </figcaption>
                                     </figure><!--/ END Summary -->
 
                                     <!-- START Circular -->
                                     <figure class="stats summary stacked circular">
-                                        <div class="gauge gauge-red" data-percent="70">
+                                        <div class="gauge gauge-red" data-percent="{{ players_online()/player_capacity()*100 }}">
                                             <span class="icon icone-exchange"></span>
                                         </div>
                                         <figcaption>
-                                            <h4>14<small>Players Online</small></h4>
+                                            <h4>{{ players_online() }}<small>Players Online</small></h4>
                                         </figcaption>
                                     </figure><!--/ END Circular -->
 
                                     <!-- START Summary -->
-                                    <figure class="stats summary stacked">
+                                    <figure class="stats summary stacked" ng-show="host_heartbeat.uptime">
                                         <div class="icon circle lime"><span class="icone-time"></span></div>
                                         <figcaption>
-                                            <h3>15:12:06<small>Uptime</small></h3>
+                                            <h3>{{ host_heartbeat.uptime | seconds_to_time }}<small>Uptime</small></h3>
                                         </figcaption>
                                     </figure><!--/ END Summary -->
 
                                     <!-- START Circular -->
-                                    <figure class="stats summary stacked circular">
+                                    <figure class="stats summary stacked circular" ng-show="host_heartbeat.freemem">
                                         <div class="gauge gauge-teal" data-percent="20">
                                             <span class="icon icone-ticket"></span>
                                         </div>
                                         <figcaption>
-                                            <h4>20%<small>RAM FREE</small></h4>
+                                            <h4>{{ host_heartbeat.freemem | bytes_to_mb }}<small>RAM FREE</small></h4>
                                         </figcaption>
                                     </figure><!--/ END Circular -->
                                 </div>
@@ -588,26 +588,12 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>the best server</td>
-                                                <td>vanilla</td>
-                                                <td class="hidden-phone">25565</td>
-                                                <td>up</td>
-                                                <td>256000 kb</td>
-                                            </tr>
-                                            <tr>
-                                                <td>server2</td>
-                                                <td>vanilla</td>
-                                                <td class="hidden-phone">25566</td>
-                                                <td>up</td>
-                                                <td>128427 kb</td>
-                                            </tr>
-                                            <tr>
-                                                <td>test</td>
-                                                <td>vanilla</td>
-                                                <td class="hidden-phone">25570</td>
-                                                <td>down</td>
-                                                <td></td>
+                                            <tr ng-repeat="(server_name, instance) in servers">
+                                                <td><a ng-click="$parent.current = server_name">{{ server_name }}</a></td>
+                                                <td><a ng-attr-title="{{ 'MC Protocol: ' + instance.heartbeat.ping.protocol }}">{{ instance.heartbeat.ping.server_version }}</a></td>
+                                                <td class="hidden-phone">{{ instance.sp['server-port'] }}</td>
+                                                <td><span class="label" ng-show="instance.heartbeat" ng-class="{'label-success': instance.heartbeat.up, 'label-important': !instance.heartbeat.up}">{{ instance.heartbeat.up ? 'up' : 'down' }}</span></td>
+                                                <td>{{ instance.heartbeat.memory.VmRSS }}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -1406,7 +1392,8 @@
     <!--/ Javascript(Plugins) -->
 
     <!-- Javascript (Application) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/angular/angular.js"></script>
     <script src="js/scriptin.js"></script>
     <script src="js/plugins.js"></script>
     <script src="js/application.js"></script>
