@@ -81,15 +81,9 @@ app.controller("Webui", ['$scope', 'socket', function($scope, socket) {
   })
 
   $scope.loadavg = [];
-
-  socket.on('/', 'host_heartbeat', function(data) {
-    $scope.host_heartbeat = data;
-    $scope.loadavg.push(data.loadavg);
-
-    while ($scope.loadavg.length > 30)
-      $scope.loadavg.splice(0,1);
-
-    var options = {
+  $scope.loadavg_options = {
+      element: $("#load_averages"),
+      fallback_xaxis_max: 1,
       series: { 
         lines: {
           show: true,
@@ -99,11 +93,14 @@ app.controller("Webui", ['$scope', 'socket', function($scope, socket) {
       },
       yaxis: { min: 0, max: 1 },
       xaxis: { min: 0, max: 30, show: false },
-      grid: {
-        borderWidth: 0, 
-        hoverable: true 
-      }
+      grid: { borderWidth: 0 }
     };
+
+  $scope.update_loadavg = function(new_datapoint) {
+    $scope.loadavg.push(new_datapoint);
+
+    while ($scope.loadavg.length > $scope.loadavg_options.xaxis.max)
+      $scope.loadavg.splice(0,1);
 
     function get_enumerated_values(column) {
       var res = [];
@@ -112,23 +109,23 @@ app.controller("Webui", ['$scope', 'socket', function($scope, socket) {
       return res;
     }
 
-    function craft_dataset() {
-      return [
-        { label: "fifteen", data: get_enumerated_values(2), color: "#0077FF" },
-        { label: "five", data: get_enumerated_values(1), color: "#ED7B00" },
-        { label: "one", data: get_enumerated_values(0), color: "#E8E800" }
-      ]
-    }
+    var dataset = [
+      { label: "fifteen", data: get_enumerated_values(2), color: "#0077FF" },
+      { label: "five", data: get_enumerated_values(1), color: "#ED7B00" },
+      { label: "one", data: get_enumerated_values(0), color: "#E8E800" }
+    ];
 
-    var dataset = craft_dataset();
-
-    options.yaxis.max = Math.max(
+    $scope.loadavg_options.yaxis.max = Math.max(
       Math.max.apply(Math,dataset[0].data),
       Math.max.apply(Math,dataset[1].data),
-      Math.max.apply(Math,dataset[2].data)) || 1;
+      Math.max.apply(Math,dataset[2].data)) || $scope.loadavg_options.fallback_xaxis_max;
 
-    var plot = $.plot($("#load_averages"), dataset, options);
-    plot.draw();
+    $.plot($scope.loadavg_options.element, dataset, $scope.loadavg_options).draw();
+  }
+
+  socket.on('/', 'host_heartbeat', function(data) {
+    $scope.host_heartbeat = data;
+    $scope.update_loadavg(data.loadavg);
   })
 
 }]);
