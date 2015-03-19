@@ -142,6 +142,14 @@ function server_model(server_name, channel) {
     self['heartbeat'] = data.payload;
   })
 
+  self.channel.on(server_name, 'page_data', function(data) {
+    switch (data.page) {
+      case 'server_status':
+        self['glance'] = data.payload;
+        break;
+    }
+  })
+
   self.channel.on(server_name, 'result', function(data) {
     if ('property' in data) {
       switch (data.property) {
@@ -155,6 +163,7 @@ function server_model(server_name, channel) {
   })
 
   self.channel.emit(server_name, 'property', {property: 'server.properties'});
+  self.channel.emit(server_name, 'page_data', 'server_status');
 
   return self;
 }

@@ -755,35 +755,35 @@
                                                     <figure class="stats summary stacked">
                                                         <div class="icon circle green"><span class="icone-ok"></span></div>
                                                         <figcaption>
-                                                            <h3>13<small>Servers Running</small></h3>
+                                                            <h4>{{ servers[current].heartbeat.up ? 'RUNNING' : 'DOWN' }}<small>Server Status</small></h4>
                                                         </figcaption>
                                                     </figure><!--/ END Summary -->
 
                                                     <!-- START Circular -->
                                                     <figure class="stats summary stacked circular">
-                                                        <div class="gauge gauge-red" data-percent="70">
+                                                        <div class="gauge gauge-red" data-percent="0">
                                                             <span class="icon icone-exchange"></span>
                                                         </div>
                                                         <figcaption>
-                                                            <h4>14<small>Players Online</small></h4>
+                                                            <h4>{{ servers[current].heartbeat.ping.players_online }} / {{ servers[current].heartbeat.ping.players_max }}<small>Players Online</small></h4>
                                                         </figcaption>
                                                     </figure><!--/ END Circular -->
 
                                                     <!-- START Summary -->
                                                     <figure class="stats summary stacked">
-                                                        <div class="icon circle lime"><span class="icone-time"></span></div>
+                                                        <div class="icon circle blue"><span class="icone-cogs"></span></div>
                                                         <figcaption>
-                                                            <h3>15:12:06<small>Uptime</small></h3>
+                                                            <h4>{{ servers[current].heartbeat.ping.server_version }}<small>Version</small></h4>
                                                         </figcaption>
                                                     </figure><!--/ END Summary -->
 
                                                     <!-- START Circular -->
                                                     <figure class="stats summary stacked circular">
-                                                        <div class="gauge gauge-teal" data-percent="20">
+                                                        <div class="gauge gauge-teal" data-percent="0">
                                                             <span class="icon icone-ticket"></span>
                                                         </div>
                                                         <figcaption>
-                                                            <h4>20%<small>RAM FREE</small></h4>
+                                                            <h4>{{ servers[current].heartbeat.memory.VmRSS }}<small>Memory Footprint</small></h4>
                                                         </figcaption>
                                                     </figure><!--/ END Circular -->
                                                 </div>
@@ -833,13 +833,13 @@
                                         <div class="span6 widget">
                                             <header>
                                                 <h4 class="title"><span class="icon icone-hdd"></span> Restore Points</h4>
-                                                <span class="badge badge-success pull-right">10</span>
+                                                <span class="badge badge-success pull-right">{{ servers[current].glance.increments.length }}</span>
                                             </header>
                                             <section class="body">
                                                 <div class="body-inner">
-                                                    <p>Most recent restore point: <a href="#" data-placement="top" title="" rel="tooltip" data-original-title="3/12/2015">yesterday</a></p>
-                                                    <p>Oldest restore point: yesterday</p>
-                                                    <p>Space used by restore points: 1.04MB</p>
+                                                    <p>Most recent restore point: <a href="#" data-placement="top" title="" rel="tooltip" data-original-title="3/12/2015">{{ servers[current].glance.increments[0].time }}</a></p>
+                                                    <p>Oldest restore point: {{ servers[current].glance.increments.slice(-1)[0].time }}</p>
+                                                    <p>Space used by restore points: {{ servers[current].glance.du_bwd | bytes_to_mb }}</p>
                                                     <!-- Alert Error -->
                                                     <div class="alert alert-success">
                                                         <button type="button" class="close" data-dismiss="alert">×</button>
@@ -855,13 +855,13 @@
                                         <div class="span6 widget">
                                             <header>
                                                 <h4 class="title"><span class="icon icone-hdd"></span> Archives</h4>
-                                                <span class="badge badge-success pull-right">10</span>
+                                                <span class="badge badge-success pull-right">{{ servers[current].glance.archives.length }}</span>
                                             </header>
                                             <section class="body">
                                                 <div class="body-inner">
-                                                    <p>Most recent archive: yesterday</p>
-                                                    <p>Oldest archive: yesterday</p>
-                                                    <p>Space used by archives: 1.04MB</p>
+                                                    <p>Most recent archive: {{ servers[current].glance.archives.slice(-1)[0].time }}</p>
+                                                    <p>Oldest archive: {{ servers[current].glance.archives[0].time }}</p>
+                                                    <p>Space used by archives: {{ servers[current].glance.du_awd | bytes_to_mb }}</p>
                                                     <!-- Alert Error -->
                                                     <div class="alert alert-error">
                                                         <button type="button" class="close" data-dismiss="alert">×</button>
@@ -891,9 +891,9 @@
                                             </header>
                                             <section class="body">
                                                 <div class="body-inner">
-                                                    <p>Server Owner: will (1000)</p>
-                                                    <p>Group Owner: will (1001)</p>
-                                                    <p>Space used by live server files: 5.04MB</p>
+                                                    <p>Server Owner: {{ servers[current].glance.owner.username }} ({{ servers[current].glance.owner.uid }})</p>
+                                                    <p>Group Owner: {{ servers[current].glance.owner.groupname }} ({{ servers[current].glance.owner.gid }})</p>
+                                                    <p>Space used by live server files: {{ servers[current].glance.du_cwd | bytes_to_mb }}</p>
                                                 </div>
                                             </section>
                                         </div>
