@@ -773,7 +773,7 @@
                                                     <figure class="stats summary stacked">
                                                         <div class="icon circle blue"><span class="icone-cogs"></span></div>
                                                         <figcaption>
-                                                            <h4>{{ servers[current].heartbeat.ping.server_version }}<small>Version</small></h4>
+                                                            <h4>{{ servers[current].heartbeat.ping.server_version }}&nbsp;<small>Version</small></h4>
                                                         </figcaption>
                                                     </figure><!--/ END Summary -->
 
@@ -783,7 +783,7 @@
                                                             <span class="icon icone-ticket"></span>
                                                         </div>
                                                         <figcaption>
-                                                            <h4>{{ servers[current].heartbeat.memory.VmRSS }}<small>Memory Footprint</small></h4>
+                                                            <h4>{{ servers[current].heartbeat.memory.VmRSS }}&nbsp;<small>Memory Footprint</small></h4>
                                                         </figcaption>
                                                     </figure><!--/ END Circular -->
                                                 </div>
@@ -801,16 +801,16 @@
                                             <section class="body">
                                                 <div class="body-inner">
                                                     <p>
-                                                        <button type="button" class="btn btn-success">Start</button>
+                                                        <button type="button" class="btn btn-success" ng-click="server_command('start')">Start</button>
 
                                                         <!-- Button Dropdown -->
                                                         <div class="btn-group">
-                                                            <button class="btn btn-danger">Stop</button>
+                                                            <button class="btn btn-danger" ng-click="server_command('stop')">Stop</button>
                                                             <button class="btn btn-danger dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
                                                             <ul class="dropdown-menu">
-                                                                <li><a href="#">Restart</a></li>
-                                                                <li><a href="#">Stop and Backup</a></li>
-                                                                <li><a href="#">Kill</a></li>
+                                                                <li><a href="#" ng-click="server_command('restart')">Restart</a></li>
+                                                                <li><a href="#" ng-click="server_command('stop_and_backup')">Stop and Backup</a></li>
+                                                                <li><a href="#" ng-click="server_command('kill')">Kill</a></li>
                                                             </ul>
                                                         </div><!--/ Button Dropdown -->
                                                     </p>
@@ -845,7 +845,7 @@
                                                         <button type="button" class="close" data-dismiss="alert">×</button>
                                                         <strong>Success! </strong> Restore point completed at 11:06 AM.
                                                     </div><!--/ Alert Error -->
-                                                    <p><a>Create a new restore point now</a></p>
+                                                    <p><a ng-click="server_command('backup')">Create a new restore point now</a></p>
                                                 </div>
                                             </section>
                                         </div>
@@ -867,7 +867,7 @@
                                                         <button type="button" class="close" data-dismiss="alert">×</button>
                                                         <strong>Uh oh! </strong> Archive could not complete with server running.
                                                     </div><!--/ Alert Error -->
-                                                    <p><a>Create a new archive now</a></p>
+                                                    <p><a ng-click="server_command('archive')">Create a new archive now</a></p>
                                                 </div>
                                                 
                                             </section>
@@ -919,7 +919,7 @@
                                                                 <input type="checkbox" value="servers"> servers/aaa
                                                             </label>
                                                         </div>
-                                                        <button type="button" class="btn btn-mini btn-warning"><span class="icone-warning-sign"></span> Delete</button>
+                                                        <button type="button" class="btn btn-mini btn-warning" ng-click="server_command('delete')"><span class="icone-warning-sign"></span> Delete</button>
                                                     </div><!--/ Default Checkbox Inline -->
 
                                                 </div>

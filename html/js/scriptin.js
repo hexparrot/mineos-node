@@ -104,6 +104,12 @@ app.controller("Webui", ['$scope', 'socket', function($scope, socket) {
       grid: { borderWidth: 0 }
     };
 
+  /* other functions */
+
+  $scope.server_command = function(cmd) {
+    socket.emit($scope.current, 'command', {command: cmd});
+  }
+
   $scope.update_loadavg = function(new_datapoint) {
     $scope.loadavg.push(new_datapoint);
 
