@@ -80,6 +80,10 @@ app.controller("Webui", ['$scope', 'socket', function($scope, socket) {
     return capacity;
   }
 
+  $scope.latest_notification = function(type) {
+    return $scope.servers[$scope.current].latest_notification[type];
+  }
+
   /* socket handlers */
 
   socket.on('/', 'server_list', function(servers) {
@@ -151,6 +155,8 @@ function server_model(server_name, channel) {
 
   self.server_name = server_name;
   self.channel = channel;
+  self.notifications = [];
+  self.latest_notification = {};
 
   self.channel.on(server_name, 'heartbeat', function(data) {
     self['heartbeat'] = data.payload;
@@ -165,7 +171,11 @@ function server_model(server_name, channel) {
   })
 
   self.channel.on(server_name, 'result', function(data) {
-    if ('property' in data) {
+    if ('command' in data) {
+      self.notifications.push(data);
+      data.timestamp = Date.now();
+      self.latest_notification[data.command] = data;
+    } else if ('property' in data) {
       switch (data.property) {
         case 'server.properties':
           self['sp'] = data.payload;

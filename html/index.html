@@ -841,9 +841,14 @@
                                                     <p>Oldest restore point: {{ servers[current].glance.increments.slice(-1)[0].time }}</p>
                                                     <p>Space used by restore points: {{ servers[current].glance.du_bwd | bytes_to_mb }}</p>
                                                     <!-- Alert Error -->
-                                                    <div class="alert alert-success">
+                                                    <div class="alert alert-success" ng-show="latest_notification('backup').success">
                                                         <button type="button" class="close" data-dismiss="alert">×</button>
-                                                        <strong>Success! </strong> Restore point completed at 11:06 AM.
+                                                        <strong>Success! </strong> Created restore point at {{ servers[current].latest_notification['backup'].timestamp }}.
+                                                    </div><!--/ Alert Error -->
+                                                    <!-- Alert Error -->
+                                                    <div class="alert alert-error" ng-show="latest_notification('backup').success == false">
+                                                        <button type="button" class="close" data-dismiss="alert">×</button>
+                                                        <strong>Uh oh! </strong> Restore point attempt failed at {{ servers[current].latest_notification['backup'].timestamp }}.
                                                     </div><!--/ Alert Error -->
                                                     <p><a ng-click="server_command('backup')">Create a new restore point now</a></p>
                                                 </div>
@@ -863,9 +868,14 @@
                                                     <p>Oldest archive: {{ servers[current].glance.archives[0].time }}</p>
                                                     <p>Space used by archives: {{ servers[current].glance.du_awd | bytes_to_mb }}</p>
                                                     <!-- Alert Error -->
-                                                    <div class="alert alert-error">
+                                                    <div class="alert alert-success" ng-show="latest_notification('archive').success">
                                                         <button type="button" class="close" data-dismiss="alert">×</button>
-                                                        <strong>Uh oh! </strong> Archive could not complete with server running.
+                                                        <strong>Success! </strong> Created archive at {{ servers[current].latest_notification['archive'].timestamp }}.
+                                                    </div><!--/ Alert Error -->
+                                                    <!-- Alert Error -->
+                                                    <div class="alert alert-error" ng-show="latest_notification('archive').success == false">
+                                                        <button type="button" class="close" data-dismiss="alert">×</button>
+                                                        <strong>Uh oh! </strong> Archive attempt failed at {{ servers[current].latest_notification['archive'].timestamp }}.
                                                     </div><!--/ Alert Error -->
                                                     <p><a ng-click="server_command('archive')">Create a new archive now</a></p>
                                                 </div>
