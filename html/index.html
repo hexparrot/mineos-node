@@ -702,18 +702,18 @@
                                             </header>
                                             <section class="body">
                                                 <div class="body-inner">
-                                                    <p>Most recent restore point: <a href="#" data-placement="top" title="" rel="tooltip" data-original-title="3/12/2015">{{ servers[current].glance.increments[0].time | time_from_now }}</a></p>
-                                                    <p>Oldest restore point: <a href="#" data-placement="top" title="" rel="tooltip" data-original-title="3/12/2015">{{ servers[current].glance.increments.slice(-1)[0].time | time_from_now }}</a></p>
+                                                    <p>Most recent restore point: <a rel="tooltip" title="{{ servers[current].glance.increments[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" am-time-ago="servers[current].glance.increments[0].time"></a></p>
+                                                    <p>Oldest restore point: <a href="#" rel="tooltip" title="{{ servers[current].glance.increments.slice(-1)[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" am-time-ago="servers[current].glance.increments.slice(-1)[0].time"></a></p>
                                                     <p>Space used by restore points: {{ servers[current].glance.du_bwd | bytes_to_mb }}</p>
                                                     <!-- Alert Error -->
                                                     <div class="alert alert-success" ng-show="latest_notification('backup').success">
                                                         <button type="button" class="close" data-dismiss="alert">×</button>
-                                                        <strong>Success! </strong> Created restore point {{ servers[current].latest_notification['backup'].timestamp | time_from_now }}.
+                                                        <strong>Success! </strong> Restore point created <span am-time-ago="servers[current].latest_notification['backup'].timestamp"></span>.
                                                     </div><!--/ Alert Error -->
                                                     <!-- Alert Error -->
                                                     <div class="alert alert-error" ng-show="latest_notification('backup').success == false">
                                                         <button type="button" class="close" data-dismiss="alert">×</button>
-                                                        <strong>Uh oh! </strong> Restore point attempt failed {{ servers[current].latest_notification['backup'].timestamp | time_from_now }}.
+                                                        <strong>Uh oh! </strong> Restore point attempt failed <span am-time-ago="servers[current].latest_notification['backup'].timestamp"></span>.
                                                     </div><!--/ Alert Error -->
                                                     <p><a ng-click="server_command('backup')">Create a new restore point now</a></p>
                                                 </div>
@@ -729,18 +729,18 @@
                                             </header>
                                             <section class="body">
                                                 <div class="body-inner">
-                                                    <p>Most recent archive: <a href="#" data-placement="top" title="" rel="tooltip" data-original-title="3/12/2015">{{ servers[current].glance.archives.slice(-1)[0].time | time_from_now }}</a></p>
-                                                    <p>Oldest archive: <a href="#" data-placement="top" title="" rel="tooltip" data-original-title="3/12/2015">{{ servers[current].glance.archives[0].time | time_from_now }}</a></p>
+                                                    <p>Most recent archive: <a title="{{ servers[current].glance.archives.slice(-1)[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" rel="tooltip" am-time-ago="servers[current].glance.archives.slice(-1)[0].time"></a></p>
+                                                    <p>Oldest archive: <a title="{{ servers[current].glance.archives[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" rel="tooltip" am-time-ago="servers[current].glance.archives[0].time"></a></p>
                                                     <p>Space used by archives: {{ servers[current].glance.du_awd | bytes_to_mb }}</p>
                                                     <!-- Alert Error -->
                                                     <div class="alert alert-success" ng-show="latest_notification('archive').success">
                                                         <button type="button" class="close" data-dismiss="alert">×</button>
-                                                        <strong>Success! </strong> Created archive {{ servers[current].latest_notification['archive'].timestamp | time_from_now }}.
+                                                        <strong>Success! </strong> Archive created <span am-time-ago="servers[current].latest_notification['archive'].timestamp"></span>.
                                                     </div><!--/ Alert Error -->
                                                     <!-- Alert Error -->
                                                     <div class="alert alert-error" ng-show="latest_notification('archive').success == false">
                                                         <button type="button" class="close" data-dismiss="alert">×</button>
-                                                        <strong>Uh oh! </strong> Archive attempt failed {{ servers[current].latest_notification['archive'].timestamp | time_from_now }}.
+                                                        <strong>Uh oh! </strong> Archive attempt failed <span am-time-ago="servers[current].latest_notification['archive'].timestamp"></span>.
                                                     </div><!--/ Alert Error -->
                                                     <p><a ng-click="server_command('archive')">Create a new archive now</a></p>
                                                 </div>
@@ -1270,6 +1270,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="/moment/moment.js"></script>
     <script src="/angular/angular.js"></script>
+    <script src="/angular-moment/angular-moment.js"></script>
     <script src="js/scriptin.js"></script>
     <script src="js/plugins.js"></script>
     <script src="js/application.js"></script>

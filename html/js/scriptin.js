@@ -1,4 +1,4 @@
-var app = angular.module("mineos", []);
+var app = angular.module("mineos", ['angularMoment']);
 var connect_string = ':3000/';
 
 /* filters */
@@ -189,6 +189,7 @@ function server_model(server_name, channel) {
     switch (data.page) {
       case 'server_status':
         self['glance'] = data.payload;
+        console.log(data)
         break;
     }
   })
