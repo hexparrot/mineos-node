@@ -189,7 +189,6 @@ function server_model(server_name, channel) {
     switch (data.page) {
       case 'server_status':
         self['glance'] = data.payload;
-        console.log(data)
         break;
     }
   })
@@ -203,6 +202,8 @@ function server_model(server_name, channel) {
       self.receipts[data.uuid]['success'] = data.success;
       self.receipts[data.uuid]['err'] = data.err;
       self.receipts[data.uuid]['completed'] = data.timestamp;
+
+      self.channel.emit(server_name, 'page_data', 'server_status');
 
     } else if ('property' in data) {
       switch (data.property) {

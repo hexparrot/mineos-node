@@ -91,7 +91,7 @@
                                     <span class="icon icone-hdd"></span>
                                     <a href="#" class="text">
                                         <strong>[{{ transaction.server_name }}] {{ transaction.command }}</strong> {{ transaction.success ? 'succeeded' : 'failed' }}<br>
-                                        <small>{{ transaction.completed | time_from_now }}</small>
+                                        <small am-time-ago="transaction.completed"></small>
                                     </a>
                                     <span class="action"><a class="close" href="#">&times;</a></span>
                                 </li>
@@ -173,7 +173,7 @@
                                         <a ng-click="page = 'dashboard'">
                                             <span class="icon icone-dashboard"></span>
                                             <span class="text">Dashboard</span>
-                                            <span class="label label-inverse">2</span>
+                                            <span class="label label-inverse">{{ servers_up() }}</span>
                                         </a>
                                     </li>
                                     <!--/ END Menu -->
@@ -193,7 +193,7 @@
                                     <!--/ END Menu Divider -->
 
                                     <!-- START Menu -->
-                                    <li class="accordion-group">
+                                    <li class="accordion-group" ng-show="current">
                                         <a ng-click="page = 'server_status'">
                                             <span class="icon icone-globe"></span>
                                             <span class="text">Server Status</span>
@@ -202,7 +202,7 @@
                                     <!--/ END Menu -->
 
                                     <!-- START Menu -->
-                                    <li class="accordion-group">
+                                    <li class="accordion-group" ng-show="current">
                                         <a data-toggle="collapse" data-parent="#navigation" href="#submenu0">
                                             <span class="icon icone-hdd"></span>
                                             <span class="text">Backups and Restores</span>
@@ -220,7 +220,7 @@
                                     <!--/ END Menu -->
 
                                     <!-- START Menu -->
-                                    <li class="accordion-group">
+                                    <li class="accordion-group" ng-show="current">
                                         <a data-toggle="collapse" data-parent="#navigation" href="#submenu1">
                                             <span class="icon iconm-pencil-5"></span>
                                             <span class="text">Configuration</span>
@@ -237,7 +237,7 @@
                                     <!--/ END Menu -->
 
                                     <!-- START Menu -->
-                                    <li class="accordion-group ">
+                                    <li class="accordion-group" ng-show="current">
                                         <a data-toggle="collapse" data-parent="#navigation" href="#submenu2">
                                             <span class="icon icone-desktop"></span>
                                             <span class="text">Logging</span>
@@ -618,7 +618,7 @@
                                                 <div class="body-inner no-padding" style="">
                                                     <!-- START Summary -->
                                                     <figure class="stats summary stacked">
-                                                        <div class="icon circle green"><span class="icone-ok"></span></div>
+                                                        <div class="icon circle" ng-class="{green: servers[current].heartbeat.up, red: servers[current].heartbeat.up == false}"><span class="icone-ok"></span></div>
                                                         <figcaption>
                                                             <h4>{{ servers[current].heartbeat.up ? 'UP' : 'DOWN' }}<small>Server Status</small></h4>
                                                         </figcaption>
