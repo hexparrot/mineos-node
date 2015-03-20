@@ -1026,61 +1026,13 @@
                             </header>
                             <section class="body">
                                 <div class="body-inner">
-                                    <!-- Help Text -->
-                                    <div class="control-group">
+                                    <!-- Read Only -->
+                                    <div class="control-group" ng-repeat="(attribute, value) in servers[current].sp">
                                         <div class="controls">
-                                            <div class="row-fluid">
-                                                <div class="span1">
-                                                    <input type="text" name="newproperty" class=""><span class="help-block">New Property</span>
-                                                </div>
-                                                <div class="span2">
-                                                    <input type="text" name="newvalue" class=""><span class="help-block">Value</span>
-                                                </div>
-                                                <div class="">
-                                                    <button type="button" class="btn btn-small btn-primary"><span class="icone-check"></span> Save</button>
-                                                </div>
-                                            </div>
+                                            <input type="text" class="input-large" ng-value="attribute" readonly>
+                                            <input type="text" class="input-xlarge" ng-value="value">
                                         </div>
-                                    </div><!--/ Help Text -->
-
-                                    <!-- Input Prepend -->
-                                    <div class="control-group">
-                                        <div class="controls">
-                                            <div class="input-prepend">
-                                                <span class="add-on">server-port</span>
-                                                <input type="text" value="25565">
-                                            </div>
-                                        </div>
-                                    </div><!--/ Input Prepend -->
-                                    <!-- Input Prepend -->
-                                    <div class="control-group error">
-                                        <div class="controls">
-                                            <div class="input-prepend">
-                                                <span class="add-on">server-ip</span>
-                                                <input type="text" value="0.0.0.0">
-                                            </div>
-                                            <button type="button" class="btn btn-small btn-success"><span class="icone-check"> Modify</span> </button>
-                                            <button type="button" class="btn btn-small btn-danger"><span class="icone-remove"></span> </button>
-                                        </div>
-                                    </div><!--/ Input Prepend -->
-                                    <!-- Input Prepend -->
-                                    <div class="control-group">
-                                        <div class="controls">
-                                            <div class="input-prepend">
-                                                <span class="add-on">level-name</span>
-                                                <input type="text" value="">
-                                            </div>
-                                        </div>
-                                    </div><!--/ Input Prepend -->
-                                    <!-- Input Prepend -->
-                                    <div class="control-group success">
-                                        <div class="controls">
-                                            <div class="input-prepend">
-                                                <span class="add-on">players-max</span>
-                                                <input type="text" value="20">
-                                            </div>
-                                        </div>
-                                    </div><!--/ Input Prepend -->
+                                    </div><!--/ Read Only -->
                                 </div>
                             </section>
                         </div>
