@@ -186,11 +186,7 @@ function server_model(server_name, channel) {
   })
 
   self.channel.on(server_name, 'page_data', function(data) {
-    switch (data.page) {
-      case 'server_status':
-        self['glance'] = data.payload;
-        break;
-    }
+    self[data.page] = data.payload;
   })
 
   self.channel.on(server_name, 'result', function(data) {
@@ -203,7 +199,7 @@ function server_model(server_name, channel) {
       self.receipts[data.uuid]['err'] = data.err;
       self.receipts[data.uuid]['completed'] = data.timestamp;
 
-      self.channel.emit(server_name, 'page_data', 'server_status');
+      self.channel.emit(server_name, 'page_data', 'glance');
 
     } else if ('property' in data) {
       switch (data.property) {
@@ -224,7 +220,7 @@ function server_model(server_name, channel) {
   })
 
   self.channel.emit(server_name, 'property', {property: 'server.properties'});
-  self.channel.emit(server_name, 'page_data', 'server_status');
+  self.channel.emit(server_name, 'page_data', 'glance');
 
   return self;
 }

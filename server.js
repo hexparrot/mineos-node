@@ -165,7 +165,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
 
         function get_page_data(page) {
           switch (page) {
-            case 'server_status':
+            case 'glance':
               console.info('[{0}] {1} requesting server at a glance info'.format(server_name, ip_address));
 
               async.parallel({
