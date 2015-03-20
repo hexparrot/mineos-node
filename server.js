@@ -133,8 +133,10 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         function start_watch(rel_filepath) {
           /* can put a tail/watch on any file, and joins a room for all future communication */
           if (rel_filepath in self.servers[server_name].tails) {
+            socket.join(rel_filepath);
             console.info('[{0}] {1} requesting tail: {2}'.format(server_name, ip_address, rel_filepath));
-          } else if (rel_filepath in self.servers[server_name].watches) { 
+          } else if (rel_filepath in self.servers[server_name].watches) {
+            socket.join(rel_filepath);
             console.info('[{0}] {1} watching file: {2}'.format(server_name, ip_address, rel_filepath));
           } else {
             console.error('[{0}] {1} requesting tail: {2} (failed: not yet created)'.format(server_name, ip_address, rel_filepath));
@@ -188,6 +190,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         socket.on('command', produce_receipt);
         socket.on('property', get_prop);
         socket.on('page_data', get_page_data);
+        socket.on('watch', start_watch);
       })
     }
 
