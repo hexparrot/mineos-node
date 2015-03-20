@@ -852,22 +852,11 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>0B</td>
-                                                <td>Today</td>
-                                                <td>14.01MB</td>
-                                                <td>14.01MB</td>
-                                                <td>
-                                                    <p>
-                                                        <button type="button" class="btn btn-mini btn-success">Restore</button>
-                                                    </p>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>1B</td>
-                                                <td>Today</td>
-                                                <td>.01MB</td>
-                                                <td>14.02MB</td>
+                                            <tr ng-repeat="incr in servers[current].glance.increments">
+                                                <td>{{ incr.step }}</td>
+                                                <td>{{ incr.time | amDateFormat: "dddd, MMMM Do YYYY, h:mm:ss a" }}</td>
+                                                <td>{{ incr.size }}</td>
+                                                <td>{{ incr.cum }}</td>
                                                 <td>
                                                     <p>
                                                         <button type="button" class="btn btn-mini btn-success">Restore</button>
@@ -915,34 +904,15 @@
                                         <thead>
                                             <tr>
                                                 <th>Timestamp</th>
-                                                <th>Filename</th>
                                                 <th>Size</th>
+                                                <th>Filename</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>Yesterday</td>
-                                                <td>mc-something-datestamp.tar.gz</td>
-                                                <td>14.01MB</td>
-                                                <td>
-                                                    <p>
-                                                        <!-- Button Dropdown -->
-                                                        <div class="btn-group">
-                                                            <button class="btn btn-small dropdown-toggle" data-toggle="dropdown">Actions <span class="caret"></span></button>
-                                                            <ul class="dropdown-menu">
-                                                                <li><a href="#">Delete this Archive</a></li>
-                                                                <li><a href="#"></a></li>
-                                                                <li><a href="#">Create server from Archive</a></li>
-                                                            </ul>
-                                                        </div><!--/ Button Dropdown -->
-                                                        <!-- Button Dropdown -->
-                                                    </p>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>Today</td>
-                                                <td>mc-something-datestamp2.tar.gz</td>
-                                                <td>.01MB</td>
+                                            <tr ng-repeat="archives in servers[current].glance.archives">
+                                                <td>{{ archives.time | amDateFormat: "dddd, MMMM Do YYYY, h:mm:ss a"  }}</td>
+                                                <td>{{ archives.size | bytes_to_mb }}</td>
+                                                <td>{{ archives.filename }}</td>
                                                 <td>
                                                     <p>
                                                         <!-- Button Dropdown -->
