@@ -204,8 +204,28 @@ function server_model(server_name, channel) {
   self.receipts = {};
   self.live_logs = {};
 
+  function gauge_memory() {
+    var bytes = 0;
+    try {
+      bytes = parseInt(self.heartbeat.memory.VmRSS.split(' ')[0]) || 0;
+    } catch (e) {}
+    
+    return ((bytes / 1024) / 384) * 100;
+  }
+
+  function gauge_capacity() {
+    var players_online = 0;
+    try {
+      players_online = parseInt(data.payload.ping.players_online);
+    } catch (e) {}
+
+    return players_online / parseInt(self.sp['players-max']) || 0;
+  }
+
   self.channel.on(server_name, 'heartbeat', function(data) {
     self['heartbeat'] = data.payload;
+    $('#memory_gauge').data('easyPieChart').update(gauge_memory());
+    $('#capacity_gauge').data('easyPieChart').update(gauge_capacity());
   })
 
   self.channel.on(server_name, 'page_data', function(data) {
@@ -213,7 +233,6 @@ function server_model(server_name, channel) {
   })
 
   self.channel.on(server_name, 'tail_data', function(data) {
-    console.log(data)
     try {
       self.live_logs[data.filepath].push(data.payload);
     } catch (e) {
