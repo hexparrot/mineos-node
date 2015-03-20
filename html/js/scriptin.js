@@ -169,6 +169,10 @@ app.controller("Webui", ['$scope', 'socket', function($scope, socket) {
                                              new_value: this.new_value });
   }
 
+  $scope.create_server = function() {
+    console.log(this)
+  }
+
   $scope.update_loadavg = function(new_datapoint) {
     $scope.loadavg.push(new_datapoint);
 
