@@ -1027,10 +1027,10 @@
                             <section class="body">
                                 <div class="body-inner">
                                     <!-- Read Only -->
-                                    <div class="control-group" ng-repeat="(attribute, value) in servers[current].sp">
+                                    <div class="control-group" ng-repeat="(property, new_value) in servers[current].sp track by $index">
                                         <div class="controls">
-                                            <input type="text" class="input-large" ng-value="attribute" readonly>
-                                            <input type="text" class="input-xlarge" ng-value="value">
+                                            <input type="text" class="input-large" ng-value="property" readonly>
+                                            <input type="text" class="input-xlarge" ng-value="new_value" ng-enter="change_sp()" ng-model="new_value">
                                         </div>
                                     </div><!--/ Read Only -->
                                 </div>

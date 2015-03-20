@@ -163,6 +163,12 @@ app.controller("Webui", ['$scope', 'socket', function($scope, socket) {
     $scope.user_input = '';
   }
 
+  $scope.change_sp = function() {
+    socket.emit($scope.current, 'command', { command: 'modify_sp', 
+                                             property: this.property,
+                                             new_value: this.new_value });
+  }
+
   $scope.update_loadavg = function(new_datapoint) {
     $scope.loadavg.push(new_datapoint);
 
