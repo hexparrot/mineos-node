@@ -93,12 +93,30 @@ app.controller("Webui", ['$scope', 'socket', function($scope, socket) {
       return {};
   }
 
+  $scope.all_notifications = function() {
+    var notifications = [];
+    for (var server_name in $scope.servers) {
+      var r_obj = $scope.servers[server_name].receipts;
+      for (var uuid in r_obj) {
+        var new_obj = r_obj[uuid];
+        new_obj['server_name'] = server_name;
+        notifications.push(new_obj);
+      }
+    }
+    return notifications.reverse();
+  }
+
   /* socket handlers */
 
   socket.on('/', 'server_list', function(servers) {
     angular.forEach(servers, function(server_name) {
       this[server_name] = new server_model(server_name, socket);
     }, $scope.servers)
+  })
+
+  socket.on('/', 'host_heartbeat', function(data) {
+    $scope.host_heartbeat = data;
+    $scope.update_loadavg(data.loadavg);
   })
 
   $scope.loadavg = [];
@@ -150,11 +168,6 @@ app.controller("Webui", ['$scope', 'socket', function($scope, socket) {
     $.plot($scope.loadavg_options.element, dataset, $scope.loadavg_options).draw();
   }
 
-  socket.on('/', 'host_heartbeat', function(data) {
-    $scope.host_heartbeat = data;
-    $scope.update_loadavg(data.loadavg);
-  })
-
 }]);
 
 /* models */
@@ -166,6 +179,7 @@ function server_model(server_name, channel) {
   self.channel = channel;
   self.notifications = [];
   self.latest_notification = {};
+  self.receipts = {};
 
   self.channel.on(server_name, 'heartbeat', function(data) {
     self['heartbeat'] = data.payload;
@@ -184,6 +198,11 @@ function server_model(server_name, channel) {
       self.notifications.push(data);
       data.timestamp = Date.now();
       self.latest_notification[data.command] = data;
+
+      self.receipts[data.uuid]['success'] = data.success;
+      self.receipts[data.uuid]['err'] = data.err;
+      self.receipts[data.uuid]['completed'] = data.timestamp;
+
     } else if ('property' in data) {
       switch (data.property) {
         case 'server.properties':
@@ -193,6 +212,13 @@ function server_model(server_name, channel) {
           break;
       }
     }
+  })
+
+  self.channel.on(server_name, 'receipt', function(data) {
+    self.receipts[data.uuid] = {
+      command: data.command,
+      requested: Date.now()
+    };
   })
 
   self.channel.emit(server_name, 'property', {property: 'server.properties'});
