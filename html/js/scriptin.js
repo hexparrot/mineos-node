@@ -1,6 +1,23 @@
 var app = angular.module("mineos", ['angularMoment']);
 var connect_string = ':3000/';
 
+/* directives */
+
+app.directive('ngEnter', function () {
+  //http://eric.sau.pe/angularjs-detect-enter-key-ngenter/
+  return function (scope, element, attrs) {
+    element.bind("keydown keypress", function (event) {
+      if(event.which === 13) {
+        scope.$apply(function (){
+          scope.$eval(attrs.ngEnter);
+        });
+
+        event.preventDefault();
+      }
+    });
+  };
+});
+
 /* filters */
 
 app.filter('bytes_to_mb', function() {
@@ -139,6 +156,11 @@ app.controller("Webui", ['$scope', 'socket', function($scope, socket) {
 
   $scope.server_command = function(cmd) {
     socket.emit($scope.current, 'command', {command: cmd});
+  }
+
+  $scope.console_input = function() {
+    socket.emit($scope.current, 'command', {command: 'stuff', msg: $scope.user_input });
+    $scope.user_input = '';
   }
 
   $scope.update_loadavg = function(new_datapoint) {
