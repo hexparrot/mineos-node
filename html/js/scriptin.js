@@ -4,39 +4,45 @@ var connect_string = ':3000/';
 /* filters */
 
 app.filter('bytes_to_mb', function() {
-    return function(bytes) {
-      if (bytes == 0)
-        return '0B';
-      else if (bytes < 1024)
-        return bytes + 'B';
+  return function(bytes) {
+    if (bytes == 0)
+      return '0B';
+    else if (bytes < 1024)
+      return bytes + 'B';
 
-      var k = 1024;
-      var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-      var i = Math.floor(Math.log(bytes) / Math.log(k));
+    var k = 1024;
+    var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    var i = Math.floor(Math.log(bytes) / Math.log(k));
 
-      return (bytes / Math.pow(k, i)).toPrecision(3) + sizes[i];
-    };
-  })
+    return (bytes / Math.pow(k, i)).toPrecision(3) + sizes[i];
+  };
+})
 
 app.filter('seconds_to_time', function() {
-    return function(seconds) {
-      function zero_pad(number){
-        if (number.toString().length == 1)
-          return '0' + number;
-        else
-          return number;
-      }
-      var hours = Math.floor(seconds / (60 * 60));
-
-      var divisor_for_minutes = seconds % (60 * 60);
-      var minutes = Math.floor(divisor_for_minutes / 60);
-
-      var divisor_for_seconds = divisor_for_minutes % 60;
-      var seconds = Math.ceil(divisor_for_seconds);
-      
-      return '{0}:{1}:{2}'.format(hours, zero_pad(minutes), zero_pad(seconds));
+  return function(seconds) {
+    function zero_pad(number){
+      if (number.toString().length == 1)
+        return '0' + number;
+      else
+        return number;
     }
-  })
+    var hours = Math.floor(seconds / (60 * 60));
+
+    var divisor_for_minutes = seconds % (60 * 60);
+    var minutes = Math.floor(divisor_for_minutes / 60);
+
+    var divisor_for_seconds = divisor_for_minutes % 60;
+    var seconds = Math.ceil(divisor_for_seconds);
+    
+    return '{0}:{1}:{2}'.format(hours, zero_pad(minutes), zero_pad(seconds));
+  }
+})
+
+app.filter('time_from_now', function() {
+  return function(seconds) {
+    return moment(seconds).fromNow();
+  }
+})
 
 /* controllers */
 
@@ -81,7 +87,10 @@ app.controller("Webui", ['$scope', 'socket', function($scope, socket) {
   }
 
   $scope.latest_notification = function(type) {
-    return $scope.servers[$scope.current].latest_notification[type];
+    if ($scope.current)
+      return $scope.servers[$scope.current].latest_notification[type];
+    else
+      return {};
   }
 
   /* socket handlers */

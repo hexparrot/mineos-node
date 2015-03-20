@@ -40,6 +40,7 @@ app.get('/', function(req, res){
 });
 
 app.use('/angular', express.static(__dirname + '/node_modules/angular'));
+app.use('/moment', express.static(__dirname + '/node_modules/moment'));
 app.use('/admin', express.static(__dirname + '/html'));
 
 process.on('SIGINT', function() {
