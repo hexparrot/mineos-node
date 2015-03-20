@@ -1134,14 +1134,8 @@
                                 <div class="body-inner no-padding">
                                     <table class="table">
                                         <tbody>
-                                            <tr>
-                                                <td>Server starting</td>
-                                            </tr>
-                                            <tr>
-                                                <td>some stuff happens</td>
-                                            </tr>
-                                            <tr>
-                                                <td>Server stopping</td>
+                                            <tr ng-repeat="line in servers[current].live_logs['logs/latest.log']">
+                                                <td>{{ line }}</td>
                                             </tr>
                                         </tbody>
                                     </table>

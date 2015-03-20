@@ -180,6 +180,7 @@ function server_model(server_name, channel) {
   self.notifications = [];
   self.latest_notification = {};
   self.receipts = {};
+  self.live_logs = {};
 
   self.channel.on(server_name, 'heartbeat', function(data) {
     self['heartbeat'] = data.payload;
@@ -187,6 +188,15 @@ function server_model(server_name, channel) {
 
   self.channel.on(server_name, 'page_data', function(data) {
     self[data.page] = data.payload;
+  })
+
+  self.channel.on(server_name, 'tail_data', function(data) {
+    console.log(data)
+    try {
+      self.live_logs[data.filepath].push(data.payload);
+    } catch (e) {
+      self.live_logs[data.filepath] = [data.payload];
+    }
   })
 
   self.channel.on(server_name, 'result', function(data) {
@@ -221,6 +231,7 @@ function server_model(server_name, channel) {
 
   self.channel.emit(server_name, 'property', {property: 'server.properties'});
   self.channel.emit(server_name, 'page_data', 'glance');
+  self.channel.emit(server_name, 'watch', 'logs/latest.log');
 
   return self;
 }
