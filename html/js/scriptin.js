@@ -170,7 +170,21 @@ app.controller("Webui", ['$scope', 'socket', function($scope, socket) {
   }
 
   $scope.create_server = function() {
-    console.log(this)
+    var serverform = $scope.serverform;
+    var server_name = serverform['server_name'];
+    var hyphenated = {};
+
+    delete serverform['server_name'];
+
+    for (var prop in serverform) 
+      if (serverform.hasOwnProperty(prop)) 
+        hyphenated[prop.split("_").join("-")] = serverform[prop]; //replace _ with -
+
+    socket.emit('/', 'command', {
+      'command': 'create',
+      'server_name': server_name,
+      'properties': hyphenated
+    }); 
   }
 
   $scope.update_loadavg = function(new_datapoint) {

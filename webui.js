@@ -6,7 +6,6 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var userid = require('userid');
 var whoami = require('whoami');
-var bodyParser = require('body-parser')
 
 var BASE_DIR = '/var/games/minecraft';
 var response_options = {root: __dirname};
@@ -17,23 +16,6 @@ var OWNER_CREDS = {
 }
 
 var be = server.backend(BASE_DIR, io, OWNER_CREDS);
-
-app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
-  extended: true
-})); 
-
-app.post('/create_server', function(req, res) {
-	var server_name = req.body['server_name'];
-	delete req.body['server_name'];
-
-	be.webui_dispatcher({
-		'command': 'create',
-		'server_name': server_name,
-		'properties': req.body
-	});
-
-    res.sendStatus(200); // equivalent to res.status(200).send('OK')
-});
 
 app.get('/', function(req, res){
   res.sendFile('index.html', response_options);

@@ -480,7 +480,7 @@
                         <h4 class="title"> Create a new server</h4>
                     </header>
                     <section class="body">
-                        <form class="span12 widget stacked dark form-horizontal bordered" ng-model="serverform">
+                        <form class="span12 widget stacked dark form-horizontal bordered">
                             <div class="body-inner">
                                 <!-- Help Text -->
                                 <div class="control-group">
@@ -488,7 +488,7 @@
                                     <div class="controls">
                                         <div class="row-fluid">
                                             <div class="span4">
-                                                <input type="text" name="server_name"><span class="help-block">Only letters, numbers and underscores.</span>
+                                                <input type="text" ng-model="serverform.server_name"><span class="help-block">Only letters, numbers and underscores.</span>
                                             </div>
                                         </div>
                                     </div>
@@ -498,7 +498,7 @@
                                 <div class="control-group">
                                     <label class="control-label">server-port</label>
                                     <div class="controls">
-                                        <input type="text" name="server_port" placeholder="25565" class="span2">
+                                        <input type="text" placeholder="25565" class="span2" ng-model="serverform.server_port">
                                     </div>
                                 </div><!--/ Input Text Placeholder -->
 
@@ -506,7 +506,7 @@
                                 <div class="control-group">
                                     <label class="control-label">server-ip</label>
                                     <div class="controls">
-                                        <input type="text" name="server_ip" placeholder="0.0.0.0" class="span2">
+                                        <input type="text" placeholder="0.0.0.0" class="span2" ng-model="serverform.server_ip">
                                     </div>
                                 </div><!--/ Input Text Placeholder -->
 
@@ -514,7 +514,7 @@
                                 <div class="control-group">
                                     <label class="control-label">max-players</label>
                                     <div class="controls">
-                                        <input type="text" name="max_players" placeholder="20" class="span2">
+                                        <input type="text" placeholder="20" class="span2" ng-model="serverform.max_players">
                                     </div>
                                 </div><!--/ Input Text Placeholder -->
 
@@ -522,7 +522,7 @@
                                 <div class="control-group">
                                     <label class="control-label">level-name</label>
                                     <div class="controls">
-                                        <input type="text" name="level_name" placeholder="world" class="span2">
+                                        <input type="text" placeholder="world" class="span2" ng-model="serverform.level_name">
                                     </div>
                                 </div><!--/ Input Text Placeholder -->
 
@@ -530,7 +530,7 @@
                                 <div class="control-group">
                                     <label class="control-label">level-seed</label>
                                     <div class="controls">
-                                        <input type="text" name="level_seed" placeholder="" class="span2">
+                                        <input type="text" placeholder="" class="span2" ng-model="serverform.level_seed">
                                     </div>
                                 </div><!--/ Input Text Placeholder -->
 
@@ -538,7 +538,7 @@
                                 <div class="control-group">
                                     <label class="control-label">difficulty</label>
                                     <div class="controls">
-                                        <select class="span2" name="difficulty">
+                                        <select class="span2" ng-model="serverform.difficulty">
                                             <option value="0" selected>Peaceful</option>
                                             <option value="1">Easy</option>
                                             <option value="2">Normal</option>
@@ -551,7 +551,7 @@
                                 <div class="control-group">
                                     <label class="control-label">gamemode</label>
                                     <div class="controls">
-                                        <select class="span2" name="gamemode">
+                                        <select class="span2" ng-model="serverform.gamemode">
                                             <option value="1" selected>Survival</option>
                                             <option value="2">Creative</option>
                                             <option value="3">Adventure</option>
@@ -563,7 +563,7 @@
                                 <div class="control-group">
                                     <label class="control-label">level-type</label>
                                     <div class="controls">
-                                        <select class="span2" name="level-type">
+                                        <select class="span2" ng-model="serverform.level_type">
                                             <option value="DEFAULT" selected>DEFAULT</option>
                                             <option value="FLAT">FLAT</option>
                                             <option value="LARGEBIOMES">LARGEBIOMES</option>
@@ -571,15 +571,15 @@
                                     </div>
                                 </div><!--/ Select -->
 
-                                <!-- Styled Checkbox Inline -->
-                                <div class="control-group">
+                                <!-- Default Checkbox -->
+                                    <div class="control-group">
                                     <label class="control-label">generate-structures</label>
                                     <div class="controls">
-                                        <label class="checkbox inline styled">
-                                            <input type="checkbox" name="generate_structures" value="true">
+                                        <label class="checkbox">
+                                            <input type="checkbox" class="nostyle" value="true" ng-model="serverform.generate_structures"> 
                                         </label>
                                     </div>
-                                </div><!--/ Styled Checkbox Inline -->
+                                </div><!--/ Default Checkbox -->
 
                                 <!-- START Button Sizing -->
                                 <div class="control-group">
