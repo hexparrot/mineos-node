@@ -37,21 +37,7 @@ app.filter('bytes_to_mb', function() {
 
 app.filter('seconds_to_time', function() {
   return function(seconds) {
-    function zero_pad(number){
-      if (number.toString().length == 1)
-        return '0' + number;
-      else
-        return number;
-    }
-    var hours = Math.floor(seconds / (60 * 60));
-
-    var divisor_for_minutes = seconds % (60 * 60);
-    var minutes = Math.floor(divisor_for_minutes / 60);
-
-    var divisor_for_seconds = divisor_for_minutes % 60;
-    var seconds = Math.ceil(divisor_for_seconds);
-    
-    return '{0}:{1}:{2}'.format(hours, zero_pad(minutes), zero_pad(seconds));
+    return moment.duration(seconds, "seconds").format();
   }
 })
 
@@ -89,7 +75,7 @@ app.controller("Webui", ['$scope', 'socket', function($scope, socket) {
     var online = 0;
     $.each($scope.servers, function(server_name, instance) {
       if ('heartbeat' in instance)
-        online += instance.heartbeat.ping.players_online;
+        online += (isNaN(instance.heartbeat.ping.players_online) ? 0 : instance.heartbeat.ping.players_online);
     })
     return online;
   }
