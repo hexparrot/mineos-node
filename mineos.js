@@ -375,26 +375,30 @@ mineos.mc = function(server_name, base_dir) {
     var all_info = [];
 
     fs.readdir(awd, function(err, files) {
-      var fullpath = files.map(function(value, index) {
-        return path.join(awd, value);
-      });
-
-      var stat = fs.stat;
-      async.map(fullpath, stat, function(inner_err, results){
-        results.forEach(function(value, index) {
-          all_info.push({
-            time: value.mtime,
-            size: value.size,
-            filename: files[index]
-          })
-        })
-
-        all_info.sort(function(a, b) {
-          return a.time.getTime() - b.time.getTime();
+      if (!err) {
+        var fullpath = files.map(function(value, index) {
+          return path.join(awd, value);
         });
 
-        callback(err || inner_err, all_info);
-      }); 
+        var stat = fs.stat;
+        async.map(fullpath, stat, function(inner_err, results){
+          results.forEach(function(value, index) {
+            all_info.push({
+              time: value.mtime,
+              size: value.size,
+              filename: files[index]
+            })
+          })
+
+          all_info.sort(function(a, b) {
+            return a.time.getTime() - b.time.getTime();
+          });
+
+          callback(err || inner_err, all_info);
+        }); 
+      } else {
+        callback(err, all_info);
+      }
     }) 
   }
 

@@ -1007,6 +1007,13 @@ test.list_archive = function(test) {
 
   async.series([
     function(callback) {
+      instance.list_archives(function(err, archives) {
+        test.ok(err);
+        test.equal(archives.length, 0);
+        callback(!err);
+      })
+    },
+    function(callback) {
       instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
         setTimeout(function() { callback(err) }, FS_DELAY_MS*2);
@@ -1033,7 +1040,7 @@ test.list_archive = function(test) {
     }
   ], function(err, results) {
     test.ifError(err);
-    test.expect(6);
+    test.expect(8);
     test.done();
   })  
 }
