@@ -49,9 +49,9 @@ app.filter('time_from_now', function() {
 
 /* controllers */
 
-app.controller("Webui", ['$scope', 'socket', function($scope, socket) {
+app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket, Servers) {
   $scope.page = 'dashboard';
-  $scope.servers = {};
+  $scope.servers = Servers;
   $scope.current = null;
 
   /* watches */
@@ -65,7 +65,7 @@ app.controller("Webui", ['$scope', 'socket', function($scope, socket) {
   /* computed variables */
 
   $scope.servers_up = function() {
-    return $.map($scope.servers, function(instance, server_name) {
+    return $.map(Servers, function(instance, server_name) {
       if ('heartbeat' in instance)
         return instance.heartbeat.up;
     }).length
@@ -73,16 +73,17 @@ app.controller("Webui", ['$scope', 'socket', function($scope, socket) {
 
   $scope.players_online = function() {
     var online = 0;
-    $.each($scope.servers, function(server_name, instance) {
+    $.each(Servers, function(server_name, instance) {
       if ('heartbeat' in instance)
-        online += (isNaN(instance.heartbeat.ping.players_online) ? 0 : instance.heartbeat.ping.players_online);
+        if (instance.heartbeat.ping.players_online)
+          online += (instance.heartbeat.ping.players_online)
     })
     return online;
   }
 
   $scope.player_capacity = function() {
     var capacity = 0;
-    $.each($scope.servers, function(server_name, instance) {
+    $.each(Servers, function(server_name, instance) {
       if ('sp' in instance)
         capacity += instance.sp['max-players'];
     })
@@ -91,15 +92,15 @@ app.controller("Webui", ['$scope', 'socket', function($scope, socket) {
 
   $scope.latest_notification = function(type) {
     if ($scope.current)
-      return $scope.servers[$scope.current].latest_notification[type];
+      return Servers[$scope.current].latest_notification[type];
     else
       return {};
   }
 
   $scope.all_notifications = function() {
     var notifications = [];
-    for (var server_name in $scope.servers) {
-      var r_obj = $scope.servers[server_name].receipts;
+    for (var server_name in Servers) {
+      var r_obj = Servers[server_name].receipts;
       for (var uuid in r_obj) {
         var new_obj = r_obj[uuid];
         new_obj['server_name'] = server_name;
@@ -110,12 +111,6 @@ app.controller("Webui", ['$scope', 'socket', function($scope, socket) {
   }
 
   /* socket handlers */
-
-  socket.on('/', 'server_list', function(servers) {
-    angular.forEach(servers, function(server_name) {
-      this[server_name] = new server_model(server_name, socket);
-    }, $scope.servers)
-  })
 
   socket.on('/', 'host_heartbeat', function(data) {
     $scope.host_heartbeat = data;
@@ -202,92 +197,89 @@ app.controller("Webui", ['$scope', 'socket', function($scope, socket) {
 
 }]);
 
-/* models */
+/* factories */
 
-function server_model(server_name, channel) {
+app.factory("Servers", ['socket', function(socket) {
   var self = this;
 
-  self.server_name = server_name;
-  self.channel = channel;
-  self.notifications = [];
-  self.latest_notification = {};
-  self.receipts = {};
-  self.live_logs = {};
+  var server_model = function(server_name) {
+    var me = this;
+    me.server_name = server_name;
+    me.channel = socket;
+    me.page_data = {};
+    me.live_logs = {};
+    me.receipts = {};
+    me.notifications = [];
+    me.latest_notification = {};
 
-  function gauge_memory() {
-    var bytes = 0;
-    try {
-      bytes = parseInt(self.heartbeat.memory.VmRSS.split(' ')[0]) || 0;
-    } catch (e) {}
-    
-    return ((bytes / 1024) / 384) * 100;
-  }
+    me.channel.on(server_name, 'heartbeat', function(data) {
+      me.heartbeat = data.payload;
+    })
 
-  function gauge_capacity() {
-    var players_online = 0;
-    try {
-      players_online = parseInt(data.payload.ping.players_online);
-    } catch (e) {}
+    me.channel.on(server_name, 'page_data', function(data) {
+      me.page_data[data.page] = data.payload;
+    })
 
-    return players_online / parseInt(self.sp['players-max']) || 0;
-  }
-
-  self.channel.on(server_name, 'heartbeat', function(data) {
-    self['heartbeat'] = data.payload;
-    $('#memory_gauge').data('easyPieChart').update(gauge_memory());
-    $('#capacity_gauge').data('easyPieChart').update(gauge_capacity());
-  })
-
-  self.channel.on(server_name, 'page_data', function(data) {
-    self[data.page] = data.payload;
-  })
-
-  self.channel.on(server_name, 'tail_data', function(data) {
-    try {
-      self.live_logs[data.filepath].push(data.payload);
-    } catch (e) {
-      self.live_logs[data.filepath] = [data.payload];
-    }
-  })
-
-  self.channel.on(server_name, 'result', function(data) {
-    if ('command' in data) {
-      self.notifications.push(data);
-      data.timestamp = Date.now();
-      self.latest_notification[data.command] = data;
-
-      self.receipts[data.uuid]['success'] = data.success;
-      self.receipts[data.uuid]['err'] = data.err;
-      self.receipts[data.uuid]['completed'] = data.timestamp;
-
-      self.channel.emit(server_name, 'page_data', 'glance');
-
-    } else if ('property' in data) {
-      switch (data.property) {
-        case 'server.properties':
-          self['sp'] = data.payload;
-          break;
-        default:
-          break;
+    me.channel.on(server_name, 'tail_data', function(data) {
+      try {
+        me.live_logs[data.filepath].push(data.payload);
+      } catch (e) {
+        me.live_logs[data.filepath] = [data.payload];
       }
-    }
+    })
+
+    me.channel.on(server_name, 'receipt', function(data) {
+      me.receipts[data.uuid] = {
+        command: data.command,
+        requested: Date.now()
+      };
+    })
+
+    me.channel.on(server_name, 'result', function(data) {
+      if ('property' in data) {
+        switch (data.property) {
+          case 'server.properties':
+            me['sp'] = data.payload;
+            break;
+          default:
+            break;
+        }
+      } else if ('command' in data) {
+        me.notifications.push(data);
+        data.timestamp = Date.now();
+        me.latest_notification[data.command] = data;
+
+        me.receipts[data.uuid]['success'] = data.success;
+        me.receipts[data.uuid]['err'] = data.err;
+        me.receipts[data.uuid]['completed'] = data.timestamp;
+
+        me.channel.emit(server_name, 'page_data', 'glance');
+      }
+    })
+
+    me.channel.emit(server_name, 'property', {property: 'server.properties'});
+    me.channel.emit(server_name, 'page_data', 'glance');
+    me.channel.emit(server_name, 'watch', 'logs/latest.log');
+
+    return me;
+  }
+
+  socket.on('/', 'server_list', function(servers) {
+    angular.forEach(servers, function(server_name) {
+      this[server_name] = new server_model(server_name);
+    }, self)
   })
 
-  self.channel.on(server_name, 'receipt', function(data) {
-    self.receipts[data.uuid] = {
-      command: data.command,
-      requested: Date.now()
-    };
+  socket.on('/', 'track_server', function(server_name) {
+    self[server_name] = new server_model(server_name);
   })
 
-  self.channel.emit(server_name, 'property', {property: 'server.properties'});
-  self.channel.emit(server_name, 'page_data', 'glance');
-  self.channel.emit(server_name, 'watch', 'logs/latest.log');
+  socket.on('/', 'untrack_server', function(server_name) {
+    delete self[server_name];
+  })
 
   return self;
-}
-
-/* factories */
+}])
 
 app.factory('socket', function ($rootScope) {
   //http://briantford.com/blog/angular-socket-io

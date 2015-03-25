@@ -628,7 +628,7 @@
                                                             <span class="icon icone-exchange"></span>
                                                         </div>
                                                         <figcaption>
-                                                            <h4>{{ servers[current].heartbeat.ping.players_online }} / {{ servers[current].heartbeat.ping.players_max }}<small>Players Online</small></h4>
+                                                            <h4>{{ servers[current].heartbeat.ping.players_online ? servers[current].heartbeat.ping.players_online : 0 }} / {{ servers[current].sp['max-players'] }}<small>Players Online</small></h4>
                                                         </figcaption>
                                                     </figure><!--/ END Circular -->
 
@@ -696,13 +696,13 @@
                                         <div class="span6 widget">
                                             <header>
                                                 <h4 class="title"><span class="icon icone-hdd"></span> Restore Points</h4>
-                                                <span class="badge badge-success pull-right">{{ servers[current].glance.increments.length }}</span>
+                                                <span class="badge badge-success pull-right">{{ servers[current].page_data.glance.increments.length }}</span>
                                             </header>
                                             <section class="body">
                                                 <div class="body-inner">
-                                                    <p>Most recent restore point: <a rel="tooltip" title="{{ servers[current].glance.increments[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" am-time-ago="servers[current].glance.increments[0].time"></a></p>
-                                                    <p>Oldest restore point: <a href="#" rel="tooltip" title="{{ servers[current].glance.increments.slice(-1)[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" am-time-ago="servers[current].glance.increments.slice(-1)[0].time"></a></p>
-                                                    <p>Space used by restore points: {{ servers[current].glance.du_bwd | bytes_to_mb }}</p>
+                                                    <p>Most recent restore point: <a rel="tooltip" title="{{ servers[current].page_data.glance.increments[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" am-time-ago="servers[current].page_data.glance.increments[0].time"></a></p>
+                                                    <p>Oldest restore point: <a href="#" rel="tooltip" title="{{ servers[current].page_data.glance.increments.slice(-1)[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" am-time-ago="servers[current].page_data.glance.increments.slice(-1)[0].time"></a></p>
+                                                    <p>Space used by restore points: {{ servers[current].page_data.glance.du_bwd | bytes_to_mb }}</p>
                                                     <!-- Alert Error -->
                                                     <div class="alert alert-success" ng-show="latest_notification('backup').success">
                                                         <button type="button" class="close" data-dismiss="alert">×</button>
@@ -723,13 +723,13 @@
                                         <div class="span6 widget">
                                             <header>
                                                 <h4 class="title"><span class="icon icone-hdd"></span> Archives</h4>
-                                                <span class="badge badge-success pull-right">{{ servers[current].glance.archives.length }}</span>
+                                                <span class="badge badge-success pull-right">{{ servers[current].page_data.glance.archives.length }}</span>
                                             </header>
                                             <section class="body">
                                                 <div class="body-inner">
-                                                    <p>Most recent archive: <a title="{{ servers[current].glance.archives.slice(-1)[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" rel="tooltip" am-time-ago="servers[current].glance.archives.slice(-1)[0].time"></a></p>
-                                                    <p>Oldest archive: <a title="{{ servers[current].glance.archives[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" rel="tooltip" am-time-ago="servers[current].glance.archives[0].time"></a></p>
-                                                    <p>Space used by archives: {{ servers[current].glance.du_awd | bytes_to_mb }}</p>
+                                                    <p>Most recent archive: <a title="{{ servers[current].page_data.glance.archives.slice(-1)[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" rel="tooltip" am-time-ago="servers[current].page_data.glance.archives.slice(-1)[0].time"></a></p>
+                                                    <p>Oldest archive: <a title="{{ servers[current].page_data.glance.archives[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" rel="tooltip" am-time-ago="servers[current].page_data.glance.archives[0].time"></a></p>
+                                                    <p>Space used by archives: {{ servers[current].page_data.glance.du_awd | bytes_to_mb }}</p>
                                                     <!-- Alert Error -->
                                                     <div class="alert alert-success" ng-show="latest_notification('archive').success">
                                                         <button type="button" class="close" data-dismiss="alert">×</button>
@@ -764,9 +764,9 @@
                                             </header>
                                             <section class="body">
                                                 <div class="body-inner">
-                                                    <p>Server Owner: {{ servers[current].glance.owner.username }} ({{ servers[current].glance.owner.uid }})</p>
-                                                    <p>Group Owner: {{ servers[current].glance.owner.groupname }} ({{ servers[current].glance.owner.gid }})</p>
-                                                    <p>Space used by live server files: {{ servers[current].glance.du_cwd | bytes_to_mb }}</p>
+                                                    <p>Server Owner: {{ servers[current].page_data.glance.owner.username }} ({{ servers[current].page_data.glance.owner.uid }})</p>
+                                                    <p>Group Owner: {{ servers[current].page_data.glance.owner.groupname }} ({{ servers[current].page_data.glance.owner.gid }})</p>
+                                                    <p>Space used by live server files: {{ servers[current].page_data.glance.du_cwd | bytes_to_mb }}</p>
                                                 </div>
                                             </section>
                                         </div>
@@ -850,7 +850,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr ng-repeat="incr in servers[current].glance.increments">
+                                            <tr ng-repeat="incr in servers[current].page_data.glance.increments">
                                                 <td>{{ incr.step }}</td>
                                                 <td>{{ incr.time | amDateFormat: "dddd, MMMM Do YYYY, h:mm:ss a" }}</td>
                                                 <td>{{ incr.size }}</td>
@@ -907,7 +907,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr ng-repeat="archives in servers[current].glance.archives">
+                                            <tr ng-repeat="archives in servers[current].page_data.glance.archives">
                                                 <td>{{ archives.time | amDateFormat: "dddd, MMMM Do YYYY, h:mm:ss a"  }}</td>
                                                 <td>{{ archives.size | bytes_to_mb }}</td>
                                                 <td>{{ archives.filename }}</td>
