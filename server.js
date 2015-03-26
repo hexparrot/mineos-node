@@ -370,7 +370,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
     self.servers[server_name].nsp.removeAllListeners();
     delete self.servers[server_name];
 
-    self.front_end.emit('server_list', Object.keys(self.servers));
+    self.front_end.emit('untrack_server', server_name);
     console.info('Server removed: {0}'.format(server_name));
   }
 

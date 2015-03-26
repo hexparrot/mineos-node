@@ -117,6 +117,16 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
     $scope.update_loadavg(data.loadavg);
   })
 
+  socket.on('/', 'track_server', function(server_name) {
+    if (server_name == $scope.current)
+      $scope.page = 'server_status';
+  })
+
+  socket.on('/', 'untrack_server', function(server_name) {
+    if (server_name == $scope.current)
+      $scope.page = 'dashboard';
+  })
+
   $scope.loadavg = [];
   $scope.loadavg_options = {
       element: $("#load_averages"),
@@ -165,7 +175,9 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
       'command': 'create',
       'server_name': server_name,
       'properties': hyphenated
-    }); 
+    });
+
+    $scope.current = server_name;
   }
 
   $scope.update_loadavg = function(new_datapoint) {
