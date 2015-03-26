@@ -117,14 +117,9 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
     $scope.update_loadavg(data.loadavg);
   })
 
-  socket.on('/', 'track_server', function(server_name) {
-    if (server_name == $scope.current)
-      $scope.page = 'server_status';
-  })
-
   socket.on('/', 'untrack_server', function(server_name) {
     if (server_name == $scope.current)
-      $scope.page = 'dashboard';
+      $scope.change_page('dashboard');
   })
 
   $scope.loadavg = [];
@@ -177,7 +172,7 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
       'properties': hyphenated
     });
 
-    $scope.current = server_name;
+    $scope.change_page('dashboard', server_name);
   }
 
   $scope.update_loadavg = function(new_datapoint) {
@@ -205,6 +200,13 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
       Math.max.apply(Math,dataset[2].data)) || $scope.loadavg_options.fallback_xaxis_max;
 
     $.plot($scope.loadavg_options.element, dataset, $scope.loadavg_options).draw();
+  }
+
+  $scope.change_page = function(page, server_name) {
+    if (server_name)
+      $scope.current = server_name;
+
+    $scope.page = page;
   }
 
 }]);
