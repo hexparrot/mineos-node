@@ -408,22 +408,32 @@ mineos.mc = function(server_name, base_dir) {
       case 'owner':
         var userid = require('userid');
         fs.stat(self.env.cwd, function(err, stat_info) {
-          callback(err, {
-            uid: stat_info['uid'],
-            gid: stat_info['gid'],
-            username: userid.username(stat_info['uid']),
-            groupname: userid.groupname(stat_info['gid'])
-          });
+          if (err)
+            callback(err, {});
+          else {
+            callback(err, {
+              uid: stat_info['uid'],
+              gid: stat_info['gid'],
+              username: userid.username(stat_info['uid']),
+              groupname: userid.groupname(stat_info['gid'])
+            });
+          }
         })
         break;
       case 'owner_uid':
         fs.stat(self.env.cwd, function(err, stat_info) {
-          callback(err, stat_info['uid']);
+          if (err)
+            callback(err, null);
+          else
+            callback(err, stat_info['uid']);
         })
         break;
       case 'owner_gid':
         fs.stat(self.env.cwd, function(err, stat_info) {
-          callback(err, stat_info['gid']);
+          if (err)
+            callback(err, null);
+          else
+            callback(err, stat_info['gid']);
         })
         break;
       case 'exists': 

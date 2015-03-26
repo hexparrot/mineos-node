@@ -127,6 +127,27 @@ test.server_ownership = function(test) {
 
   async.series([
     function(callback) {
+      instance.property('owner', function(err, result) {
+        test.ok(err); //expected to throw an error
+        test.equal(Object.keys(result).length, 0);
+        callback(!err);
+      })
+    },
+    function(callback) {
+      instance.property('owner_uid', function(err, result) {
+        test.ok(err); //expected to throw an error
+        test.equal(result, null);
+        callback(!err);
+      })
+    },
+    function(callback) {
+      instance.property('owner_gid', function(err, result) {
+        test.ok(err); //expected to throw an error
+        test.equal(result, null);
+        callback(!err);
+      })
+    },
+    function(callback) {
       instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
         callback(err);
@@ -156,7 +177,7 @@ test.server_ownership = function(test) {
     }
   ], function(err, results) {
     test.ifError(err);
-    test.expect(9);
+    test.expect(15);
     test.done();
   })
 }
