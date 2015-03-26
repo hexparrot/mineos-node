@@ -937,7 +937,7 @@ test.list_increments = function(test) {
     function(callback) {
       instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
-        setTimeout(function() { callback(err) }, FS_DELAY_MS*2);
+        callback(err);
       })
     },
     function(callback) {

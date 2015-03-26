@@ -127,7 +127,7 @@ mineos.mc = function(server_name, base_dir) {
   self.create = function(owner, callback) {
     async.series([
       function(cb) {
-        async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.mkdirs, cb)
+        async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.ensureDir, cb)
       },
       function(cb) {
         self._sp.write(mineos.SP_DEFAULTS, cb)
@@ -358,15 +358,20 @@ mineos.mc = function(server_name, base_dir) {
           incrs += 1;
         }
       }
-
-      rdiff.on('close', function(code) {
-        callback(null, increment_lines);
-      });
     });
 
-    rdiff.stderr.on('data', function(data) {
-      callback(true, []);
-    })
+    rdiff.on('error', function(code) {
+      // branch if path does not exist
+      if (code != 0)
+        callback(true, []);
+    });
+
+    rdiff.on('exit', function(code) {
+      if (code == 0) // branch if all is well
+        callback(code, increment_lines);
+      else // branch if dir exists, not an rdiff-backup dir
+        callback(true, []);
+    });
   }
 
   self.list_archives = function(callback) {
