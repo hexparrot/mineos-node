@@ -210,7 +210,7 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
         })
       } catch (e) {}
     }
-    $('#calendar').fullCalendar({eventSources: [events] });
+    $('#calendar').fullCalendar('destroy').fullCalendar({events: events });
   }
 
   $scope.change_page = function(page, server_name) {

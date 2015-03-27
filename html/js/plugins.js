@@ -482,41 +482,6 @@ $(function() {
 });
 
 /*----------------------------------------------------*/
-/*  Jquery Full Calendar
-/*  http://arshaw.com/fullcalendar
-/*----------------------------------------------------*/
-$(function() {
-    if(jQuery().fullCalendar) {
-        /* Default Calendar
-        -----------------------------------------------------------------*/
-        var date = new Date();
-        var d = date.getDate();
-        var m = date.getMonth();
-        var y = date.getFullYear();
-
-        $('#calendar').fullCalendar({
-            header: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'month,agendaWeek,agendaDay'
-            },
-            buttonText: {
-                prev: '&laquo;',
-                next: '&raquo;',
-                prevYear: '&nbsp;&lt;&lt;&nbsp;',
-                nextYear: '&nbsp;&gt;&gt;&nbsp;',
-                today: 'today',
-                month: 'month',
-                week: 'week',
-                day: 'day'
-            },
-            editable: true,
-            events: []
-        });
-    }
-});
-
-/*----------------------------------------------------*/
 /*  Gallery Shuffle
 /*----------------------------------------------------*/
 $(function(){
