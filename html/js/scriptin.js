@@ -219,6 +219,7 @@ app.factory("Servers", ['socket', function(socket) {
     me.page_data = {};
     me.live_logs = {};
     me.notices = {};
+    me.latest_notice = {};
 
     me.channel.on(server_name, 'heartbeat', function(data) {
       me.heartbeat = data.payload;
@@ -251,6 +252,7 @@ app.factory("Servers", ['socket', function(socket) {
         }
       } else if ('command' in data) {
         me.notices[data.uuid] = data;
+        me.latest_notice[data.command] = data;
         me.channel.emit(server_name, 'page_data', 'glance');
       }
     })
