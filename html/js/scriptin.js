@@ -56,9 +56,15 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
 
   /* watches */
 
+  $scope.$watch(function(scope) { return scope.current },
+    function(new_value, previous_value) {
+      socket.emit(new_value, 'property', {property: 'server.properties'});
+    }
+  );
+
   $scope.$watch(function(scope) { return scope.page },
     function(new_value, previous_value) {
-      socket.emit($scope.current, 'page_data', new_value);
+      socket.emit(new_value, 'page_data', new_value);
     }
   );
 
