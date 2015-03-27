@@ -237,6 +237,12 @@ app.factory("Servers", ['socket', function(socket) {
       }
     })
 
+    me.channel.on(server_name, 'notices', function(data) {
+      data.forEach(function(notice, index) {
+        me.notices[notice.uuid] = notice;
+      })
+    })
+
     me.channel.on(server_name, 'server_ack', function(data) {
       me.notices[data.uuid] = data;
     })

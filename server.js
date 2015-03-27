@@ -194,6 +194,8 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         socket.on('property', get_prop);
         socket.on('page_data', get_page_data);
         socket.on('watch', start_watch);
+        console.info('[{0}] broadcasting {1} previous notices'.format(server_name, self.servers[server_name].notices.length));
+        nsp.emit('notices', self.servers[server_name].notices);
       })
     }
 
@@ -211,6 +213,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         args.error = e;
         args.time_resolved = Date.now();
         nsp.emit('server_fin', args);
+        console.error('server_fin', args);
         self.servers[server_name].notices.push(args);
         return;
       }
@@ -224,6 +227,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
             args.time_resolved = Date.now();
             nsp.emit('server_fin', args);
             console.log('server_fin', args)
+            self.servers[server_name].notices.push(args);
           })
         else if (required_args[i] in args) {
           arg_array.push(args[required_args[i]])
@@ -416,6 +420,9 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           })
         }
         break;
+      case 'notices':
+        for (var server_name in self.servers) 
+          self.servers[server_name].nsp.emit('notices', self.servers[server_name].notices);
       default:
         break;
     }
