@@ -187,9 +187,43 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
     $.plot($scope.loadavg_options.element, dataset, $scope.loadavg_options).draw();
   }
 
+  $scope.refresh_calendar = function() {
+    var events = [];
+    for (var server_name in Servers) {
+      try { //archives
+        Servers[server_name].page_data.glance.archives.forEach(function(value, idx) {
+          events.push({
+            title: '{0} archive'.format(server_name),
+            start: value.time,
+            allDay : false
+          })
+        })
+      } catch (e) {}
+
+      try { //backups
+        Servers[server_name].page_data.glance.increments.forEach(function(value, idx) {
+          events.push({
+            title: '{0} backup'.format(server_name),
+            start: value.time,
+            allDay : false
+          })
+        })
+      } catch (e) {}
+    }
+    $('#calendar').fullCalendar({eventSources: [events] });
+  }
+
   $scope.change_page = function(page, server_name) {
     if (server_name)
       $scope.current = server_name;
+
+    switch(page) {
+      case 'calendar':
+        $scope.refresh_calendar();
+        break;
+      default:
+        break;
+    }
 
     $scope.page = page;
   }
