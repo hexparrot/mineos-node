@@ -74,9 +74,10 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
   $scope.players_online = function() {
     var online = 0;
     $.each(Servers, function(server_name, instance) {
-      if ('heartbeat' in instance)
+      try {
         if (instance.heartbeat.ping.players_online)
           online += (instance.heartbeat.ping.players_online)
+      } catch (e) {}
     })
     return online;
   }
