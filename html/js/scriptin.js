@@ -90,26 +90,6 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
     return capacity;
   }
 
-  $scope.latest_notification = function(type) {
-    if ($scope.current)
-      return Servers[$scope.current].latest_notification[type];
-    else
-      return {};
-  }
-
-  $scope.all_notifications = function() {
-    var notifications = [];
-    for (var server_name in Servers) {
-      var r_obj = Servers[server_name].receipts;
-      for (var uuid in r_obj) {
-        var new_obj = r_obj[uuid];
-        new_obj['server_name'] = server_name;
-        notifications.push(new_obj);
-      }
-    }
-    return notifications.reverse();
-  }
-
   /* socket handlers */
 
   socket.on('/', 'host_heartbeat', function(data) {
@@ -222,9 +202,7 @@ app.factory("Servers", ['socket', function(socket) {
     me.channel = socket;
     me.page_data = {};
     me.live_logs = {};
-    me.receipts = {};
-    me.notifications = [];
-    me.latest_notification = {};
+    me.notices = {};
 
     me.channel.on(server_name, 'heartbeat', function(data) {
       me.heartbeat = data.payload;
@@ -242,14 +220,12 @@ app.factory("Servers", ['socket', function(socket) {
       }
     })
 
-    me.channel.on(server_name, 'receipt', function(data) {
-      me.receipts[data.uuid] = {
-        command: data.command,
-        requested: Date.now()
-      };
+    me.channel.on(server_name, 'server_ack', function(data) {
+      console.log('server_ack', data);
+      me.notices[data.uuid] = data;
     })
 
-    me.channel.on(server_name, 'result', function(data) {
+    me.channel.on(server_name, 'server_fin', function(data) {
       if ('property' in data) {
         switch (data.property) {
           case 'server.properties':
@@ -259,15 +235,10 @@ app.factory("Servers", ['socket', function(socket) {
             break;
         }
       } else if ('command' in data) {
-        me.notifications.push(data);
-        data.timestamp = Date.now();
-        me.latest_notification[data.command] = data;
-
-        me.receipts[data.uuid]['success'] = data.success;
-        me.receipts[data.uuid]['err'] = data.err;
-        me.receipts[data.uuid]['completed'] = data.timestamp;
-
-        me.channel.emit(server_name, 'page_data', 'glance');
+        console.log('server_fin', data)
+        me.notices[data.uuid] = data;
+        console.log(me.notices)
+        /*me.channel.emit(server_name, 'page_data', 'glance');*/
       }
     })
 

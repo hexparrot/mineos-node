@@ -87,11 +87,11 @@
                         <div class="dropdown-menu" role="menu">
                             <header>Notifications</header>
                             <ul class="body">
-                                <li ng-repeat="transaction in all_notifications()">
+                                <li ng-repeat="">
                                     <span class="icon icone-hdd"></span>
                                     <a href="#" class="text">
-                                        <strong>[{{ transaction.server_name }}] {{ transaction.command }}</strong> {{ transaction.success ? 'succeeded' : 'failed' }}<br>
-                                        <small am-time-ago="transaction.completed"></small>
+                                        <strong>[servername] command</strong> success<br>
+                                        <small am-time-ago=""></small>
                                     </a>
                                     <span class="action"><a class="close" href="#">&times;</a></span>
                                 </li>
