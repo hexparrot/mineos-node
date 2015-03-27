@@ -340,7 +340,16 @@
                         <!-- Breadcrumb -->
                         <ul class="breadcrumb">
                             <li><a href="#">Currently Selected Server</a> <span class="divider"></span></li>
-                            <li class="active">{{ current }}</li>
+                            <li class="active">
+                                <!-- Select -->
+                                    <div class="control-group">
+                                        <div class="controls">
+                                            <select class="span2" ng-model="current" ng-options="name as name for (name, instance) in servers">
+                                            </select>
+                                        </div>
+                                    </div>
+                                <!--/ Select -->
+                            </li>
                         </ul>
                         <!--/ Breadcrumb -->
                     </div>
