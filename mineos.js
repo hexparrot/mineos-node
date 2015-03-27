@@ -322,9 +322,8 @@ mineos.mc = function(server_name, base_dir) {
 
   self.restore = function(step, callback) {
     var binary = which.sync('rdiff-backup');
-    var args = ['--restore-as-of', step, self.env.bwd, self.env.cwd];
+    var args = ['--restore-as-of', step, '--force', self.env.bwd, self.env.cwd];
     var params = { cwd: self.env.bwd };
-
 
     var proc = child_process.spawn(binary, args, params);
     proc.once('close', function(code) {

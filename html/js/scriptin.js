@@ -263,7 +263,15 @@ app.factory("Servers", ['socket', function(socket) {
       } else if ('command' in data) {
         me.notices[data.uuid] = data;
         me.latest_notice[data.command] = data;
-        me.channel.emit(server_name, 'page_data', 'glance');
+
+        switch(data.command) {
+          case 'restore':
+            me.channel.emit(server_name, 'property', {property: 'server.properties'});
+          default:
+            me.channel.emit(server_name, 'page_data', 'glance');
+            break;
+        }
+        
       }
     })
 
