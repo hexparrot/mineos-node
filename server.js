@@ -163,7 +163,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           console.info('[{0}] {1} requesting property: {2}'.format(server_name, ip_address, requested.property));
           instance.property(requested.property, function(err, retval) {
             console.info('[{0}] returned to {1}: {2}'.format(server_name, ip_address, retval));
-            nsp.emit('result', {'server_name': server_name, 'property': requested.property, 'payload': retval});
+            nsp.emit('server_fin', {'server_name': server_name, 'property': requested.property, 'payload': retval});
           })
         }
 
