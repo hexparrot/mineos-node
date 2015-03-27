@@ -191,6 +191,22 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
 
 }]);
 
+app.controller("Toolbar", ['$scope', 'Servers', function($scope, Servers) {
+  $scope.servers = Servers;
+
+  $scope.all_notices = function() {
+    var all = [];
+    for (var server_name in Servers) {
+      for (var uuid in Servers[server_name].notices) {
+        var new_obj = Servers[server_name].notices[uuid];
+        new_obj.server_name = server_name;
+        all.push(new_obj);
+      }
+    }
+    return all;
+  }
+}])
+
 /* factories */
 
 app.factory("Servers", ['socket', function(socket) {
@@ -221,7 +237,6 @@ app.factory("Servers", ['socket', function(socket) {
     })
 
     me.channel.on(server_name, 'server_ack', function(data) {
-      console.log('server_ack', data);
       me.notices[data.uuid] = data;
     })
 
@@ -235,10 +250,8 @@ app.factory("Servers", ['socket', function(socket) {
             break;
         }
       } else if ('command' in data) {
-        console.log('server_fin', data)
         me.notices[data.uuid] = data;
-        console.log(me.notices)
-        /*me.channel.emit(server_name, 'page_data', 'glance');*/
+        me.channel.emit(server_name, 'page_data', 'glance');
       }
     })
 

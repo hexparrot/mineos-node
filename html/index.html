@@ -76,7 +76,7 @@
                 <!--/ END Mobile Sidebar Toggler -->
 
                 <!-- START Toolbar -->
-                <ul class="toolbar" id="toolbar">
+                <ul class="toolbar" id="toolbar" ng-controller="Toolbar">
                     
                     <!-- START Notification -->
                     <li class="notification">
@@ -87,11 +87,11 @@
                         <div class="dropdown-menu" role="menu">
                             <header>Notifications</header>
                             <ul class="body">
-                                <li ng-repeat="">
+                                <li ng-repeat="notice in all_notices() | orderBy:'-time_initiated' | limitTo: 10">
                                     <span class="icon icone-hdd"></span>
                                     <a href="#" class="text">
-                                        <strong>[servername] command</strong> success<br>
-                                        <small am-time-ago=""></small>
+                                        <strong>[{{ notice.server_name }}] {{ notice.command }}</strong> {{ notice.success ? 'success' : 'failed' }}<br>
+                                        <small am-time-ago="notice.time_resolved"></small>
                                     </a>
                                     <span class="action"><a class="close" href="#">&times;</a></span>
                                 </li>
