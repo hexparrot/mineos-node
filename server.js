@@ -108,7 +108,8 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         instance: instance,
         nsp: nsp,
         tails: {},
-        watches: {}
+        watches: {},
+        notices: []
       }
 
       console.info('Discovered server: {0}'.format(server_name));
@@ -127,7 +128,8 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           /* when a command is received, immediately respond to client it has been received */
           console.info('[{0}] {1} issued command : "{2}"'.format(server_name, ip_address, args.command))
           args.uuid = uuid.v1();
-          nsp.emit('receipt', args)
+          args.time_initiated = Date.now();
+          nsp.emit('server_ack', args)
           server_dispatcher(args);
         }
 
@@ -192,6 +194,8 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         socket.on('property', get_prop);
         socket.on('page_data', get_page_data);
         socket.on('watch', start_watch);
+        console.info('[{0}] broadcasting {1} previous notices'.format(server_name, self.servers[server_name].notices.length));
+        nsp.emit('notices', self.servers[server_name].notices);
       })
     }
 
@@ -207,7 +211,10 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
       } catch (e) { 
         args.success = false;
         args.error = e;
-        nsp.emit('result', args);
+        args.time_resolved = Date.now();
+        nsp.emit('server_fin', args);
+        console.error('server_fin', args);
+        self.servers[server_name].notices.push(args);
         return;
       }
 
@@ -217,8 +224,10 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           arg_array.push(function(err, payload) {
             args.success = !err;
             args.err = err;
-            nsp.emit('result', args);
-            console.log('sent result', args)
+            args.time_resolved = Date.now();
+            nsp.emit('server_fin', args);
+            console.log('server_fin', args)
+            self.servers[server_name].notices.push(args);
           })
         else if (required_args[i] in args) {
           arg_array.push(args[required_args[i]])
@@ -226,7 +235,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           args.success = false;
           console.error('Provided values missing required argument', required_args[i]);
           args.error = 'Provided values missing required argument: {0}'.format(required_args[i]);
-          nsp.emit('result', args);
+          nsp.emit('server_fin', args);
           return;
         }
       }
@@ -411,6 +420,9 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           })
         }
         break;
+      case 'notices':
+        for (var server_name in self.servers) 
+          self.servers[server_name].nsp.emit('notices', self.servers[server_name].notices);
       default:
         break;
     }
