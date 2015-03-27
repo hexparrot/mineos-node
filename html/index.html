@@ -907,17 +907,17 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr ng-repeat="archives in servers[current].page_data.glance.archives">
-                                                <td>{{ archives.time | amDateFormat: "dddd, MMMM Do YYYY, h:mm:ss a"  }}</td>
-                                                <td>{{ archives.size | bytes_to_mb }}</td>
-                                                <td>{{ archives.filename }}</td>
+                                            <tr ng-repeat="archive in servers[current].page_data.glance.archives">
+                                                <td>{{ archive.time | amDateFormat: "dddd, MMMM Do YYYY, h:mm:ss a"  }}</td>
+                                                <td>{{ archive.size | bytes_to_mb }}</td>
+                                                <td>{{ archive.filename }}</td>
                                                 <td>
                                                     <p>
                                                         <!-- Button Dropdown -->
                                                         <div class="btn-group">
                                                             <button class="btn btn-small dropdown-toggle" data-toggle="dropdown">Actions <span class="caret"></span></button>
                                                             <ul class="dropdown-menu">
-                                                                <li><a href="#">Delete this Archive</a></li>
+                                                                <li><a ng-click="server_command('delete_archive', {filename: archive.filename})">Delete this Archive</a></li>
                                                                 <li><a href="#"></a></li>
                                                                 <li><a href="#">Create server from Archive</a></li>
                                                             </ul>

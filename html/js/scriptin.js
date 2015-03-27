@@ -120,8 +120,12 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
 
   /* other functions */
 
-  $scope.server_command = function(cmd) {
-    socket.emit($scope.current, 'command', {command: cmd});
+  $scope.server_command = function(cmd, args) {
+    if (args) {
+      args.command = cmd;
+      socket.emit($scope.current, 'command', args);
+    } else
+      socket.emit($scope.current, 'command', {command: cmd});
   }
 
   $scope.console_input = function() {
