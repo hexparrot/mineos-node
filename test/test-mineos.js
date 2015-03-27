@@ -1065,3 +1065,54 @@ test.list_archive = function(test) {
     test.done();
   })  
 }
+
+test.delete_archive = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.waterfall([
+    function(callback) {
+      instance.create(OWNER_CREDS, function(err) {
+        test.ifError(err);
+        callback(err);
+      })
+    },
+    function(callback) {
+      instance.archive(function(err) {
+        test.ifError(err);
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*6);
+      })
+    },
+    function(callback) {
+      instance.archive(function(err) {
+        test.ifError(err);
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*5);
+      })
+    },
+    function(callback) {
+      instance.list_archives(function(err, archives) {
+        test.ifError(err);
+        test.equal(archives.length, 2);
+        callback(err, archives[1].filename, archives[0].filename);
+      })
+    },
+    function(archive_to_delete, archive_to_remain, callback) {
+      instance.delete_archive(archive_to_delete, function(err) {
+        test.ifError(err);
+        callback(err, archive_to_remain);
+      })
+    },
+    function(archive_to_remain, callback) {
+      instance.list_archives(function(err, archives) {
+        test.ifError(err);
+        test.equal(archives[0].filename, archive_to_remain);
+        test.equal(archives.length, 1);
+        callback(err);
+      })
+    }
+  ], function(err, results) {
+    test.ifError(err);
+    test.expect(10);
+    test.done();
+  })  
+}
