@@ -288,6 +288,10 @@ app.factory("Servers", ['socket', function(socket) {
       })
     })
 
+    me.channel.on(server_name, 'file head', function(data) {
+      me.live_logs[data.filename] = data.payload.split('\n');
+    })
+
     me.channel.on(server_name, 'server_ack', function(data) {
       me.notices[data.uuid] = data;
     })
@@ -318,7 +322,7 @@ app.factory("Servers", ['socket', function(socket) {
 
     me.channel.emit(server_name, 'property', {property: 'server.properties'});
     me.channel.emit(server_name, 'page_data', 'glance');
-    me.channel.emit(server_name, 'watch', 'logs/latest.log');
+    me.channel.emit(server_name, 'watch', {filepath: 'logs/latest.log', from_start: true});
 
     return me;
   }

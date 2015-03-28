@@ -133,9 +133,23 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           server_dispatcher(args);
         }
 
-        function start_watch(rel_filepath) {
+        function start_watch(opts) {
           /* can put a tail/watch on any file, and joins a room for all future communication */
+          var rel_filepath = opts.filepath;
+
           if (rel_filepath in self.servers[server_name].tails) {
+            var fs = require('fs');
+            var abs_filepath = path.join(self.servers[server_name].instance.env['cwd'], rel_filepath);
+
+            if (opts.from_start) {
+              fs.readFile(abs_filepath, function (err, data) {
+                if (!err) {
+                  console.info('[{0}] {1} transmittting existing file contents: {2} ({3} bytes)'.format(server_name, ip_address, rel_filepath, data.length));
+                  nsp.emit('file head', {filename: rel_filepath, payload: data.toString()});
+                }
+              });
+            }
+
             socket.join(rel_filepath);
             console.info('[{0}] {1} requesting tail: {2}'.format(server_name, ip_address, rel_filepath));
           } else if (rel_filepath in self.servers[server_name].watches) {
