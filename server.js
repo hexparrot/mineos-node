@@ -147,10 +147,11 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
                   console.info('[{0}] {1} transmittting existing file contents: {2} ({3} bytes)'.format(server_name, ip_address, rel_filepath, data.length));
                   nsp.emit('file head', {filename: rel_filepath, payload: data.toString()});
                 }
+                socket.join(rel_filepath);
               });
+            } else {
+              socket.join(rel_filepath);
             }
-
-            socket.join(rel_filepath);
             console.info('[{0}] {1} requesting tail: {2}'.format(server_name, ip_address, rel_filepath));
           } else if (rel_filepath in self.servers[server_name].watches) {
             socket.join(rel_filepath);
