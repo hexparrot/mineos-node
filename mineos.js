@@ -597,6 +597,34 @@ mineos.mc = function(server_name, base_dir) {
     })  
   }
 
+  self.previous_version = function(filepath, restore_as_of, callback) {
+    var tmp = require('tmp');
+    var binary = which.sync('rdiff-backup');
+    var abs_filepath = path.join(self.env.bwd, filepath);
+
+    tmp.file(function (err, new_file_path, fd, cleanupCallback) {
+      if (err) throw err;
+
+      var args = ['--force', '--restore-as-of', restore_as_of, abs_filepath, new_file_path];
+      var params = { cwd: self.env.bwd };
+      var proc = child_process.spawn(binary, args, params);
+
+      proc.on('error', function(code) {
+        callback(code, null);
+      })
+
+      proc.on('exit', function(code) {
+        if (code == 0) {
+          fs.readFile(new_file_path, function (inner_err, data) {
+            callback(inner_err, data.toString());
+          })
+        } else {
+          callback(code, null);
+        }
+      })
+    });
+  }
+
   return self;
 }
 
