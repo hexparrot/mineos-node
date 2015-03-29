@@ -625,6 +625,18 @@ mineos.mc = function(server_name, base_dir) {
     });
   }
 
+  self.previous_property = function(restore_as_of, callback) {
+    self.previous_version('server.properties', restore_as_of, function(err, file_contents) {
+      
+      if (err) {
+        callback(err, null)
+      } else {
+        var ini = require('ini');
+        callback(err, ini.decode(file_contents));
+      }
+    });
+  }
+
   return self;
 }
 

@@ -28,7 +28,7 @@ test.tearDown = function(callback) {
   callback();
 }
 
-/*test.server_list = function (test) {
+test.server_list = function (test) {
   var servers = mineos.server_list(BASE_DIR);
   var instance = new mineos.mc('testing', BASE_DIR);
 
@@ -1115,7 +1115,7 @@ test.delete_archive = function(test) {
     test.expect(10);
     test.done();
   })  
-}*/
+}
 
 test.previous_version = function(test) {
   var cf = require('../config_file');
@@ -1168,4 +1168,48 @@ test.previous_version = function(test) {
     test.expect(7);
     test.done();
   }) 
+}
+
+test.previous_property = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    function(callback) {
+      instance.create(OWNER_CREDS, function(err) {
+        test.ifError(err);
+        callback(err);
+      })
+    },
+    function(callback) {
+      instance.previous_property('1B', function(err, psp) {
+        test.ok(err); //testing for error
+        test.equal(psp, null);
+        callback(!err);
+      })
+    },
+    function(callback) {
+      instance.backup(function(err) {
+        test.ifError(err);
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*3);
+      })
+    },
+    function(callback) {
+      instance.modify_sp('server-port', 25570, function(err) {
+        test.ifError(err);
+        callback(err);
+      })
+    },
+    function(callback) {
+      instance.previous_property('0B', function(err, psp) {
+        test.ifError(err);
+        test.equal(psp['server-port'], '25565');
+        callback(err);
+      })
+    }
+  ], function(err, results) {
+    test.ifError(err);
+    test.expect(8);
+    test.done();
+  })
 }
