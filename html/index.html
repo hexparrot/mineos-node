@@ -85,7 +85,7 @@
                         </a>
                         <!-- START Dropdown Menu -->
                         <div class="dropdown-menu" role="menu">
-                            <header>{{ 'NOTIFICATIONS' | translate }}</header>
+                            <header translate="NOTIFICATIONS"></header>
                             <ul class="body">
                                 <li ng-repeat="notice in all_notices() | orderBy:'-time_initiated' | limitTo: 10">
                                     <span class="icon icone-hdd"></span>
@@ -165,14 +165,14 @@
                             <nav id="nav" class="accordion">
                                 <ul id="navigation">
                                     <!-- START Menu Divider -->
-                                    <li class="divider">{{ 'HOST_SETTINGS' | translate }}</li>
+                                    <li class="divider" translate="HOST_SETTINGS"></li>
                                     <!--/ END Menu Divider -->
 
                                     <!-- START Menu -->
                                     <li class="accordion-group">
                                         <a ng-click="change_page('dashboard')">
                                             <span class="icon icone-dashboard"></span>
-                                            <span class="text">{{ 'DASHBOARD' | translate }}</span>
+                                            <span class="text" translate="DASHBOARD"></span>
                                             <span class="label label-inverse">{{ servers_up() }}</span>
                                         </a>
                                     </li>
@@ -182,7 +182,7 @@
                                     <li class="accordion-group">
                                         <a ng-click="change_page('create_server')">
                                             <span class="icon icone-share"></span>
-                                            <span class="text">{{ 'CREATE_NEW_SERVER' | translate }}</span>
+                                            <span class="text" translate="CREATE_NEW_SERVER"></span>
                                         </a>
                                     </li>
                                     <!--/ END Menu -->
@@ -191,20 +191,20 @@
                                     <li class="accordion-group">
                                         <a ng-click="change_page('calendar')">
                                             <span class="icon icone-share"></span>
-                                            <span class="text">{{ 'CALENDAR' | translate }}</span>
+                                            <span class="text" translate="CALENDAR"></span>
                                         </a>
                                     </li>
                                     <!--/ END Menu -->
 
                                     <!-- START Menu Divider -->
-                                    <li class="divider">{{ 'SERVER_SETTINGS' | translate }}</li>
+                                    <li class="divider" translate="SERVER_SETTINGS"></li>
                                     <!--/ END Menu Divider -->
 
                                     <!-- START Menu -->
                                     <li class="accordion-group" ng-show="current">
                                         <a ng-click="change_page('server_status')">
                                             <span class="icon icone-globe"></span>
-                                            <span class="text">{{ 'SERVER_STATUS' | translate }}s</span>
+                                            <span class="text" translate="SERVER_STATUS">s</span>
                                         </a>
                                     </li>
                                     <!--/ END Menu -->
@@ -213,7 +213,7 @@
                                     <li class="accordion-group" ng-show="current">
                                         <a data-toggle="collapse" data-parent="#navigation" href="#submenu0">
                                             <span class="icon icone-hdd"></span>
-                                            <span class="text">{{ 'BACKUPS_AND_RESTORES' | translate }}</span>
+                                            <span class="text" translate="BACKUPS_AND_RESTORES"></span>
                                             <span class="arrow icone-caret-down"></span>
                                         </a>
                                         <!-- START Submenu Menu -->
@@ -230,7 +230,7 @@
                                     <li class="accordion-group" ng-show="current">
                                         <a data-toggle="collapse" data-parent="#navigation" href="#submenu1">
                                             <span class="icon iconm-pencil-5"></span>
-                                            <span class="text">{{ 'CONFIGURATION' | translate }}</span>
+                                            <span class="text" translate="CONFIGURATION"></span>
                                             <span class="arrow icone-caret-down"></span>
                                         </a>
                                         <!-- START Submenu Menu -->
@@ -247,7 +247,7 @@
                                     <li class="accordion-group" ng-show="current">
                                         <a data-toggle="collapse" data-parent="#navigation" href="#submenu2">
                                             <span class="icon icone-desktop"></span>
-                                            <span class="text">{{ 'LOGGING' | translate }}</span>
+                                            <span class="text" translate="LOGGING"></span>
                                             <span class="arrow icone-caret-down"></span>
                                         </a>
                                         <!-- START Submenu Menu -->
@@ -339,7 +339,7 @@
                     <div class="navbar-inner">
                         <!-- Breadcrumb -->
                         <ul class="breadcrumb">
-                            <li><a href="#">{{ 'CURRENTLY_SELECTED_SERVER' | translate }}</a> <span class="divider"></span></li>
+                            <li><a href="#" translate="CURRENTLY_SELECTED_SERVER"></a> <span class="divider"></span></li>
                             <li class="active">
                                 <!-- Select -->
                                     <div class="control-group">
@@ -370,7 +370,7 @@
                         <!-- START Page/Section header -->
                         <div class="span12">
                             <div class="page-header line1">
-                                <h4>{{ 'SERVER_OVERVIEW' | translate }}</h4>
+                                <h4 translate="SERVER_OVERVIEW"></h4>
                             </div>
                         </div>
                         <!--/ END Page/Section header -->
@@ -387,7 +387,7 @@
                                     <figure class="stats summary stacked">
                                         <div class="icon circle green"><span class="icone-ok"></span></div>
                                         <figcaption>
-                                            <h3>{{ servers_up() }}<small>{{ 'SERVERS_RUNNING' | translate }}</small></h3>
+                                            <h3>{{ servers_up() }}<small translate="SERVERS_RUNNING"></small></h3>
                                         </figcaption>
                                     </figure><!--/ END Summary -->
 
@@ -397,7 +397,7 @@
                                             <span class="icon icone-exchange"></span>
                                         </div>
                                         <figcaption>
-                                            <h4>{{ players_online() }}<small>{{ 'PLAYERS_ONLINE' | translate }}</small></h4>
+                                            <h4>{{ players_online() }}<small translate="PLAYERS_ONLINE"></small></h4>
                                         </figcaption>
                                     </figure><!--/ END Circular -->
 
@@ -405,7 +405,7 @@
                                     <figure class="stats summary stacked" ng-show="host_heartbeat.uptime">
                                         <div class="icon circle lime"><span class="icone-time"></span></div>
                                         <figcaption>
-                                            <h3>{{ host_heartbeat.uptime | seconds_to_time }}<small>{{ 'UPTIME' | translate }}</small></h3>
+                                            <h3>{{ host_heartbeat.uptime | seconds_to_time }}<small translate="UPTIME"></small></h3>
                                         </figcaption>
                                     </figure><!--/ END Summary -->
 
@@ -415,7 +415,7 @@
                                             <span class="icon icone-ticket"></span>
                                         </div>
                                         <figcaption>
-                                            <h4>{{ host_heartbeat.freemem | bytes_to_mb }}<small>{{ 'RAM_FREE' | translate }}</small></h4>
+                                            <h4>{{ host_heartbeat.freemem | bytes_to_mb }}<small translate="RAM_FREE"></small></h4>
                                         </figcaption>
                                     </figure><!--/ END Circular -->
                                 </div>
@@ -430,7 +430,7 @@
                         <!-- START Line Chart - Filled -->
                         <div class="span12 widget stacked">
                             <header>
-                                <h4 class="title">{{ 'LOAD_AVERAGES' | translate }}</h4>
+                                <h4 class="title" translate="LOAD_AVERAGES"></h4>
                             </header>
                             <section class="body">
                                 <div class="body-inner">
@@ -461,11 +461,11 @@
                                     <table class="table">
                                         <thead>
                                             <tr>
-                                                <th>{{ 'SERVER' | translate }}</th>
-                                                <th>{{ 'TYPE' | translate }}</th>
-                                                <th class="hidden-phone">{{ 'PORT' | translate }}</th>
-                                                <th>{{ 'STATUS' | translate }}</th>
-                                                <th>{{ 'MEMORY' | translate }}</th>
+                                                <th translate="SERVER"></th>
+                                                <th translate="TYPE"></th>
+                                                <th class="hidden-phone" translate="PORT"></th>
+                                                <th translate="STATUS"></th>
+                                                <th translate="MEMORY"></th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -500,11 +500,11 @@
                             <div class="body-inner">
                                 <!-- Help Text -->
                                 <div class="control-group">
-                                    <label class="control-label">{{ 'SERVER_NAME' | translate }}</label>
+                                    <label class="control-label" translate="SERVER_NAME"></label>
                                     <div class="controls">
                                         <div class="row-fluid">
                                             <div class="span4">
-                                                <input type="text" ng-model="serverform.server_name"><span class="help-block">{{ 'CREATE_HELP' | translate }}</span>
+                                                <input type="text" ng-model="serverform.server_name"><span class="help-block" translate="CREATE_HELP"></span>
                                             </div>
                                         </div>
                                     </div>
@@ -600,7 +600,7 @@
                                 <!-- START Button Sizing -->
                                 <div class="control-group">
                                     <p>
-                                        <button type="submit" class="btn btn-primary" ng-click="create_server()">{{ 'CREATE_NEW_SERVER' | translate }}</button>
+                                        <button type="submit" class="btn btn-primary" ng-click="create_server()" translate="CREATE_NEW_SERVER"></button>
                                     </p>
                                 </div>
                                 <!--/ END Button Default -->
@@ -634,7 +634,7 @@
                                                     <figure class="stats summary stacked">
                                                         <div class="icon circle" ng-class="{green: servers[current].heartbeat.up, red: servers[current].heartbeat.up == false}"><span class="icone-ok"></span></div>
                                                         <figcaption>
-                                                            <h4>{{ servers[current].heartbeat.up ? 'UP' : 'DOWN' }}<small>{{ 'SERVER_STATUS' | translate }}</small></h4>
+                                                            <h4>{{ servers[current].heartbeat.up ? 'UP' : 'DOWN' }}<small translate="SERVER_STATUS"></small></h4>
                                                         </figcaption>
                                                     </figure><!--/ END Summary -->
 
@@ -644,7 +644,7 @@
                                                             <span class="icon icone-exchange"></span>
                                                         </div>
                                                         <figcaption>
-                                                            <h4>{{ servers[current].heartbeat.ping.players_online ? servers[current].heartbeat.ping.players_online : 0 }} / {{ servers[current].sp['max-players'] }}<small>{{ 'PLAYERS_ONLINE' | translate }}</small></h4>
+                                                            <h4>{{ servers[current].heartbeat.ping.players_online ? servers[current].heartbeat.ping.players_online : 0 }} / {{ servers[current].sp['max-players'] }}<small translate="PLAYERS_ONLINE"></small></h4>
                                                         </figcaption>
                                                     </figure><!--/ END Circular -->
 
@@ -652,7 +652,7 @@
                                                     <figure class="stats summary stacked">
                                                         <div class="icon circle blue"><span class="icone-cogs"></span></div>
                                                         <figcaption>
-                                                            <h4>{{ servers[current].heartbeat.ping.server_version }}&nbsp;<small>{{ 'VERSION' | translate }}</small></h4>
+                                                            <h4>{{ servers[current].heartbeat.ping.server_version }}&nbsp;<small translate="VERSION"></small></h4>
                                                         </figcaption>
                                                     </figure><!--/ END Summary -->
 
@@ -662,7 +662,7 @@
                                                             <span class="icon icone-ticket"></span>
                                                         </div>
                                                         <figcaption>
-                                                            <h4>{{ servers[current].heartbeat.memory.VmRSS }}&nbsp;<small>{{ 'MEMORY_FOOTPRINT' | translate }}</small></h4>
+                                                            <h4>{{ servers[current].heartbeat.memory.VmRSS }}&nbsp;<small translate="MEMORY_FOOTPRINT"></small></h4>
                                                         </figcaption>
                                                     </figure><!--/ END Circular -->
                                                 </div>
@@ -680,16 +680,16 @@
                                             <section class="body">
                                                 <div class="body-inner">
                                                     <p>
-                                                        <button type="button" class="btn btn-success" ng-click="server_command('start')">{{ 'START' | translate }}</button>
+                                                        <button type="button" class="btn btn-success" ng-click="server_command('start')" translate="START"></button>
 
                                                         <!-- Button Dropdown -->
                                                         <div class="btn-group">
-                                                            <button class="btn btn-danger" ng-click="server_command('stop')">{{ 'STOP' | translate }}</button>
+                                                            <button class="btn btn-danger" ng-click="server_command('stop')" translate="STOP"></button>
                                                             <button class="btn btn-danger dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
                                                             <ul class="dropdown-menu">
-                                                                <li><a href="#" ng-click="server_command('restart')">{{ 'RESTART' | translate }}</a></li>
-                                                                <li><a href="#" ng-click="server_command('stop_and_backup')">{{ 'STOP_AND_BACKUP' | translate }}</a></li>
-                                                                <li><a href="#" ng-click="server_command('kill')">{{ 'KILL' | translate }}</a></li>
+                                                                <li><a href="#" ng-click="server_command('restart')" translate="RESTART"></a></li>
+                                                                <li><a href="#" ng-click="server_command('stop_and_backup')" translate="STOP_AND_BACKUP"></a></li>
+                                                                <li><a href="#" ng-click="server_command('kill')" translate="KILL"></a></li>
                                                             </ul>
                                                         </div><!--/ Button Dropdown -->
                                                     </p>
@@ -729,7 +729,7 @@
                                                         <button type="button" class="close" data-dismiss="alert">×</button>
                                                         <strong>{{ 'FAILURE' | translate }}! </strong> {{ 'RESTORE_POINT_FAILED' | translate }} <span am-time-ago="servers[current].latest_notice['backup'].time_resolved"></span>.
                                                     </div><!--/ Alert Error -->
-                                                    <p><a ng-click="server_command('backup')">{{ 'CREATE_NEW_RESTORE_POINT' | translate }}</a></p>
+                                                    <p><a ng-click="server_command('backup')" translate="CREATE_NEW_RESTORE_POINT"></a></p>
                                                 </div>
                                             </section>
                                         </div>
@@ -756,7 +756,7 @@
                                                         <button type="button" class="close" data-dismiss="alert">×</button>
                                                         <strong>{{ 'FAILURE' | translate }}! </strong> {{ 'ARCHIVE_FAILED' | translate }} <span am-time-ago="servers[current].latest_notice['archive'].time_resolved"></span>.
                                                     </div><!--/ Alert Error -->
-                                                    <p><a ng-click="server_command('archive')">{{ 'CREATE_NEW_ARCHIVE' | translate }}</a></p>
+                                                    <p><a ng-click="server_command('archive')" translate="CREATE_NEW_ARCHIVE"></a></p>
                                                 </div>
                                                 
                                             </section>
@@ -838,7 +838,7 @@
                         <!-- START Basic Table -->
                         <div class="span12 widget">
                             <header>
-                                <h4 class="title">{{ 'AVAILABLE_RESTORE_POINTS' | translate }}</h4>
+                                <h4 class="title" translate="AVAILABLE_RESTORE_POINTS"></h4>
                                 <!-- START Toolbar -->
                                 <ul class="toolbar pull-right">
                                     <li><a href="#" class="link"><span class="icon icone-cog"></span></a></li>
@@ -858,10 +858,10 @@
                                     <table class="table">
                                         <thead>
                                             <tr>
-                                                <th>{{ 'STEP' | translate }}</th>
-                                                <th>{{ 'TIMESTAMP' | translate }}</th>
-                                                <th>{{ 'SIZE' | translate }}</th>
-                                                <th>{{ 'CUMULATIVE_SIZE' | translate }}</th>
+                                                <th translate="STEP"></th>
+                                                <th translate="TIMESTAMP"></th>
+                                                <th translate="SIZE"></th>
+                                                <th translate="CUMULATIVE_SIZE"></th>
                                                 <th></th>
                                             </tr>
                                         </thead>
@@ -873,7 +873,7 @@
                                                 <td>{{ incr.cum }}</td>
                                                 <td>
                                                     <p>
-                                                        <button type="button" class="btn btn-mini btn-success" ng-click="server_command('restore', {step: incr.step})">{{ 'RESTORE' | translate }}</button>
+                                                        <button type="button" class="btn btn-mini btn-success" ng-click="server_command('restore', {step: incr.step})" translate="RESTORE"></button>
                                                     </p>
                                                 </td>
                                             </tr>
@@ -897,7 +897,7 @@
                         <!-- START Basic Table -->
                         <div class="span12 widget">
                             <header>
-                                <h4 class="title">{{ 'AVAILABLE_ARCHIVES' | translate }}</h4>
+                                <h4 class="title" translate="AVAILABLE_ARCHIVES"></h4>
                                 <!-- START Toolbar -->
                                 <ul class="toolbar pull-right">
                                     <li><a href="#" class="link"><span class="icon icone-cog"></span></a></li>
@@ -917,9 +917,9 @@
                                     <table class="table">
                                         <thead>
                                             <tr>
-                                                <th>{{ 'TIMESTAMP' | translate }}</th>
-                                                <th>{{ 'SIZE' | translate }}</th>
-                                                <th>{{ 'FILENAME' | translate }}</th>
+                                                <th translate="TIMESTAMP"></th>
+                                                <th translate="SIZE"></th>
+                                                <th translate="FILENAME"></th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -933,9 +933,9 @@
                                                         <div class="btn-group">
                                                             <button class="btn btn-small dropdown-toggle" data-toggle="dropdown">Actions <span class="caret"></span></button>
                                                             <ul class="dropdown-menu">
-                                                                <li><a ng-click="server_command('delete_archive', {filename: archive.filename})">{{ 'DELETE_THIS_ARCHIVE' | translate }}</a></li>
+                                                                <li><a ng-click="server_command('delete_archive', {filename: archive.filename})" translate="DELETE_THIS_ARCHIVE"></a></li>
                                                                 <li><a href="#"></a></li>
-                                                                <li><a href="#">{{ 'CREATE_FROM_ARCHIVE' | translate }}</a></li>
+                                                                <li><a href="#" translate="CREATE_FROM_ARCHIVE"></a></li>
                                                             </ul>
                                                         </div><!--/ Button Dropdown -->
                                                         <!-- Button Dropdown -->
@@ -967,7 +967,7 @@
                             <div class="body-inner">
                             	<!-- Tagging Support -->
                                 <div class="control-group">
-                                    <label class="control-label">{{ 'CREATE_RESTORE_POINTS_EVERY' | translate }}:</label>
+                                    <label class="control-label" translate="CREATE_RESTORE_POINTS_EVERY">:</label>
                                     <div class="controls">
                                         <input type="hidden" class="frequencies" class=""/>
                                     </div>
@@ -976,7 +976,7 @@
                         </section>
                         <footer>
                             <div class="body-inner">
-                                <p>{{ 'FREQUENCY_NOTE' | translate }}</p>
+                                <p translate="FREQUENCY_NOTE"></p>
                             </div>
                         </footer>
                     </div>
@@ -985,13 +985,13 @@
                     <!-- START Widget Color - Green -->
                     <div class="span5 widget green">
                         <header>
-                            <h4 class="title">{{ 'ARCHIVE_FREQUENCY' | translate }}</h4>
+                            <h4 class="title" translate="ARCHIVE_FREQUENCY"></h4>
                         </header>
                         <section class="body">
                             <div class="body-inner">
                                <!-- Tagging Support -->
                                 <div class="control-group">
-                                    <label class="control-label">{{ 'CREATE_ARCHIVES_EVERY' | translate }}:</label>
+                                    <label class="control-label" translate="CREATE_ARCHIVES_EVERY">:</label>
                                     <div class="controls">
                                         <input type="hidden" class="frequencies" class=""/>
                                     </div>
@@ -1000,7 +1000,7 @@
                         </section>
                         <footer>
                         	<div class="body-inner">
-                                <p>{{ 'FREQUENCY_NOTE' | translate }}</p>
+                                <p translate="FREQUENCY_NOTE"></p>
                             </div>
                         </footer>
                     </div>
@@ -1129,7 +1129,7 @@
 
             <!-- START Template Footer -->
             <footer id="footer">
-                <p>{{ 'CREDITS' | translate }}</p>
+                <p translate="CREDITS"></p>
 
                 <!-- START To Top Scroller -->
                 <a href="#" class="totop"><span class="icon icone-angle-up"></span></a>
