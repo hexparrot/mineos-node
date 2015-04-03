@@ -179,25 +179,24 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.stop = function(callback) {
-    self.stuff('stop', function(err, proc) {
-      if (err) {
-        callback(err);
-      } else {
-         async.whilst(
+    var test_interval_ms = 200;
+
+    async.series([
+      async.apply(self.verify, ['exists', 'up']),
+      async.apply(self.stuff, 'stop'),
+      function(cb) {
+        async.whilst(
           function() { return (self.server_name in mineos.server_pids_up()) },
-          function(callback) {
-            setTimeout(callback, 200);
-          },
+          function(cc) { setTimeout(cc, test_interval_ms) },
           function(ignored_err) {
             if (self.server_name in mineos.server_pids_up())
-              callback(true); //error, stop succeeded: false
+              callback(true); //error, stop did not succeed
             else
-              callback(null); //no error, stop succeeded: true
+              callback(null); //no error, stop succeeded as expected
           }
         );  
       }
-       
-    })
+    ], callback);
   }
 
   self.stop_and_backup = function(callback) {

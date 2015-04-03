@@ -27,7 +27,7 @@ test.tearDown = function(callback) {
   }
   callback();
 }
-/*
+
 test.server_list = function (test) {
   var servers = mineos.server_list(BASE_DIR);
   var instance = new mineos.mc('testing', BASE_DIR);
@@ -331,7 +331,7 @@ test.start = function(test) {
     test.done();
   })
 }
-*/
+
 test.stop = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -426,7 +426,7 @@ test.stop_and_backup = function(test) {
     test.done();
   })
 }
-/*
+
 test.kill = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -1291,4 +1291,4 @@ test.stuff = function(test) {
     test.expect(6);
     test.done();
   })
-}*/
+}
