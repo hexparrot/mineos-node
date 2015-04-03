@@ -27,7 +27,7 @@ test.tearDown = function(callback) {
   }
   callback();
 }
-
+/*
 test.server_list = function (test) {
   var servers = mineos.server_list(BASE_DIR);
   var instance = new mineos.mc('testing', BASE_DIR);
@@ -1240,6 +1240,44 @@ test.previous_property = function(test) {
   ], function(err, results) {
     test.ifError(err);
     test.expect(8);
+    test.done();
+  })
+}*/
+
+test.stuff = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    function(callback) {
+      instance.stuff('op hexparrot', function(err, proc) {
+        test.ok(err); //looking for positive error
+        callback(!err);
+      })
+    },
+    function(callback) {
+      instance.create(OWNER_CREDS, function(err) {
+        test.ifError(err);
+        callback(err);
+      })
+    },
+    function(callback) {
+      setTimeout(function() {
+        instance.start(function(err) {
+          test.ifError(err);
+          callback(err);
+        })
+      }, PROC_START_DELAY_MS*100)
+    },
+    function(callback) {
+      instance.stuff('op hexparrot', function(err, proc) {
+        test.ifError(err);
+        callback(err);
+      })
+    }
+  ], function(err, results) {
+    test.ifError(err);
+    test.expect(5);
     test.done();
   })
 }
