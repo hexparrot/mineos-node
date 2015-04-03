@@ -28,7 +28,7 @@ test.tearDown = function(callback) {
   callback();
 }
 
-/*test.server_list = function (test) {
+test.server_list = function (test) {
   var servers = mineos.server_list(BASE_DIR);
   var instance = new mineos.mc('testing', BASE_DIR);
 
@@ -113,10 +113,16 @@ test.create_server = function(test) {
         test.equal(mineos.server_list(BASE_DIR).length, 1);
         callback(err);
       })
+    },
+    function(callback) {
+      instance.create(OWNER_CREDS, function(err){
+        test.ok(err); //testing for error
+        callback(!err);
+      })
     }
   ], function(err, results) {
     test.ifError(err);
-    test.expect(17);
+    test.expect(18);
     test.done();
   })
 }
@@ -188,6 +194,12 @@ test.delete_server = function(test) {
 
   async.series([
     function(callback) {
+      instance.delete(function(err) {
+        test.ok(err); //testing for error
+        callback(!err);
+      })
+    },
+    function(callback) {
       instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
         callback(err);
@@ -215,7 +227,7 @@ test.delete_server = function(test) {
     }
   ], function(err, results) {
     test.ifError(err);
-    test.expect(7);
+    test.expect(8);
     test.done();
   })
 }
@@ -297,6 +309,12 @@ test.start = function(test) {
         test.equal(typeof(pid), 'number');
         test.ok(pid > 0);
         callback(err);
+      })
+    },
+    function(callback) {
+      instance.start(function(err) {
+        test.ok(err); //looking for positive error
+        callback(!err);
       })
     },
     function(callback) {
@@ -410,6 +428,12 @@ test.kill = function(test) {
 
   async.series([
     function(callback) {
+      instance.kill(function(err) {
+        test.ok(err); //testing for error
+        callback(!err);
+      })
+    },
+    function(callback) {
       instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
         callback(err);
@@ -449,9 +473,15 @@ test.kill = function(test) {
         callback(err);
       })
     },
+    function(callback) {
+      instance.kill(function(err) {
+        test.ok(err); //testing for error
+        callback(!err);
+      })
+    }
   ], function(err, results) {
     test.ifError(err);
-    test.expect(9);
+    test.expect(11);
     test.done();
   })
 }
@@ -766,7 +796,7 @@ test.properties = function(test) {
     test.done();
   })
 }
-*/
+
 test.verify = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -833,7 +863,7 @@ test.verify = function(test) {
     test.done();
   })
 }
-/*
+
 test.ping = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -1212,4 +1242,4 @@ test.previous_property = function(test) {
     test.expect(8);
     test.done();
   })
-}*/
+}

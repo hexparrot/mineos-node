@@ -126,6 +126,7 @@ mineos.mc = function(server_name, base_dir) {
 
   self.create = function(owner, callback) {
     async.series([
+      async.apply(self.verify, ['!exists', '!up']),
       function(cb) {
         async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.ensureDir, cb)
       },
@@ -146,7 +147,14 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.delete = function(callback) {
-    async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.remove, callback);
+    async.series([
+      async.apply(self.verify, ['exists', '!up']),
+      async.apply(fs.remove, self.env.cwd),
+      async.apply(fs.remove, self.env.bwd),
+      async.apply(fs.remove, self.env.awd)
+    ], function(err, results) {
+      callback(err);
+    })
   }
 
   self.start = function(callback) {
@@ -161,6 +169,7 @@ mineos.mc = function(server_name, base_dir) {
     var dest_filename = 'minecraft_server.jar';
 
     async.series([
+      async.apply(self.verify, ['exists', '!up']),
       function(cb) {
         fs.copy(orig_filepath, path.join(self.env.cwd, dest_filename), cb);
       },
