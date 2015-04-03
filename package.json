@@ -39,7 +39,8 @@
     "angular": "1.3.x",
     "moment": "2.9.x",
     "angular-moment": "0.9.x",
-    "moment-duration-format": "1.3.x"
+    "moment-duration-format": "1.3.x",
+    "angular-translate": "2.6.x"
   },
   "devDependencies": {
     "fs-extra": "0.11.x"
