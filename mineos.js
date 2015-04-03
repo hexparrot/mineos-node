@@ -136,9 +136,7 @@ mineos.mc = function(server_name, base_dir) {
       async.apply(fs.chown, self.env.awd, owner['uid'], owner['gid']),
       async.apply(fs.chown, self.env.sp, owner['uid'], owner['gid'])
 
-    ], function(err, results) {
-      callback(err);
-    })
+    ], callback)
   }
 
   self.delete = function(callback) {
@@ -147,9 +145,7 @@ mineos.mc = function(server_name, base_dir) {
       async.apply(fs.remove, self.env.cwd),
       async.apply(fs.remove, self.env.bwd),
       async.apply(fs.remove, self.env.awd)
-    ], function(err, results) {
-      callback(err);
-    })
+    ], callback)
   }
 
   self.start = function(callback) {
@@ -179,9 +175,7 @@ mineos.mc = function(server_name, base_dir) {
           callback(code);
         })
       }
-    ], function(err, results) {
-      callback(err);
-    });
+    ], callback);
   }
 
   self.stop = function(callback) {
@@ -205,9 +199,7 @@ mineos.mc = function(server_name, base_dir) {
     async.series([
       async.apply(self.stop),
       async.apply(self.backup)
-    ], function(err, results) {
-      callback(err);
-    })
+    ], callback)
   }
 
   self.kill = function(callback) {
@@ -279,9 +271,7 @@ mineos.mc = function(server_name, base_dir) {
           callback(code);
         })
       }
-    ], function(err, results) {
-      callback(err);
-    });
+    ], callback);
   }
 
   self.backup = function(callback) {
@@ -303,9 +293,7 @@ mineos.mc = function(server_name, base_dir) {
           callback(code);
         })
       }
-    ], function(err, results) {
-      callback(err);
-    })
+    ], callback)
   }
 
   self.restore = function(step, callback) {

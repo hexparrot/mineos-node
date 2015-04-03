@@ -27,7 +27,7 @@ test.tearDown = function(callback) {
   }
   callback();
 }
-/*
+
 test.server_list = function (test) {
   var servers = mineos.server_list(BASE_DIR);
   var instance = new mineos.mc('testing', BASE_DIR);
@@ -1242,7 +1242,7 @@ test.previous_property = function(test) {
     test.expect(8);
     test.done();
   })
-}*/
+}
 
 test.stuff = function(test) {
   var server_name = 'testing';
