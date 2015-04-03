@@ -27,7 +27,7 @@ test.tearDown = function(callback) {
   }
   callback();
 }
-
+/*
 test.server_list = function (test) {
   var servers = mineos.server_list(BASE_DIR);
   var instance = new mineos.mc('testing', BASE_DIR);
@@ -331,13 +331,18 @@ test.start = function(test) {
     test.done();
   })
 }
-
+*/
 test.stop = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
-
   async.series([
+    function(callback) {
+      instance.stop(function(err) {
+        test.ok(err); //testing for error
+        callback(!err);
+      })
+    },
     function(callback) {
       instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
@@ -374,7 +379,7 @@ test.stop = function(test) {
     }
   ], function(err, results) {
     test.ifError(err);
-    test.expect(8);
+    test.expect(9);
     test.done();
   })
 }
@@ -421,7 +426,7 @@ test.stop_and_backup = function(test) {
     test.done();
   })
 }
-
+/*
 test.kill = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -1286,4 +1291,4 @@ test.stuff = function(test) {
     test.expect(6);
     test.done();
   })
-}
+}*/

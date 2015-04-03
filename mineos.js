@@ -180,18 +180,23 @@ mineos.mc = function(server_name, base_dir) {
 
   self.stop = function(callback) {
     self.stuff('stop', function(err, proc) {
-      async.whilst(
-        function() { return (self.server_name in mineos.server_pids_up()) },
-        function(callback) {
-          setTimeout(callback, 200);
-        },
-        function(ignored_err) {
-          if (self.server_name in mineos.server_pids_up())
-            callback(true); //error, stop succeeded: false
-          else
-            callback(null); //no error, stop succeeded: true
-        }
-      );  
+      if (err) {
+        callback(err);
+      } else {
+         async.whilst(
+          function() { return (self.server_name in mineos.server_pids_up()) },
+          function(callback) {
+            setTimeout(callback, 200);
+          },
+          function(ignored_err) {
+            if (self.server_name in mineos.server_pids_up())
+              callback(true); //error, stop succeeded: false
+            else
+              callback(null); //no error, stop succeeded: true
+          }
+        );  
+      }
+       
     })
   }
 
