@@ -28,7 +28,7 @@ test.tearDown = function(callback) {
   callback();
 }
 
-test.server_list = function (test) {
+/*test.server_list = function (test) {
   var servers = mineos.server_list(BASE_DIR);
   var instance = new mineos.mc('testing', BASE_DIR);
 
@@ -766,34 +766,34 @@ test.properties = function(test) {
     test.done();
   })
 }
-
+*/
 test.verify = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
   
   async.series([
     function(callback) {
-      instance.verify(['!exists', '!up'], function(result) {
-        test.ok(result);
-        callback(null);
+      instance.verify(['!exists', '!up'], function(err) {
+        test.ifError(err); //testing for error
+        callback(err);
       })
     },
     function(callback) {
-      instance.verify(['exists'], function(result) {
-        test.ok(!result);
-        callback(null);
+      instance.verify(['exists'], function(err) {
+        test.ok(err); //testing for error
+        callback(!err);
       })
     },
     function(callback) {
-      instance.verify(['up'], function(result) {
-        test.ok(!result);
-        callback(null);
+      instance.verify(['up'], function(err) {
+        test.ok(err); //testing for error
+        callback(!err);
       })
     },
     function(callback) {
-      instance.verify(['exists', 'up'], function(result) {
-        test.ok(!result);
-        callback(null);
+      instance.verify(['exists', 'up'], function(err) {
+        test.ok(err); //testing for error
+        callback(!err);
       })
     },
     function(callback) {
@@ -803,9 +803,9 @@ test.verify = function(test) {
       })
     },
     function(callback) {
-      instance.verify(['exists', '!up'], function(result) {
-        test.ok(result);
-        callback(null);
+      instance.verify(['exists', '!up'], function(err) {
+        test.ifError(err);
+        callback(err);
       })
     },
     function(callback) {
@@ -815,9 +815,9 @@ test.verify = function(test) {
       })
     },
     function(callback) {
-      instance.verify(['exists', 'up'], function(result) {
-        test.ok(result);
-        callback(null);
+      instance.verify(['exists', 'up'], function(err) {
+        test.ifError(err);
+        callback(err);
       })
     },
     function(callback) {
@@ -833,7 +833,7 @@ test.verify = function(test) {
     test.done();
   })
 }
-
+/*
 test.ping = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -1212,4 +1212,4 @@ test.previous_property = function(test) {
     test.expect(8);
     test.done();
   })
-}
+}*/

@@ -542,7 +542,7 @@ mineos.mc = function(server_name, base_dir) {
 
   self.verify = function(tests, callback) {
     async.map(tests, self.property, function(err, result) {
-      callback(result.every(function(val) { return !!val === true })); //double '!' converts any value to bool
+      callback(!result.every(function(val) { return !!val === true })); //double '!' converts any value to bool, then result negated
     })
   }
 
