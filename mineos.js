@@ -237,34 +237,24 @@ mineos.mc = function(server_name, base_dir) {
 
   self.stuff = function(msg, callback) {
     var params = { cwd: self.env.cwd };
+    var binary = which.sync('screen');
 
-    async.series([
-      function(cb) {
-        self.property('up', function(err, is_up) {
-          if (err || !is_up) // if error or server down, do not continue
-            cb(true, false);
-          else
-            cb(null, is_up);
-        })
-      },
+    async.waterfall([
+      async.apply(self.verify, ['exists', 'up']),
       function(cb) {
         self.property('owner', function(err, result) {
           params['uid'] = result['uid'];
           params['gid'] = result['gid'];
           cb(err);
         })
+      },
+      function(cb) {
+        cb(null, child_process.spawn(binary, 
+                                     ['-S', 'mc-{0}'.format(self.server_name),
+                                      '-p', '0', '-X', 'eval', 'stuff "{0}\012"'.format(msg)],
+                                     params));
       }
-    ], function(err, results) {
-      if (!err) {
-        var binary = which.sync('screen');
-        callback(err, child_process.spawn(binary, 
-                       ['-S', 'mc-{0}'.format(self.server_name), 
-                        '-p', '0', '-X', 'eval', 'stuff "{0}\012"'.format(msg)], 
-                       params));
-      } else {
-        callback(err, null);
-      }
-    });
+    ], callback);
   }
 
   self.archive = function(callback) {

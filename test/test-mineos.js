@@ -1262,6 +1262,12 @@ test.stuff = function(test) {
       })
     },
     function(callback) {
+      instance.stuff('op hexparrot', function(err, proc) {
+        test.ok(err); //looking for positive error
+        callback(!err);
+      })
+    },
+    function(callback) {
       setTimeout(function() {
         instance.start(function(err) {
           test.ifError(err);
@@ -1277,7 +1283,7 @@ test.stuff = function(test) {
     }
   ], function(err, results) {
     test.ifError(err);
-    test.expect(5);
+    test.expect(6);
     test.done();
   })
 }
