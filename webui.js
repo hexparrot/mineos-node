@@ -22,6 +22,7 @@ app.get('/', function(req, res){
 });
 
 app.use('/angular', express.static(__dirname + '/node_modules/angular'));
+app.use('/angular-translate', express.static(__dirname + '/node_modules/angular-translate/dist'));
 app.use('/moment', express.static(__dirname + '/node_modules/moment'));
 app.use('/angular-moment', express.static(__dirname + '/node_modules/angular-moment'));
 app.use('/angular-moment-duration-format', express.static(__dirname + '/node_modules/moment-duration-format/lib'));

@@ -1,5 +1,19 @@
-var app = angular.module("mineos", ['angularMoment']);
+var app = angular.module("mineos", ['angularMoment', 'pascalprecht.translate']);
 var connect_string = ':3000/';
+
+app.run(['$rootScope', '$translate', function($rootScope, $translate) {
+  $rootScope.change_locale = function (locale) {
+    $translate.use(locale);
+  }
+}]);
+
+app.config(function ($translateProvider) {
+  $translateProvider.useStaticFilesLoader({
+    prefix: 'locales/locale-',
+    suffix: '.json'
+  });
+  $translateProvider.preferredLanguage('en_US');
+});
 
 /* directives */
 
