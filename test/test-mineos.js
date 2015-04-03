@@ -327,7 +327,7 @@ test.start = function(test) {
     }
   ], function(err, results) {
     test.ifError(err);
-    test.expect(11);
+    test.expect(12);
     test.done();
   })
 }

@@ -127,20 +127,15 @@ mineos.mc = function(server_name, base_dir) {
   self.create = function(owner, callback) {
     async.series([
       async.apply(self.verify, ['!exists', '!up']),
-      function(cb) {
-        async.each([self.env.cwd, self.env.bwd, self.env.awd], fs.ensureDir, cb)
-      },
-      function(cb) {
-        self._sp.write(mineos.SP_DEFAULTS, cb)
-      },
-      function(cb) {
-        async.series([
-          async.apply(fs.chown, self.env.cwd, owner['uid'], owner['gid']),
-          async.apply(fs.chown, self.env.bwd, owner['uid'], owner['gid']),
-          async.apply(fs.chown, self.env.awd, owner['uid'], owner['gid']),
-          async.apply(fs.chown, self.env.sp, owner['uid'], owner['gid'])
-        ], cb)
-      }
+      async.apply(fs.ensureDir, self.env.cwd),
+      async.apply(fs.ensureDir, self.env.bwd),
+      async.apply(fs.ensureDir, self.env.awd),
+      async.apply(self._sp.write, mineos.SP_DEFAULTS),
+      async.apply(fs.chown, self.env.cwd, owner['uid'], owner['gid']),
+      async.apply(fs.chown, self.env.bwd, owner['uid'], owner['gid']),
+      async.apply(fs.chown, self.env.awd, owner['uid'], owner['gid']),
+      async.apply(fs.chown, self.env.sp, owner['uid'], owner['gid'])
+
     ], function(err, results) {
       callback(err);
     })
@@ -170,9 +165,7 @@ mineos.mc = function(server_name, base_dir) {
 
     async.series([
       async.apply(self.verify, ['exists', '!up']),
-      function(cb) {
-        fs.copy(orig_filepath, path.join(self.env.cwd, dest_filename), cb);
-      },
+      async.apply(fs.copy, orig_filepath, path.join(self.env.cwd, dest_filename)),
       function(cb) {
         self.property('owner', function(err, result) {
           params['uid'] = result['uid'];
@@ -210,12 +203,8 @@ mineos.mc = function(server_name, base_dir) {
 
   self.stop_and_backup = function(callback) {
     async.series([
-      function(cb) {
-        self.stop(cb);
-      },
-      function(cb) {
-        self.backup(cb);
-      }
+      async.apply(self.stop),
+      async.apply(self.backup)
     ], function(err, results) {
       callback(err);
     })
