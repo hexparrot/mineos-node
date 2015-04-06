@@ -323,10 +323,15 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
         me.notices[data.uuid] = data;
         me.latest_notice[data.command] = data;
 
+        var help_text = '';
+        try {
+          help_text = $filter('translate')(data.err);
+        } catch (e) {}
+
         $.gritter.add({
           title: "[{0}] {1} {2}".format(me.server_name, data.command,
                                         (data.success ? $filter('translate')('SUCCEEDED') : $filter('translate')('FAILED')) ),
-          text: $filter('translate')(data.err)
+          text: help_text
         });
 
         switch(data.command) {
