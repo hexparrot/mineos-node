@@ -242,7 +242,9 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
             args.time_resolved = Date.now();
             nsp.emit('server_fin', args);
             console.log('server_fin', args)
-            self.servers[server_name].notices.push(args);
+            
+            if (args.command != 'delete')
+              self.servers[server_name].notices.push(args);
           })
         else if (required_args[i] in args) {
           arg_array.push(args[required_args[i]])
