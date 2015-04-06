@@ -268,7 +268,7 @@ app.controller("Toolbar", ['$scope', 'Servers', function($scope, Servers) {
 
 /* factories */
 
-app.factory("Servers", ['socket', function(socket) {
+app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
   var self = this;
 
   var server_model = function(server_name) {
@@ -322,6 +322,12 @@ app.factory("Servers", ['socket', function(socket) {
       } else if ('command' in data) {
         me.notices[data.uuid] = data;
         me.latest_notice[data.command] = data;
+
+        $.gritter.add({
+          title: "[{0}] {1} {2}".format(me.server_name, data.command,
+                                        (data.success ? $filter('translate')('SUCCEEDED') : $filter('translate')('FAILED')) ),
+          text: $filter('translate')(data.err)
+        });
 
         switch(data.command) {
           case 'restore':
