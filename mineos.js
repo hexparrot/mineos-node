@@ -126,7 +126,8 @@ mineos.mc = function(server_name, base_dir) {
 
   self.create = function(owner, callback) {
     async.series([
-      async.apply(self.verify, ['!exists', '!up']),
+      async.apply(self.verify, '!exists'),
+      async.apply(self.verify, '!up'),
       async.apply(fs.ensureDir, self.env.cwd),
       async.apply(fs.ensureDir, self.env.bwd),
       async.apply(fs.ensureDir, self.env.awd),
@@ -141,7 +142,8 @@ mineos.mc = function(server_name, base_dir) {
 
   self.delete = function(callback) {
     async.series([
-      async.apply(self.verify, ['exists', '!up']),
+      async.apply(self.verify, 'exists'),
+      async.apply(self.verify, '!up'),
       async.apply(fs.remove, self.env.cwd),
       async.apply(fs.remove, self.env.bwd),
       async.apply(fs.remove, self.env.awd)
@@ -160,7 +162,8 @@ mineos.mc = function(server_name, base_dir) {
     var dest_filename = 'minecraft_server.jar';
 
     async.series([
-      async.apply(self.verify, ['exists', '!up']),
+      async.apply(self.verify, 'exists'),
+      async.apply(self.verify, '!up'),
       async.apply(fs.copy, orig_filepath, path.join(self.env.cwd, dest_filename)),
       function(cb) {
         self.property('owner', function(err, result) {
@@ -182,7 +185,8 @@ mineos.mc = function(server_name, base_dir) {
     var test_interval_ms = 200;
 
     async.series([
-      async.apply(self.verify, ['exists', 'up']),
+      async.apply(self.verify, 'exists'),
+      async.apply(self.verify, 'up'),
       async.apply(self.stuff, 'stop'),
       function(cb) {
         async.whilst(
@@ -236,7 +240,8 @@ mineos.mc = function(server_name, base_dir) {
     var binary = which.sync('screen');
 
     async.waterfall([
-      async.apply(self.verify, ['exists', 'up']),
+      async.apply(self.verify, 'exists'),
+      async.apply(self.verify, 'up'),
       function(cb) {
         self.property('owner', function(err, result) {
           params['uid'] = result['uid'];
@@ -520,9 +525,12 @@ mineos.mc = function(server_name, base_dir) {
     }
   }
 
-  self.verify = function(tests, callback) {
-    async.map(tests, self.property, function(err, result) {
-      callback(!result.every(function(val) { return !!val === true })); //double '!' converts any value to bool, then result negated
+  self.verify = function(test, callback) {
+    self.property(test, function(err, result) {
+      if (err || !result)
+        callback(test);
+      else
+        callback(null);
     })
   }
 

@@ -808,26 +808,28 @@ test.verify = function(test) {
   
   async.series([
     function(callback) {
-      instance.verify(['!exists', '!up'], function(err) {
-        test.ifError(err); //testing for error
+      instance.verify('!exists', function(err) {
+        test.ifError(err);
         callback(err);
       })
     },
     function(callback) {
-      instance.verify(['exists'], function(err) {
+      instance.verify('exists', function(err) {
         test.ok(err); //testing for error
+        test.equal(err, 'exists');
         callback(!err);
       })
     },
     function(callback) {
-      instance.verify(['up'], function(err) {
-        test.ok(err); //testing for error
-        callback(!err);
+      instance.verify('!up', function(err) {
+        test.ifError(err);
+        callback(err);
       })
     },
     function(callback) {
-      instance.verify(['exists', 'up'], function(err) {
+      instance.verify('up', function(err) {
         test.ok(err); //testing for error
+        test.equal(err, 'up');
         callback(!err);
       })
     },
@@ -838,9 +840,29 @@ test.verify = function(test) {
       })
     },
     function(callback) {
-      instance.verify(['exists', '!up'], function(err) {
+      instance.verify('!exists', function(err) {
+        test.ok(err); //testing for error
+        test.equal(err, '!exists');
+        callback(!err);
+      })
+    },
+    function(callback) {
+      instance.verify('exists', function(err) {
         test.ifError(err);
         callback(err);
+      })
+    },
+    function(callback) {
+      instance.verify('!up', function(err) {
+        test.ifError(err);
+        callback(err);
+      })
+    },
+    function(callback) {
+      instance.verify('up', function(err) {
+        test.ok(err); //testing for error
+        test.equal(err, 'up');
+        callback(!err);
       })
     },
     function(callback) {
@@ -850,7 +872,27 @@ test.verify = function(test) {
       })
     },
     function(callback) {
-      instance.verify(['exists', 'up'], function(err) {
+      instance.verify('!exists', function(err) {
+        test.ok(err); //testing for error
+        test.equal(err, '!exists');
+        callback(!err);
+      })
+    },
+    function(callback) {
+      instance.verify('exists', function(err) {
+        test.ifError(err);
+        callback(err);
+      })
+    },
+    function(callback) {
+      instance.verify('!up', function(err) {
+        test.ok(err); //testing for error
+        test.equal(err, '!up');
+        callback(!err);
+      })
+    },
+    function(callback) {
+      instance.verify('up', function(err) {
         test.ifError(err);
         callback(err);
       })
@@ -864,7 +906,7 @@ test.verify = function(test) {
       }, 200)
     }
   ], function(err, results) {
-    test.expect(9);
+    test.expect(21);
     test.done();
   })
 }
