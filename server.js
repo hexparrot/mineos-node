@@ -58,51 +58,8 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         nsp;
 
     function setup() {
+      var HEARTBEAT_INTERVAL_MS = 5000;
       nsp = self.front_end.of('/{0}'.format(server_name));
-
-      function heartbeat() {
-        var retval = {};
-
-        async.waterfall([
-          function(cb) {
-            instance.property('up', function(err, is_up) {
-              retval['up'] = is_up;
-              cb(err, is_up);
-            })
-          },
-          function(is_up, cb) {
-            if (is_up)
-              instance.property('memory', function(err, memdata) {
-                retval['memory'] = memdata;
-                cb(err, is_up);
-              })
-            else {
-              retval['memory'] = {};
-              cb(null, is_up);
-            }
-          },
-          function(is_up, cb) {
-            if (is_up)
-              instance.ping(function(err, pingdata) {
-                retval['ping'] = pingdata;
-                cb(err, is_up)
-              })
-            else {
-              retval['ping'] = {};
-              cb(null, is_up);
-            }
-          }
-        ], function(err, results) {
-          nsp.emit('heartbeat', {
-            'server_name': server_name,
-            'timestamp': Date.now(),
-            'payload': retval
-          });
-          //console.log('[{0}] Heartbeat transmitted.'.format(server_name))
-        })
-      }
-
-      setInterval(heartbeat, 5000);
 
       self.servers[server_name] = {
         instance: instance,
@@ -111,6 +68,44 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         watches: {},
         notices: []
       }
+
+      async.forever(
+        function(next) {
+          async.series({
+            'up': function(cb) {
+              instance.property('up', function(err, is_up) {
+                cb(null, is_up);
+              })
+            },
+            'memory': function(cb) {
+              instance.property('memory', function(err, mem_info) {
+                cb(null, err ? {} : mem_info);
+              })
+            },
+            'ping': function(cb) {
+              instance.property('ping', function(err, ping_info) {
+                cb(null, err ? {} : ping_info);
+              })
+            }
+          }, function(err, retval) {
+            if (server_name in self.servers) {
+              nsp.emit('heartbeat', {
+                'server_name': server_name,
+                'timestamp': Date.now(),
+                'payload': retval
+              })
+              //console.log('[{0}] Heartbeat transmitted.'.format(server_name))
+              setTimeout(next, HEARTBEAT_INTERVAL_MS);
+            }
+            else {
+              next(true);
+            }
+          })
+        },
+        function(err) {
+          console.log('[{0}] Heartbeats ceased.'.format(server_name))
+        }
+      )
 
       console.info('Discovered server: {0}'.format(server_name));
       self.front_end.emit('track_server', server_name);
