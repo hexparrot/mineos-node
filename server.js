@@ -368,10 +368,8 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
 
     }
 
-    instance.property('exists', function(err, result) {
-      if (result)
-        setup();
-    })
+    async.nextTick(setup);
+
   }
 
   self.untrack_server = function(server_name) {
