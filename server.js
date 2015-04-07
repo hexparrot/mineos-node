@@ -418,16 +418,12 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           var instance = new mineos.mc(args.server_name, base_dir);
 
           async.series([
-            function(cb) {
-              instance.create(dir_owner, cb)
-            },
-            function(cb) {
-              instance._sp.overlay(args.properties, cb);
-            }
+            async.apply(instance.create, dir_owner),
+            async.apply(instance._sp.overlay, args.properties),
           ], function(err, results) {
             if (err) {
               var ERROR = '[{0}] Attempt to create server failed in the backend.'.format(args.server_name);
-              console.error(ERROR);
+              console.error(ERROR, err);
               self.front_end.emit('error', ERROR);
             } else {
               console.info('[{0}] Server created in filesystem.'.format(args.server_name))
