@@ -86,9 +86,10 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
 
   $scope.servers_up = function() {
     return $.map(Servers, function(instance, server_name) {
-      if ('heartbeat' in instance)
-        return instance.heartbeat.up;
-    }).length
+      return instance;
+    }).filter(function(instance) {
+      return ('heartbeat' in instance ? instance.heartbeat.up : false);
+    }).length;
   }
 
   $scope.players_online = function() {
