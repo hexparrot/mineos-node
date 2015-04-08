@@ -791,7 +791,7 @@
                                         <!-- START Widget Header Badge -->
                                         <div class="span6 widget">
                                             <header>
-                                                <h4 class="title"><span class="icon icone-trash"></span> {{ 'DELETE_SERVER' | translate }}r</h4>
+                                                <h4 class="title"><span class="icon icone-trash"></span> {{ 'DELETE_SERVER' | translate }}</h4>
                                             </header>
                                             <section class="body">
                                                 <div class="body-inner">
@@ -845,9 +845,9 @@
                                     <li>
                                         <a href="#" class="link" data-toggle="dropdown"><span class="icon icone-ellipsis-vertical"></span></a>
                                         <ul class="dropdown-menu pull-right">
-                                            <li><a href="#"><span class="icon icone-pencil"></span> Edit</a></li>
-                                            <li><a href="#"><span class="icon icone-trash"></span> Delete</a></li>
-                                            <li><a href="#"><span class="icon icone-cog"></span> Setting</a></li>
+                                            <li><a href="#"><span class="icon icone-pencil"></span> {{ 'EDIT' | translate }}</a></li>
+                                            <li><a href="#"><span class="icon icone-trash"></span> {{ 'DELETE' | translate }}</a></li>
+                                            <li><a href="#"><span class="icon icone-cog"></span> {{ 'SETTINGS' | translate }}</a></li>
                                         </ul>
                                     </li>
                                 </ul>
@@ -904,9 +904,9 @@
                                     <li>
                                         <a href="#" class="link" data-toggle="dropdown"><span class="icon icone-ellipsis-vertical"></span></a>
                                         <ul class="dropdown-menu pull-right">
-                                            <li><a href="#"><span class="icon icone-pencil"></span> Edit</a></li>
-                                            <li><a href="#"><span class="icon icone-trash"></span> Delete</a></li>
-                                            <li><a href="#"><span class="icon icone-cog"></span> Setting</a></li>
+                                            <li><a href="#"><span class="icon icone-pencil"></span> {{ 'EDIT' | translate }}</a></li>
+                                            <li><a href="#"><span class="icon icone-trash"></span> {{ 'DELETE' | translate }}</a></li>
+                                            <li><a href="#"><span class="icon icone-cog"></span> {{ 'SETTINGS' | translate }}</a></li>
                                         </ul>
                                     </li>
                                 </ul>
@@ -931,7 +931,7 @@
                                                     <p>
                                                         <!-- Button Dropdown -->
                                                         <div class="btn-group">
-                                                            <button class="btn btn-small dropdown-toggle" data-toggle="dropdown">Actions <span class="caret"></span></button>
+                                                            <button class="btn btn-small dropdown-toggle" data-toggle="dropdown">{{ 'ACTIONS' | translate }} <span class="caret"></span></button>
                                                             <ul class="dropdown-menu">
                                                                 <li><a ng-click="server_command('delete_archive', {filename: archive.filename})" translate="DELETE_THIS_ARCHIVE"></a></li>
                                                                 <li><a href="#"></a></li>

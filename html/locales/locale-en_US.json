@@ -12,7 +12,6 @@
   "BACKUPS_AND_RESTORES": "Backups and Restores",
   "RESTORE_POINT": "Restore point",
   "RESTORE_POINTS": "Restore Points",
-  "ARCHIVE": "Archive",
   "ARCHIVES": "Archives",
   "SCHEDULING": "Scheduling",
   "CONFIGURATION": "Configuration",
@@ -75,6 +74,8 @@
 
   "DELETE_SERVER": "Delete Server",
   "DELETE": "Delete",
+  "EDIT": "Edit",
+  "SETTINGS": "Settings",
 
   "AVAILABLE_RESTORE_POINTS": "Available Restore Points",
   "STEP": "Step",
