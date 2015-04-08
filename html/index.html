@@ -220,7 +220,7 @@
                                         <ul id="submenu0" class="collapse">
                                             <li class=""><a ng-click="change_page('restore_points')"><span class="icon icone-angle-right"></span> {{ 'RESTORE_POINTS' | translate }}</a></li>
                                             <li class=""><a ng-click="change_page('archives')"><span class="icon icone-angle-right"></span> {{ 'ARCHIVES' | translate }}</a></li>
-                                            <li class=""><a ng-click="change_page('scheduling')"><span class="icon icone-angle-right"></span> {{ 'SCHEDULING' | translate }}</a></li>
+                                            <li class=""><a ng-click="change_page('cron')"><span class="icon icone-angle-right"></span> {{ 'SCHEDULING' | translate }}</a></li>
                                         </ul>
                                         <!--/ END Submenu Menu -->
                                     </li>
@@ -954,7 +954,7 @@
                 <!--/ END Content -->
 
                 <!-- START Content - SCHEDULING -->
-                <div class="container-fluid" ng-show="page == 'scheduling'">
+                <div class="container-fluid" ng-show="page == 'cron'">
 
                     <!-- START Row -->
                     <div class="row-fluid">
@@ -970,13 +970,15 @@
                                             <tr>
                                                 <th translate="CRON_EXPRESSION"></th>
                                                 <th translate="COMMAND_TO_RUN"></th>
+                                                <th>hash</th>
                                                 <th translate="ACTIONS"></th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr ng-repeat="cronjob in servers[current].page_data.cron">
-                                                <td>{{ cronjob.source }}</td>
-                                                <td>{{ cronjob.command }}</td>
+                                            <tr ng-repeat="(hash, definition) in servers[current].page_data.cron">
+                                                <td>{{ definition.source }}</td>
+                                                <td>{{ definition.command }}</td>
+                                                <td>{{ hash }}</td>
                                                 <td>
                                                     <p>
                                                         <button type="button" class="btn btn-warning" ng-click="" translate="DELETE"></button>

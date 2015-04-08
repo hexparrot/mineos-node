@@ -248,7 +248,6 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
 
     $scope.page = page;
   }
-
 }]);
 
 app.controller("Toolbar", ['$scope', 'Servers', function($scope, Servers) {
@@ -351,8 +350,8 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
 
     me.channel.emit(server_name, 'property', {property: 'server.properties'});
     me.channel.emit(server_name, 'page_data', 'glance');
+    me.channel.emit(server_name, 'page_data', 'cron');
     me.channel.emit(server_name, 'watch', {filepath: 'logs/latest.log', from_start: true});
-    me.channel.emit(server_name, 'cron', {});
 
     return me;
   }

@@ -68,7 +68,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         tails: {},
         watches: {},
         notices: [],
-        cron: []
+        cron: {}
       }
 
       async.forever(
@@ -195,55 +195,41 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
                 nsp.emit('page_data', {page: page, payload: results});
               })
               break;
+            case 'cron':
+              console.info('[{0}] {1} requesting cron info'.format(server_name, ip_address));
+              var cron_table = {};
+              for (var hash in self.servers[server_name].cron) 
+                cron_table[hash] = self.servers[server_name].cron[hash].definition;
+
+              nsp.emit('page_data', {page: page, payload: cron_table});
+              break;
             default:
               nsp.emit('page_data', {page: page});
               break;
           }
         }
 
-        function manage_cron(opts) {
-          function emit_cronjobs() {
-            var crontabs = self.servers[server_name].cron;
-            var retval = [];
-            for (var i=0; i < crontabs.length; i++)
-              retval.push(crontabs[i].opts);
+        function create_cron(opts) {
+          var hash = require('object-hash');
+          console.log('[{0}] {1} requests cron creation:'.format(server_name, ip_address), opts);
 
-            nsp.emit('page_data', {
-              page: 'cron',
-              payload: retval
-            });
-          }
-          
-          switch (opts.operation) {
-            case 'enable_cron':
-              console.log('[{0}] {1} requests cron addition: "{2}" -> {3}'.format(server_name, ip_address, opts.source, opts.command));
-              console.log('Adding cronjob', opts);
-              var cronjob = new CronJob(opts.source, function (){
-                opts['suppress_popup'] = true;
-                server_dispatcher(opts);
-              }, null, false);
+          var cronjob = new CronJob(opts.source, function (){
+            server_dispatcher(opts);
+          }, null, false);
 
-              cronjob['opts'] = opts;
-              self.servers[server_name].cron.push(cronjob);
-              cronjob.start();
-              emit_cronjobs();
-              break;
-            case 'disable_cron':
-              console.log('[{0}] {1} requests cron deletion: "{2}" -> {3}'.format(server_name, ip_address, opts.source, opts.command));
-              var crontabs = self.servers[server_name].cron;
-              for (var i = crontabs.length-1; i >= 0; i--)
-                if (crontabs[i].cronTime.source == opts.source &&
-                    crontabs[i].opts.command == opts.command) {
-                  console.log('Removing cronjob: "{0}" -> {1}'.format(opts.source, opts.command));
-                  crontabs[i].stop();
-                  crontabs.splice(i, 1);
-                }
-              emit_cronjobs();
-              break;
-            default:
-              emit_cronjobs();
-              break;
+          self.servers[server_name].cron[hash(opts)] = {
+            definition: opts,
+            instance: cronjob
           }
+          get_page_data('cron');
+        }
+
+        function delete_cron(hash) {
+          console.log('[{0}] {1} requests cron deletion:'.format(server_name, ip_address), hash);
+
+          self.servers[server_name].cron[hash].instance.stop();
+          delete self.servers[server_name].cron[hash];
+          get_page_data('cron');
         }
 
         console.info('[{0}] {1} connected to namespace'.format(server_name, ip_address));
@@ -251,7 +237,8 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         socket.on('property', get_prop);
         socket.on('page_data', get_page_data);
         socket.on('watch', start_watch);
-        socket.on('cron', manage_cron);
+        socket.on('cron_create', create_cron);
+        socket.on('cron_delete', delete_cron);
         console.info('[{0}] broadcasting {1} previous notices'.format(server_name, self.servers[server_name].notices.length));
         nsp.emit('notices', self.servers[server_name].notices);
       })
