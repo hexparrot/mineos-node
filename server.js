@@ -7,6 +7,7 @@ var introspect = require('introspect');
 var tail = require('tail').Tail;
 var uuid = require('node-uuid');
 var os = require('os');
+var CronJob = require('cron').CronJob;
 var server = exports;
 
 server.backend = function(base_dir, socket_emitter, dir_owner) {
@@ -66,7 +67,8 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         nsp: nsp,
         tails: {},
         watches: {},
-        notices: []
+        notices: [],
+        cron: []
       }
 
       async.forever(
@@ -199,11 +201,39 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           }
         }
 
+        function manage_cron(opts) {
+          switch (opts.operation) {
+            case 'enable_cron':
+              console.log('Adding cronjob', opts);
+              var cronjob = new CronJob(opts.source, function (){
+                server_dispatcher(opts);
+              }, null, false);
+
+              cronjob['command'] = opts.command;
+              self.servers[server_name].cron.push(cronjob);
+              cronjob.start();
+              break;
+            case 'disable_cron':
+              console.log('Removing cronjob', opts);
+              var crontabs = self.servers[server_name].cron;
+              for (var i = crontabs.length-1; i >= 0; i--)
+                if (crontabs[i].cronTime.source == opts.source &&
+                    crontabs[i].command == opts.command) {
+                  crontabs[i].stop();
+                  crontabs.splice(i, 1);
+                }
+              break;
+            default:
+              break;
+          }
+        }
+
         console.info('[{0}] {1} connected to namespace'.format(server_name, ip_address));
         socket.on('command', produce_receipt);
         socket.on('property', get_prop);
         socket.on('page_data', get_page_data);
         socket.on('watch', start_watch);
+        socket.on('cron', manage_cron);
         console.info('[{0}] broadcasting {1} previous notices'.format(server_name, self.servers[server_name].notices.length));
         nsp.emit('notices', self.servers[server_name].notices);
       })
