@@ -202,10 +202,12 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         }
 
         function manage_cron(opts) {
+          console.log('[{0}] {1} requests cron modification: "{2}" -> {3}'.format(server_name, ip_address, opts.source, opts.command));
           switch (opts.operation) {
             case 'enable_cron':
               console.log('Adding cronjob', opts);
               var cronjob = new CronJob(opts.source, function (){
+                opts['suppress_popup'] = true;
                 server_dispatcher(opts);
               }, null, false);
 
@@ -214,12 +216,12 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
               cronjob.start();
               break;
             case 'disable_cron':
-              console.log('Removing cronjob', opts);
               var crontabs = self.servers[server_name].cron;
               for (var i = crontabs.length-1; i >= 0; i--)
                 if (crontabs[i].cronTime.source == opts.source &&
                     crontabs[i].command == opts.command) {
                   crontabs[i].stop();
+                  console.log('Removing cronjob: "{0}" -> {1}'.format(opts.source, opts.command));
                   crontabs.splice(i, 1);
                 }
               break;
