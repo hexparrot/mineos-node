@@ -202,9 +202,21 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         }
 
         function manage_cron(opts) {
-          console.log('[{0}] {1} requests cron modification: "{2}" -> {3}'.format(server_name, ip_address, opts.source || opts.operation, opts.command));
+          function emit_cronjobs() {
+            var crontabs = self.servers[server_name].cron;
+            var retval = [];
+            for (var i=0; i < crontabs.length; i++)
+              retval.push(crontabs[i].opts);
+
+            nsp.emit('page_data', {
+              page: 'cron',
+              payload: retval
+            });
+          }
+          
           switch (opts.operation) {
             case 'enable_cron':
+              console.log('[{0}] {1} requests cron addition: "{2}" -> {3}'.format(server_name, ip_address, opts.source, opts.command));
               console.log('Adding cronjob', opts);
               var cronjob = new CronJob(opts.source, function (){
                 opts['suppress_popup'] = true;
@@ -214,8 +226,10 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
               cronjob['opts'] = opts;
               self.servers[server_name].cron.push(cronjob);
               cronjob.start();
+              emit_cronjobs();
               break;
             case 'disable_cron':
+              console.log('[{0}] {1} requests cron deletion: "{2}" -> {3}'.format(server_name, ip_address, opts.source, opts.command));
               var crontabs = self.servers[server_name].cron;
               for (var i = crontabs.length-1; i >= 0; i--)
                 if (crontabs[i].cronTime.source == opts.source &&
@@ -224,16 +238,10 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
                   crontabs[i].stop();
                   crontabs.splice(i, 1);
                 }
-              break;
-            case 'view_cron':
-              var crontabs = self.servers[server_name].cron;
-              var retval = [];
-              console.log(crontabs[0].opts)
-              for (var i=0; i < crontabs.length; i++)
-                retval.push(crontabs[i].opts);
-              nsp.emit('crontabs', retval);
+              emit_cronjobs();
               break;
             default:
+              emit_cronjobs();
               break;
           }
         }

@@ -950,61 +950,47 @@
                         <!--/ END Basic Table -->
                     </div>
                     <!--/ END Row -->
-
-
                 </div>
                 <!--/ END Content -->
 
                 <!-- START Content - SCHEDULING -->
                 <div class="container-fluid" ng-show="page == 'scheduling'">
 
-                    <!-- START Widget Color - Blue -->
-                    <div class="span5 widget blue">
-                        <header>
-                            <h4 class="title"><span class="icon icone-bookmark"></span> {{ 'BACKUP_FREQUENCY' | translate }}</h4>
-                        </header>
-                        <section class="body">
-                            <div class="body-inner">
-                            	<!-- Tagging Support -->
-                                <div class="control-group">
-                                    <label class="control-label" translate="CREATE_RESTORE_POINTS_EVERY">:</label>
-                                    <div class="controls">
-                                        <input type="hidden" class="frequencies" class=""/>
-                                    </div>
-                                </div><!--/ Tagging Support -->
-                            </div>
-                        </section>
-                        <footer>
-                            <div class="body-inner">
-                                <p translate="FREQUENCY_NOTE"></p>
-                            </div>
-                        </footer>
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Basic Table -->
+                        <div class="span12 widget">
+                            <header>
+                                <h4 class="title" translate="CRONTAB_SCHEDULE"></h4>
+                            </header>
+                            <section class="body">
+                                <div class="body-inner no-padding">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th translate="CRON_EXPRESSION"></th>
+                                                <th translate="COMMAND_TO_RUN"></th>
+                                                <th translate="ACTIONS"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="cronjob in servers[current].page_data.cron">
+                                                <td>{{ cronjob.source }}</td>
+                                                <td>{{ cronjob.command }}</td>
+                                                <td>
+                                                    <p>
+                                                        <button type="button" class="btn btn-warning" ng-click="" translate="DELETE"></button>
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Basic Table -->
                     </div>
-                    <!--/ END Widget Color - Blue -->
-
-                    <!-- START Widget Color - Green -->
-                    <div class="span5 widget green">
-                        <header>
-                            <h4 class="title" translate="ARCHIVE_FREQUENCY"></h4>
-                        </header>
-                        <section class="body">
-                            <div class="body-inner">
-                               <!-- Tagging Support -->
-                                <div class="control-group">
-                                    <label class="control-label" translate="CREATE_ARCHIVES_EVERY">:</label>
-                                    <div class="controls">
-                                        <input type="hidden" class="frequencies" class=""/>
-                                    </div>
-                                </div><!--/ Tagging Support -->
-                            </div>
-                        </section>
-                        <footer>
-                        	<div class="body-inner">
-                                <p translate="FREQUENCY_NOTE"></p>
-                            </div>
-                        </footer>
-                    </div>
-                    <!--/ END Widget Color - Green -->
+                    <!--/ END Row -->
 
                 </div>
                 <!--/ END Content -->

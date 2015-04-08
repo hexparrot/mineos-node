@@ -349,13 +349,10 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
       }
     })
 
-    me.channel.on(server_name, 'crontabs', function(data) {
-      console.log(data);
-    })
-
     me.channel.emit(server_name, 'property', {property: 'server.properties'});
     me.channel.emit(server_name, 'page_data', 'glance');
     me.channel.emit(server_name, 'watch', {filepath: 'logs/latest.log', from_start: true});
+    me.channel.emit(server_name, 'cron', {});
 
     return me;
   }
