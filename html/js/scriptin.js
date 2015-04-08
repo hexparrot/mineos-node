@@ -324,16 +324,19 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
         me.notices[data.uuid] = data;
         me.latest_notice[data.command] = data;
 
-        var help_text = '';
-        try {
-          help_text = $filter('translate')(data.err);
-        } catch (e) {}
+        var suppress = ('suppress_popup' in data ? data.suppress_popup : false);
+        if (!suppress) {
+          var help_text = '';
+          try {
+            help_text = $filter('translate')(data.err);
+          } catch (e) {}
 
-        $.gritter.add({
-          title: "[{0}] {1} {2}".format(me.server_name, data.command,
-                                        (data.success ? $filter('translate')('SUCCEEDED') : $filter('translate')('FAILED')) ),
-          text: help_text
-        });
+          $.gritter.add({
+            title: "[{0}] {1} {2}".format(me.server_name, data.command,
+                                          (data.success ? $filter('translate')('SUCCEEDED') : $filter('translate')('FAILED')) ),
+            text: help_text || ''
+          });
+        }
 
         switch(data.command) {
           case 'restore':
