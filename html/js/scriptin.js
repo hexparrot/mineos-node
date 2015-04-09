@@ -150,6 +150,11 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
       socket.emit($scope.current, 'command', {command: cmd});
   }
 
+  $scope.cron_command = function(cmd, args) {
+    args['operation'] = cmd;
+    socket.emit($scope.current, 'cron', args);
+  }
+
   $scope.console_input = function() {
     socket.emit($scope.current, 'command', {command: 'stuff', msg: $scope.user_input });
     $scope.user_input = '';

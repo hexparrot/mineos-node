@@ -238,9 +238,9 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
 
               self.servers[server_name].cron[opts.hash].instance.start();
               break;
-            case 'stop':
+            case 'suspend':
               console.log('[{0}] {1} suspending cron: {2}'.format(server_name, ip_address, opts.hash));
-              
+
               self.servers[server_name].cron[opts.hash].instance.stop();
               break;
             default:
