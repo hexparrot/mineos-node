@@ -209,26 +209,43 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           }
         }
 
-        function create_cron(opts) {
-          var hash = require('object-hash');
-          console.log('[{0}] {1} requests cron creation:'.format(server_name, ip_address), opts);
+        function manage_cron(opts) {
+          var operation = opts.operation;
+          delete opts.operation;
 
-          var cronjob = new CronJob(opts.source, function (){
-            server_dispatcher(opts);
-          }, null, false);
+          switch (operation) {
+            case 'create':
+              var hash = require('object-hash');
+              console.log('[{0}] {1} requests cron creation:'.format(server_name, ip_address), opts);
 
-          self.servers[server_name].cron[hash(opts)] = {
-            definition: opts,
-            instance: cronjob
+              var cronjob = new CronJob(opts.source, function (){
+                server_dispatcher(opts);
+              }, null, false);
+
+              self.servers[server_name].cron[hash(opts)] = {
+                definition: opts,
+                instance: cronjob
+              }
+              break;
+            case 'delete':
+              console.log('[{0}] {1} requests cron deletion: {2}'.format(server_name, ip_address, opts.hash));
+
+              self.servers[server_name].cron[opts.hash].instance.stop();
+              delete self.servers[server_name].cron[opts.hash];
+              break;
+            case 'start':
+              console.log('[{0}] {1} starting cron: {2}'.format(server_name, ip_address, opts.hash));
+
+              self.servers[server_name].cron[opts.hash].instance.start();
+              break;
+            case 'stop':
+              console.log('[{0}] {1} suspending cron: {2}'.format(server_name, ip_address, opts.hash));
+              
+              self.servers[server_name].cron[opts.hash].instance.stop();
+              break;
+            default:
+              console.warn('[{0}] {1} requested unexpected cron operation: {2}'.format(server_name, ip_address, operation), opts);
           }
-          get_page_data('cron');
-        }
-
-        function delete_cron(hash) {
-          console.log('[{0}] {1} requests cron deletion:'.format(server_name, ip_address), hash);
-
-          self.servers[server_name].cron[hash].instance.stop();
-          delete self.servers[server_name].cron[hash];
           get_page_data('cron');
         }
 
@@ -237,8 +254,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         socket.on('property', get_prop);
         socket.on('page_data', get_page_data);
         socket.on('watch', start_watch);
-        socket.on('cron_create', create_cron);
-        socket.on('cron_delete', delete_cron);
+        socket.on('cron', manage_cron);
         console.info('[{0}] broadcasting {1} previous notices'.format(server_name, self.servers[server_name].notices.length));
         nsp.emit('notices', self.servers[server_name].notices);
       })
