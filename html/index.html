@@ -968,17 +968,60 @@
                                     <table class="table">
                                         <thead>
                                             <tr>
-                                                <th translate="CRON_EXPRESSION"></th>
-                                                <th translate="COMMAND_TO_RUN"></th>
-                                                <th>hash</th>
+                                                <th translate="CRON_EXPRESSION" class="span4"></th>
+                                                <th translate="COMMAND_TO_RUN" class="span4"></th>
+                                                <th translate="ADDITIONAL_ARGUMENT"></th>
                                                 <th translate="ACTIONS"></th>
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            <tr>
+                                                <td>
+                                                    <p>
+                                                        <!-- Input Text -->
+                                                        <div class="control-group">
+                                                            <div class="controls">
+                                                                <input type="text" name="input-text" class="span12" ng-value="*/10 * * * * *" ng-model="cron.source">
+                                                            </div>
+                                                        </div><!--/ Input Text -->
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p>
+                                                        <!-- Select -->
+                                                        <div class="control-group">
+                                                            <div class="controls">
+                                                                <select class="span12" ng-model="cron.action">
+                                                                    <option translate="START" value="start"></option>
+                                                                    <option translate="STOP" value="stop"></option>
+                                                                    <option translate="CREATE_NEW_RESTORE_POINT" value="backup"></option>
+                                                                    <option translate="CREATE_NEW_ARCHIVE" value="archive"></option>
+                                                                    <option translate="SEND_TO_CONSOLE" value="stuff"></option>
+                                                                </select>
+                                                            </div>
+                                                        </div><!--/ Select -->
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p>
+                                                        <!-- Input Text -->
+                                                        <div class="control-group">
+                                                            <div class="controls">
+                                                                <input type="text" name="input-text" class="span12" ng-model="cron.msg" />
+                                                            </div>
+                                                        </div><!--/ Input Text -->
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p>
+                                                        <button type="button" class="btn btn-primary" ng-click="cron_command('create', {command: cron.action, source: cron.source, msg: cron.msg})" translate="SUBMIT_CRONJOB"></button>
+                                                    </p>
+                                                </td>
+                                            </tr>
                                             <tr ng-repeat="(hash, definition) in servers[current].page_data.cron">
                                                 <td>{{ definition.source }}</td>
                                                 <td>{{ definition.command }}</td>
-                                                <td>{{ hash }}</td>
+                                                <td>{{ definition.msg }}</td>
                                                 <td>
                                                     <p>
                                                         <button type="button" class="btn btn-success" ng-click="cron_command('start', {hash: hash})" translate="START"></button>
