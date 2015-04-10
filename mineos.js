@@ -110,18 +110,39 @@ mineos.mc = function(server_name, base_dir) {
     sp: path.join(base_dir, mineos.DIRS['servers'], server_name, 'server.properties')
   }
 
-  self._sp = new cf.config_file(self.env.sp);
-
   self.sp = function(callback) {
-    self._sp.load(function(err) {
-      callback(err, self._sp.props);
+    var ini = require('ini');
+
+    fs.readFile(self.env.sp, function(err, data) {
+      if (err) {
+        self._sp = {};
+        fs.writeFile(self.env.sp, ini.stringify(self._sp), function(inner_err) {
+          callback(inner_err, self._sp);
+        });
+      } else {
+        self._sp = ini.parse(data.toString());
+        callback(err, self._sp);
+      }
     })
   }
 
   self.modify_sp = function(property, new_value, callback) {
-    self._sp.modify(property, new_value, function(err) {
-      callback(err);
-    }) 
+    var ini = require('ini');
+
+    self._sp[property] = new_value;
+    fs.writeFile(self.env.sp, ini.stringify(self._sp), callback);
+  }
+
+  self.overlay_sp = function(dict, callback) {
+    var ini = require('ini');
+
+    self.sp(function(err, props) {
+      for (var key in dict)
+        props[key] = dict[key];
+
+      self._sp = props;
+      fs.writeFile(self.env.sp, ini.stringify(self._sp), callback);
+    })
   }
 
   self.create = function(owner, callback) {
@@ -131,12 +152,12 @@ mineos.mc = function(server_name, base_dir) {
       async.apply(fs.ensureDir, self.env.cwd),
       async.apply(fs.ensureDir, self.env.bwd),
       async.apply(fs.ensureDir, self.env.awd),
-      async.apply(self._sp.write, mineos.SP_DEFAULTS),
+      async.apply(fs.ensureFile, self.env.sp),
+      async.apply(self.overlay_sp, mineos.SP_DEFAULTS),
       async.apply(fs.chown, self.env.cwd, owner['uid'], owner['gid']),
       async.apply(fs.chown, self.env.bwd, owner['uid'], owner['gid']),
       async.apply(fs.chown, self.env.awd, owner['uid'], owner['gid']),
       async.apply(fs.chown, self.env.sp, owner['uid'], owner['gid'])
-
     ], callback)
   }
 

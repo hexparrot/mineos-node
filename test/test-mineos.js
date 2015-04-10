@@ -608,7 +608,7 @@ test.sp = function(test) {
       })
     },
     function(callback) {
-      instance._sp.modify('server-port', '25570', function(err) {
+      instance.modify_sp('server-port', '25570', function(err) {
         test.ifError(err);
         callback(err);
       })
