@@ -220,7 +220,7 @@
                                         <ul id="submenu0" class="collapse">
                                             <li class=""><a ng-click="change_page('restore_points')"><span class="icon icone-angle-right"></span> {{ 'RESTORE_POINTS' | translate }}</a></li>
                                             <li class=""><a ng-click="change_page('archives')"><span class="icon icone-angle-right"></span> {{ 'ARCHIVES' | translate }}</a></li>
-                                            <li class=""><a ng-click="change_page('scheduling')"><span class="icon icone-angle-right"></span> {{ 'SCHEDULING' | translate }}</a></li>
+                                            <li class=""><a ng-click="change_page('cron')"><span class="icon icone-angle-right"></span> {{ 'SCHEDULING' | translate }}</a></li>
                                         </ul>
                                         <!--/ END Submenu Menu -->
                                     </li>
@@ -950,61 +950,94 @@
                         <!--/ END Basic Table -->
                     </div>
                     <!--/ END Row -->
-
-
                 </div>
                 <!--/ END Content -->
 
                 <!-- START Content - SCHEDULING -->
-                <div class="container-fluid" ng-show="page == 'scheduling'">
+                <div class="container-fluid" ng-show="page == 'cron'">
 
-                    <!-- START Widget Color - Blue -->
-                    <div class="span5 widget blue">
-                        <header>
-                            <h4 class="title"><span class="icon icone-bookmark"></span> {{ 'BACKUP_FREQUENCY' | translate }}</h4>
-                        </header>
-                        <section class="body">
-                            <div class="body-inner">
-                            	<!-- Tagging Support -->
-                                <div class="control-group">
-                                    <label class="control-label" translate="CREATE_RESTORE_POINTS_EVERY">:</label>
-                                    <div class="controls">
-                                        <input type="hidden" class="frequencies" class=""/>
-                                    </div>
-                                </div><!--/ Tagging Support -->
-                            </div>
-                        </section>
-                        <footer>
-                            <div class="body-inner">
-                                <p translate="FREQUENCY_NOTE"></p>
-                            </div>
-                        </footer>
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Basic Table -->
+                        <div class="span12 widget">
+                            <header>
+                                <h4 class="title" translate="CRONTAB_SCHEDULE"></h4>
+                            </header>
+                            <section class="body">
+                                <div class="body-inner no-padding">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th translate="CRON_EXPRESSION" class="span4"></th>
+                                                <th translate="COMMAND_TO_RUN" class="span4"></th>
+                                                <th translate="ADDITIONAL_ARGUMENT"></th>
+                                                <th translate="ACTIONS"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <p>
+                                                        <!-- Input Text -->
+                                                        <div class="control-group">
+                                                            <div class="controls">
+                                                                <input type="text" name="input-text" class="span12" ng-value="*/10 * * * * *" ng-model="cron.source">
+                                                            </div>
+                                                        </div><!--/ Input Text -->
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p>
+                                                        <!-- Select -->
+                                                        <div class="control-group">
+                                                            <div class="controls">
+                                                                <select class="span12" ng-model="cron.action">
+                                                                    <option translate="START" value="start"></option>
+                                                                    <option translate="STOP" value="stop"></option>
+                                                                    <option translate="CREATE_NEW_RESTORE_POINT" value="backup"></option>
+                                                                    <option translate="CREATE_NEW_ARCHIVE" value="archive"></option>
+                                                                    <option translate="SEND_TO_CONSOLE" value="stuff"></option>
+                                                                </select>
+                                                            </div>
+                                                        </div><!--/ Select -->
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p>
+                                                        <!-- Input Text -->
+                                                        <div class="control-group">
+                                                            <div class="controls">
+                                                                <input type="text" name="input-text" class="span12" ng-model="cron.msg" />
+                                                            </div>
+                                                        </div><!--/ Input Text -->
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p>
+                                                        <button type="button" class="btn btn-primary" ng-click="cron_command('create', {command: cron.action, source: cron.source, msg: cron.msg})" translate="SUBMIT_CRONJOB"></button>
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                            <tr ng-repeat="(hash, definition) in servers[current].page_data.cron">
+                                                <td>{{ definition.source }}</td>
+                                                <td>{{ definition.command }}</td>
+                                                <td>{{ definition.msg }}</td>
+                                                <td>
+                                                    <p>
+                                                        <button type="button" class="btn btn-success" ng-click="cron_command('start', {hash: hash})" translate="START"></button>
+                                                        <button type="button" class="btn btn-warning" ng-click="cron_command('stop', {hash: hash})" translate="STOP"></button>
+                                                        <button type="button" class="btn btn-danger" ng-click="cron_command('delete', {hash: hash})" translate="DELETE"></button>
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Basic Table -->
                     </div>
-                    <!--/ END Widget Color - Blue -->
-
-                    <!-- START Widget Color - Green -->
-                    <div class="span5 widget green">
-                        <header>
-                            <h4 class="title" translate="ARCHIVE_FREQUENCY"></h4>
-                        </header>
-                        <section class="body">
-                            <div class="body-inner">
-                               <!-- Tagging Support -->
-                                <div class="control-group">
-                                    <label class="control-label" translate="CREATE_ARCHIVES_EVERY">:</label>
-                                    <div class="controls">
-                                        <input type="hidden" class="frequencies" class=""/>
-                                    </div>
-                                </div><!--/ Tagging Support -->
-                            </div>
-                        </section>
-                        <footer>
-                        	<div class="body-inner">
-                                <p translate="FREQUENCY_NOTE"></p>
-                            </div>
-                        </footer>
-                    </div>
-                    <!--/ END Widget Color - Green -->
+                    <!--/ END Row -->
 
                 </div>
                 <!--/ END Content -->

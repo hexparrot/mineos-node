@@ -90,11 +90,12 @@
   "DELETE_THIS_ARCHIVE": "Delete this Archive",
   "CREATE_FROM_ARCHIVE": "Create server from Archive",
 
-  "BACKUP_FREQUENCY": "Backup Frequency",
-  "CREATE_RESTORE_POINTS_EVERY": "Create restore points every",
-  "ARCHIVE_FREQUENCY": "Archive Frequency",
-  "CREATE_ARCHIVES_EVERY": "Create archives every",
-  "FREQUENCY_NOTE": "Times measured from midnight server time.",
+  "CRONTAB_SCHEDULE": "Crontab Schedule",
+  "CRON_EXPRESSION": "Cron Expression",
+  "COMMAND_TO_RUN": "Command to run",
+  "SEND_TO_CONSOLE": "Send to console",
+  "ADDITIONAL_ARGUMENT": "Additional argument",
+  "SUBMIT_CRONJOB": "Submit cronjob",
 
   "CREDITS": "MineOS created and maintained by William Dizon",
 

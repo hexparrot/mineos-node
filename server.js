@@ -68,7 +68,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         tails: {},
         watches: {},
         notices: [],
-        cron: []
+        cron: {}
       }
 
       async.forever(
@@ -195,6 +195,14 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
                 nsp.emit('page_data', {page: page, payload: results});
               })
               break;
+            case 'cron':
+              console.info('[{0}] {1} requesting cron info'.format(server_name, ip_address));
+              var cron_table = {};
+              for (var hash in self.servers[server_name].cron) 
+                cron_table[hash] = self.servers[server_name].cron[hash].definition;
+
+              nsp.emit('page_data', {page: page, payload: cron_table});
+              break;
             default:
               nsp.emit('page_data', {page: page});
               break;
@@ -202,32 +210,43 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         }
 
         function manage_cron(opts) {
-          console.log('[{0}] {1} requests cron modification: "{2}" -> {3}'.format(server_name, ip_address, opts.source, opts.command));
-          switch (opts.operation) {
-            case 'enable_cron':
-              console.log('Adding cronjob', opts);
+          var operation = opts.operation;
+          delete opts.operation;
+
+          switch (operation) {
+            case 'create':
+              var hash = require('object-hash');
+              console.log('[{0}] {1} requests cron creation:'.format(server_name, ip_address), opts);
+
               var cronjob = new CronJob(opts.source, function (){
-                opts['suppress_popup'] = true;
                 server_dispatcher(opts);
               }, null, false);
 
-              cronjob['command'] = opts.command;
-              self.servers[server_name].cron.push(cronjob);
-              cronjob.start();
+              self.servers[server_name].cron[hash(opts)] = {
+                definition: opts,
+                instance: cronjob
+              }
               break;
-            case 'disable_cron':
-              var crontabs = self.servers[server_name].cron;
-              for (var i = crontabs.length-1; i >= 0; i--)
-                if (crontabs[i].cronTime.source == opts.source &&
-                    crontabs[i].command == opts.command) {
-                  crontabs[i].stop();
-                  console.log('Removing cronjob: "{0}" -> {1}'.format(opts.source, opts.command));
-                  crontabs.splice(i, 1);
-                }
+            case 'delete':
+              console.log('[{0}] {1} requests cron deletion: {2}'.format(server_name, ip_address, opts.hash));
+
+              self.servers[server_name].cron[opts.hash].instance.stop();
+              delete self.servers[server_name].cron[opts.hash];
+              break;
+            case 'start':
+              console.log('[{0}] {1} starting cron: {2}'.format(server_name, ip_address, opts.hash));
+
+              self.servers[server_name].cron[opts.hash].instance.start();
+              break;
+            case 'suspend':
+              console.log('[{0}] {1} suspending cron: {2}'.format(server_name, ip_address, opts.hash));
+
+              self.servers[server_name].cron[opts.hash].instance.stop();
               break;
             default:
-              break;
+              console.warn('[{0}] {1} requested unexpected cron operation: {2}'.format(server_name, ip_address, operation), opts);
           }
+          get_page_data('cron');
         }
 
         console.info('[{0}] {1} connected to namespace'.format(server_name, ip_address));
