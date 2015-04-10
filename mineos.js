@@ -107,9 +107,11 @@ mineos.mc = function(server_name, base_dir) {
     cwd: path.join(base_dir, mineos.DIRS['servers'], server_name),
     bwd: path.join(base_dir, mineos.DIRS['backup'], server_name),
     awd: path.join(base_dir, mineos.DIRS['archive'], server_name),
-    sp: path.join(base_dir, mineos.DIRS['servers'], server_name, 'server.properties')
+    sp: path.join(base_dir, mineos.DIRS['servers'], server_name, 'server.properties'),
+    sc: path.join(base_dir, mineos.DIRS['servers'], server_name, 'server.config')
   }
 
+  // server properties functions
   self.sp = function(callback) {
     var ini = require('ini');
 
@@ -145,6 +147,36 @@ mineos.mc = function(server_name, base_dir) {
     })
   }
 
+  // server config functions
+  self.sc = function(callback) {
+    var ini = require('ini');
+
+    fs.readFile(self.env.sc, function(err, data) {
+      if (err) {
+        self._sc = ini.encode({});
+        fs.writeFile(self.env.sp, ini.stringify(self._sc), function(inner_err) {
+          callback(inner_err, self._sc);
+        });
+      } else {
+        self._sc = ini.parse(data.toString());
+        callback(err, self._sc);
+      }
+    })
+  }
+
+  self.modify_sc = function(section, property, new_value, callback) {
+    var ini = require('ini');
+
+    try {
+      self._sc[section][property] = new_value;
+    } catch (e) {
+      self._sc[section] = {};
+      self._sc[section][property] = new_value;
+    }
+    
+    fs.writeFile(self.env.sc, ini.stringify(self._sc), callback);
+  }
+
   self.create = function(owner, callback) {
     async.series([
       async.apply(self.verify, '!exists'),
@@ -154,10 +186,12 @@ mineos.mc = function(server_name, base_dir) {
       async.apply(fs.ensureDir, self.env.awd),
       async.apply(fs.ensureFile, self.env.sp),
       async.apply(self.overlay_sp, mineos.SP_DEFAULTS),
+      async.apply(fs.ensureFile, self.env.sc),
       async.apply(fs.chown, self.env.cwd, owner['uid'], owner['gid']),
       async.apply(fs.chown, self.env.bwd, owner['uid'], owner['gid']),
       async.apply(fs.chown, self.env.awd, owner['uid'], owner['gid']),
-      async.apply(fs.chown, self.env.sp, owner['uid'], owner['gid'])
+      async.apply(fs.chown, self.env.sp, owner['uid'], owner['gid']),
+      async.apply(fs.chown, self.env.sc, owner['uid'], owner['gid'])
     ], callback)
   }
 
