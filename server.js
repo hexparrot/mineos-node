@@ -218,9 +218,21 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
               var hash = require('object-hash');
               console.log('[{0}] {1} requests cron creation:'.format(server_name, ip_address), opts);
 
-              var cronjob = new CronJob(opts.source, function (){
-                server_dispatcher(opts);
-              }, null, false);
+              try {
+                var cronjob = new CronJob(opts.source, function (){
+                  server_dispatcher(opts);
+                }, null, false);
+              } catch (e) {
+                console.log('[{0}] rejected invalid cron format: "{1}"'.format(server_name, opts.source));
+                opts.uuid = uuid.v1();
+                opts.time_initiated = Date.now();
+                opts.command = '{0} cron'.format(operation);
+                opts.success = false;
+                opts.err = 'invalid cron format: "{0}"'.format(opts.source);
+                opts.time_resolved = Date.now();
+                nsp.emit('server_fin', opts);
+                return;
+              }
 
               self.servers[server_name].cron[hash(opts)] = {
                 definition: opts,
