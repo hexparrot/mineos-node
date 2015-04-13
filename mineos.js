@@ -249,9 +249,9 @@ mineos.mc = function(server_name, base_dir) {
           function(cc) { setTimeout(cc, test_interval_ms) },
           function(ignored_err) {
             if (self.server_name in mineos.server_pids_up())
-              callback(true); //error, stop did not succeed
+              cb(true); //error, stop did not succeed
             else
-              callback(null); //no error, stop succeeded as expected
+              cb(null); //no error, stop succeeded as expected
           }
         );  
       }
@@ -267,6 +267,7 @@ mineos.mc = function(server_name, base_dir) {
 
   self.kill = function(callback) {
     var pids = mineos.server_pids_up();
+    var test_interval_ms = 200;
 
     if (!(self.server_name in pids)) {
       callback(true);
@@ -274,8 +275,8 @@ mineos.mc = function(server_name, base_dir) {
       process.kill(pids[self.server_name].java);
 
       async.doWhilst(
-        function(callback) {
-          setTimeout(callback, 100);
+        function(cb) {
+          setTimeout(cb, test_interval_ms);
         },
         function() { 
           return (self.server_name in mineos.server_pids_up())
@@ -332,7 +333,7 @@ mineos.mc = function(server_name, base_dir) {
       function(cb) {
         var proc = child_process.spawn(binary, args, params);
         proc.once('close', function(code) {
-          callback(code);
+          cb(code);
         })
       }
     ], callback);
@@ -354,7 +355,7 @@ mineos.mc = function(server_name, base_dir) {
       function(cb) {
         var proc = child_process.spawn(binary, args, params);
         proc.once('close', function(code) {
-          callback(code);
+          cb(code);
         })
       }
     ], callback)
