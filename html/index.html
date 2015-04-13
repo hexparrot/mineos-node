@@ -675,8 +675,8 @@
                                     <!-- START Row -->
                                     <div class="row-fluid">
                                         <!-- START Button Default -->
-                                        <div class="span12 widget">
-                                            <header><h4 class="title"><span class="icon icone-home"></span>{{ 'SERVER_ACTIONS' | translate }}s</h4></header>
+                                        <div class="span6 widget">
+                                            <header><h4 class="title"><span class="icon icone-home"></span>{{ 'SERVER_ACTIONS' | translate }}</h4></header>
                                             <section class="body">
                                                 <div class="body-inner">
                                                     <p>
@@ -692,6 +692,36 @@
                                                                 <li><a href="#" ng-click="server_command('kill')" translate="KILL"></a></li>
                                                             </ul>
                                                         </div><!--/ Button Dropdown -->
+                                                    </p>
+                                                </div>
+                                            </section>
+                                        </div>
+                                        <!--/ END Button Default -->
+
+                                        <!-- START Button Default -->
+                                        <div class="span6 widget">
+                                            <header><h4 class="title"><span class="icon icone-ticket"></span>{{ 'JAVA_SETTINGS' | translate }}</h4></header>
+                                            <section class="body">
+                                                <div class="body-inner">
+                                                    <p>
+                                                        <!-- Help Text -->
+                                                        <div class="control-group">
+                                                            <label class="control-label" translate="MEMORY_ALLOCATION"></label>
+                                                            <div class="controls">
+                                                                <div class="input-prepend input-append">
+                                                                    <span class="add-on" translate="JAVA_XMX"></span>
+                                                                    <input type="text">
+                                                                    <span class="add-on" translate="MB_ABBREVIATION"></span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="controls">
+                                                                <div class="input-prepend input-append">
+                                                                    <span class="add-on" translate="JAVA_XMS"></span>
+                                                                    <input type="text">
+                                                                    <span class="add-on" translate="MB_ABBREVIATION"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div><!--/ Help Text -->
                                                     </p>
                                                 </div>
                                             </section>
