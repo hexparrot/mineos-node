@@ -160,6 +160,13 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
     $scope.user_input = '';
   }
 
+  $scope.change_sc = function(section, property) {
+    socket.emit($scope.current, 'command', { command: 'modify_sc',
+                                             section: section, 
+                                             property: property,
+                                             new_value: Servers[$scope.current].sc.java[property] });
+  }
+
   $scope.change_sp = function() {
     socket.emit($scope.current, 'command', { command: 'modify_sp', 
                                              property: this.property,
@@ -321,6 +328,9 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
           case 'server.properties':
             me['sp'] = data.payload;
             break;
+          case 'server.config':
+            me['sc'] = data.payload;
+            break;
           default:
             break;
         }
@@ -345,6 +355,7 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
         switch(data.command) {
           case 'restore':
             me.channel.emit(server_name, 'property', {property: 'server.properties'});
+            me.channel.emit(server_name, 'property', {property: 'server.config'});
           default:
             me.channel.emit(server_name, 'page_data', 'glance');
             break;
@@ -354,6 +365,7 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
     })
 
     me.channel.emit(server_name, 'property', {property: 'server.properties'});
+    me.channel.emit(server_name, 'property', {property: 'server.config'});
     me.channel.emit(server_name, 'page_data', 'glance');
     me.channel.emit(server_name, 'page_data', 'cron');
     me.channel.emit(server_name, 'watch', {filepath: 'logs/latest.log', from_start: true});

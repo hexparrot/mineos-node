@@ -710,14 +710,14 @@
                                                             <div class="controls">
                                                                 <div class="input-prepend input-append">
                                                                     <span class="add-on" translate="JAVA_XMX"></span>
-                                                                    <input type="text">
+                                                                    <input type="text" ng-model="servers[current].sc.java.java_xmx" ng-enter="change_sc('java', 'java_xmx', servers[current].sc.java.java_xmx)">
                                                                     <span class="add-on" translate="MB_ABBREVIATION"></span>
                                                                 </div>
                                                             </div>
                                                             <div class="controls">
                                                                 <div class="input-prepend input-append">
                                                                     <span class="add-on" translate="JAVA_XMS"></span>
-                                                                    <input type="text">
+                                                                    <input type="text" ng-model="servers[current].sc.java.java_xms" ng-enter="change_sc('java', 'java_xms', servers[current].sc.java.java_xms)">
                                                                     <span class="add-on" translate="MB_ABBREVIATION"></span>
                                                                 </div>
                                                             </div>
@@ -1011,7 +1011,7 @@
                                                         <!-- Input Text -->
                                                         <div class="control-group">
                                                             <div class="controls">
-                                                                <input type="text" name="input-text" class="span12" ng-value="*/10 * * * * *" ng-model="cron.source">
+                                                                <input type="text" name="input-text" class="span12" ng-value="" ng-model="cron.source">
                                                             </div>
                                                         </div><!--/ Input Text -->
                                                     </p>

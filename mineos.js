@@ -560,6 +560,11 @@ mineos.mc = function(server_name, base_dir) {
           callback(err, dict);
         })
         break;
+      case 'server.config':
+        self.sc(function(err, dict) {
+          callback(err, dict);
+        })
+        break;
       case 'du_awd':
         var du = require('du');
         du(self.env.awd, { disk: true }, function (err, size) {
