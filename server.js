@@ -437,7 +437,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
 
           async.series([
             async.apply(instance.create, dir_owner),
-            async.apply(instance._sp.overlay, args.properties),
+            async.apply(instance.overlay_sp, args.properties),
           ], function(err, results) {
             if (err) {
               var ERROR = '[{0}] Attempt to create server failed in the backend.'.format(args.server_name);
