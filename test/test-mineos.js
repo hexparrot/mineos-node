@@ -604,13 +604,6 @@ test.sc = function(test) {
       })
     },
     function(callback) {
-      instance.sc(function(err, dict) {
-        test.ifError(err);
-        test.equal(Object.keys(dict).length, 0);
-        callback(err);
-      })
-    },
-    function(callback) {
       instance.modify_sc('java', 'java_xmx', '512', function(err) {
         test.ifError(err);
         callback(err);
@@ -653,7 +646,7 @@ test.sc = function(test) {
     },
   ], function(err, results) {
     test.ifError(err);
-    test.expect(15);
+    test.expect(13);
     test.done();
   })
 }

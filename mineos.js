@@ -187,6 +187,7 @@ mineos.mc = function(server_name, base_dir) {
       async.apply(fs.ensureFile, self.env.sp),
       async.apply(self.overlay_sp, mineos.SP_DEFAULTS),
       async.apply(fs.ensureFile, self.env.sc),
+      async.apply(self.sc),
       async.apply(fs.chown, self.env.cwd, owner['uid'], owner['gid']),
       async.apply(fs.chown, self.env.bwd, owner['uid'], owner['gid']),
       async.apply(fs.chown, self.env.awd, owner['uid'], owner['gid']),
