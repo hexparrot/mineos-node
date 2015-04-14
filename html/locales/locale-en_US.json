@@ -45,6 +45,9 @@
   "MOJANG_ID": "Mojang ID",
   "RELEASE_TIMESTAMP": "Release Timestamp",
   "RELEASE_TYPE": "Release Type",
+  "RELEASE": "Release",
+  "SNAPSHOT": "Snapshot",
+  "SHOW_ALL_RELEASES": "Show All", 
 
   "GLANCE": "Server at a Glance", 
   "VERSION": "Version",
