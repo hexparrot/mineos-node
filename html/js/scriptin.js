@@ -180,6 +180,13 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     $scope.user_input = '';
   }
 
+  $scope.change_profile = function() {
+    socket.emit($scope.current, 'command', { command: 'modify_sc',
+                                             section: 'minecraft', 
+                                             property: 'profile',
+                                             new_value: this.profile });
+  }
+
   $scope.change_sc = function(section, property) {
     socket.emit($scope.current, 'command', { command: 'modify_sc',
                                              section: section, 
