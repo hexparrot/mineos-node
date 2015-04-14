@@ -206,6 +206,55 @@ mineos.mc = function(server_name, base_dir) {
     ], callback)
   }
 
+  self.get_start_args = function(callback) {
+    var server_config = async.memoize(self.sc);
+    var java_binary = which.sync('java');
+
+    async.series({
+      'binary': function (cb) {
+        server_config(function (err, dict) {
+          var value = (dict.java || {}).java_binary || java_binary;
+          cb((value.length ? null : 'No java binary assigned for server.'), value);
+        });
+      },
+      'xmx': function (cb) {
+        server_config(function (err, dict) {
+          var value = parseInt((dict.java || {}).java_xmx) || 0;
+          cb((value > 0 ? null : 'XMX heapsize must be positive integer'), value);
+        });
+      },
+      'xms': function (cb) {
+        server_config(function (err, dict) {
+          var xmx = parseInt((dict.java || {}).java_xmx) || 0;
+          var xms = parseInt((dict.java || {}).java_xms) || xmx;
+          cb((xmx >= xms && xms > 0 ? null : 'XMS heapsize must be positive integer where XMX >= XMS > 0'), xms);
+        });
+      },
+      'jarfile': function (cb) {
+        server_config(function (err, dict) {
+          var value = (dict.java || {}).jar_file || 'minecraft_server.jar';
+          cb((value.length ? null : 'Minecraft server jar filename must have length > 0'), value);
+        });
+      },
+      'jar_args': function (cb) {
+        server_config(function (err, dict) {
+          var value = (dict.java || {}).jar_args || 'nogui';
+          cb(null, value);
+        });
+      },
+    }, function(err, results) {
+      if (err) {
+        callback(err, {});
+      } else {
+        var args = ['-dmS', 'mc-{0}'.format(self.server_name)];
+        args.push.apply(args, [results.binary, '-server', '-Xmx{0}M'.format(results.xmx), '-Xms{0}M'.format(results.xms)]);
+        args.push.apply(args, ['-jar', results.jarfile, results.jar_args]);
+
+        callback(null, args);
+      }
+    })
+  }
+
   self.start = function(callback) {
     var binary = which.sync('screen');
     var java_binary = which.sync('java');
