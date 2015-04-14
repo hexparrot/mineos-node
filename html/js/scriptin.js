@@ -63,7 +63,7 @@ app.filter('time_from_now', function() {
 
 /* controllers */
 
-app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket, Servers) {
+app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($scope, socket, Servers, $filter) {
   $scope.page = 'dashboard';
   $scope.servers = Servers;
   $scope.current = null;
@@ -124,6 +124,18 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
       $scope.change_page('dashboard');
   })
 
+  socket.on('/', 'mojang_urls', function(mojang_url_data) {
+    $scope.mojang = mojang_url_data;
+  })
+
+  socket.on('/', 'file_download', function(data) {
+    $.gritter.add({
+      title: "{0} {1}".format(data.command,
+                              (data.success ? $filter('translate')('SUCCEEDED') : $filter('translate')('FAILED')) ),
+      text: data.help_text
+    });
+  })
+
   $scope.loadavg = [];
   $scope.loadavg_options = {
       element: $("#load_averages"),
@@ -150,6 +162,14 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
       socket.emit($scope.current, 'command', {command: cmd});
   }
 
+  $scope.host_command = function(cmd, args) {
+    if (args) {
+      args.command = cmd;
+      socket.emit('/', 'command', args);
+    } else
+      socket.emit('/', 'command', {command: cmd});
+  }
+
   $scope.cron_command = function(cmd, args) {
     args['operation'] = cmd;
     socket.emit($scope.current, 'cron', args);
@@ -158,6 +178,13 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
   $scope.console_input = function() {
     socket.emit($scope.current, 'command', {command: 'stuff', msg: $scope.user_input });
     $scope.user_input = '';
+  }
+
+  $scope.change_sc = function(section, property, new_value) {
+    socket.emit($scope.current, 'command', { command: 'modify_sc',
+                                             section: section, 
+                                             property: property,
+                                             new_value: new_value });
   }
 
   $scope.change_sp = function() {
@@ -321,6 +348,9 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
           case 'server.properties':
             me['sp'] = data.payload;
             break;
+          case 'server.config':
+            me['sc'] = data.payload;
+            break;
           default:
             break;
         }
@@ -345,6 +375,7 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
         switch(data.command) {
           case 'restore':
             me.channel.emit(server_name, 'property', {property: 'server.properties'});
+            me.channel.emit(server_name, 'property', {property: 'server.config'});
           default:
             me.channel.emit(server_name, 'page_data', 'glance');
             break;
@@ -354,6 +385,7 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
     })
 
     me.channel.emit(server_name, 'property', {property: 'server.properties'});
+    me.channel.emit(server_name, 'property', {property: 'server.config'});
     me.channel.emit(server_name, 'page_data', 'glance');
     me.channel.emit(server_name, 'page_data', 'cron');
     me.channel.emit(server_name, 'watch', {filepath: 'logs/latest.log', from_start: true});

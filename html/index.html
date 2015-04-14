@@ -189,6 +189,15 @@
 
                                     <!-- START Menu -->
                                     <li class="accordion-group">
+                                        <a ng-click="change_page('profiles')">
+                                            <span class="icon icone-share"></span>
+                                            <span class="text" translate="PROFILES"></span>
+                                        </a>
+                                    </li>
+                                    <!--/ END Menu -->
+
+                                    <!-- START Menu -->
+                                    <li class="accordion-group">
                                         <a ng-click="change_page('calendar')">
                                             <span class="icon icone-share"></span>
                                             <span class="text" translate="CALENDAR"></span>
@@ -471,7 +480,7 @@
                                         <tbody>
                                             <tr ng-repeat="(server_name, instance) in servers">
                                                 <td><a ng-click="$parent.change_page('server_status', server_name)">{{ server_name }}</a></td>
-                                                <td><a ng-attr-title="{{ 'MC Protocol: ' + instance.heartbeat.ping.protocol }}">{{ instance.heartbeat.ping.server_version }}</a></td>
+                                                <td><a ng-attr-title="{{ 'MC Protocol: ' + instance.heartbeat.ping.protocol }}">{{ servers[server_name].sc.minecraft.profile }}</a></td>
                                                 <td class="hidden-phone">{{ instance.sp['server-port'] }}</td>
                                                 <td><span class="label" ng-show="instance.heartbeat" ng-class="{'label-success': instance.heartbeat.up, 'label-important': !instance.heartbeat.up}">{{ instance.heartbeat.up ? 'up' : 'down' }}</span></td>
                                                 <td>{{ instance.heartbeat.memory.VmRSS }}</td>
@@ -613,6 +622,63 @@
                 </div>
                 <!--/ END Content -->
 
+
+                <!-- START Content - profiles -->
+                <div class="container-fluid" ng-show="page == 'profiles'">
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Basic Table -->
+                        <div class="span12 widget">
+                            <header>
+                                <h4 class="title" translate="OFFICIAL_MOJANG_SERVER_JARS"></h4>
+                                <!-- START Toolbar -->
+                                <ul class="toolbar pull-right">
+                                    <li>
+                                        <a href="#" class="link" data-toggle="dropdown"><span class="icon icone-ellipsis-vertical"></span></a>
+                                        <ul class="dropdown-menu pull-right">
+                                            <li><a href="#" ng-click="showonly='release'"><span class="icon icone-star"></span> {{ 'RELEASE' | translate }}</a></li>
+                                            <li><a href="#" ng-click="showonly='snapshot'"><span class="icon icone-camera"></span> {{ 'SNAPSHOT' | translate }}</a></li>
+                                            <li><a href="#" ng-click="showonly=''"><span class="icon icone-asterisk"></span> {{ 'SHOW_ALL_RELEASES' | translate }}</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <!--/ END Toolbar -->
+                            </header>
+                            <section class="body">
+                                <div class="body-inner no-padding">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th translate="MOJANG_ID"></th>
+                                                <th translate="RELEASE_TIMESTAMP"></th>
+                                                <th translate="RELEASE_TYPE"></th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="jar in mojang.versions | orderBy:'-releaseTime' | filter:showonly">
+                                                <td>{{ jar.id }}</td>
+                                                <td>{{ jar.releaseTime | amDateFormat: "dddd, MMMM Do YYYY, h:mm:ss a" }}</td>
+                                                <td>{{ jar.type }}</td>
+                                                <td>
+                                                    <p>
+                                                        <button type="button" class="btn btn-mini btn-success" ng-click="host_command('mojang_download', {id: jar.id})" translate="DOWNLOAD"></button>
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Basic Table -->
+                    </div>
+                    <!--/ END Row -->
+
+
+                </div>
+                <!--/ END Content -->
+
                 <!-- START Content - SERVER_STATUS -->
                 <div class="container-fluid" ng-show="page == 'server_status'">
                     <!-- START Row -->
@@ -675,8 +741,8 @@
                                     <!-- START Row -->
                                     <div class="row-fluid">
                                         <!-- START Button Default -->
-                                        <div class="span12 widget">
-                                            <header><h4 class="title"><span class="icon icone-home"></span>{{ 'SERVER_ACTIONS' | translate }}s</h4></header>
+                                        <div class="span6 widget">
+                                            <header><h4 class="title"><span class="icon icone-home"></span>{{ 'SERVER_ACTIONS' | translate }}</h4></header>
                                             <section class="body">
                                                 <div class="body-inner">
                                                     <p>
@@ -692,6 +758,36 @@
                                                                 <li><a href="#" ng-click="server_command('kill')" translate="KILL"></a></li>
                                                             </ul>
                                                         </div><!--/ Button Dropdown -->
+                                                    </p>
+                                                </div>
+                                            </section>
+                                        </div>
+                                        <!--/ END Button Default -->
+
+                                        <!-- START Button Default -->
+                                        <div class="span6 widget">
+                                            <header><h4 class="title"><span class="icon icone-ticket"></span>{{ 'JAVA_SETTINGS' | translate }}</h4></header>
+                                            <section class="body">
+                                                <div class="body-inner">
+                                                    <p>
+                                                        <!-- Help Text -->
+                                                        <div class="control-group">
+                                                            <label class="control-label" translate="MEMORY_ALLOCATION"></label>
+                                                            <div class="controls">
+                                                                <div class="input-prepend input-append">
+                                                                    <span class="add-on" translate="JAVA_XMX"></span>
+                                                                    <input type="text" ng-model="servers[current].sc.java.java_xmx" ng-enter="change_sc('java', 'java_xmx', servers[current].sc.java.java_xmx)">
+                                                                    <span class="add-on" translate="MB_ABBREVIATION"></span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="controls">
+                                                                <div class="input-prepend input-append">
+                                                                    <span class="add-on" translate="JAVA_XMS"></span>
+                                                                    <input type="text" ng-model="servers[current].sc.java.java_xms" ng-enter="change_sc('java', 'java_xms', servers[current].sc.java.java_xms)">
+                                                                    <span class="add-on" translate="MB_ABBREVIATION"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div><!--/ Help Text -->
                                                     </p>
                                                 </div>
                                             </section>
@@ -981,7 +1077,7 @@
                                                         <!-- Input Text -->
                                                         <div class="control-group">
                                                             <div class="controls">
-                                                                <input type="text" name="input-text" class="span12" ng-value="*/10 * * * * *" ng-model="cron.source">
+                                                                <input type="text" name="input-text" class="span12" ng-value="" ng-model="cron.source">
                                                             </div>
                                                         </div><!--/ Input Text -->
                                                     </p>
@@ -1094,7 +1190,59 @@
 
                 <!-- START Content - JAVA -->
                 <div class="container-fluid" ng-show="page == 'java'">
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Button Default -->
+                        <div class="span6 widget">
+                            <header><h4 class="title"><span class="icon icone-home"></span>{{ 'SELECT_SERVER_PROFILE' | translate }}</h4></header>
+                            <section class="body">
+                                <div class="body-inner">
+                                    <p>
+                                        <!-- Select -->
+                                        <div class="control-group">
+                                            <div class="controls">
+                                                <select class="span6" ng-model="servers[current].sc.minecraft.profile" ng-options="item.id for item in mojang.versions track by item.id" ng-change="change_sc('minecraft', 'profile', servers[current].sc.minecraft.profile.id)">
+                                                </select>
+                                            </div>
+                                        </div>
+                                    <!--/ Select -->
+                                    </p>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Button Default -->
 
+                        <!-- START Button Default -->
+                        <div class="span6 widget">
+                            <header><h4 class="title"><span class="icon icone-ticket"></span>{{ 'MEMORY_ALLOCATION' | translate }}</h4></header>
+                            <section class="body">
+                                <div class="body-inner">
+                                    <p>
+                                        <!-- Help Text -->
+                                        <div class="control-group">
+                                            <label class="control-label" translate="MEMORY_ALLOCATION"></label>
+                                            <div class="controls">
+                                                <div class="input-prepend input-append">
+                                                    <span class="add-on" translate="JAVA_XMX"></span>
+                                                    <input type="text" ng-model="servers[current].sc.java.java_xmx" ng-enter="change_sc('java', 'java_xmx', servers[current].sc.java.java_xmx)">
+                                                    <span class="add-on" translate="MB_ABBREVIATION"></span>
+                                                </div>
+                                            </div>
+                                            <div class="controls">
+                                                <div class="input-prepend input-append">
+                                                    <span class="add-on" translate="JAVA_XMS"></span>
+                                                    <input type="text" ng-model="servers[current].sc.java.java_xms" ng-enter="change_sc('java', 'java_xms', servers[current].sc.java.java_xms)">
+                                                    <span class="add-on" translate="MB_ABBREVIATION"></span>
+                                                </div>
+                                            </div>
+                                        </div><!--/ Help Text -->
+                                    </p>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Button Default -->
+                    </div>
+                    <!--/ END Row -->
 
                 </div>
                 <!--/ END Content -->

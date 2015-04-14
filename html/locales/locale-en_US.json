@@ -5,6 +5,7 @@
   "HOST_SETTINGS": "Host Settings",
   "DASHBOARD": "Dashboard",
   "CREATE_NEW_SERVER": "Create New Server",
+  "PROFILES": "Profiles",
   "CALENDAR": "Calendar",
 
   "SERVER_SETTINGS": "Server Settings",
@@ -40,6 +41,14 @@
   "SERVER_NAME": "Server Name",
   "CREATE_HELP": "Only letters, numbers and underscores.",
 
+  "OFFICIAL_MOJANG_SERVER_JARS": "Official Mojang Server Jars",
+  "MOJANG_ID": "Mojang ID",
+  "RELEASE_TIMESTAMP": "Release Timestamp",
+  "RELEASE_TYPE": "Release Type",
+  "RELEASE": "Release",
+  "SNAPSHOT": "Snapshot",
+  "SHOW_ALL_RELEASES": "Show All", 
+
   "GLANCE": "Server at a Glance", 
   "VERSION": "Version",
   "MEMORY_FOOTPRINT": "Memory Footprint",
@@ -51,6 +60,13 @@
   "STOP_AND_BACKUP": "Stop and Backup",
   "KILL": "Kill",
 
+  "JAVA_SETTINGS": "Java Settings",
+  "MEMORY_ALLOCATION": "Memory Allocation (Heapsize)",
+  "JAVA_XMX": "-XMX",
+  "JAVA_XMS": "-XMS",
+  "MB_ABBREVIATION": "MB",
+  "SELECT_SERVER_PROFILE": "Select server profile",
+
   "MOST_RECENT_RESTORE_POINT": "Most recent restore point",
   "OLDEST_RESTORE_POINT": "Oldest restore point",
   "SPACE_USED_RESTORES": "Space used by restore points",
@@ -58,14 +74,14 @@
   "RESTORE_POINT_CREATED": "Restore point created",
   "FAILURE": "Uh oh!",
   "RESTORE_POINT_FAILED": "Restore point attempt failed",
-  "CREATE_NEW_RESTORE_POINT": "Create a new restore point now",
+  "CREATE_NEW_RESTORE_POINT": "Create a new restore point",
 
   "MOST_RECENT_ARCHIVE": "Most recent archive",
   "OLDEST_ARCHIVE": "Oldest Archive",
   "SPACE_USED_ARCHIVES": "Space used by archives",
   "ARCHIVE_CREATED": "Archive created",
   "ARCHIVE_FAILED": "Archive attempt failed",
-  "CREATE_NEW_ARCHIVE": "Create a new archive now",
+  "CREATE_NEW_ARCHIVE": "Create a new archive",
 
   "OWNERSHIP_AND_DISK_USAGE": "Ownership and Disk Usage",
   "SERVER_OWNER": "Server Owner",

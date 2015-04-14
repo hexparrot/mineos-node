@@ -275,6 +275,60 @@ test.extract_server_name = function(test) {
   test.done();
 }
 
+test.get_start_args = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'java_xmx', '-256'),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ok(err); //testing for positive error
+        test.equal(Object.keys(args).length, 0);
+        test.equal(err, 'XMX heapsize must be positive integer');
+        callback(!err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'java_xmx', '256'),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[4], '-Xmx256M');
+        test.equal(args[5], '-Xms256M');
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'java_xms', '-256'),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ok(err); //testing for positive error
+        test.equal(Object.keys(args).length, 0);
+        test.equal(err, 'XMS heapsize must be positive integer where XMX >= XMS > 0');
+        callback(!err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'java_xms', '128'),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[4], '-Xmx256M');
+        test.equal(args[5], '-Xms128M');
+        callback(err);
+      })
+    },
+  ], function(err, results) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
 test.start = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -604,13 +658,6 @@ test.sc = function(test) {
       })
     },
     function(callback) {
-      instance.sc(function(err, dict) {
-        test.ifError(err);
-        test.equal(Object.keys(dict).length, 0);
-        callback(err);
-      })
-    },
-    function(callback) {
       instance.modify_sc('java', 'java_xmx', '512', function(err) {
         test.ifError(err);
         callback(err);
@@ -653,7 +700,7 @@ test.sc = function(test) {
     },
   ], function(err, results) {
     test.ifError(err);
-    test.expect(15);
+    test.expect(13);
     test.done();
   })
 }

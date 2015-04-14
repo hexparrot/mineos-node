@@ -187,6 +187,8 @@ mineos.mc = function(server_name, base_dir) {
       async.apply(fs.ensureFile, self.env.sp),
       async.apply(self.overlay_sp, mineos.SP_DEFAULTS),
       async.apply(fs.ensureFile, self.env.sc),
+      async.apply(self.sc),
+      async.apply(self.modify_sc, 'java', 'java_xmx', '256'),
       async.apply(fs.chown, self.env.cwd, owner['uid'], owner['gid']),
       async.apply(fs.chown, self.env.bwd, owner['uid'], owner['gid']),
       async.apply(fs.chown, self.env.awd, owner['uid'], owner['gid']),
@@ -205,13 +207,57 @@ mineos.mc = function(server_name, base_dir) {
     ], callback)
   }
 
+  self.get_start_args = function(callback) {
+    var server_config = async.memoize(self.sc);
+    var java_binary = which.sync('java');
+
+    async.series({
+      'binary': function (cb) {
+        server_config(function (err, dict) {
+          var value = (dict.java || {}).java_binary || java_binary;
+          cb((value.length ? null : 'No java binary assigned for server.'), value);
+        });
+      },
+      'xmx': function (cb) {
+        server_config(function (err, dict) {
+          var value = parseInt((dict.java || {}).java_xmx) || 0;
+          cb((value > 0 ? null : 'XMX heapsize must be positive integer'), value);
+        });
+      },
+      'xms': function (cb) {
+        server_config(function (err, dict) {
+          var xmx = parseInt((dict.java || {}).java_xmx) || 0;
+          var xms = parseInt((dict.java || {}).java_xms) || xmx;
+          cb((xmx >= xms && xms > 0 ? null : 'XMS heapsize must be positive integer where XMX >= XMS > 0'), xms);
+        });
+      },
+      'jarfile': function (cb) {
+        server_config(function (err, dict) {
+          var value = (dict.java || {}).jar_file || 'minecraft_server.jar';
+          cb((value.length ? null : 'Minecraft server jar filename must have length > 0'), value);
+        });
+      },
+      'jar_args': function (cb) {
+        server_config(function (err, dict) {
+          var value = (dict.java || {}).jar_args || 'nogui';
+          cb(null, value);
+        });
+      },
+    }, function(err, results) {
+      if (err) {
+        callback(err, {});
+      } else {
+        var args = ['-dmS', 'mc-{0}'.format(self.server_name)];
+        args.push.apply(args, [results.binary, '-server', '-Xmx{0}M'.format(results.xmx), '-Xms{0}M'.format(results.xms)]);
+        args.push.apply(args, ['-jar', results.jarfile, results.jar_args]);
+
+        callback(null, args);
+      }
+    })
+  }
+
   self.start = function(callback) {
     var binary = which.sync('screen');
-    var java_binary = which.sync('java');
-    var args = ['-dmS', 'mc-{0}'.format(self.server_name), 
-                java_binary, '-server', '-Xmx256M', '-Xms256M',
-                '-jar',  'minecraft_server.jar', 'nogui'];
-
     var params = { cwd: self.env.cwd };
     var orig_filepath = path.join(JAR_PATH, 'minecraft_server.1.7.9.jar');
     var dest_filename = 'minecraft_server.jar';
@@ -228,9 +274,15 @@ mineos.mc = function(server_name, base_dir) {
         })
       },
       function(cb) {
-        var proc = child_process.spawn(binary, args, params);
-        proc.once('close', function(code) {
-          callback(code);
+        self.get_start_args(function(err, args) {
+          if (err)
+            cb(err)
+          else {
+            var proc = child_process.spawn(binary, args, params);
+            proc.once('close', function(code) {
+              cb(code);
+            })
+          }
         })
       }
     ], callback);
@@ -557,6 +609,11 @@ mineos.mc = function(server_name, base_dir) {
         break;
       case 'server.properties':
         self.sp(function(err, dict) {
+          callback(err, dict);
+        })
+        break;
+      case 'server.config':
+        self.sc(function(err, dict) {
           callback(err, dict);
         })
         break;
