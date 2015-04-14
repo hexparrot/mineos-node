@@ -65,7 +65,7 @@
   "JAVA_XMX": "-XMX",
   "JAVA_XMS": "-XMS",
   "MB_ABBREVIATION": "MB",
-  "SELECT_SERVER_JAR": "Select server jar",
+  "SELECT_SERVER_PROFILE": "Select server profile",
 
   "MOST_RECENT_RESTORE_POINT": "Most recent restore point",
   "OLDEST_RESTORE_POINT": "Oldest restore point",

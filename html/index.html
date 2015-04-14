@@ -480,7 +480,7 @@
                                         <tbody>
                                             <tr ng-repeat="(server_name, instance) in servers">
                                                 <td><a ng-click="$parent.change_page('server_status', server_name)">{{ server_name }}</a></td>
-                                                <td><a ng-attr-title="{{ 'MC Protocol: ' + instance.heartbeat.ping.protocol }}">{{ instance.heartbeat.ping.server_version }}</a></td>
+                                                <td><a ng-attr-title="{{ 'MC Protocol: ' + instance.heartbeat.ping.protocol }}">{{ servers[server_name].sc.minecraft.profile }}</a></td>
                                                 <td class="hidden-phone">{{ instance.sp['server-port'] }}</td>
                                                 <td><span class="label" ng-show="instance.heartbeat" ng-class="{'label-success': instance.heartbeat.up, 'label-important': !instance.heartbeat.up}">{{ instance.heartbeat.up ? 'up' : 'down' }}</span></td>
                                                 <td>{{ instance.heartbeat.memory.VmRSS }}</td>
@@ -1194,14 +1194,14 @@
                     <div class="row-fluid">
                         <!-- START Button Default -->
                         <div class="span6 widget">
-                            <header><h4 class="title"><span class="icon icone-home"></span>{{ 'SELECT_SERVER_JAR' | translate }}</h4></header>
+                            <header><h4 class="title"><span class="icon icone-home"></span>{{ 'SELECT_SERVER_PROFILE' | translate }}</h4></header>
                             <section class="body">
                                 <div class="body-inner">
                                     <p>
                                         <!-- Select -->
                                         <div class="control-group">
                                             <div class="controls">
-                                                <select class="span6" ng-model="profile" ng-options="item.id as item.id for item in mojang.versions" ng-change="change_sc('minecraft', 'profile', profile)">
+                                                <select class="span6" ng-model="servers[current].sc.minecraft.profile" ng-options="item.id for item in mojang.versions track by item.id" ng-change="change_sc('minecraft', 'profile', servers[current].sc.minecraft.profile.id)">
                                                 </select>
                                             </div>
                                         </div>
