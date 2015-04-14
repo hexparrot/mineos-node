@@ -154,6 +154,15 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
       socket.emit($scope.current, 'command', {command: cmd});
   }
 
+  $scope.host_command = function(cmd, args) {
+    console.log(cmd, args)
+    if (args) {
+      args.command = cmd;
+      socket.emit('/', 'command', args);
+    } else
+      socket.emit('/', 'command', {command: cmd});
+  }
+
   $scope.cron_command = function(cmd, args) {
     args['operation'] = cmd;
     socket.emit($scope.current, 'cron', args);

@@ -449,6 +449,41 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           })
         }
         break;
+      case 'mojang_download':
+        var request = require('request');
+        var fs = require('fs-extra');
+
+        var dest_dir = '/var/games/minecraft/profiles/vanilla-{0}'.format(args.id);
+        var filename = 'minecraft_server.{0}.jar'.format(args.id);
+        var dest_filepath = path.join(dest_dir, filename);
+
+        var url = 'https://s3.amazonaws.com/Minecraft.Download/versions/{0}/{1}'.format(args.id, filename);
+
+        fs.ensureDir(dest_dir, function(err) {
+          if (err) {
+            console.error('[WEBUI] Error attempting download:', err);
+          } else {
+            request(url)
+              .on('error', function(err) {
+                console.error('[WEBUI] Server was unable to download file:', url);
+              })
+              .on('complete', function(response) {
+                if (response.statusCode == 200) {
+                  console.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                  console.log(err);
+                  args['dest_dir'] = dest_dir;
+                  args['filename'] = filename;
+                  self.front_end.emit('file_download_success', args);
+                } else {
+                  console.error('[WEBUI] Server was unable to download file:', url);
+                  console.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                  self.front_end.emit('file_download_failed', args);
+                }
+              })
+              .pipe(fs.createWriteStream(dest_filepath))
+          }
+        });
+        break;
       case 'notices':
         for (var server_name in self.servers) 
           self.servers[server_name].nsp.emit('notices', self.servers[server_name].notices);
