@@ -63,7 +63,7 @@ app.filter('time_from_now', function() {
 
 /* controllers */
 
-app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket, Servers) {
+app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($scope, socket, Servers, $filter) {
   $scope.page = 'dashboard';
   $scope.servers = Servers;
   $scope.current = null;
@@ -128,6 +128,14 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
     $scope.mojang = mojang_url_data;
   })
 
+  socket.on('/', 'file_download', function(data) {
+    $.gritter.add({
+      title: "{0} {1}".format(data.command,
+                              (data.success ? $filter('translate')('SUCCEEDED') : $filter('translate')('FAILED')) ),
+      text: data.help_text
+    });
+  })
+
   $scope.loadavg = [];
   $scope.loadavg_options = {
       element: $("#load_averages"),
@@ -155,7 +163,6 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
   }
 
   $scope.host_command = function(cmd, args) {
-    console.log(cmd, args)
     if (args) {
       args.command = cmd;
       socket.emit('/', 'command', args);

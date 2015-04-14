@@ -464,20 +464,21 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
             console.error('[WEBUI] Error attempting download:', err);
           } else {
             request(url)
-              .on('error', function(err) {
-                console.error('[WEBUI] Server was unable to download file:', url);
-              })
               .on('complete', function(response) {
                 if (response.statusCode == 200) {
                   console.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
                   console.log(err);
                   args['dest_dir'] = dest_dir;
                   args['filename'] = filename;
-                  self.front_end.emit('file_download_success', args);
+                  args['success'] = true;
+                  args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
+                  self.front_end.emit('file_download', args);
                 } else {
                   console.error('[WEBUI] Server was unable to download file:', url);
                   console.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
-                  self.front_end.emit('file_download_failed', args);
+                  args['success'] = false;
+                  args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                  self.front_end.emit('file_download', args);
                 }
               })
               .pipe(fs.createWriteStream(dest_filepath))
