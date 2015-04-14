@@ -188,6 +188,7 @@ mineos.mc = function(server_name, base_dir) {
       async.apply(self.overlay_sp, mineos.SP_DEFAULTS),
       async.apply(fs.ensureFile, self.env.sc),
       async.apply(self.sc),
+      async.apply(self.modify_sc, 'java', 'java_xmx', '256'),
       async.apply(fs.chown, self.env.cwd, owner['uid'], owner['gid']),
       async.apply(fs.chown, self.env.bwd, owner['uid'], owner['gid']),
       async.apply(fs.chown, self.env.awd, owner['uid'], owner['gid']),
@@ -257,11 +258,6 @@ mineos.mc = function(server_name, base_dir) {
 
   self.start = function(callback) {
     var binary = which.sync('screen');
-    var java_binary = which.sync('java');
-    var args = ['-dmS', 'mc-{0}'.format(self.server_name), 
-                java_binary, '-server', '-Xmx256M', '-Xms256M',
-                '-jar',  'minecraft_server.jar', 'nogui'];
-
     var params = { cwd: self.env.cwd };
     var orig_filepath = path.join(JAR_PATH, 'minecraft_server.1.7.9.jar');
     var dest_filename = 'minecraft_server.jar';
@@ -278,9 +274,15 @@ mineos.mc = function(server_name, base_dir) {
         })
       },
       function(cb) {
-        var proc = child_process.spawn(binary, args, params);
-        proc.once('close', function(code) {
-          callback(code);
+        self.get_start_args(function(err, args) {
+          if (err)
+            cb(err)
+          else {
+            var proc = child_process.spawn(binary, args, params);
+            proc.once('close', function(code) {
+              cb(code);
+            })
+          }
         })
       }
     ], callback);

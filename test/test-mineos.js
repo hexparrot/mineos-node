@@ -283,10 +283,8 @@ test.get_start_args = function(test) {
     async.apply(instance.create, OWNER_CREDS),
     function(callback) {
       instance.get_start_args(function(err, args) {
-        test.ok(err); //testing for positive error
-        test.equal(Object.keys(args).length, 0);
-        test.equal(err, 'XMX heapsize must be positive integer');
-        callback(!err);
+        test.ifError(err);
+        callback(err);
       })
     },
     async.apply(instance.modify_sc, 'java', 'java_xmx', '-256'),
