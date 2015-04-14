@@ -43,7 +43,8 @@
     "angular-translate": "2.6.x",
     "cron": "1.0.x",
     "object-hash": "0.5.x",
-    "tmp": "0.0.x"
+    "tmp": "0.0.x",
+    "request": "2.55.x"
   },
   "devDependencies": {
     "fs-extra": "0.11.x"

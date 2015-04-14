@@ -124,6 +124,10 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', function($scope, socket,
       $scope.change_page('dashboard');
   })
 
+  socket.on('/', 'mojang_urls', function(mojang_url_data) {
+    $scope.mojang = mojang_url_data;
+  })
+
   $scope.loadavg = [];
   $scope.loadavg_options = {
       element: $("#load_averages"),

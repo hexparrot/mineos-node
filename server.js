@@ -461,6 +461,23 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
     console.info('[WEBUI] User connected from', socket.request.connection.remoteAddress);
     self.front_end.emit('server_list', Object.keys(self.servers));
     socket.on('command', self.webui_dispatcher);
+
+
+    (function() {
+      var request = require('request');
+      var MOJANG_VERSIONS_URL = 'http://s3.amazonaws.com/Minecraft.Download/versions/versions.json';
+      request({
+        url: MOJANG_VERSIONS_URL,
+        json: true
+      }, function (error, response, body) {
+        if (!error && response.statusCode === 200) {
+          console.info('[WEBUI] broadcasting available Mojang jars: {0} count'.format(body.versions.length));
+          self.front_end.emit('mojang_urls', body);
+        }
+      })
+    })();
+
+    
   })
 
   return self;
