@@ -1201,7 +1201,7 @@
                                         <!-- Select -->
                                         <div class="control-group">
                                             <div class="controls">
-                                                <select class="span6" ng-model="profile" ng-options="item.id as item.id for item in mojang.versions" ng-change="change_profile()">
+                                                <select class="span6" ng-model="profile" ng-options="item.id as item.id for item in mojang.versions" ng-change="change_sc('minecraft', 'profile', profile)">
                                                 </select>
                                             </div>
                                         </div>
