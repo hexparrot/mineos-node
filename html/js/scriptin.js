@@ -61,6 +61,32 @@ app.filter('time_from_now', function() {
   }
 })
 
+app.filter('profile_filter', function() {
+  return function(profiles, criteria) {
+    var keep = [];
+
+    if (profiles.mojang.length) {
+      switch(criteria) {
+        case 'downloaded':
+          for (var index in profiles.mojang)
+            if (profiles.mojang[index].downloaded)
+              keep.push(profiles.mojang[index]);
+          break;
+        case '*':
+          keep = profiles.mojang;
+          break;
+        default:
+          for (var index in profiles.mojang)
+            if (profiles.mojang[index].type == criteria)
+              keep.push(profiles.mojang[index]);
+          break;
+      }
+    }
+      
+    return keep;
+  }
+})
+
 /* controllers */
 
 app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($scope, socket, Servers, $filter) {
@@ -124,8 +150,8 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
       $scope.change_page('dashboard');
   })
 
-  socket.on('/', 'mojang_urls', function(mojang_url_data) {
-    $scope.mojang = mojang_url_data;
+  socket.on('/', 'profile_list', function(profile_data) {
+    $scope.profiles = profile_data;
   })
 
   socket.on('/', 'file_download', function(data) {

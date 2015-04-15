@@ -47,7 +47,8 @@
   "RELEASE_TYPE": "Release Type",
   "RELEASE": "Release",
   "SNAPSHOT": "Snapshot",
-  "SHOW_ALL_RELEASES": "Show All", 
+  "SHOW_ALL_RELEASES": "Show All",
+  "DOWNLOADED_PROFILES": "Downloaded Profiles",
 
   "GLANCE": "Server at a Glance", 
   "VERSION": "Version",

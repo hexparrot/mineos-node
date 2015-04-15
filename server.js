@@ -13,7 +13,8 @@ var server = exports;
 server.backend = function(base_dir, socket_emitter, dir_owner) {
   var self = this;
 
-  self.servers = {}
+  self.servers = {};
+  self.profiles = {};
   self.front_end = socket_emitter || new events.EventEmitter();
 
   (function() {
@@ -453,7 +454,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         var request = require('request');
         var fs = require('fs-extra');
 
-        var dest_dir = '/var/games/minecraft/profiles/vanilla-{0}'.format(args.id);
+        var dest_dir = '/var/games/minecraft/profiles/vanilla/{0}'.format(args.id);
         var filename = 'minecraft_server.{0}.jar'.format(args.id);
         var dest_filepath = path.join(dest_dir, filename);
 
@@ -493,27 +494,37 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
     }
   }
 
+  function download_mojang_versions() {
+    var request = require('request');
+    var MOJANG_VERSIONS_URL = 'http://s3.amazonaws.com/Minecraft.Download/versions/versions.json';
+    request({
+      url: MOJANG_VERSIONS_URL,
+      json: true
+    }, function (error, response, body) {
+      if (!error && response.statusCode === 200) {
+        self.profiles['mojang'] = body.versions;
+        self.check_jarfile_downloaded();
+      }
+    })
+  }
+
+  self.check_jarfile_downloaded = function() {
+    var fs = require('fs');
+    var path_prefix = path.join(base_dir, mineos.DIRS['profiles'], 'vanilla');
+
+    for (var index in self.profiles.mojang) {
+      var item = self.profiles.mojang[index];
+      var jar_path = path.join(path_prefix, item.id, 'minecraft_server.{0}.jar'.format(item.id));
+      item['downloaded'] = fs.existsSync(jar_path);
+    }
+    self.front_end.emit('profile_list', self.profiles);
+  }
+
   self.front_end.on('connection', function(socket) {
     console.info('[WEBUI] User connected from', socket.request.connection.remoteAddress);
     self.front_end.emit('server_list', Object.keys(self.servers));
     socket.on('command', self.webui_dispatcher);
-
-
-    (function() {
-      var request = require('request');
-      var MOJANG_VERSIONS_URL = 'http://s3.amazonaws.com/Minecraft.Download/versions/versions.json';
-      request({
-        url: MOJANG_VERSIONS_URL,
-        json: true
-      }, function (error, response, body) {
-        if (!error && response.statusCode === 200) {
-          console.info('[WEBUI] broadcasting available Mojang jars: {0} count'.format(body.versions.length));
-          self.front_end.emit('mojang_urls', body);
-        }
-      })
-    })();
-
-    
+    async.setImmediate(download_mojang_versions);
   })
 
   return self;
