@@ -367,20 +367,22 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
     })
 
     me.channel.on(server_name, 'server_fin', function(data) {
-      if ('property' in data) {
-        switch (data.property) {
-          case 'server.properties':
-            me['sp'] = data.payload;
-            break;
-          case 'server.config':
-            me['sc'] = data.payload;
-            break;
-          default:
-            break;
-        }
-      } else if ('command' in data) {
+      if ('command' in data) {
         me.notices[data.uuid] = data;
         me.latest_notice[data.command] = data;
+
+        switch(data.command) {
+          case 'modify_sc':
+            me.channel.emit(server_name, 'property', {property: 'server.config'});
+            data['suppress_popup'] = true;
+            break;
+          case 'restore':
+            me.channel.emit(server_name, 'property', {property: 'server.properties'});
+            me.channel.emit(server_name, 'property', {property: 'server.config'});
+          default:
+            me.channel.emit(server_name, 'page_data', 'glance');
+            break;
+        }
 
         var suppress = ('suppress_popup' in data ? data.suppress_popup : false);
         if (!suppress) {
@@ -396,15 +398,17 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
           });
         }
 
-        switch(data.command) {
-          case 'restore':
-            me.channel.emit(server_name, 'property', {property: 'server.properties'});
-            me.channel.emit(server_name, 'property', {property: 'server.config'});
+      } else if ('property' in data) {
+        switch (data.property) {
+          case 'server.properties':
+            me['sp'] = data.payload;
+            break;
+          case 'server.config':
+            me['sc'] = data.payload;
+            break;
           default:
-            me.channel.emit(server_name, 'page_data', 'glance');
             break;
         }
-        
       }
     })
 
