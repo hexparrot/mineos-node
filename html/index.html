@@ -1202,8 +1202,14 @@
                                         <!-- Select -->
                                         <div class="control-group">
                                             <div class="controls">
-                                                <select class="span6" ng-model="servers[current].sc.minecraft.profile" ng-options="item.id for item in mojang.versions track by item.id" ng-change="change_sc('minecraft', 'profile', servers[current].sc.minecraft.profile.id)">
-                                                </select>
+                                                <label class="control-label">{{ 'CURRENTLY_USING_PROFILE' | translate}} {{ servers[current].sc.minecraft.profile }}</label>
+                                                <!-- Select -->
+                                                <div class="control-group">
+                                                    <label class="control-label" translate="CHANGE_PROFILE_TO"></label>
+                                                    <div class="controls">
+                                                        <select class="span6" ng-model="myprofile" data-ng-options="p as p.id group by p.group for p in profiles | profile_filter:'downloaded' | orderBy:'-releaseTime'" ng-change="change_sc('minecraft', 'profile', myprofile.id)"></select>
+                                                    </div>
+                                                </div><!--/ Select -->
                                             </div>
                                         </div>
                                     <!--/ Select -->

@@ -496,28 +496,27 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
 
   function download_mojang_versions() {
     var request = require('request');
+    var fs = require('fs');
+
     var MOJANG_VERSIONS_URL = 'http://s3.amazonaws.com/Minecraft.Download/versions/versions.json';
+    var path_prefix = path.join(base_dir, mineos.DIRS['profiles'], 'vanilla');
+
     request({
       url: MOJANG_VERSIONS_URL,
       json: true
     }, function (error, response, body) {
       if (!error && response.statusCode === 200) {
-        self.profiles['mojang'] = body.versions;
-        self.check_jarfile_downloaded();
+        for (var index in body.versions) {
+          var item = body.versions[index];
+          item['group'] = 'mojang';
+          item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], 'vanilla', item.id, 'minecraft_server.{0}.jar'.format(item.id)));
+
+          self.profiles[item.id] = item;
+        }
+
+        self.front_end.emit('profile_list', self.profiles);
       }
     })
-  }
-
-  self.check_jarfile_downloaded = function() {
-    var fs = require('fs');
-    var path_prefix = path.join(base_dir, mineos.DIRS['profiles'], 'vanilla');
-
-    for (var index in self.profiles.mojang) {
-      var item = self.profiles.mojang[index];
-      var jar_path = path.join(path_prefix, item.id, 'minecraft_server.{0}.jar'.format(item.id));
-      item['downloaded'] = fs.existsSync(jar_path);
-    }
-    self.front_end.emit('profile_list', self.profiles);
   }
 
   self.front_end.on('connection', function(socket) {

@@ -65,22 +65,20 @@ app.filter('profile_filter', function() {
   return function(profiles, criteria) {
     var keep = [];
 
-    if (profiles.mojang.length) {
-      switch(criteria) {
-        case 'downloaded':
-          for (var index in profiles.mojang)
-            if (profiles.mojang[index].downloaded)
-              keep.push(profiles.mojang[index]);
-          break;
-        case '*':
-          keep = profiles.mojang;
-          break;
-        default:
-          for (var index in profiles.mojang)
-            if (profiles.mojang[index].type == criteria)
-              keep.push(profiles.mojang[index]);
-          break;
-      }
+    switch(criteria) {
+      case 'downloaded':
+        for (var index in profiles)
+          if (profiles[index].downloaded)
+            keep.push(profiles[index]);
+        break;
+      case '*':
+        keep = profiles;
+        break;
+      default:
+        for (var index in profiles)
+          if (profiles[index].type == criteria)
+            keep.push(profiles[index]);
+        break;
     }
       
     return keep;
