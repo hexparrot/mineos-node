@@ -719,7 +719,15 @@
                                                     <figure class="stats summary stacked">
                                                         <div class="icon circle blue"><span class="icone-cogs"></span></div>
                                                         <figcaption>
-                                                            <h4>{{ servers[current].heartbeat.ping.server_version }}&nbsp;<small translate="VERSION"></small></h4>
+                                                            <h4>{{ servers[current].sc.minecraft.profile }}&nbsp;<small translate="PROFILE"></small></h4>
+                                                        </figcaption>
+                                                    </figure><!--/ END Summary -->
+
+                                                    <!-- START Summary -->
+                                                    <figure class="stats summary stacked">
+                                                        <div class="icon circle blue"><span class="icone-cogs"></span></div>
+                                                        <figcaption>
+                                                            <h4>{{ servers[current].heartbeat.ping.server_version }}&nbsp;<small translate="REPORTED_VERSION"></small></h4>
                                                         </figcaption>
                                                     </figure><!--/ END Summary -->
 
@@ -760,6 +768,15 @@
                                                             </ul>
                                                         </div><!--/ Button Dropdown -->
                                                     </p>
+                                                    <p>
+                                                        <!-- Select -->
+                                                        <div class="control-group">
+                                                            <label class="control-label span3" translate="CHANGE_PROFILE_TO"></label>
+                                                            <div class="controls">
+                                                                <select class="span6" ng-model="myprofile" data-ng-options="p as p.id group by p.group for p in profiles | profile_filter:'downloaded' | orderBy:'-releaseTime'" ng-change="change_sc('minecraft', 'profile', myprofile.id)"></select>
+                                                            </div>
+                                                        </div><!--/ Select -->
+                                                    
                                                 </div>
                                             </section>
                                         </div>
@@ -1203,13 +1220,12 @@
                                         <div class="control-group">
                                             <div class="controls">
                                                 <label class="control-label">{{ 'CURRENTLY_USING_PROFILE' | translate}} {{ servers[current].sc.minecraft.profile }}</label>
-                                                <!-- Select -->
                                                 <div class="control-group">
-                                                    <label class="control-label span2" translate="CHANGE_PROFILE_TO"></label>
+                                                    <label class="control-label span3" translate="CHANGE_PROFILE_TO"></label>
                                                     <div class="controls">
                                                         <select class="span6" ng-model="myprofile" data-ng-options="p as p.id group by p.group for p in profiles | profile_filter:'downloaded' | orderBy:'-releaseTime'" ng-change="change_sc('minecraft', 'profile', myprofile.id)"></select>
                                                     </div>
-                                                </div><!--/ Select -->
+                                                </div>
                                             </div>
                                         </div>
                                     <!--/ Select -->

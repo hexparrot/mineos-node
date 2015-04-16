@@ -51,9 +51,11 @@
   "DOWNLOADED_PROFILES": "Downloaded Profiles",
   "CURRENTLY_USING_PROFILE": "Currently using profile:",
   "CHANGE_PROFILE_TO": "Change profile to:",
+  "PROFILE": "Profile",
 
   "GLANCE": "Server at a Glance", 
   "VERSION": "Version",
+  "REPORTED_VERSION": "Ping Version",
   "MEMORY_FOOTPRINT": "Memory Footprint",
 
   "SERVER_ACTIONS": "Server Actions",
