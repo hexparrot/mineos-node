@@ -474,6 +474,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
                   args['success'] = true;
                   args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
                   self.front_end.emit('file_download', args);
+                  self.send_profiles();
                 } else {
                   console.error('[WEBUI] Server was unable to download file:', url);
                   console.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
@@ -494,36 +495,48 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
     }
   }
 
-  function download_mojang_versions() {
-    var request = require('request');
-    var fs = require('fs');
-
-    var MOJANG_VERSIONS_URL = 'http://s3.amazonaws.com/Minecraft.Download/versions/versions.json';
-    var path_prefix = path.join(base_dir, mineos.DIRS['profiles'], 'vanilla');
-
-    request({
-      url: MOJANG_VERSIONS_URL,
-      json: true
-    }, function (error, response, body) {
-      if (!error && response.statusCode === 200) {
-        for (var index in body.versions) {
-          var item = body.versions[index];
-          item['group'] = 'mojang';
-          item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], 'vanilla', item.id, 'minecraft_server.{0}.jar'.format(item.id)));
-
-          self.profiles[item.id] = item;
-        }
-
-        self.front_end.emit('profile_list', self.profiles);
-      }
+  self.send_profiles = function() {
+    async.parallel([
+      async.apply(self.check_profiles.mojang)
+    ], function(err, results) {
+      //http://stackoverflow.com/a/10865042/1191579
+      var merged = [];
+      merged = merged.concat.apply(merged, results);
+      self.front_end.emit('profile_list', merged);
     })
   }
 
+  self.check_profiles = {
+    mojang: function(callback) {
+      var request = require('request');
+      var fs = require('fs');
+
+      var MOJANG_VERSIONS_URL = 'http://s3.amazonaws.com/Minecraft.Download/versions/versions.json';
+      var path_prefix = path.join(base_dir, mineos.DIRS['profiles'], 'vanilla');
+
+      function handle_reply(err, response, body) {
+        var p = [];
+
+        if (!err && response.statusCode === 200)
+          for (var index in body.versions) {
+            var item = body.versions[index];
+            item['group'] = 'mojang';
+            item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], 'vanilla', item.id, 'minecraft_server.{0}.jar'.format(item.id)));
+
+            p.push(item);
+          }
+
+        callback(err, p);
+      }
+      request({ url: MOJANG_VERSIONS_URL, json: true }, handle_reply);
+    }
+  }
+    
   self.front_end.on('connection', function(socket) {
     console.info('[WEBUI] User connected from', socket.request.connection.remoteAddress);
     self.front_end.emit('server_list', Object.keys(self.servers));
     socket.on('command', self.webui_dispatcher);
-    async.setImmediate(download_mojang_versions);
+    self.send_profiles();
   })
 
   return self;

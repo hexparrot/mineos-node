@@ -71,7 +71,13 @@ app.filter('profile_filter', function() {
           if (profiles[index].downloaded)
             keep.push(profiles[index]);
         break;
-      case '*':
+      case undefined:
+        //showonly is unset by user
+        for (var index in profiles)
+          if (profiles[index].type == 'release')
+            keep.push(profiles[index]);
+        break;
+      case '':
         keep = profiles;
         break;
       default:
