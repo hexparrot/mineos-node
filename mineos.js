@@ -107,6 +107,7 @@ mineos.mc = function(server_name, base_dir) {
     cwd: path.join(base_dir, mineos.DIRS['servers'], server_name),
     bwd: path.join(base_dir, mineos.DIRS['backup'], server_name),
     awd: path.join(base_dir, mineos.DIRS['archive'], server_name),
+    pwd: path.join(base_dir, mineos.DIRS['profiles']),
     sp: path.join(base_dir, mineos.DIRS['servers'], server_name, 'server.properties'),
     sc: path.join(base_dir, mineos.DIRS['servers'], server_name, 'server.config')
   }
@@ -233,8 +234,11 @@ mineos.mc = function(server_name, base_dir) {
       },
       'jarfile': function (cb) {
         server_config(function (err, dict) {
-          var value = (dict.java || {}).jar_file || 'minecraft_server.jar';
-          cb((value.length ? null : 'Minecraft server jar filename must have length > 0'), value);
+          var profile = (dict.minecraft || {}).profile;
+          if (!profile)
+            cb('Server not assigned a runnable jar')
+          else
+            cb(null, 'minecraft_server.{0}.jar'.format(profile));
         });
       },
       'jar_args': function (cb) {
@@ -259,13 +263,12 @@ mineos.mc = function(server_name, base_dir) {
   self.start = function(callback) {
     var binary = which.sync('screen');
     var params = { cwd: self.env.cwd };
-    var orig_filepath = path.join(JAR_PATH, 'minecraft_server.1.7.9.jar');
-    var dest_filename = 'minecraft_server.jar';
 
-    async.series([
+    var args = null;
+
+    async.waterfall([
       async.apply(self.verify, 'exists'),
       async.apply(self.verify, '!up'),
-      async.apply(fs.copy, orig_filepath, path.join(self.env.cwd, dest_filename)),
       function(cb) {
         self.property('owner', function(err, result) {
           params['uid'] = result['uid'];
@@ -273,16 +276,23 @@ mineos.mc = function(server_name, base_dir) {
           cb(err);
         })
       },
+      async.apply(self.get_start_args),
+      function(start_args, cb) {
+        args = start_args;
+        cb(null);
+      },
+      async.apply(self.sc),
+      function(sc, cb) {
+        var orig_profile_path = path.join(self.env.pwd, sc.minecraft.profile, args[7]);
+        var dest_filepath = path.join(self.env.cwd, args[7]);
+        fs.copy(orig_profile_path, dest_filepath, function (err) {
+          cb(err);
+        })
+      },
       function(cb) {
-        self.get_start_args(function(err, args) {
-          if (err)
-            cb(err)
-          else {
-            var proc = child_process.spawn(binary, args, params);
-            proc.once('close', function(code) {
-              cb(code);
-            })
-          }
+        var proc = child_process.spawn(binary, args, params);
+        proc.once('close', function(code) {
+          cb(code);
         })
       }
     ], callback);
