@@ -487,7 +487,6 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
               .on('complete', function(response) {
                 if (response.statusCode == 200) {
                   console.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
-                  console.log(err);
                   args['dest_dir'] = dest_dir;
                   args['filename'] = filename;
                   args['success'] = true;

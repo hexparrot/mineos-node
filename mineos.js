@@ -190,6 +190,7 @@ mineos.mc = function(server_name, base_dir) {
       async.apply(fs.ensureFile, self.env.sc),
       async.apply(self.sc),
       async.apply(self.modify_sc, 'java', 'java_xmx', '256'),
+      async.apply(self.modify_sc, 'minecraft', 'profile', '1.7.9'),
       async.apply(fs.chown, self.env.cwd, owner['uid'], owner['gid']),
       async.apply(fs.chown, self.env.bwd, owner['uid'], owner['gid']),
       async.apply(fs.chown, self.env.awd, owner['uid'], owner['gid']),
