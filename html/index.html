@@ -213,61 +213,63 @@
                                     <li class="accordion-group" ng-show="current">
                                         <a ng-click="change_page('server_status')">
                                             <span class="icon icone-globe"></span>
-                                            <span class="text" translate="SERVER_STATUS">s</span>
+                                            <span class="text" translate="SERVER_STATUS"></span>
                                         </a>
                                     </li>
                                     <!--/ END Menu -->
 
                                     <!-- START Menu -->
                                     <li class="accordion-group" ng-show="current">
-                                        <a data-toggle="collapse" data-parent="#navigation" href="#submenu0">
-                                            <span class="icon icone-hdd"></span>
-                                            <span class="text" translate="BACKUPS_AND_RESTORES"></span>
-                                            <span class="arrow icone-caret-down"></span>
-                                        </a>
-                                        <!-- START Submenu Menu -->
-                                        <ul id="submenu0" class="collapse">
-                                            <li class=""><a ng-click="change_page('restore_points')"><span class="icon icone-angle-right"></span> {{ 'RESTORE_POINTS' | translate }}</a></li>
-                                            <li class=""><a ng-click="change_page('archives')"><span class="icon icone-angle-right"></span> {{ 'ARCHIVES' | translate }}</a></li>
-                                            <li class=""><a ng-click="change_page('cron')"><span class="icon icone-angle-right"></span> {{ 'SCHEDULING' | translate }}</a></li>
-                                        </ul>
-                                        <!--/ END Submenu Menu -->
-                                    </li>
-                                    <!--/ END Menu -->
-
-                                    <!-- START Menu -->
-                                    <li class="accordion-group" ng-show="current">
-                                        <a data-toggle="collapse" data-parent="#navigation" href="#submenu1">
+                                        <a ng-click="change_page('server_properties')">
                                             <span class="icon iconm-pencil-5"></span>
-                                            <span class="text" translate="CONFIGURATION"></span>
-                                            <span class="arrow icone-caret-down"></span>
+                                            <span class="text">server.properties</span>
                                         </a>
-                                        <!-- START Submenu Menu -->
-                                        <ul id="submenu1" class="collapse">
-                                            <li class=""><a ng-click="change_page('server_properties')"><span class="icon icone-angle-right"></span> server.properties</a></li>
-                                            <li class=""><a ng-click="change_page('java')"><span class="icon icone-angle-right"></span> {{ 'JAVA' | translate }}</a></li>
-                                            <li class=""><a ng-click="change_page('maintenance')"><span class="icon icone-angle-right"></span> {{ 'GAME_MAINTENANCE' | translate }}</a></li>
-                                        </ul>
-                                        <!--/ END Submenu Menu -->
+                                    </li>
+                                    <!--/ END Menu -->
+
+                                    <!-- START Menu Divider -->
+                                    <li class="divider" translate="BACKUPS_AND_RESTORES" ng-show="current"></li>
+                                    <!--/ END Menu Divider -->
+
+                                    <!-- START Menu -->
+                                    <li class="accordion-group" ng-show="current">
+                                        <a ng-click="change_page('restore_points')">
+                                            <span class="icon icone-hdd"></span>
+                                            <span class="text" translate="RESTORE_POINTS"></span>
+                                        </a>
                                     </li>
                                     <!--/ END Menu -->
 
                                     <!-- START Menu -->
                                     <li class="accordion-group" ng-show="current">
-                                        <a data-toggle="collapse" data-parent="#navigation" href="#submenu2">
-                                            <span class="icon icone-desktop"></span>
-                                            <span class="text" translate="LOGGING"></span>
-                                            <span class="arrow icone-caret-down"></span>
+                                        <a ng-click="change_page('archives')">
+                                            <span class="icon icone-hdd"></span>
+                                            <span class="text" translate="ARCHIVES"></span>
                                         </a>
-                                        <!-- START Submenu Menu -->
-                                        <ul id="submenu2" class="collapse ">
-                                            <li class=""><a ng-click="change_page('console')"><span class="icon icone-angle-right"></span> {{ 'CONSOLE' | translate }}</a></li>
-                                            <li class=""><a ng-click="change_page('otherfiles')"><span class="icon icone-angle-right"></span> {{ 'OTHER_FILES' | translate }}</a></li>
-                                        </ul>
-                                        <!--/ END Submenu Menu -->
                                     </li>
                                     <!--/ END Menu -->
-                                    
+
+                                    <!-- START Menu -->
+                                    <li class="accordion-group" ng-show="current">
+                                        <a ng-click="change_page('cron')">
+                                            <span class="icon icone-time"></span>
+                                            <span class="text" translate="SCHEDULING"></span>
+                                        </a>
+                                    </li>
+                                    <!--/ END Menu -->
+
+                                    <!-- START Menu Divider -->
+                                    <li class="divider" translate="LOGGING" ng-show="current"></li>
+                                    <!--/ END Menu Divider -->
+
+                                    <!-- START Menu -->
+                                    <li class="accordion-group" ng-show="current">
+                                        <a ng-click="change_page('console')">
+                                            <span class="icon icone-desktop"></span>
+                                            <span class="text" translate="CONSOLE"></span>
+                                        </a>
+                                    </li>
+                                    <!--/ END Menu -->                                    
                                 </ul>
                             </nav>
                             <!--/ END Sidebar Menu -->
