@@ -42,6 +42,25 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
       })
   })();
 
+  (function() {
+    var profile_path = path.join(base_dir, mineos.DIRS['profiles']);
+    var regex_profiles = new RegExp('{0}\/[a-zA-Z0-9_\.]+\/.+'.format(profile_path));
+    self.watcher = chokidar.watch(profile_path, { persistent: true, ignored: regex_profiles });
+    // ignores event updates from profiles that have more path beyond the /profiles/<dirhere>/<filehere>
+
+    self.watcher
+      .on('addDir', function(dirpath) {
+        // event to trigger when new profile detected, e.g., /var/games/minecraft/profiles/<newdirhere>
+        console.log('[WEBUI] new profile detected: {0}'.format(dirpath));
+        self.send_profile_list();
+      })
+      .on('unlinkDir', function(dirpath) {
+        // event to trigger when profile directory deleted
+        console.log('[WEBUI] profile directory deletion detected: {0}'.format(dirpath));
+        self.send_profile_list();
+      })
+  })();
+
   function host_heartbeat() {
     self.front_end.emit('host_heartbeat', {
       'uptime': os.uptime(),
@@ -454,7 +473,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         var request = require('request');
         var fs = require('fs-extra');
 
-        var dest_dir = '/var/games/minecraft/profiles/vanilla/{0}'.format(args.id);
+        var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.id);
         var filename = 'minecraft_server.{0}.jar'.format(args.id);
         var dest_filepath = path.join(dest_dir, filename);
 
@@ -474,7 +493,6 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
                   args['success'] = true;
                   args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
                   self.front_end.emit('file_download', args);
-                  self.send_profiles();
                 } else {
                   console.error('[WEBUI] Server was unable to download file:', url);
                   console.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
@@ -495,7 +513,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
     }
   }
 
-  self.send_profiles = function() {
+  self.send_profile_list = function() {
     async.parallel([
       async.apply(self.check_profiles.mojang)
     ], function(err, results) {
@@ -512,7 +530,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
       var fs = require('fs');
 
       var MOJANG_VERSIONS_URL = 'http://s3.amazonaws.com/Minecraft.Download/versions/versions.json';
-      var path_prefix = path.join(base_dir, mineos.DIRS['profiles'], 'vanilla');
+      var path_prefix = path.join(base_dir, mineos.DIRS['profiles']);
 
       function handle_reply(err, response, body) {
         var p = [];
@@ -521,7 +539,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           for (var index in body.versions) {
             var item = body.versions[index];
             item['group'] = 'mojang';
-            item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], 'vanilla', item.id, 'minecraft_server.{0}.jar'.format(item.id)));
+            item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, 'minecraft_server.{0}.jar'.format(item.id)));
 
             p.push(item);
           }
@@ -536,7 +554,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
     console.info('[WEBUI] User connected from', socket.request.connection.remoteAddress);
     self.front_end.emit('server_list', Object.keys(self.servers));
     socket.on('command', self.webui_dispatcher);
-    self.send_profiles();
+    self.send_profile_list();
   })
 
   return self;
