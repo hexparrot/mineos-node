@@ -1015,12 +1015,7 @@ test.previous_version = function(test) {
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   async.series([
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.create, OWNER_CREDS),
     function(callback) {
       instance.backup(function(err) {
         test.ifError(err);
@@ -1065,15 +1060,10 @@ test.previous_property = function(test) {
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   async.series([
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.create, OWNER_CREDS),
     function(callback) {
       instance.previous_property('1B', function(err, psp) {
-        test.ok(err); //testing for error
+        test.ifError(!err); //testing for error
         test.equal(psp, null);
         callback(!err);
       })
@@ -1099,7 +1089,7 @@ test.previous_property = function(test) {
     }
   ], function(err, results) {
     test.ifError(err);
-    test.expect(8);
+    test.expect(7);
     test.done();
   })
 }
@@ -1115,35 +1105,22 @@ test.stuff = function(test) {
         callback(!err);
       })
     },
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.create, OWNER_CREDS),
     function(callback) {
       instance.stuff('op hexparrot', function(err, proc) {
         test.ok(err); //looking for positive error
         callback(!err);
       })
     },
+    async.apply(instance.start),
     function(callback) {
-      setTimeout(function() {
-        instance.start(function(err) {
-          test.ifError(err);
-          callback(err);
-        })
-      }, PROC_START_DELAY_MS*100)
+      setTimeout(callback, 10000);
     },
-    function(callback) {
-      instance.stuff('op hexparrot', function(err, proc) {
-        test.ifError(err);
-        callback(err);
-      })
-    }
-  ], function(err, results) {
+    async.apply(instance.stuff, 'op hexparrot'),
+    async.apply(instance.kill)
+  ], function(err) {
     test.ifError(err);
-    test.expect(6);
+    test.expect(3);
     test.done();
   })
 }
