@@ -15,17 +15,29 @@ var OWNER_CREDS = {
   gid: userid.gid(whoami)
 }
 
-test.tearDown = function(callback) {
+function delete_everything(callback) {
   var server_list = new mineos.server_list(BASE_DIR);
 
-  for (var i in server_list) {
-    var instance = new mineos.mc(server_list[i], BASE_DIR);
+  function delete_server(server_name, cb) {
+    var instance = new mineos.mc(server_name, BASE_DIR);
 
-    fs.removeSync(instance.env.cwd);
-    fs.removeSync(instance.env.bwd);
-    fs.removeSync(instance.env.awd);
+    async.series([
+      function(c) { instance.kill(function(err) { c() }) },
+      async.apply(fs.remove, instance.env.cwd),
+      async.apply(fs.remove, instance.env.bwd),
+      async.apply(fs.remove, instance.env.awd)
+    ], cb)
   }
-  callback();
+
+  async.each(server_list, delete_server, callback)
+}
+
+test.setUp = function(callback) {
+  delete_everything(callback);
+}
+
+test.tearDown = function(callback) {
+  delete_everything(callback);
 }
 
 test.server_list = function (test) {
@@ -1081,7 +1093,7 @@ test.previous_property = function(test) {
     test.done();
   })
 }
-/*
+
 test.stuff = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
