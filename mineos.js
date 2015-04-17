@@ -395,7 +395,7 @@ mineos.mc = function(server_name, base_dir) {
       },
       function(cb) {
         var proc = child_process.spawn(binary, args, params);
-        proc.once('close', function(code) {
+        proc.once('exit', function(code) {
           cb(code);
         })
       }

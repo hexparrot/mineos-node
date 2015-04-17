@@ -408,30 +408,25 @@ test.kill = function(test) {
     test.done();
   })
 }
-
+*/
 test.archive = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   async.series([
     async.apply(instance.create, OWNER_CREDS),
-    function(callback) {
-      instance.archive(function(err, proc) {
-        test.ifError(err);
-        setTimeout(function() { callback(err) }, FS_DELAY_MS)
-      })
-    },
+    async.apply(instance.archive),
     function(callback) {
       test.equal(fs.readdirSync(instance.env.awd).length, 1);
       callback(null);
     }
   ], function(err) {
     test.ifError(err);
-    test.expect(3);
+    test.expect(2);
     test.done();
   })
 }
-
+/*
 test.backup = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -930,18 +925,11 @@ test.list_archive = function(test) {
       })
     },
     async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.archive),
     function(callback) {
-      instance.archive(function(err) {
-        test.ifError(err);
-        setTimeout(function() { callback(err) }, 400);
-      })
+      setTimeout(function() {callback()}, 1000);
     },
-    function(callback) {
-      instance.archive(function(err) {
-        test.ifError(err);
-        setTimeout(function() { callback(err) }, 400);
-      })
-    },
+    async.apply(instance.archive),
     function(callback) {
       instance.list_archives(function(err, archives) {
         test.ifError(err);
@@ -951,7 +939,7 @@ test.list_archive = function(test) {
     }
   ], function(err, results) {
     test.ifError(err);
-    test.expect(7);
+    test.expect(5);
     test.done();
   })  
 }
