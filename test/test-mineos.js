@@ -63,12 +63,7 @@ test.is_server = function(test) {
         callback(err);
       })
     },
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.create, OWNER_CREDS),
     function(callback) {
       instance.property('exists', function(err, result) {
         test.ifError(err);
@@ -76,9 +71,9 @@ test.is_server = function(test) {
         callback(err);
       })
     },
-  ], function(err, results) {
+  ], function(err) {
     test.ifError(err);
-    test.expect(6);
+    test.expect(5);
     test.done();
   })
 }
@@ -90,42 +85,38 @@ test.create_server = function(test) {
   test.equal(mineos.server_list(BASE_DIR).length, 0);
 
   async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(fs.stat, instance.env.cwd),
+    async.apply(fs.stat, instance.env.bwd),
+    async.apply(fs.stat, instance.env.awd),
+    async.apply(fs.stat, instance.env.sp),
+    async.apply(fs.stat, instance.env.sc),
     function(callback) {
-      instance.create(OWNER_CREDS, function(err){
-        test.ifError(err);
+      test.equal(fs.statSync(instance.env.cwd).uid, OWNER_CREDS['uid']);
+      test.equal(fs.statSync(instance.env.bwd).uid, OWNER_CREDS['uid']);
+      test.equal(fs.statSync(instance.env.awd).uid, OWNER_CREDS['uid']);
+      test.equal(fs.statSync(instance.env.sp).uid, OWNER_CREDS['uid']);
+      test.equal(fs.statSync(instance.env.sc).uid, OWNER_CREDS['uid']);
 
-        test.ok(fs.existsSync(instance.env.cwd));
-        test.ok(fs.existsSync(instance.env.bwd));
-        test.ok(fs.existsSync(instance.env.awd));
-        test.ok(fs.existsSync(instance.env.sp));
-        test.ok(fs.existsSync(instance.env.sc));
+      test.equal(fs.statSync(instance.env.cwd).gid, OWNER_CREDS['gid']);
+      test.equal(fs.statSync(instance.env.bwd).gid, OWNER_CREDS['gid']);
+      test.equal(fs.statSync(instance.env.awd).gid, OWNER_CREDS['gid']);
+      test.equal(fs.statSync(instance.env.sp).gid, OWNER_CREDS['gid']);
+      test.equal(fs.statSync(instance.env.sc).gid, OWNER_CREDS['gid']);
 
-        test.equal(fs.statSync(instance.env.cwd).uid, OWNER_CREDS['uid']);
-        test.equal(fs.statSync(instance.env.bwd).uid, OWNER_CREDS['uid']);
-        test.equal(fs.statSync(instance.env.awd).uid, OWNER_CREDS['uid']);
-        test.equal(fs.statSync(instance.env.sp).uid, OWNER_CREDS['uid']);
-        test.equal(fs.statSync(instance.env.sc).uid, OWNER_CREDS['uid']);
-
-        test.equal(fs.statSync(instance.env.cwd).gid, OWNER_CREDS['gid']);
-        test.equal(fs.statSync(instance.env.bwd).gid, OWNER_CREDS['gid']);
-        test.equal(fs.statSync(instance.env.awd).gid, OWNER_CREDS['gid']);
-        test.equal(fs.statSync(instance.env.sp).gid, OWNER_CREDS['gid']);
-        test.equal(fs.statSync(instance.env.sc).gid, OWNER_CREDS['gid']);
-
-        test.equal(mineos.server_list(BASE_DIR)[0], server_name);
-        test.equal(mineos.server_list(BASE_DIR).length, 1);
-        callback(err);
-      })
+      test.equal(mineos.server_list(BASE_DIR)[0], server_name);
+      test.equal(mineos.server_list(BASE_DIR).length, 1);
+      callback();
     },
     function(callback) {
       instance.create(OWNER_CREDS, function(err){
-        test.ok(err); //testing for error
+        test.ifError(!err);
         callback(!err);
       })
     }
-  ], function(err, results) {
+  ], function(err) {
     test.ifError(err);
-    test.expect(21);
+    test.expect(15);
     test.done();
   })
 }
@@ -137,31 +128,26 @@ test.server_ownership = function(test) {
   async.series([
     function(callback) {
       instance.property('owner', function(err, result) {
-        test.ok(err); //expected to throw an error
+        test.ifError(!err);
         test.equal(Object.keys(result).length, 0);
         callback(!err);
       })
     },
     function(callback) {
       instance.property('owner_uid', function(err, result) {
-        test.ok(err); //expected to throw an error
+        test.ifError(!err);
         test.equal(result, null);
         callback(!err);
       })
     },
     function(callback) {
       instance.property('owner_gid', function(err, result) {
-        test.ok(err); //expected to throw an error
+        test.ifError(!err);
         test.equal(result, null);
         callback(!err);
       })
     },
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.create, OWNER_CREDS),
     function(callback) {
       instance.property('owner_uid', function(err, result) {
         test.ifError(err);
@@ -184,9 +170,9 @@ test.server_ownership = function(test) {
         callback(err);
       })
     }
-  ], function(err, results) {
+  ], function(err) {
     test.ifError(err);
-    test.expect(15);
+    test.expect(14);
     test.done();
   })
 }
@@ -198,39 +184,17 @@ test.delete_server = function(test) {
   async.series([
     function(callback) {
       instance.delete(function(err) {
-        test.ok(err); //testing for error
+        test.ifError(!err);
         callback(!err);
       })
     },
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
-    function(callback) {
-      instance.property('exists', function(err, result) {
-        test.ifError(err);
-        test.ok(result);
-        callback(err);
-      })
-    },
-    function(callback) {
-      instance.delete(function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
-    function(callback) {
-      instance.property('!exists', function(err, result) {
-        test.ifError(err);
-        test.ok(result);
-        callback(err);
-      })
-    }
-  ], function(err, results) {
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.verify, 'exists'),
+    async.apply(instance.delete),
+    async.apply(instance.verify, '!exists'),
+  ], function(err) {
     test.ifError(err);
-    test.expect(8);
+    test.expect(2);
     test.done();
   })
 }
@@ -281,12 +245,7 @@ test.get_start_args = function(test) {
 
   async.series([
     async.apply(instance.create, OWNER_CREDS),
-    function(callback) {
-      instance.get_start_args(function(err, args) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.get_start_args),
     async.apply(instance.modify_sc, 'java', 'java_xmx', '-256'),
     function(callback) {
       instance.get_start_args(function(err, args) {
@@ -323,7 +282,7 @@ test.get_start_args = function(test) {
         callback(err);
       })
     },
-  ], function(err, results) {
+  ], function(err) {
     test.ifError(err);
     test.done();
   })
@@ -336,22 +295,12 @@ test.start = function(test) {
   async.series([
     function(callback) {
       instance.stuff('stop', function(err, proc) {
-        test.ok(err); //looking for positive error
+        test.ifError(!err);
         callback(!err);
       })
     },
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
-    function(callback) {
-      instance.start(function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.start),
     function(callback) {
       instance.property('screen_pid', function(err, pid) {
         test.ifError(err);
@@ -370,21 +319,14 @@ test.start = function(test) {
     },
     function(callback) {
       instance.start(function(err) {
-        test.ok(err); //looking for positive error
+        test.ifError(!err);
         callback(!err);
       })
     },
-    function(callback) {
-      setTimeout(function() {
-        instance.kill(function(err) {
-          test.ifError(err);
-          callback(err);
-        })
-      }, PROC_START_DELAY_MS)
-    }
+    async.apply(instance.kill)
   ], function(err, results) {
     test.ifError(err);
-    test.expect(12);
+    test.expect(9);
     test.done();
   })
 }
@@ -396,47 +338,18 @@ test.stop = function(test) {
   async.series([
     function(callback) {
       instance.stop(function(err) {
-        test.ok(err); //testing for error
+        test.ifError(!err);
         callback(!err);
       })
     },
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
-    function(callback) {
-      instance.start(function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
-    function(callback) {
-      instance.property('screen_pid', function(err, pid) {
-        test.ifError(err);
-        test.ok(pid > 0);
-        callback(err);
-      })
-    },
-    function(callback) {
-      setTimeout(function() {
-        instance.stop(function(err) {
-          test.ifError(err);
-          callback(err);
-        })
-      }, PROC_START_DELAY_MS)
-    },
-    function(callback) {
-      instance.property('!up', function(err, result) {
-        test.ifError(err);
-        test.ok(result);
-        callback(err);
-      })
-    }
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.start),
+    async.apply(instance.verify, 'up'),
+    async.apply(instance.stop),
+    async.apply(instance.verify, '!up')
   ], function(err, results) {
     test.ifError(err);
-    test.expect(9);
+    test.expect(2);
     test.done();
   })
 }
@@ -446,40 +359,17 @@ test.stop_and_backup = function(test) {
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.start),
+    async.apply(instance.stop_and_backup),
+    async.apply(instance.verify, '!up'),
     function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
-    function(callback) {
-      instance.start(function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
-    function(callback) {
-      instance.stop_and_backup(function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
-    function(callback) {
-      instance.property('!up', function(err, result) {
-        test.ifError(err);
-        test.ok(result);
-        callback(err);
-      })
-    },
-    function(callback) {
-      setTimeout(function() {
-        test.ok(fs.readdirSync(instance.env.bwd).length > 2);
-        callback(null);
-      }, FS_DELAY_MS)
+      test.ok(fs.readdirSync(instance.env.bwd).length > 2);
+      callback(null);
     }
-  ], function(err, results) {
+  ], function(err) {
     test.ifError(err);
-    test.expect(7);
+    test.expect(2);
     test.done();
   })
 }
@@ -491,59 +381,30 @@ test.kill = function(test) {
   async.series([
     function(callback) {
       instance.kill(function(err) {
-        test.ok(err); //testing for error
+        test.ifError(!err);
         callback(!err);
       })
     },
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.create, OWNER_CREDS),
     function(callback) {
       instance.kill(function(err) {
-        test.ok(err); //this should throw an error
+        test.ifError(!err);
         callback(!err);
       })
     },
-    function(callback) {
-      instance.start(function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
-    function(callback) {
-      instance.property('up', function(err, result) {
-        test.ifError(err);
-        test.ok(result);
-        callback(err);
-      })
-    },
-    function(callback) {
-      setTimeout(function() {
-        instance.kill(function(err) {
-          test.ifError(err);
-          callback(err);
-        })
-      }, 200)
-    },
-    function(callback) {
-      instance.property('up', function(err, result) {
-        test.ifError(err);
-        test.ok(!result);
-        callback(err);
-      })
-    },
+    async.apply(instance.start),
+    async.apply(instance.verify, 'up'),
+    async.apply(instance.kill),
+    async.apply(instance.verify, '!up'),
     function(callback) {
       instance.kill(function(err) {
-        test.ok(err); //testing for error
+        test.ifError(!err);
         callback(!err);
       })
     }
-  ], function(err, results) {
+  ], function(err) {
     test.ifError(err);
-    test.expect(11);
+    test.expect(4);
     test.done();
   })
 }
@@ -553,12 +414,7 @@ test.archive = function(test) {
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   async.series([
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.create, OWNER_CREDS),
     function(callback) {
       instance.archive(function(err, proc) {
         test.ifError(err);
@@ -569,9 +425,9 @@ test.archive = function(test) {
       test.equal(fs.readdirSync(instance.env.awd).length, 1);
       callback(null);
     }
-  ], function(err, results) {
+  ], function(err) {
     test.ifError(err);
-    test.expect(4);
+    test.expect(3);
     test.done();
   })
 }
@@ -581,25 +437,15 @@ test.backup = function(test) {
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   async.series([
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
-    function(callback) {
-      instance.backup(function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.backup),
     function(callback) {
       test.equal(fs.readdirSync(instance.env.bwd).length, 3);
       callback(null);
     }
-  ], function(err, results) {
+  ], function(err) {
     test.ifError(err);
-    test.expect(4);
+    test.expect(2);
     test.done();
   })
 }
@@ -609,39 +455,18 @@ test.restore = function(test) {
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   async.series([
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
-    function(callback) {
-      instance.backup(function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
-    function(callback) {
-      fs.removeSync(instance.env.cwd);
-      instance.property('!exists', function(err, result) {
-        test.ifError(err);
-        test.ok(result);
-        callback(err);
-      })
-    },
-    function(callback) {
-      instance.restore('now', function(err) {
-        test.ifError(err);
-        callback(err)
-      })
-    },
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.backup),
+    async.apply(fs.remove, instance.env.cwd),
+    async.apply(instance.verify, '!exists'),
+    async.apply(instance.restore, 'now'),
     function(callback) {
       test.equal(fs.readdirSync(instance.env.cwd).length, 2);
       callback(null);
     }
-  ], function(err, results) {
+  ], function(err) {
     test.ifError(err);
-    test.expect(7);
+    test.expect(2);
     test.done();
   })
 }
@@ -651,18 +476,8 @@ test.sc = function(test) {
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   async.series([
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
-    function(callback) {
-      instance.modify_sc('java', 'java_xmx', '512', function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.modify_sc, 'java', 'java_xmx', '512'),
     function(callback) {
       instance.sc(function(err, dict) {
         test.ifError(err);
@@ -670,12 +485,7 @@ test.sc = function(test) {
         callback(err);
       })
     },
-    function(callback) {
-      instance.modify_sc('java', 'java_xms', '256', function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.modify_sc, 'java', 'java_xms', '256'),
     function(callback) {
       instance.sc(function(err, dict) {
         test.ifError(err);
@@ -684,12 +494,7 @@ test.sc = function(test) {
         callback(err);
       })
     },
-    function(callback) {
-      instance.modify_sc('java', 'java_xmx', '1024', function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.modify_sc, 'java', 'java_xmx', '1024'),
     function(callback) {
       instance.sc(function(err, dict) {
         test.ifError(err);
@@ -698,9 +503,9 @@ test.sc = function(test) {
         callback(err);
       })
     },
-  ], function(err, results) {
+  ], function(err) {
     test.ifError(err);
-    test.expect(13);
+    test.expect(9);
     test.done();
   })
 }
@@ -710,12 +515,7 @@ test.sp = function(test) {
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   async.series([
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.create, OWNER_CREDS),
     function(callback) {
       instance.sp(function(err, dict) {
         test.ifError(err);
@@ -723,12 +523,7 @@ test.sp = function(test) {
         callback(err);
       })
     },
-    function(callback) {
-      instance.modify_sp('server-port', '25570', function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.modify_sp, 'server-port', '25570'),
     function(callback) {
       instance.sp(function(err, dict) {
         test.ifError(err);
@@ -736,9 +531,9 @@ test.sp = function(test) {
         callback(err);
       })
     }
-  ], function(err, results) {
+  ], function(err) {
     test.ifError(err);
-    test.expect(7);
+    test.expect(5);
     test.done();
   })
 }
@@ -911,7 +706,7 @@ test.properties = function(test) {
         })
       }, 200)
     }
-  ], function(err, results) {
+  ], function(err) {
     test.ifError(err);
     test.expect(48);
     test.done();
@@ -923,106 +718,59 @@ test.verify = function(test) {
   var instance = new mineos.mc(server_name, BASE_DIR);
   
   async.series([
-    function(callback) {
-      instance.verify('!exists', function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.verify, '!exists'),
     function(callback) {
       instance.verify('exists', function(err) {
-        test.ok(err); //testing for error
+        test.ifError(!err);
         test.equal(err, 'exists');
         callback(!err);
       })
     },
-    function(callback) {
-      instance.verify('!up', function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.verify, '!up'),
     function(callback) {
       instance.verify('up', function(err) {
-        test.ok(err); //testing for error
+        test.ifError(!err);
         test.equal(err, 'up');
         callback(!err);
       })
     },
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.create, OWNER_CREDS),
     function(callback) {
       instance.verify('!exists', function(err) {
-        test.ok(err); //testing for error
+        test.ifError(!err);
         test.equal(err, '!exists');
         callback(!err);
       })
     },
-    function(callback) {
-      instance.verify('exists', function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
-    function(callback) {
-      instance.verify('!up', function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.verify, 'exists'),
+    async.apply(instance.verify, '!up'),
     function(callback) {
       instance.verify('up', function(err) {
-        test.ok(err); //testing for error
+        test.ifError(!err);
         test.equal(err, 'up');
         callback(!err);
       })
     },
-    function(callback) {
-      instance.start(function(err) {
-        test.ifError(err);
-        callback(null);
-      })
-    },
+    async.apply(instance.start),
     function(callback) {
       instance.verify('!exists', function(err) {
-        test.ok(err); //testing for error
+        test.ifError(!err);
         test.equal(err, '!exists');
         callback(!err);
       })
     },
-    function(callback) {
-      instance.verify('exists', function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.verify, 'exists'),
     function(callback) {
       instance.verify('!up', function(err) {
-        test.ok(err); //testing for error
+        test.ifError(!err);
         test.equal(err, '!up');
         callback(!err);
       })
     },
-    function(callback) {
-      instance.verify('up', function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
-    function(callback) {
-      setTimeout(function() {
-        instance.kill(function(err) {
-          test.ifError(err);
-          callback(null);
-        })
-      }, 200)
-    }
-  ], function(err, results) {
-    test.expect(21);
+    async.apply(instance.verify, 'up'),
+    async.apply(instance.kill)
+  ], function(err) {
+    test.expect(12);
     test.done();
   })
 }
@@ -1032,18 +780,8 @@ test.ping = function(test) {
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   async.series([
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
-    function(callback) {
-      instance.start(function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.start),
     function(callback) {
       setTimeout(function() {
         instance.ping(function(err, pingback) {
@@ -1057,17 +795,10 @@ test.ping = function(test) {
         })
       }, 15000)
     },
-    function(callback) {
-      setTimeout(function() {
-        instance.kill(function(err) {
-          test.ifError(err);
-          callback(err);
-        })
-      }, 200)
-    }
-  ], function(err, results) {
+    async.apply(instance.kill)
+  ], function(err) {
     test.ifError(err);
-    test.expect(10);
+    test.expect(7);
     test.done();
   })
 }
@@ -1078,18 +809,11 @@ test.memory = function(test) {
   var memory_regex = /(\d+) kB/
 
   async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.start),
     function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
-    function(callback) {
-      instance.start(function(err) {
-        test.ifError(err);
-        setTimeout(function() {
-          callback(err);
-        }, PROC_START_DELAY_MS) 
+      instance.start(function() {
+        setTimeout(callback, 400);
       })
     },
     function(callback) {
@@ -1103,15 +827,10 @@ test.memory = function(test) {
         callback(err);
       })
     },
-    function(callback) {
-      instance.kill(function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    }
-  ], function(err, results) {
+    async.apply(instance.kill)
+  ], function(err) {
     test.ifError(err);
-    test.expect(10);
+    test.expect(7);
     test.done();
   })  
 }
@@ -1127,12 +846,7 @@ test.list_increments = function(test) {
         callback(!err);
       })
     },
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.create, OWNER_CREDS),
     function(callback) {
       instance.list_increments(function(err, increments) {
         test.ok(err); // testing for error
@@ -1140,21 +854,19 @@ test.list_increments = function(test) {
       })
     },
     function(callback) {
-      instance.backup(function(err) {
-        test.ifError(err);
-        setTimeout(function() { callback(err) }, FS_DELAY_MS*3);
+      instance.backup(function() {
+        setTimeout(callback, 400);
       })
     },
     function(callback) {
-      instance.modify_sp('server-port', 25570, function(err) {
-        test.ifError(err);
-        setTimeout(function() { callback(err) }, FS_DELAY_MS*3);
+      instance.modify_sp('server-port', 25570, function() {
+        setTimeout(callback, 400);
       })
     },
+    async.apply(instance.modify_sp, 'server-port', 25570),
     function(callback) {
-      instance.backup(function(err) {
-        test.ifError(err);
-        setTimeout(function() { callback(err) }, FS_DELAY_MS*3);
+      instance.backup(function() {
+        setTimeout(callback, 400);
       })
     },
     function(callback) {
@@ -1172,7 +884,7 @@ test.list_increments = function(test) {
     }
   ], function(err, results) {
     test.ifError(err);
-    test.expect(17);
+    test.expect(13);
     test.done();
   })  
 }
@@ -1182,12 +894,7 @@ test.modify_sp = function(test) {
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   async.series([
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.create, OWNER_CREDS),
     function(callback) {
       instance.sp(function(err, props) {
         test.ifError(err);
@@ -1195,22 +902,17 @@ test.modify_sp = function(test) {
         callback(err);
       })
     },
-    function(callback) {
-      instance.modify_sp('server-port', 25570, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.modify_sp, 'server-port', 25570),
     function(callback) {
       instance.sp(function(err, props) {
         test.ifError(err);
         test.equal(props['server-port'], 25570);
         callback(err);
       })
-    },
+    }
   ], function(err, results) {
     test.ifError(err);
-    test.expect(7);
+    test.expect(5);
     test.done();
   })  
 }
@@ -1222,27 +924,22 @@ test.list_archive = function(test) {
   async.series([
     function(callback) {
       instance.list_archives(function(err, archives) {
-        test.ok(err);
+        test.ifError(!err);
         test.equal(archives.length, 0);
         callback(!err);
       })
     },
+    async.apply(instance.create, OWNER_CREDS),
     function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
+      instance.archive(function(err) {
         test.ifError(err);
-        setTimeout(function() { callback(err) }, FS_DELAY_MS*2);
+        setTimeout(function() { callback(err) }, 400);
       })
     },
     function(callback) {
       instance.archive(function(err) {
         test.ifError(err);
-        setTimeout(function() { callback(err) }, FS_DELAY_MS*5);
-      })
-    },
-    function(callback) {
-      instance.archive(function(err) {
-        test.ifError(err);
-        setTimeout(function() { callback(err) }, FS_DELAY_MS*2);
+        setTimeout(function() { callback(err) }, 400);
       })
     },
     function(callback) {
@@ -1254,7 +951,7 @@ test.list_archive = function(test) {
     }
   ], function(err, results) {
     test.ifError(err);
-    test.expect(8);
+    test.expect(7);
     test.done();
   })  
 }
@@ -1358,7 +1055,7 @@ test.previous_version = function(test) {
     }
   ], function(err, results) {
     test.ifError(err);
-    test.expect(7);
+    test.expect(6);
     test.done();
   }) 
 }
