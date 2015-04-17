@@ -417,7 +417,7 @@ mineos.mc = function(server_name, base_dir) {
       },
       function(cb) {
         var proc = child_process.spawn(binary, args, params);
-        proc.once('close', function(code) {
+        proc.once('exit', function(code) {
           cb(code);
         })
       }
@@ -430,7 +430,7 @@ mineos.mc = function(server_name, base_dir) {
     var params = { cwd: self.env.bwd };
 
     var proc = child_process.spawn(binary, args, params);
-    proc.once('close', function(code) {
+    proc.once('exit', function(code) {
       callback(code);
     })
   }

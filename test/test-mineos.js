@@ -408,7 +408,7 @@ test.kill = function(test) {
     test.done();
   })
 }
-*/
+
 test.archive = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -426,7 +426,7 @@ test.archive = function(test) {
     test.done();
   })
 }
-/*
+
 test.backup = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -1081,7 +1081,7 @@ test.previous_property = function(test) {
     test.done();
   })
 }
-
+/*
 test.stuff = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
