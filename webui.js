@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var mineos = require('./mineos');
 var server = require('./server');
 var express = require('express');

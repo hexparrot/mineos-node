@@ -18,7 +18,7 @@ In the future, MineOS will be it's own NPM project which should facilitate even 
 
 Using an apt-get based Linux distribution:
 
-    apt-get install -y nodejs npm git
+    apt-get install -y nodejs nodejs-legacy npm git rdiff-backup openjdk-7-jre-headless
     git clone https://github.com/hexparrot/mineos-node.git
     cd mineos-node
     npm install --all
