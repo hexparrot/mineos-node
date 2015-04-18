@@ -15,15 +15,16 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
 
   self.servers = {};
   self.profiles = {};
+  self.watches = {};
   self.front_end = socket_emitter || new events.EventEmitter();
 
   (function() {
     var server_path = path.join(base_dir, mineos.DIRS['servers']);
     var regex_servers = new RegExp('{0}\/[a-zA-Z0-9_\.]+\/.+'.format(server_path));
-    self.watcher = chokidar.watch(server_path, { persistent: true, ignored: regex_servers });
+    self.watches['servers'] = chokidar.watch(server_path, { persistent: true, ignored: regex_servers });
     // ignores event updates from servers that have more path beyond the /servers/<dirhere>/<filehere>
 
-    self.watcher
+    self.watches['servers']
       .on('addDir', function(dirpath) {
         // event to trigger when new server detected, e.g., /var/games/minecraft/servers/<newdirhere>
         try {
@@ -45,10 +46,10 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
   (function() {
     var profile_path = path.join(base_dir, mineos.DIRS['profiles']);
     var regex_profiles = new RegExp('{0}\/[a-zA-Z0-9_\.]+\/.+'.format(profile_path));
-    self.watcher = chokidar.watch(profile_path, { persistent: true, ignored: regex_profiles });
+    self.watches['profiles'] = chokidar.watch(profile_path, { persistent: true, ignored: regex_profiles });
     // ignores event updates from profiles that have more path beyond the /profiles/<dirhere>/<filehere>
 
-    self.watcher
+    self.watches['profiles']
       .on('addDir', function(dirpath) {
         // event to trigger when new profile detected, e.g., /var/games/minecraft/profiles/<newdirhere>
         console.log('[WEBUI] new profile detected: {0}'.format(dirpath));
@@ -438,7 +439,8 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
 
   self.shutdown = function() {
     /* cleans up all servers that are open, including all tails and watches */
-    self.watcher.close();
+    self.watches['servers'].close();
+    self.watches['profiles'].close();
 
     for (var s in self.servers)
       self.untrack_server(s);
