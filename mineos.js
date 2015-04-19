@@ -2,7 +2,6 @@ var fs = require('fs-extra');
 var path = require('path');
 var events = require('events');
 var async = require('async');
-var which = require('which');
 var cf = require('./config_file');
 var child_process = require('child_process');
 var mineos = exports;
@@ -97,6 +96,16 @@ mineos.extract_server_name = function(base_dir, server_path) {
     throw new Error('no server name in path');
   }
 }
+
+mineos.dependencies = async.memoize(function(callback) {
+  var which = require('which');
+  async.parallel({
+    'screen': async.apply(which, 'screen'),
+    'tar': async.apply(which, 'tar'),
+    'java': async.apply(which, 'java'),
+    'rdiff-backup': async.apply(which, 'rdiff-backup')
+  }, callback);
+})
 
 mineos.mc = function(server_name, base_dir) {
   var self = this;

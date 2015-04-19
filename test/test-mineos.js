@@ -40,6 +40,15 @@ test.tearDown = function(callback) {
   delete_everything(callback);
 }
 
+test.dependencies_met = function(test) {
+  async.series([
+    async.apply(mineos.dependencies)
+  ], function(err, results) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
 test.server_list = function (test) {
   var servers = mineos.server_list(BASE_DIR);
   var instance = new mineos.mc('testing', BASE_DIR);
