@@ -1328,7 +1328,19 @@
                 </div>
                 <!--/ END Content -->
 
-                
+            <!-- Modal With Animation -->
+            <div id="modal_eula" class="modal hide fade">
+                <div class="modal-header">
+                    <h4 translate="EULA_DETECTED"></h4>
+                </div>
+                <div class="modal-body">
+                    <p translate="EULA_MUST_BE_ACCEPTED"></p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" aria-hidden="true" translate="ACCEPT_EULA" ng-click="server_command('accept_eula')"></button>
+                    <button class="btn btn-warning" data-dismiss="modal" translate="RESTART" ng-click="server_command('restart')"></button>
+                </div>
+            </div><!--/ Modal With Animation --> 
 
             </section>
             <!--/ END Template Main Content -->

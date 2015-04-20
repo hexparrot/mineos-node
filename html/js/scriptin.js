@@ -373,7 +373,8 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
     })
 
     me.channel.on(server_name, 'eula', function(data) {
-      console.log('eula', data)
+      if (!data)
+        $('#modal_eula').modal('show')
     })
 
     me.channel.on(server_name, 'server_fin', function(data) {
