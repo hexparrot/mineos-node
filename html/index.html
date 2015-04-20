@@ -190,7 +190,7 @@
                                     <!-- START Menu -->
                                     <li class="accordion-group">
                                         <a ng-click="change_page('profiles')">
-                                            <span class="icon icone-share"></span>
+                                            <span class="icon icone-tags"></span>
                                             <span class="text" translate="PROFILES"></span>
                                         </a>
                                     </li>
@@ -199,7 +199,7 @@
                                     <!-- START Menu -->
                                     <li class="accordion-group">
                                         <a ng-click="change_page('calendar')">
-                                            <span class="icon icone-share"></span>
+                                            <span class="icon icone-calendar"></span>
                                             <span class="text" translate="CALENDAR"></span>
                                         </a>
                                     </li>
@@ -636,7 +636,7 @@
                                 <!-- START Toolbar -->
                                 <ul class="toolbar pull-right">
                                     <li>
-                                        <a href="#" class="link" data-toggle="dropdown"><span class="icon icone-ellipsis-vertical"></span></a>
+                                        <a href="#" class="link" data-toggle="dropdown"><span class="icon icone-filter"></span></a>
                                         <ul class="dropdown-menu pull-right">
                                             <li><a href="#" ng-click="showonly='release'"><span class="icon icone-star"></span> {{ 'RELEASE' | translate }}</a></li>
                                             <li><a href="#" ng-click="showonly='snapshot'"><span class="icon icone-camera"></span> {{ 'SNAPSHOT' | translate }}</a></li>
@@ -852,7 +852,7 @@
                                                         <button type="button" class="close" data-dismiss="alert">×</button>
                                                         <strong>{{ 'FAILURE' | translate }}! </strong> {{ 'RESTORE_POINT_FAILED' | translate }} <span am-time-ago="servers[current].latest_notice['backup'].time_resolved"></span>.
                                                     </div><!--/ Alert Error -->
-                                                    <p><a ng-click="server_command('backup')" translate="CREATE_NEW_RESTORE_POINT"></a></p>
+                                                    <p><button type="button" class="btn btn-small btn-primary" ng-click="server_command('backup')"><span class="icone-plus"></span> {{ 'CREATE_NEW_RESTORE_POINT' | translate }}</button></p>
                                                 </div>
                                             </section>
                                         </div>
@@ -879,7 +879,7 @@
                                                         <button type="button" class="close" data-dismiss="alert">×</button>
                                                         <strong>{{ 'FAILURE' | translate }}! </strong> {{ 'ARCHIVE_FAILED' | translate }} <span am-time-ago="servers[current].latest_notice['archive'].time_resolved"></span>.
                                                     </div><!--/ Alert Error -->
-                                                    <p><a ng-click="server_command('archive')" translate="CREATE_NEW_ARCHIVE"></a></p>
+                                                    <p><button type="button" class="btn btn-small btn-primary" ng-click="server_command('archive')"><span class="icone-plus"></span> {{ 'CREATE_NEW_ARCHIVE' | translate }}</button></p>
                                                 </div>
                                                 
                                             </section>
@@ -931,7 +931,7 @@
                                                                 <input type="checkbox" value="servers"> servers/aaa
                                                             </label>
                                                         </div>
-                                                        <button type="button" class="btn btn-mini btn-warning" ng-click="server_command('delete')"><span class="icone-warning-sign"></span> {{ 'DELETE' | translate }}</button>
+                                                        <button type="button" class="btn btn-mini btn-danger" ng-click="server_command('delete')"><span class="icone-warning-sign"></span> {{ 'DELETE' | translate }}</button>
                                                     </div><!--/ Default Checkbox Inline -->
 
                                                 </div>
