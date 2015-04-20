@@ -797,14 +797,20 @@
                                                             <div class="controls">
                                                                 <div class="input-prepend input-append">
                                                                     <span class="add-on" translate="JAVA_XMX"></span>
-                                                                    <input type="text" ng-model="servers[current].sc.java.java_xmx" ng-enter="change_sc('java', 'java_xmx', servers[current].sc.java.java_xmx)">
+                                                                    <input type="text" 
+                                                                        ng-model="servers[current].sc.java.java_xmx" 
+                                                                        ng-change="change_sc('java', 'java_xmx', servers[current].sc.java.java_xmx)" 
+                                                                        ng-model-options="{ updateOn: 'default blur', debounce: {'default': 1500, 'blur': 0} }">
                                                                     <span class="add-on" translate="MB_ABBREVIATION"></span>
                                                                 </div>
                                                             </div>
                                                             <div class="controls">
                                                                 <div class="input-prepend input-append">
                                                                     <span class="add-on" translate="JAVA_XMS"></span>
-                                                                    <input type="text" ng-model="servers[current].sc.java.java_xms" ng-enter="change_sc('java', 'java_xms', servers[current].sc.java.java_xms)">
+                                                                    <input type="text" 
+                                                                        ng-model="servers[current].sc.java.java_xms" 
+                                                                        ng-change="change_sc('java', 'java_xms', servers[current].sc.java.java_xms)"
+                                                                        ng-model-options="{ updateOn: 'default blur', debounce: {'default': 1500, 'blur': 0} }">
                                                                     <span class="add-on" translate="MB_ABBREVIATION"></span>
                                                                 </div>
                                                             </div>
@@ -1188,7 +1194,11 @@
                                     <div class="control-group" ng-repeat="(property, new_value) in servers[current].sp track by $index">
                                         <div class="controls">
                                             <input type="text" class="input-large" ng-value="property" readonly>
-                                            <input type="text" class="input-xlarge" ng-value="new_value" ng-enter="change_sp()" ng-model="new_value">
+                                            <input type="text" class="input-xlarge" 
+                                                ng-value="new_value" 
+                                                ng-change="change_sp()" 
+                                                ng-model="new_value"
+                                                ng-model-options="{ updateOn: 'default blur', debounce: {'default': 1500, 'blur': 0} }">
                                         </div>
                                     </div><!--/ Read Only -->
                                 </div>

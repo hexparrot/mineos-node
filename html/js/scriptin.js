@@ -388,7 +388,6 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
 
         switch(data.command) {
           case 'modify_sc':
-            me.channel.emit(server_name, 'property', {property: 'server.config'});
             data['suppress_popup'] = true;
             break;
           case 'restore':
