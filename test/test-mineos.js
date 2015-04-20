@@ -395,6 +395,26 @@ test.stop_and_backup = function(test) {
   })
 }
 
+test.restart = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.start),
+    function(callback) {
+      setTimeout(callback, 10000);
+    },
+    async.apply(instance.verify, 'up'),
+    async.apply(instance.restart),
+    async.apply(instance.verify, 'up'),
+  ], function(err) {
+    test.ifError(err);
+    test.expect(1);
+    test.done();
+  })
+}
+
 test.kill = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);

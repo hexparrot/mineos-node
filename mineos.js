@@ -330,6 +330,13 @@ mineos.mc = function(server_name, base_dir) {
     ], callback);
   }
 
+  self.restart = function(callback) {
+    async.series([
+      async.apply(self.stop),
+      async.apply(self.start)
+    ], callback)
+  }
+
   self.stop_and_backup = function(callback) {
     async.series([
       async.apply(self.stop),
