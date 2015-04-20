@@ -243,6 +243,10 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     $scope.change_page('dashboard', server_name);
   }
 
+  $scope.accept_eula = function() {
+    $('#modal_eula').modal('show');
+  }
+
   $scope.update_loadavg = function(new_datapoint) {
     $scope.loadavg.push(new_datapoint);
 
@@ -374,7 +378,7 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
 
     me.channel.on(server_name, 'eula', function(data) {
       if (!data)
-        $('#modal_eula').modal('show')
+        $('#modal_eula').modal('show');
     })
 
     me.channel.on(server_name, 'server_fin', function(data) {

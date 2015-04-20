@@ -124,6 +124,7 @@
   "EULA_DETECTED": "eula.txt detected",
   "EULA_MUST_BE_ACCEPTED": "Mojang requires Minecraft server admins to accept the End User License Agreement before hosting a Minecraft server. This is done by changing 'eula=false' to 'eula=true' in eula.txt in your server root.",
   "ACCEPT_EULA": "Accept EULA",
+  "READ_THE_EULA": "Read the Minecraft EULA",
 
   "SUCCEEDED": "succeeded",
   "FAILED": "failed",
