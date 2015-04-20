@@ -7,7 +7,7 @@
     <!-- START META SECTION -->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>{{ 'WEBSITE_TITLE' | translate }}</title>
+    <title translate="WEBSITE_TITLE"></title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, user-scalable=0, initial-scale=1.0">
     <!--/ END META SECTION -->
@@ -447,7 +447,7 @@
                                 <div class="body-inner">
 
                                         <!-- START Auto Update Chart -->
-                                        <div class="span4 widget">
+                                        <div class="span12 widget">
                                             <section class="body">
                                                 <div class="body-inner">
                                                     <div class="flot" id="load_averages"></div>
@@ -473,7 +473,7 @@
                                         <thead>
                                             <tr>
                                                 <th translate="SERVER"></th>
-                                                <th translate="TYPE"></th>
+                                                <th translate="PROFILE"></th>
                                                 <th class="hidden-phone" translate="PORT"></th>
                                                 <th translate="STATUS"></th>
                                                 <th translate="MEMORY"></th>
@@ -958,13 +958,10 @@
                                 <h4 class="title" translate="AVAILABLE_RESTORE_POINTS"></h4>
                                 <!-- START Toolbar -->
                                 <ul class="toolbar pull-right">
-                                    <li><a href="#" class="link"><span class="icon icone-cog"></span></a></li>
                                     <li>
                                         <a href="#" class="link" data-toggle="dropdown"><span class="icon icone-ellipsis-vertical"></span></a>
                                         <ul class="dropdown-menu pull-right">
-                                            <li><a href="#"><span class="icon icone-pencil"></span> {{ 'EDIT' | translate }}</a></li>
-                                            <li><a href="#"><span class="icon icone-trash"></span> {{ 'DELETE' | translate }}</a></li>
-                                            <li><a href="#"><span class="icon icone-cog"></span> {{ 'SETTINGS' | translate }}</a></li>
+                                            <li><a href="#" ng-click="server_command('backup')"><span class="icon icone-hdd"></span> {{ 'CREATE_NEW_RESTORE_POINT' | translate }}</a></li>
                                         </ul>
                                     </li>
                                 </ul>
@@ -1017,13 +1014,10 @@
                                 <h4 class="title" translate="AVAILABLE_ARCHIVES"></h4>
                                 <!-- START Toolbar -->
                                 <ul class="toolbar pull-right">
-                                    <li><a href="#" class="link"><span class="icon icone-cog"></span></a></li>
                                     <li>
                                         <a href="#" class="link" data-toggle="dropdown"><span class="icon icone-ellipsis-vertical"></span></a>
                                         <ul class="dropdown-menu pull-right">
-                                            <li><a href="#"><span class="icon icone-pencil"></span> {{ 'EDIT' | translate }}</a></li>
-                                            <li><a href="#"><span class="icon icone-trash"></span> {{ 'DELETE' | translate }}</a></li>
-                                            <li><a href="#"><span class="icon icone-cog"></span> {{ 'SETTINGS' | translate }}</a></li>
+                                            <li><a href="#" ng-click="server_command('archive')"><span class="icon icone-hdd"></span> {{ 'CREATE_NEW_ARCHIVE' | translate }}</a></li>
                                         </ul>
                                     </li>
                                 </ul>
@@ -1124,7 +1118,7 @@
                                                         <!-- Input Text -->
                                                         <div class="control-group">
                                                             <div class="controls">
-                                                                <input type="text" name="input-text" class="span12" ng-model="cron.msg" />
+                                                                <input type="text" name="input-text" class="span12" ng-model="cron.msg" ng-show="cron.action == 'stuff'" />
                                                             </div>
                                                         </div><!--/ Input Text -->
                                                     </p>
@@ -1340,7 +1334,8 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-success" aria-hidden="true" translate="ACCEPT_EULA" ng-click="server_command('accept_eula')"></button>
-                    <button class="btn btn-warning" data-dismiss="modal" translate="RESTART" ng-click="server_command('restart')"></button>
+                    <button class="btn btn-warning" data-dismiss="modal" translate="RESTART" ng-click="server_command('restart')" ng-show="servers[current].heartbeat.up"></button>
+                    <button class="btn btn-warning" data-dismiss="modal" translate="START" ng-click="server_command('start')" ng-show="!servers[current].heartbeat.up"></button>
                 </div>
             </div><!--/ Modal With Animation --> 
 
