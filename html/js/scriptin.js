@@ -372,6 +372,10 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
       me.notices[data.uuid] = data;
     })
 
+    me.channel.on(server_name, 'eula', function(data) {
+      console.log('eula', data)
+    })
+
     me.channel.on(server_name, 'server_fin', function(data) {
       if ('command' in data) {
         me.notices[data.uuid] = data;
