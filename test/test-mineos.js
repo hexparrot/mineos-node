@@ -1028,7 +1028,7 @@ test.previous_version = function(test) {
     function(callback) {
       instance.backup(function(err) {
         test.ifError(err);
-        setTimeout(function() { callback(err) }, FS_DELAY_MS*3);
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*5);
       })
     },
     function(callback) {
@@ -1047,7 +1047,7 @@ test.previous_version = function(test) {
     function(callback) {
       instance.backup(function(err) {
         test.ifError(err);
-        setTimeout(function() { callback(err) }, FS_DELAY_MS*3);
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*5);
       })
     },
     function(callback) {
