@@ -381,20 +381,20 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
         $('#modal_eula').modal('show');
     })
 
+    me.channel.on(server_name, 'server.properties', function(data) {
+      me['sp'] = data;
+    })
+
+    me.channel.on(server_name, 'server.config', function(data) {
+      me['sc'] = data;
+    })
+
     me.channel.on(server_name, 'server_fin', function(data) {
       if ('command' in data) {
         me.notices[data.uuid] = data;
         me.latest_notice[data.command] = data;
 
         switch(data.command) {
-          case 'modify_sp':
-            me.channel.emit(server_name, 'property', {property: 'server.properties'});
-            data['suppress_popup'] = true;
-            break;
-          case 'modify_sc':
-            me.channel.emit(server_name, 'property', {property: 'server.config'});
-            data['suppress_popup'] = true;
-            break;
           case 'restore':
             me.channel.emit(server_name, 'property', {property: 'server.properties'});
             me.channel.emit(server_name, 'property', {property: 'server.config'});
@@ -415,18 +415,6 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
                                           (data.success ? $filter('translate')('SUCCEEDED') : $filter('translate')('FAILED')) ),
             text: help_text || ''
           });
-        }
-
-      } else if ('property' in data) {
-        switch (data.property) {
-          case 'server.properties':
-            me['sp'] = data.payload;
-            break;
-          case 'server.config':
-            me['sc'] = data.payload;
-            break;
-          default:
-            break;
         }
       }
     })

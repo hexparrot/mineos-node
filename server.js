@@ -233,7 +233,16 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           console.info('[{0}] {1} requesting property: {2}'.format(server_name, ip_address, requested.property));
           instance.property(requested.property, function(err, retval) {
             console.info('[{0}] returned to {1}: {2}'.format(server_name, ip_address, retval));
-            nsp.emit('server_fin', {'server_name': server_name, 'property': requested.property, 'payload': retval});
+            if (requested.property == 'server.properties')
+              instance.sp(function(err, sp_data) {
+                nsp.emit('server.properties', sp_data);
+              })
+            else if (requested.property == 'server.config')
+              instance.sc(function(err, sc_data) {
+                nsp.emit('server.config', sc_data);
+              })
+            else
+              nsp.emit('server_fin', {'server_name': server_name, 'property': requested.property, 'payload': retval});
           })
         }
 
@@ -358,9 +367,24 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
             args.time_resolved = Date.now();
             nsp.emit('server_fin', args);
             console.log('server_fin', args)
-            
-            if (args.command != 'delete')
-              self.servers[server_name].notices.push(args);
+
+            switch(args.command) {
+              case 'delete':
+                self.servers[server_name].notices.push(args);
+                break;
+              case 'modify_sp':
+                instance.sp(function(err, sp_data) {
+                  nsp.emit('server.properties', sp_data);
+                })
+                break;
+              case 'modify_sc':
+                instance.sc(function(err, sc_data) {
+                  nsp.emit('server.config', sc_data);
+                })
+                break;
+              default:
+                break;
+            }
           })
         else if (required_args[i] in args) {
           arg_array.push(args[required_args[i]])
