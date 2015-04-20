@@ -208,6 +208,10 @@ mineos.mc = function(server_name, base_dir) {
     ], callback)
   }
 
+  self.accept_eula = function(callback) {
+    fs.outputFile(path.join(self.env.cwd, 'eula.txt'), 'eula=true', callback);
+  }
+
   self.delete = function(callback) {
     async.series([
       async.apply(self.verify, 'exists'),

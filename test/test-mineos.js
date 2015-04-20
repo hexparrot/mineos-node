@@ -1153,3 +1153,22 @@ test.stuff = function(test) {
     test.done();
   })
 }
+
+test.accept_eula = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.waterfall([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(fs.outputFile, path.join(instance.env.cwd, 'eula.txt'), 'eula=false'),
+    async.apply(instance.accept_eula),
+    async.apply(fs.readFile, path.join(instance.env.cwd, 'eula.txt')),
+    function(eula_text, callback) {
+      test.equal(eula_text.toString(), 'eula=true');
+      callback(null);
+    }
+  ], function(err) {
+    test.expect(1);
+    test.done();
+  })
+}

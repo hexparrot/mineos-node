@@ -44,6 +44,43 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
   })();
 
   (function() {
+    var server_path = path.join(base_dir, mineos.DIRS['servers']);
+    self.watches['eula'] = chokidar.watch(server_path, { persistent: true, depth: 1 });
+    // ignores event updates from servers that have more path beyond the /servers/<dirhere>/<filehere>
+
+    self.watches['eula']
+      .on('add', function(dirpath) {
+        // event to trigger when new eula.txt detected, e.g., /var/games/minecraft/servers/<newdirhere>
+
+        if (path.basename(dirpath) == 'eula.txt') {
+          try {
+            var server_name = mineos.extract_server_name(base_dir, dirpath);
+          } catch (e) { return }
+
+          var ini = require('ini');
+          var fs = require('fs-extra');
+
+          async.waterfall([
+            async.apply(fs.readFile, dirpath),
+            function(file_contents, cb) {
+              cb(null, ini.parse(file_contents.toString()));
+            },
+            function(parsed_ini, cb) {
+              var accepted = parsed_ini['eula'] == true; //minecraft accepts 'true' case-insensitive
+              if (!accepted)
+                accepted = parsed_ini['eula'] && parsed_ini['eula'].toString().toLowerCase() == 'true';
+
+              console.log('[{0}] eula.txt detected: {1} (eula={2})'.format(server_name,
+                                                                           (accepted ? 'ACCEPTED' : 'NOT YET ACCEPTED'),
+                                                                           parsed_ini['eula']));
+              self.servers[server_name].nsp.emit('eula', accepted);
+            }
+          ])
+        }
+      })
+  })();
+
+  (function() {
     var profile_path = path.join(base_dir, mineos.DIRS['profiles']);
     var regex_profiles = new RegExp('{0}\/[a-zA-Z0-9_\.]+\/.+'.format(profile_path));
     self.watches['profiles'] = chokidar.watch(profile_path, { persistent: true, ignored: regex_profiles });
