@@ -170,11 +170,21 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
       console.info('Discovered server: {0}'.format(server_name));
       self.front_end.emit('track_server', server_name);
       make_tail('logs/latest.log');
-      make_watch('server.properties', function() {
+
+      make_watch('server.properties', broadcast_sp);
+      make_watch('server.config', broadcast_sc);
+
+      function broadcast_sp() {
         instance.sp(function(err, sp_data) {
-          nsp.emit('result', {'server_name': server_name, 'property': 'server.properties', 'payload': sp_data});
+          nsp.emit('server.properties', sp_data);
         })
-      });
+      }
+
+      function broadcast_sc() {
+        instance.sc(function(err, sc_data) {
+          nsp.emit('server.config', sc_data);
+        })
+      }
 
       nsp.on('connection', function(socket) {
         var ip_address = socket.request.connection.remoteAddress;
@@ -188,44 +198,20 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           server_dispatcher(args);
         }
 
-        function start_watch(opts) {
-          /* can put a tail/watch on any file, and joins a room for all future communication */
-          var rel_filepath = opts.filepath;
-
-          if (rel_filepath in self.servers[server_name].tails) {
+        function get_file_contents(rel_filepath) {
+          if (rel_filepath in self.servers[server_name].tails) { //this is the protection from malicious client
+            // a tail would only exist for a file the server itself has opened
             var fs = require('fs');
             var abs_filepath = path.join(self.servers[server_name].instance.env['cwd'], rel_filepath);
 
-            if (opts.from_start) {
-              fs.readFile(abs_filepath, function (err, data) {
-                if (!err) {
-                  console.info('[{0}] {1} transmittting existing file contents: {2} ({3} bytes)'.format(server_name, ip_address, rel_filepath, data.length));
-                  nsp.emit('file head', {filename: rel_filepath, payload: data.toString()});
-                }
-                socket.join(rel_filepath);
-              });
-            } else {
-              socket.join(rel_filepath);
-            }
-            console.info('[{0}] {1} requesting tail: {2}'.format(server_name, ip_address, rel_filepath));
-          } else if (rel_filepath in self.servers[server_name].watches) {
-            socket.join(rel_filepath);
-            console.info('[{0}] {1} watching file: {2}'.format(server_name, ip_address, rel_filepath));
-          } else {
-            console.error('[{0}] {1} requesting tail: {2} (failed: not yet created)'.format(server_name, ip_address, rel_filepath));
-          }
-        }
-
-        function unwatch(rel_filepath) {
-          /* removes a tail/watch for a given file, and leaves the room */
-          if (rel_filepath in self.servers[server_name].tails) {
-            socket.leave(rel_filepath);
-            console.info('[{0}] {1} dropping tail: {2}'.format(server_name, ip_address, rel_filepath));
-          } else if (rel_filepath in self.servers[server_name].watches) {
-            socket.leave(rel_filepath);
-            console.info('[{0}] {1} stopped watching file: {1}'.format(server_name, ip_address, rel_filepath));
-          } else {
-            //console.error('[{0}] no existing room found for {1}'.format(server_name, rel_filepath));
+            fs.readFile(abs_filepath, function (err, data) {
+              if (!err) {
+                console.info('[{0}] {1} transmittting existing file contents: {2} ({3} bytes)'.format(server_name, ip_address, rel_filepath, data.length));
+                nsp.emit('file head', {filename: rel_filepath, payload: data.toString()});
+              }
+              else 
+                console.log('what', err)
+            });
           }
         }
 
@@ -233,16 +219,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           console.info('[{0}] {1} requesting property: {2}'.format(server_name, ip_address, requested.property));
           instance.property(requested.property, function(err, retval) {
             console.info('[{0}] returned to {1}: {2}'.format(server_name, ip_address, retval));
-            if (requested.property == 'server.properties')
-              instance.sp(function(err, sp_data) {
-                nsp.emit('server.properties', sp_data);
-              })
-            else if (requested.property == 'server.config')
-              instance.sc(function(err, sc_data) {
-                nsp.emit('server.config', sc_data);
-              })
-            else
-              nsp.emit('server_fin', {'server_name': server_name, 'property': requested.property, 'payload': retval});
+            nsp.emit('server_fin', {'server_name': server_name, 'property': requested.property, 'payload': retval});
           })
         }
 
@@ -332,10 +309,13 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         socket.on('command', produce_receipt);
         socket.on('property', get_prop);
         socket.on('page_data', get_page_data);
-        socket.on('watch', start_watch);
+        socket.on('get_file_contents', get_file_contents);
         socket.on('cron', manage_cron);
         console.info('[{0}] broadcasting {1} previous notices'.format(server_name, self.servers[server_name].notices.length));
         nsp.emit('notices', self.servers[server_name].notices);
+
+        broadcast_sp();
+        broadcast_sc();
       })
     }
 
@@ -368,23 +348,8 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
             nsp.emit('server_fin', args);
             console.log('server_fin', args)
 
-            switch(args.command) {
-              case 'delete':
-                self.servers[server_name].notices.push(args);
-                break;
-              case 'modify_sp':
-                instance.sp(function(err, sp_data) {
-                  nsp.emit('server.properties', sp_data);
-                })
-                break;
-              case 'modify_sc':
-                instance.sc(function(err, sc_data) {
-                  nsp.emit('server.config', sc_data);
-                })
-                break;
-              default:
-                break;
-            }
+            if (args.command != 'delete')
+              self.servers[server_name].notices.push(args);
           })
         else if (required_args[i] in args) {
           arg_array.push(args[required_args[i]])

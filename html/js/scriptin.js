@@ -99,13 +99,6 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
   $scope.current = null;
 
   /* watches */
-
-  $scope.$watch(function(scope) { return scope.current },
-    function(new_value, previous_value) {
-      socket.emit(new_value, 'property', {property: 'server.properties'});
-    }
-  );
-
   $scope.$watch(function(scope) { return scope.page },
     function(new_value, previous_value) {
       socket.emit(new_value, 'page_data', new_value);
@@ -390,40 +383,28 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
     })
 
     me.channel.on(server_name, 'server_fin', function(data) {
-      if ('command' in data) {
-        me.notices[data.uuid] = data;
-        me.latest_notice[data.command] = data;
+      me.notices[data.uuid] = data;
+      me.latest_notice[data.command] = data;
+      me.channel.emit(server_name, 'page_data', 'glance');
 
-        switch(data.command) {
-          case 'restore':
-            me.channel.emit(server_name, 'property', {property: 'server.properties'});
-            me.channel.emit(server_name, 'property', {property: 'server.config'});
-          default:
-            me.channel.emit(server_name, 'page_data', 'glance');
-            break;
-        }
+      var suppress = ('suppress_popup' in data ? data.suppress_popup : false);
+      if (!suppress) {
+        var help_text = '';
+        try {
+          help_text = $filter('translate')(data.err);
+        } catch (e) {}
 
-        var suppress = ('suppress_popup' in data ? data.suppress_popup : false);
-        if (!suppress) {
-          var help_text = '';
-          try {
-            help_text = $filter('translate')(data.err);
-          } catch (e) {}
-
-          $.gritter.add({
-            title: "[{0}] {1} {2}".format(me.server_name, data.command,
-                                          (data.success ? $filter('translate')('SUCCEEDED') : $filter('translate')('FAILED')) ),
-            text: help_text || ''
-          });
-        }
+        $.gritter.add({
+          title: "[{0}] {1} {2}".format(me.server_name, data.command,
+                                        (data.success ? $filter('translate')('SUCCEEDED') : $filter('translate')('FAILED')) ),
+          text: help_text || ''
+        });
       }
     })
 
-    me.channel.emit(server_name, 'property', {property: 'server.properties'});
-    me.channel.emit(server_name, 'property', {property: 'server.config'});
     me.channel.emit(server_name, 'page_data', 'glance');
     me.channel.emit(server_name, 'page_data', 'cron');
-    me.channel.emit(server_name, 'watch', {filepath: 'logs/latest.log', from_start: true});
+    me.channel.emit(server_name, 'get_file_contents', 'logs/latest.log');
 
     return me;
   }
