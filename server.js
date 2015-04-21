@@ -182,8 +182,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
 
       function broadcast_sc() {
         instance.sc(function(err, sc_data) {
-          if (!err)
-            nsp.emit('server.config', sc_data);
+          nsp.emit('server.config', sc_data);
         })
       }
 
@@ -199,23 +198,20 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           server_dispatcher(args);
         }
 
-        function start_watch(opts) {
-          /* can put a tail/watch on any file, and joins a room for all future communication */
-          var rel_filepath = opts.filepath;
-
-          if (rel_filepath in self.servers[server_name].tails) {
+        function get_file_contents(rel_filepath) {
+          if (rel_filepath in self.servers[server_name].tails) { //this is the protection from malicious client
+            // a tail would only exist for a file the server itself has opened
             var fs = require('fs');
             var abs_filepath = path.join(self.servers[server_name].instance.env['cwd'], rel_filepath);
 
-            if (opts.from_start) {
-              fs.readFile(abs_filepath, function (err, data) {
-                if (!err) {
-                  console.info('[{0}] {1} transmittting existing file contents: {2} ({3} bytes)'.format(server_name, ip_address, rel_filepath, data.length));
-                  nsp.emit('file head', {filename: rel_filepath, payload: data.toString()});
-                }
-              });
-            }
-            console.info('[{0}] {1} requesting tail: {2}'.format(server_name, ip_address, rel_filepath));
+            fs.readFile(abs_filepath, function (err, data) {
+              if (!err) {
+                console.info('[{0}] {1} transmittting existing file contents: {2} ({3} bytes)'.format(server_name, ip_address, rel_filepath, data.length));
+                nsp.emit('file head', {filename: rel_filepath, payload: data.toString()});
+              }
+              else 
+                console.log('what', err)
+            });
           }
         }
 
@@ -313,7 +309,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         socket.on('command', produce_receipt);
         socket.on('property', get_prop);
         socket.on('page_data', get_page_data);
-        socket.on('watch', start_watch);
+        socket.on('get_file_contents', get_file_contents);
         socket.on('cron', manage_cron);
         console.info('[{0}] broadcasting {1} previous notices'.format(server_name, self.servers[server_name].notices.length));
         nsp.emit('notices', self.servers[server_name].notices);
@@ -352,13 +348,8 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
             nsp.emit('server_fin', args);
             console.log('server_fin', args)
 
-            switch(args.command) {
-              case 'delete':
-                self.servers[server_name].notices.push(args);
-                break;
-              default:
-                break;
-            }
+            if (args.command != 'delete')
+              self.servers[server_name].notices.push(args);
           })
         else if (required_args[i] in args) {
           arg_array.push(args[required_args[i]])
