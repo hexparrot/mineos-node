@@ -404,7 +404,7 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
 
     me.channel.emit(server_name, 'page_data', 'glance');
     me.channel.emit(server_name, 'page_data', 'cron');
-    me.channel.emit(server_name, 'watch', {filepath: 'logs/latest.log', from_start: true});
+    me.channel.emit(server_name, 'get_file_contents', 'logs/latest.log');
 
     return me;
   }
