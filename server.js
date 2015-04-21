@@ -202,30 +202,9 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
                   console.info('[{0}] {1} transmittting existing file contents: {2} ({3} bytes)'.format(server_name, ip_address, rel_filepath, data.length));
                   nsp.emit('file head', {filename: rel_filepath, payload: data.toString()});
                 }
-                socket.join(rel_filepath);
               });
-            } else {
-              socket.join(rel_filepath);
             }
             console.info('[{0}] {1} requesting tail: {2}'.format(server_name, ip_address, rel_filepath));
-          } else if (rel_filepath in self.servers[server_name].watches) {
-            socket.join(rel_filepath);
-            console.info('[{0}] {1} watching file: {2}'.format(server_name, ip_address, rel_filepath));
-          } else {
-            console.error('[{0}] {1} requesting tail: {2} (failed: not yet created)'.format(server_name, ip_address, rel_filepath));
-          }
-        }
-
-        function unwatch(rel_filepath) {
-          /* removes a tail/watch for a given file, and leaves the room */
-          if (rel_filepath in self.servers[server_name].tails) {
-            socket.leave(rel_filepath);
-            console.info('[{0}] {1} dropping tail: {2}'.format(server_name, ip_address, rel_filepath));
-          } else if (rel_filepath in self.servers[server_name].watches) {
-            socket.leave(rel_filepath);
-            console.info('[{0}] {1} stopped watching file: {1}'.format(server_name, ip_address, rel_filepath));
-          } else {
-            //console.error('[{0}] no existing room found for {1}'.format(server_name, rel_filepath));
           }
         }
 
