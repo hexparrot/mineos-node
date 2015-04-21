@@ -164,7 +164,7 @@ mineos.mc = function(server_name, base_dir) {
     fs.readFile(self.env.sc, function(err, data) {
       if (err) {
         self._sc = ini.encode({});
-        fs.writeFile(self.env.sp, ini.stringify(self._sc), function(inner_err) {
+        fs.writeFile(self.env.sc, ini.stringify(self._sc), function(inner_err) {
           callback(inner_err, self._sc);
         });
       } else {
