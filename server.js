@@ -170,11 +170,21 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
       console.info('Discovered server: {0}'.format(server_name));
       self.front_end.emit('track_server', server_name);
       make_tail('logs/latest.log');
-      make_watch('server.properties', function() {
+
+      make_watch('server.properties', broadcast_sp);
+      make_watch('server.config', broadcast_sc);
+
+      function broadcast_sp() {
         instance.sp(function(err, sp_data) {
-          nsp.emit('result', {'server_name': server_name, 'property': 'server.properties', 'payload': sp_data});
+          nsp.emit('server.properties', sp_data);
         })
-      });
+      }
+
+      function broadcast_sc() {
+        instance.sc(function(err, sc_data) {
+          nsp.emit('server.config', sc_data);
+        })
+      }
 
       nsp.on('connection', function(socket) {
         var ip_address = socket.request.connection.remoteAddress;
@@ -212,16 +222,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           console.info('[{0}] {1} requesting property: {2}'.format(server_name, ip_address, requested.property));
           instance.property(requested.property, function(err, retval) {
             console.info('[{0}] returned to {1}: {2}'.format(server_name, ip_address, retval));
-            if (requested.property == 'server.properties')
-              instance.sp(function(err, sp_data) {
-                nsp.emit('server.properties', sp_data);
-              })
-            else if (requested.property == 'server.config')
-              instance.sc(function(err, sc_data) {
-                nsp.emit('server.config', sc_data);
-              })
-            else
-              nsp.emit('server_fin', {'server_name': server_name, 'property': requested.property, 'payload': retval});
+            nsp.emit('server_fin', {'server_name': server_name, 'property': requested.property, 'payload': retval});
           })
         }
 
@@ -315,6 +316,9 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         socket.on('cron', manage_cron);
         console.info('[{0}] broadcasting {1} previous notices'.format(server_name, self.servers[server_name].notices.length));
         nsp.emit('notices', self.servers[server_name].notices);
+
+        broadcast_sp();
+        broadcast_sc();
       })
     }
 
@@ -350,16 +354,6 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
             switch(args.command) {
               case 'delete':
                 self.servers[server_name].notices.push(args);
-                break;
-              case 'modify_sp':
-                instance.sp(function(err, sp_data) {
-                  nsp.emit('server.properties', sp_data);
-                })
-                break;
-              case 'modify_sc':
-                instance.sc(function(err, sc_data) {
-                  nsp.emit('server.config', sc_data);
-                })
                 break;
               default:
                 break;
