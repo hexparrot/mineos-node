@@ -163,28 +163,27 @@ mineos.mc = function(server_name, base_dir) {
 
     fs.readFile(self.env.sc, function(err, data) {
       if (err) {
-        self._sc = ini.encode({});
-        fs.writeFile(self.env.sc, ini.stringify(self._sc), function(inner_err) {
-          callback(inner_err, self._sc);
+        fs.writeFile(self.env.sc, '', function(inner_err) {
+          callback(inner_err, {});
         });
       } else {
-        self._sc = ini.parse(data.toString());
-        callback(err, self._sc);
+        callback(err, ini.parse(data.toString()));
       }
     })
   }
 
   self.modify_sc = function(section, property, new_value, callback) {
     var ini = require('ini');
-
-    try {
-      self._sc[section][property] = new_value;
-    } catch (e) {
-      self._sc[section] = {};
-      self._sc[section][property] = new_value;
-    }
-    
-    fs.writeFile(self.env.sc, ini.stringify(self._sc), callback);
+    self.sc(function(err, sc_data) {
+      try {
+        sc_data[section][property] = new_value;
+      } catch (e) {
+        sc_data[section] = {};
+        sc_data[section][property] = new_value;
+      }
+      
+      fs.writeFile(self.env.sc, ini.stringify(sc_data), callback);
+    });
   }
 
   self.create = function(owner, callback) {
@@ -196,7 +195,6 @@ mineos.mc = function(server_name, base_dir) {
       async.apply(fs.ensureDir, self.env.awd),
       async.apply(fs.ensureFile, self.env.sp),
       async.apply(self.overlay_sp, mineos.SP_DEFAULTS),
-      async.apply(fs.ensureFile, self.env.sc),
       async.apply(self.sc),
       async.apply(self.modify_sc, 'java', 'java_xmx', '256'),
       async.apply(self.modify_sc, 'minecraft', 'profile', '1.7.9'),

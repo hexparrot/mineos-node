@@ -182,7 +182,8 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
 
       function broadcast_sc() {
         instance.sc(function(err, sc_data) {
-          nsp.emit('server.config', sc_data);
+          if (!err)
+            nsp.emit('server.config', sc_data);
         })
       }
 
