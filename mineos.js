@@ -274,38 +274,38 @@ mineos.mc = function(server_name, base_dir) {
 
   self.start = function(callback) {
     var binary = which.sync('screen');
-    var params = { cwd: self.env.cwd };
-
     var args = null;
+    var params = { cwd: self.env.cwd };
 
     async.waterfall([
       async.apply(self.verify, 'exists'),
       async.apply(self.verify, '!up'),
-      function(cb) {
-        self.property('owner', function(err, result) {
-          params['uid'] = result['uid'];
-          params['gid'] = result['gid'];
-          cb(err);
-        })
+      async.apply(self.property, 'owner'),
+      function(owner, cb) {
+        params['uid'] = owner['uid'];
+        params['gid'] = owner['gid'];
+        cb();
       },
       async.apply(self.get_start_args),
       function(start_args, cb) {
         args = start_args;
-        cb(null);
+        cb();
       },
       async.apply(self.sc),
       function(sc, cb) {
         var orig_profile_path = path.join(self.env.pwd, sc.minecraft.profile, args[7]);
         var dest_filepath = path.join(self.env.cwd, args[7]);
-        fs.copy(orig_profile_path, dest_filepath, function (err) {
+        fs.copy(orig_profile_path, dest_filepath, cb);
+      },
+      function(cb) {
+        var dest_filepath = path.join(self.env.cwd, args[7]);
+        fs.chown(dest_filepath, params['uid'], params['gid'], function(err) {
           cb(err);
-        })
+        });
       },
       function(cb) {
         var proc = child_process.spawn(binary, args, params);
-        proc.once('close', function(code) {
-          cb(code);
-        })
+        proc.once('close', cb);
       }
     ], callback);
   }
