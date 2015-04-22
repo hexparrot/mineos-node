@@ -273,9 +273,26 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.start = function(callback) {
-    var binary = which.sync('screen');
     var args = null;
     var params = { cwd: self.env.cwd };
+    var owner_info = null;
+
+    function copy_profile(source, dest, username, groupname, call_back_er) {
+      var rsync = require('rsync');
+      
+      var obj = rsync.build({
+        source: source,
+        destination: dest,
+        flags: 'a',
+        shell:'ssh'
+      });
+
+      obj.set('--chown', '{0}:{1}'.format(username, groupname));
+
+      obj.execute(function(error, code, cmd) {
+        call_back_er(error);
+      });
+    }
 
     async.waterfall([
       async.apply(self.verify, 'exists'),
@@ -284,6 +301,7 @@ mineos.mc = function(server_name, base_dir) {
       function(owner, cb) {
         params['uid'] = owner['uid'];
         params['gid'] = owner['gid'];
+        owner_info = owner;
         cb();
       },
       async.apply(self.get_start_args),
@@ -293,17 +311,12 @@ mineos.mc = function(server_name, base_dir) {
       },
       async.apply(self.sc),
       function(sc, cb) {
-        var orig_profile_path = path.join(self.env.pwd, sc.minecraft.profile, args[7]);
-        var dest_filepath = path.join(self.env.cwd, args[7]);
-        fs.copy(orig_profile_path, dest_filepath, cb);
+        var source = path.join(self.env.pwd, sc.minecraft.profile) + '/';
+        var dest = self.env.cwd + '/';
+        copy_profile(source, dest, owner_info['username'], owner_info['groupname'], cb);
       },
-      function(cb) {
-        var dest_filepath = path.join(self.env.cwd, args[7]);
-        fs.chown(dest_filepath, params['uid'], params['gid'], function(err) {
-          cb(err);
-        });
-      },
-      function(cb) {
+      async.apply(which, 'screen'),
+      function(binary, cb) {
         var proc = child_process.spawn(binary, args, params);
         proc.once('close', cb);
       }
