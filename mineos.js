@@ -277,6 +277,23 @@ mineos.mc = function(server_name, base_dir) {
     var params = { cwd: self.env.cwd };
     var owner_info = null;
 
+    function copy_profile(source, dest, username, groupname, call_back_er) {
+      var rsync = require('rsync');
+      
+      var obj = rsync.build({
+        source: source,
+        destination: dest,
+        flags: 'a',
+        shell:'ssh'
+      });
+
+      obj.set('--chown', '{0}:{1}'.format(username, groupname));
+
+      obj.execute(function(error, code, cmd) {
+        call_back_er(error);
+      });
+    }
+
     async.waterfall([
       async.apply(self.verify, 'exists'),
       async.apply(self.verify, '!up'),
@@ -294,20 +311,9 @@ mineos.mc = function(server_name, base_dir) {
       },
       async.apply(self.sc),
       function(sc, cb) {
-        var rsync = require('rsync');
-        
-        var obj = rsync.build({
-          source: path.join(self.env.pwd, sc.minecraft.profile) + '/',
-          destination: self.env.cwd + '/',
-          flags: 'a',
-          shell:'ssh'
-        });
-
-        obj.set('--chown', '{0}:{1}'.format(owner_info['username'], owner_info['groupname']));
-       
-        obj.execute(function(error, code, cmd) {
-          cb(error);
-        });
+        var source = path.join(self.env.pwd, sc.minecraft.profile) + '/';
+        var dest = self.env.cwd + '/';
+        copy_profile(source, dest, owner_info['username'], owner_info['groupname'], cb);
       },
       async.apply(which, 'screen'),
       function(binary, cb) {
