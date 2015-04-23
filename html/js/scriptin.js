@@ -224,6 +224,13 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
                                              new_value: this.new_value });
   }
 
+  $scope.change_owner = function() {
+    socket.emit($scope.current, 'command', {command: 'chown', new_owner: {
+      uid: parseInt($scope.servers[$scope.current].page_data.glance.owner.uid),
+      gid: parseInt($scope.servers[$scope.current].page_data.glance.owner.gid)
+    }})
+  }
+
   $scope.create_server = function() {
     var serverform = $scope.serverform;
     var server_name = serverform['server_name'];
