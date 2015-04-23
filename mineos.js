@@ -786,6 +786,15 @@ mineos.mc = function(server_name, base_dir) {
     });
   }
 
+  self.chown = function(new_owner, callback) {
+    async.series([
+      async.apply(self.verify, 'exists'),
+      async.apply(fs.chown, self.env.cwd, new_owner['uid'], new_owner['gid']),
+      async.apply(fs.chown, self.env.bwd, new_owner['uid'], new_owner['gid']),
+      async.apply(fs.chown, self.env.awd, new_owner['uid'], new_owner['gid'])
+    ], callback)
+  }
+
   return self;
 }
 

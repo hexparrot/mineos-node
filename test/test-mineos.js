@@ -1172,3 +1172,37 @@ test.accept_eula = function(test) {
     test.done();
   })
 }
+
+test.chown = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  var NEW_OWNER_CREDS = {
+    uid: userid.uid('bill'),
+    gid: userid.gid('bill')
+  }
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    function(callback) {
+      instance.property('owner', function(err, result) {
+        test.ifError(err);
+        test.equal(OWNER_CREDS['uid'], result['uid']);
+        test.equal(OWNER_CREDS['gid'], result['gid']);
+        callback(err);
+      })
+    },
+    async.apply(instance.chown, NEW_OWNER_CREDS),
+    function(callback) {
+      instance.property('owner', function(err, result) {
+        test.ifError(err);
+        test.equal(NEW_OWNER_CREDS['uid'], result['uid']);
+        test.equal(NEW_OWNER_CREDS['gid'], result['gid']);
+        callback(err);
+      })
+    }
+  ], function(err) {
+    test.expect(6);
+    test.done();
+  })
+}
