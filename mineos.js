@@ -174,16 +174,22 @@ mineos.mc = function(server_name, base_dir) {
 
   self.modify_sc = function(section, property, new_value, callback) {
     var ini = require('ini');
-    self.sc(function(err, sc_data) {
-      try {
-        sc_data[section][property] = new_value;
-      } catch (e) {
-        sc_data[section] = {};
-        sc_data[section][property] = new_value;
+
+    async.waterfall([
+      async.apply(self.sc),
+      function(sc_data, cb) {
+        try {
+          sc_data[section][property] = new_value;
+        } catch (e) {
+          sc_data[section] = {};
+          sc_data[section][property] = new_value;
+        }
+        cb(null, sc_data);
+      },
+      function(sc_data, cb) {
+        fs.writeFile(self.env.sc, ini.stringify(sc_data), cb);
       }
-      
-      fs.writeFile(self.env.sc, ini.stringify(sc_data), callback);
-    });
+    ], callback)
   }
 
   self.create = function(owner, callback) {
