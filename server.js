@@ -581,6 +581,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
   self.send_user_list = function() {
     var passwd = require('etc-passwd');
     var users = [];
+    var groups = [];
 
     var gu = passwd.getUsers()
       .on('user', function(user_data) {
@@ -594,6 +595,20 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
       })
       .on('end', function() {
         self.front_end.emit('user_list', users);
+      })
+
+    var gg = passwd.getGroups()
+      .on('group', function(group_data) {
+
+        if (group_data.gid >= 1000)
+          groups.push({
+            groupname: group_data.groupname,
+            gid: group_data.gid,
+            users: group_data.users
+          })
+      })
+      .on('end', function() {
+        self.front_end.emit('group_list', groups);
       })
   }
     
