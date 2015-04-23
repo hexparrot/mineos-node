@@ -906,8 +906,11 @@
                                                     <!-- Select -->
                                                         <div class="control-group">
                                                             <div class="controls">
-                                                                <select class="span6">
-                                                                    <option ng-repeat="user in users" value="user.username">{{ '{0} ({1})'.format(user.username, user.gid) }}</option>
+                                                                {{ 'SERVER_OWNER' | translate }}: <select class="span4">
+                                                                    <option 
+                                                                        ng-repeat="user in users" 
+                                                                        value="user.uid"
+                                                                        ng-selected="user.uid == servers[current].page_data.glance.owner.uid">{{ '{0} ({1})'.format(user.username, user.uid) }}</option>
                                                                 </select>
                                                             </div>
                                                         </div>
@@ -915,14 +918,15 @@
                                                     <!-- Select -->
                                                         <div class="control-group">
                                                             <div class="controls">
-                                                                <select class="span6">
-                                                                    <option ng-repeat="group in groups" value="group.groupname">{{ '{0} ({1})'.format(group.groupname, group.gid) }}</option>
+                                                                {{ 'GROUP_OWNER' | translate }}: <select class="span4">
+                                                                    <option 
+                                                                        ng-repeat="group in groups" 
+                                                                        value="group.groupname"
+                                                                        ng-selected="group.gid == servers[current].page_data.glance.owner.gid">{{ '{0} ({1})'.format(group.groupname, group.gid) }}</option>
                                                                 </select>
                                                             </div>
                                                         </div>
                                                     <!--/ Select -->
-                                                    <p>{{ 'SERVER_OWNER' | translate }}: {{ servers[current].page_data.glance.owner.username }} ({{ servers[current].page_data.glance.owner.uid }})</p>
-                                                    <p>{{ 'GROUP_OWNER' | translate }}: {{ servers[current].page_data.glance.owner.groupname }} ({{ servers[current].page_data.glance.owner.gid }})</p>
                                                     <p>{{ 'SPACE_USED_LIVE' | translate }}: {{ servers[current].page_data.glance.du_cwd | bytes_to_mb }}</p>
                                                 </div>
                                             </section>
