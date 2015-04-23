@@ -151,6 +151,10 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     $scope.profiles = profile_data;
   })
 
+  socket.on('/', 'user_list', function(user_data) {
+    $scope.users = user_data;
+  })
+
   socket.on('/', 'file_download', function(data) {
     $.gritter.add({
       title: "{0} {1}".format(data.command,

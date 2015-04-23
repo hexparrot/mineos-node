@@ -903,6 +903,15 @@
                                             </header>
                                             <section class="body">
                                                 <div class="body-inner">
+                                                    <!-- Select -->
+                                                        <div class="control-group">
+                                                            <div class="controls">
+                                                                <select class="span6">
+                                                                    <option ng-repeat="user in users" value="user.username">{{ '{0} ({1})'.format(user.username, user.gid) }}</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    <!--/ Select -->
                                                     <p>{{ 'SERVER_OWNER' | translate }}: {{ servers[current].page_data.glance.owner.username }} ({{ servers[current].page_data.glance.owner.uid }})</p>
                                                     <p>{{ 'GROUP_OWNER' | translate }}: {{ servers[current].page_data.glance.owner.groupname }} ({{ servers[current].page_data.glance.owner.gid }})</p>
                                                     <p>{{ 'SPACE_USED_LIVE' | translate }}: {{ servers[current].page_data.glance.du_cwd | bytes_to_mb }}</p>
