@@ -1192,7 +1192,7 @@ test.chown = function(test) {
         callback(err);
       })
     },
-    async.apply(instance.chown, NEW_OWNER_CREDS),
+    async.apply(instance.chown, NEW_OWNER_CREDS.uid, NEW_OWNER_CREDS.gid),
     function(callback) {
       instance.property('owner', function(err, result) {
         test.ifError(err);
