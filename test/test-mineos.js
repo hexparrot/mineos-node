@@ -1174,12 +1174,22 @@ test.accept_eula = function(test) {
 }
 
 test.chown = function(test) {
+  var userid = require('userid');
+  var whoami = require('whoami');
+
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   var NEW_OWNER_CREDS = {
-    uid: userid.uid('bill'),
-    gid: userid.gid('bill')
+    uid: 1001,
+    gid: 1001
+  }
+
+  if (userid.uid(whoami) != 0) {
+    NEW_OWNER_CREDS = {
+      uid: userid.uid(whoami),
+      gid: userid.uid(whoami)
+    }
   }
 
   async.series([
@@ -1192,7 +1202,7 @@ test.chown = function(test) {
         callback(err);
       })
     },
-    async.apply(instance.chown, NEW_OWNER_CREDS),
+    async.apply(instance.chown, NEW_OWNER_CREDS.uid, NEW_OWNER_CREDS.gid),
     function(callback) {
       instance.property('owner', function(err, result) {
         test.ifError(err);

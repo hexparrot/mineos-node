@@ -903,8 +903,34 @@
                                             </header>
                                             <section class="body">
                                                 <div class="body-inner">
-                                                    <p>{{ 'SERVER_OWNER' | translate }}: {{ servers[current].page_data.glance.owner.username }} ({{ servers[current].page_data.glance.owner.uid }})</p>
-                                                    <p>{{ 'GROUP_OWNER' | translate }}: {{ servers[current].page_data.glance.owner.groupname }} ({{ servers[current].page_data.glance.owner.gid }})</p>
+                                                    <!-- Select -->
+                                                        <div class="control-group">
+                                                            <div class="controls">
+                                                                {{ 'SERVER_OWNER' | translate }}: <select class="span4" 
+                                                                                                ng-model="servers[current].page_data.glance.owner.uid" 
+                                                                                                ng-change="change_owner()">
+                                                                    <option 
+                                                                        ng-repeat="user in users" 
+                                                                        value="{{ user.uid }}"
+                                                                        ng-selected="user.uid == servers[current].page_data.glance.owner.uid">{{ '{0} ({1})'.format(user.username, user.uid) }}</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    <!--/ Select -->
+                                                    <!-- Select -->
+                                                        <div class="control-group">
+                                                            <div class="controls">
+                                                                {{ 'GROUP_OWNER' | translate }}: <select class="span4" 
+                                                                                                ng-model="servers[current].page_data.glance.owner.gid" 
+                                                                                                ng-change="change_owner()">
+                                                                    <option 
+                                                                        ng-repeat="group in groups" 
+                                                                        value="{{ group.gid }}"
+                                                                        ng-selected="group.gid == servers[current].page_data.glance.owner.gid">{{ '{0} ({1})'.format(group.groupname, group.gid) }}</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    <!--/ Select -->
                                                     <p>{{ 'SPACE_USED_LIVE' | translate }}: {{ servers[current].page_data.glance.du_cwd | bytes_to_mb }}</p>
                                                 </div>
                                             </section>

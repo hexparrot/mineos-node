@@ -14,8 +14,8 @@ var BASE_DIR = '/var/games/minecraft';
 var response_options = {root: __dirname};
 
 var OWNER_CREDS = {
-  uid: userid.uid(whoami),
-  gid: userid.gid(whoami)
+	uid: userid.uid(whoami) || 1000,
+	gid: userid.gid(whoami) || 1000
 }
 
 mineos.dependencies(function(err, binaries) {
@@ -26,7 +26,7 @@ mineos.dependencies(function(err, binaries) {
 		var be = server.backend(BASE_DIR, io, OWNER_CREDS);
 
 		app.get('/', function(req, res){
-		  res.sendFile('index.html', response_options);
+			res.sendFile('index.html', response_options);
 		});
 
 		app.use('/angular', express.static(__dirname + '/node_modules/angular'));
@@ -37,13 +37,13 @@ mineos.dependencies(function(err, binaries) {
 		app.use('/admin', express.static(__dirname + '/html'));
 
 		process.on('SIGINT', function() {
-		  console.log("Caught interrupt signal; closing webui....");
-		  be.shutdown();
-		  process.exit();
+			console.log("Caught interrupt signal; closing webui....");
+			be.shutdown();
+			process.exit();
 		});
 
 		http.listen(3000, function(){
-		  console.log('listening on *:3000');
+			console.log('listening on *:3000');
 		});
 	}
 })

@@ -577,12 +577,47 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
       request({ url: MOJANG_VERSIONS_URL, json: true }, handle_reply);
     }
   }
+
+  self.send_user_list = function() {
+    var passwd = require('etc-passwd');
+    var users = [];
+    var groups = [];
+
+    var gu = passwd.getUsers()
+      .on('user', function(user_data) {
+        if (user_data.uid >= 1000 && user_data.gid >= 1000)
+          users.push({
+            username: user_data.username,
+            uid: user_data.uid,
+            gid: user_data.gid,
+            home: user_data.home
+          })
+      })
+      .on('end', function() {
+        self.front_end.emit('user_list', users);
+      })
+
+    var gg = passwd.getGroups()
+      .on('group', function(group_data) {
+
+        if (group_data.gid >= 1000)
+          groups.push({
+            groupname: group_data.groupname,
+            gid: group_data.gid,
+            users: group_data.users
+          })
+      })
+      .on('end', function() {
+        self.front_end.emit('group_list', groups);
+      })
+  }
     
   self.front_end.on('connection', function(socket) {
     console.info('[WEBUI] User connected from', socket.request.connection.remoteAddress);
     self.front_end.emit('server_list', Object.keys(self.servers));
     socket.on('command', self.webui_dispatcher);
     self.send_profile_list();
+    self.send_user_list();
   })
 
   return self;

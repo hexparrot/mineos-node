@@ -151,6 +151,14 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     $scope.profiles = profile_data;
   })
 
+  socket.on('/', 'user_list', function(user_data) {
+    $scope.users = user_data;
+  })
+
+  socket.on('/', 'group_list', function(group_data) {
+    $scope.groups = group_data;
+  })
+
   socket.on('/', 'file_download', function(data) {
     $.gritter.add({
       title: "{0} {1}".format(data.command,
@@ -214,6 +222,12 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     socket.emit($scope.current, 'command', { command: 'modify_sp', 
                                              property: this.property,
                                              new_value: this.new_value });
+  }
+
+  $scope.change_owner = function() {
+    socket.emit($scope.current, 'command', { command: 'chown', 
+                                             uid: parseInt($scope.servers[$scope.current].page_data.glance.owner.uid),
+                                             gid: parseInt($scope.servers[$scope.current].page_data.glance.owner.gid)});
   }
 
   $scope.create_server = function() {
