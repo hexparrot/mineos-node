@@ -560,6 +560,8 @@ mineos.mc = function(server_name, base_dir) {
         })
       },
       async.apply(fs.ensureDir, new_server_dir),
+      async.apply(fs.ensureDir, path.join(base_dir, mineos.DIRS['archive'], new_server_name)),
+      async.apply(fs.ensureDir, path.join(base_dir, mineos.DIRS['backup'], new_server_name)),
       function(cb) {
         var proc = child_process.spawn(binary, args, params);
         proc.once('exit', function(code) {

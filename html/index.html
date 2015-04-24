@@ -1078,7 +1078,7 @@
                                                             <ul class="dropdown-menu">
                                                                 <li><a ng-click="server_command('delete_archive', {filename: archive.filename})" translate="DELETE_THIS_ARCHIVE"></a></li>
                                                                 <li><a href="#"></a></li>
-                                                                <li><a href="#" translate="CREATE_FROM_ARCHIVE"></a></li>
+                                                                <li><a ng-click="server_from_archive(archive.filename)" translate="CREATE_FROM_ARCHIVE"></a></li>
                                                             </ul>
                                                         </div><!--/ Button Dropdown -->
                                                         <!-- Button Dropdown -->
@@ -1385,6 +1385,20 @@
                     <button class="btn btn-success" aria-hidden="true" translate="ACCEPT_EULA" ng-click="server_command('accept_eula')"></button>
                     <button class="btn btn-warning" data-dismiss="modal" translate="RESTART" ng-click="server_command('restart')" ng-show="servers[current].heartbeat.up"></button>
                     <button class="btn btn-warning" data-dismiss="modal" translate="START" ng-click="server_command('start')" ng-show="!servers[current].heartbeat.up"></button>
+                </div>
+            </div><!--/ Modal With Animation --> 
+
+            <!-- Modal With Animation -->
+            <div id="modal_server_from_archive" class="modal hide fade">
+                <div class="modal-header">
+                    <h4 translate="CREATE_SERVER_FROM_ARCHIVE"></h4>
+                </div>
+                <div class="modal-body">
+                    <p translate="SERVER_FROM_ARCHIVE_DESC"></p>
+                    <input type="text" class="span2" ng-model="new_server_name">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" aria-hidden="true" translate="CREATE_FROM_ARCHIVE" ng-click="server_from_archive_create(new_server_name)"></button>
                 </div>
             </div><!--/ Modal With Animation --> 
 

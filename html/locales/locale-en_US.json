@@ -126,6 +126,9 @@
   "ACCEPT_EULA": "Accept EULA",
   "READ_THE_EULA": "Read the Minecraft EULA",
 
+  "CREATE_SERVER_FROM_ARCHIVE": "Create a new server from an existing archive",
+  "SERVER_FROM_ARCHIVE_DESC": "Please type in the name of the new server to create",
+
   "SUCCEEDED": "succeeded",
   "FAILED": "failed",
   "!up": "Server may not be up when performing this action.",

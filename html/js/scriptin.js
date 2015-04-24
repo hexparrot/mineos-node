@@ -284,6 +284,19 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     $('#modal_eula').modal('show');
   }
 
+  $scope.server_from_archive = function(archive_filename) {
+    $scope.archive_filename = archive_filename;
+    $('#modal_server_from_archive').modal('show');
+  }
+
+  $scope.server_from_archive_create = function(new_server_name) {
+    socket.emit($scope.current, 'command', {
+      'command': 'server_from_archive',
+      'new_server_name': new_server_name,
+      'filename': $scope.archive_filename
+    });
+  }
+
   $scope.update_loadavg = function(new_datapoint) {
     $scope.loadavg.push(new_datapoint);
 
