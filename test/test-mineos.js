@@ -48,7 +48,7 @@ test.dependencies_met = function(test) {
     test.done();
   })
 }
-
+/*
 test.server_list = function (test) {
   var servers = mineos.server_list(BASE_DIR);
   var instance = new mineos.mc('testing', BASE_DIR);
@@ -1216,7 +1216,7 @@ test.chown = function(test) {
     test.done();
   })
 }
-
+*/
 test.create_server_from_archive = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -1244,10 +1244,16 @@ test.create_server_from_archive = function(test) {
       test.ok(servers.indexOf('testing') >= 0);
       test.ok(servers.indexOf('testing_server_2') >= 0);
       callback();
-    }
+    },
+    function(callback) {
+      instance.server_from_archive('testing_server_2', created_archive, function(err){
+        test.ifError(!err);
+        callback(!err);
+      });
+    },
   ], function(err) {
     test.ifError(err);
-    test.expect(5);
+    test.expect(6);
     test.done();
   })
 }

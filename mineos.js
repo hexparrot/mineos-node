@@ -554,6 +554,11 @@ mineos.mc = function(server_name, base_dir) {
     var params = { cwd: new_server_dir }; //awd!
 
     async.series([
+      function(cb) {
+        fs.stat(new_server_dir, function(err, stat_data) {
+          cb(!err);
+        })
+      },
       async.apply(fs.ensureDir, new_server_dir),
       function(cb) {
         var proc = child_process.spawn(binary, args, params);
