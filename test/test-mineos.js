@@ -1216,3 +1216,38 @@ test.chown = function(test) {
     test.done();
   })
 }
+
+test.create_server_from_archive = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  var created_archive = null;
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    function(callback) {
+      var servers = mineos.server_list(BASE_DIR);
+      test.equal(servers.length, 1);
+      callback();
+    },
+    async.apply(instance.archive),
+    function(callback) {
+      created_archive = fs.readdirSync(instance.env.awd)[0];
+      callback(null);
+    },
+    function(callback) {
+      instance.server_from_archive('testing_server_2', created_archive, callback);
+    },
+    function(callback) {
+      var servers = mineos.server_list(BASE_DIR);
+      test.equal(servers.length, 2);
+      test.ok(servers.indexOf('testing') >= 0);
+      test.ok(servers.indexOf('testing_server_2') >= 0);
+      callback();
+    }
+  ], function(err) {
+    test.ifError(err);
+    test.expect(5);
+    test.done();
+  })
+}

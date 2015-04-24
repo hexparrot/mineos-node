@@ -418,9 +418,9 @@ mineos.mc = function(server_name, base_dir) {
     var strftime = require('strftime');
     var binary = which.sync('tar');
     var filename = 'server-{0}_{1}.tgz'.format(self.server_name, strftime('%Y-%m-%d_%H:%M:%S'));
-    var args = ['czf', path.join(self.env.awd, filename), self.env.cwd];
+    var args = ['czf', path.join(self.env.awd, filename), '.'];
 
-    var params = { cwd: self.env.awd }; //awd!
+    var params = { cwd: self.env.cwd }; //awd!
 
     async.series([
       function(cb) {
@@ -545,6 +545,23 @@ mineos.mc = function(server_name, base_dir) {
         callback(err, all_info);
       }
     }) 
+  }
+
+  self.server_from_archive = function(new_server_name, filename, callback) {
+    var binary = which.sync('tar');
+    var new_server_dir = path.join(base_dir, mineos.DIRS['servers'], new_server_name);
+    var args = ['xf', path.join(self.env.awd, filename)];
+    var params = { cwd: new_server_dir }; //awd!
+
+    async.series([
+      async.apply(fs.ensureDir, new_server_dir),
+      function(cb) {
+        var proc = child_process.spawn(binary, args, params);
+        proc.once('exit', function(code) {
+          cb(code);
+        })
+      }
+    ], callback);
   }
 
   self.delete_archive = function(filename, callback) {
