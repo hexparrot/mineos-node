@@ -32,6 +32,36 @@ app.directive('ngEnter', function () {
   };
 });
 
+app.directive('icheck', function($timeout, $parse) {
+  //http://stackoverflow.com/q/19346523/1191579
+  return {
+    link: function($scope, element, $attrs) {
+      return $timeout(function() {
+        var ngModelGetter, value;
+        ngModelGetter = $parse($attrs['ngModel']);
+        value = $parse($attrs['ngValue'])($scope);
+        return $(element).iCheck({
+          checkboxClass: 'icheckbox_minimal',
+          radioClass: 'iradio_minimal-grey',
+          checkboxClass: 'icheckbox_minimal-grey',
+          increaseArea: '20%'
+        }).on('ifChanged', function(event) {
+          if ($(element).attr('type') === 'checkbox' && $attrs['ngModel']) {
+            $scope.$apply(function() {
+                return ngModelGetter.assign($scope, event.target.checked);
+            });
+          }
+          if ($(element).attr('type') === 'radio' && $attrs['ngModel']) {
+            return $scope.$apply(function() {
+                return ngModelGetter.assign($scope, value);
+            });
+          }
+        });
+      });
+    }
+  };
+});  
+
 /* filters */
 
 app.filter('bytes_to_mb', function() {

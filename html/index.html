@@ -948,16 +948,16 @@
                                                     <div class="control-group">
                                                         <div class="controls">
                                                             <label class="checkbox">
-                                                                <input type="checkbox" value="archive"> archive/aaa
+                                                                <input icheck class="icheck" type="checkbox" ng-model="delete_archive"> archive/aaa
                                                             </label>
                                                             <label class="checkbox">
-                                                                <input type="checkbox" value="backup"> backup/aaa
+                                                                <input icheck class="icheck" type="checkbox" ng-model="delete_backup"> backup/aaa
                                                             </label>
                                                             <label class="checkbox">
-                                                                <input type="checkbox" value="servers"> servers/aaa
+                                                                <input icheck class="icheck" type="checkbox" ng-model="delete_servers"> servers/aaa
                                                             </label>
                                                         </div>
-                                                        <button type="button" class="btn btn-mini btn-danger" ng-click="server_command('delete')"><span class="icone-warning-sign"></span> {{ 'DELETE' | translate }}</button>
+                                                        <button type="button" class="btn btn-mini btn-danger" ng-disabled="!(delete_servers && delete_backup && delete_archive)" ng-click="server_command('delete')"><span class="icone-warning-sign"></span> {{ 'DELETE' | translate }}</button>
                                                     </div><!--/ Default Checkbox Inline -->
 
                                                 </div>
