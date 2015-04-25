@@ -8,6 +8,7 @@ var tail = require('tail').Tail;
 var uuid = require('node-uuid');
 var os = require('os');
 var CronJob = require('cron').CronJob;
+var dgram = require('dgram');
 var server = exports;
 
 server.backend = function(base_dir, socket_emitter, dir_owner) {
@@ -17,6 +18,47 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
   self.profiles = {};
   self.watches = {};
   self.front_end = socket_emitter || new events.EventEmitter();
+  
+
+  (function() {
+    //thanks to https://github.com/flareofghast/node-advertiser/blob/master/advert.js
+    console.log('z')
+    var udp_broadcaster = dgram.createSocket('udp4');
+    var udp_dest = '255.255.255.255';
+    var udp_port = 4445;
+    var broadcast_delay_ms = 2000;
+
+    udp_broadcaster.bind(function() {
+      udp_broadcaster.setBroadcast(true);
+    })
+    
+
+    async.forever(
+      function(next) {
+        for (var s in self.servers) {
+          console.log(s)
+          var instance = self.servers[s].instance;
+          if (instance) {
+            async.series([
+              async.apply(instance.verify, 'exists'),
+              async.apply(instance.verify, 'up'),
+            ], function(err) {
+              var msg = new Buffer('this is my server');
+              if (!err)
+                udp_broadcaster.send(msg, 0, msg.length, udp_port, udp_dest, function(err, bytes) {
+                  console.error('[WEBUI] udp broadcast error', err, bytes);
+                })
+              console.log('broadcasted')
+            })
+          }
+        }
+        setTimeout(next, broadcast_delay_ms)
+      },
+      function(err) {
+        //shouldn't really ever happen;
+      }
+    )    
+  })();
 
   (function() {
     var server_path = path.join(base_dir, mineos.DIRS['servers']);
