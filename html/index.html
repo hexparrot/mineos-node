@@ -579,9 +579,9 @@
                                     <label class="control-label">gamemode</label>
                                     <div class="controls">
                                         <select class="span2" ng-model="serverform.gamemode">
-                                            <option value="1" selected>Survival</option>
-                                            <option value="2">Creative</option>
-                                            <option value="3">Adventure</option>
+                                            <option value="0" selected>Survival</option>
+                                            <option value="1">Creative</option>
+                                            <option value="2">Adventure</option>
                                         </select>
                                     </div>
                                 </div><!--/ Select -->
@@ -604,6 +604,16 @@
                                     <div class="controls">
                                         <label class="checkbox">
                                             <input type="checkbox" class="nostyle" value="true" ng-model="serverform.generate_structures"> 
+                                        </label>
+                                    </div>
+                                </div><!--/ Default Checkbox -->
+
+								<!-- Default Checkbox -->
+                                    <div class="control-group">
+                                    <label class="control-label">broadcast-local</label>
+                                    <div class="controls">
+                                        <label class="checkbox">
+                                            <input type="checkbox" class="nostyle" value="true" ng-model="serverform.broadcast_local"> 
                                         </label>
                                     </div>
                                 </div><!--/ Default Checkbox -->
