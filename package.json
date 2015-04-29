@@ -22,7 +22,7 @@
     "path": "0.4.x",
     "introspect": "0.0.x",
     "tail": "0.4.x",
-    "uuid": "1.4.x",
+    "node-uuid": "1.4.x",
     "fs-extra": "0.11.x",
     "async": "0.9.x",
     "which": "1.0.x",
