@@ -622,3 +622,4 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
 
   return self;
 }
+
