@@ -27,7 +27,6 @@ mineos.SP_DEFAULTS = {
   'generate-structures': 'false',
   'generator-settings': '',
   'server-ip': '0.0.0.0',
-  'broadcast-local': 'true',
 }
 
 var JAR_PATH = process.env['HOME'];
