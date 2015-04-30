@@ -141,15 +141,6 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     }
   )
 
-  $scope.$watch(function(scope) { return Servers[$scope.current].sc },
-    function(sc_data) {
-      if ((sc_data.minecraft || {}).broadcast)
-        $('#broadcast').iCheck('check');
-      else
-        $('#broadcast').iCheck('uncheck');
-    }
-  )
-
   /* computed variables */
 
   $scope.servers_up = function() {
@@ -452,6 +443,10 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
 
     me.channel.on(server_name, 'server.config', function(data) {
       me['sc'] = data;
+      if ((data.minecraft || {}).broadcast)
+        $('#broadcast').iCheck('check');
+      else
+        $('#broadcast').iCheck('uncheck');
     })
 
     me.channel.on(server_name, 'server_fin', function(data) {
