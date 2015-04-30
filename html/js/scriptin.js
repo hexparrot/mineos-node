@@ -141,9 +141,9 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     }
   )
 
-  $scope.$watch(function(scope) { return Servers[$scope.current].sc.minecraft.broadcast },
-    function(new_value) {
-      if (new_value)
+  $scope.$watch(function(scope) { return Servers[$scope.current].sc },
+    function(sc_data) {
+      if ((sc_data.minecraft || {}).broadcast)
         $('#broadcast').iCheck('check');
       else
         $('#broadcast').iCheck('uncheck');
