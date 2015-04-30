@@ -135,6 +135,21 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     }
   );
 
+  $scope.$watch(function(scope) { return scope.broadcast_to_lan },
+    function(new_value, previous_value) {
+      $scope.change_sc('minecraft', 'broadcast', new_value);
+    }
+  )
+
+  $scope.$watch(function(scope) { return Servers[$scope.current].sc.minecraft.broadcast },
+    function(new_value) {
+      if (new_value)
+        $('#broadcast').iCheck('check');
+      else
+        $('#broadcast').iCheck('uncheck');
+    }
+  )
+
   /* computed variables */
 
   $scope.servers_up = function() {

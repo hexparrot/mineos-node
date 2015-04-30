@@ -64,6 +64,7 @@
   "RESTART": "Restart",
   "STOP_AND_BACKUP": "Stop and Backup",
   "KILL": "Kill",
+  "BROADCAST_TO_LAN": "Broadcast to LAN",
 
   "JAVA_SETTINGS": "Java Settings",
   "MEMORY_ALLOCATION": "Memory Allocation (Heapsize)",
