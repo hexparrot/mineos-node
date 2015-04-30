@@ -48,7 +48,7 @@ test.dependencies_met = function(test) {
     test.done();
   })
 }
-/*
+
 test.server_list = function (test) {
   var servers = mineos.server_list(BASE_DIR);
   var instance = new mineos.mc('testing', BASE_DIR);
@@ -1216,7 +1216,7 @@ test.chown = function(test) {
     test.done();
   })
 }
-*/
+
 test.create_server_from_archive = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -1251,6 +1251,39 @@ test.create_server_from_archive = function(test) {
         callback(!err);
       });
     },
+  ], function(err) {
+    test.ifError(err);
+    test.expect(6);
+    test.done();
+  })
+}
+
+test.broadcast_property = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    function(callback) {
+      instance.create(OWNER_CREDS, function(err) {
+        test.ifError(err);
+        callback(err);
+      })
+    },
+    function(callback) {
+      instance.property('broadcast', function(err, will_broadcast) {
+        test.ifError(err);
+        test.ok(!will_broadcast);
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'minecraft', 'broadcast', 'true'),
+    function(callback) {
+      instance.property('broadcast', function(err, will_broadcast) {
+        test.ifError(err);
+        test.ok(true);
+        callback(err);
+      })
+    }
   ], function(err) {
     test.ifError(err);
     test.expect(6);

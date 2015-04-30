@@ -779,7 +779,10 @@
                                                                 <select class="span6" ng-model="myprofile" data-ng-options="p as p.id group by p.group for p in profiles | profile_filter:'downloaded' | orderBy:'-releaseTime'" ng-change="change_sc('minecraft', 'profile', myprofile.id)"></select>
                                                             </div>
                                                         </div><!--/ Select -->
-                                                    
+
+                                                        <label class="checkbox">
+                                                            <input icheck id="broadcast" class="icheck" type="checkbox" ng-model="broadcast_to_lan"> {{ 'BROADCAST_TO_LAN' | translate }}
+                                                        </label>
                                                 </div>
                                             </section>
                                         </div>

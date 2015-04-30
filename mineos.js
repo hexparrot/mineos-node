@@ -707,6 +707,11 @@ mineos.mc = function(server_name, base_dir) {
           callback(err, size);
         })
         break;
+      case 'broadcast':
+        self.sc(function(err, dict) {
+          callback(err, dict['minecraft']['broadcast']);
+        })
+        break;
     }
   }
 
