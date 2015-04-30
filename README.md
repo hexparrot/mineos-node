@@ -47,15 +47,21 @@ TODO
 -------
 
 * implement authentication model and web-ui login page
-* implement server.config importing and configuration in the web-ui
 * implement profiles or a replacement model for downloading jar files
-* implement previous_versions: functionality to roll back or view particular files' previous state
 * remove restore points from the web-ui, allow rotation of restore points
 * save all user actions in web-ui to a file/database (log kept in working memory currently)
+* save cronjobs to portable format, e.g., server.config
 * macro often-repeated tasks from web-ui
+* daemonize with auto-restart capability
+* more fully document functions
+
+EVENTUALLY
+-------
+
+* implement previous_versions: functionality to roll back or view particular files' previous state
+* command-line interface for scripting
 * PHAR support
 * identify java versions in web-ui, allow choice of utilized jvm
-* more fully document functions
 
 CURRENTLY WORKING
 -------
