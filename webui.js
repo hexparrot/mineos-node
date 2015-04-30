@@ -8,14 +8,13 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var userid = require('userid');
-var whoami = require('whoami');
 
 var BASE_DIR = '/var/games/minecraft';
 var response_options = {root: __dirname};
 
 var OWNER_CREDS = {
-	uid: userid.uid(whoami) || 1000,
-	gid: userid.gid(whoami) || 1000
+	uid: userid.uid(process.env.USER) || 1000,
+	gid: userid.gid(process.env.GROUP) || 1000
 }
 
 mineos.dependencies(function(err, binaries) {

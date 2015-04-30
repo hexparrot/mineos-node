@@ -5,7 +5,7 @@ var path = require('path');
 var events = require('events');
 var introspect = require('introspect');
 var tail = require('tail').Tail;
-var uuid = require('node-uuid');
+var uuid = require('uuid');
 var os = require('os');
 var CronJob = require('cron').CronJob;
 var dgram = require('dgram');
@@ -43,7 +43,8 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
               async.apply(instance.verify, 'exists'),
               async.apply(instance.verify, 'up'),
             ], function(err) {
-              var msg = new Buffer('this is my server');
+              var msg = new Buffer('[MOTD]'+ self.servers[s].motd + '[/MOTD][AD]' + self.servers[s].server-port + '[/AD]');
+              console.log(msg)
               if (!err)
                 udp_broadcaster.send(msg, 0, msg.length, udp_port, udp_dest, function(err, bytes) {
                   console.error('[WEBUI] udp broadcast error', err, bytes);
