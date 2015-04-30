@@ -22,7 +22,6 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
 
   (function() {
     //thanks to https://github.com/flareofghast/node-advertiser/blob/master/advert.js
-    console.log('z')
     var udp_broadcaster = dgram.createSocket('udp4');
     var udp_dest = '255.255.255.255';
     var udp_port = 4445;
@@ -36,20 +35,34 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
     async.forever(
       function(next) {
         for (var s in self.servers) {
-          console.log(s)
+//          console.log(s)
           var instance = self.servers[s].instance;
           if (instance) {
             async.series([
               async.apply(instance.verify, 'exists'),
               async.apply(instance.verify, 'up'),
             ], function(err) {
-              var msg = new Buffer('[MOTD]'+ self.servers[s].motd + '[/MOTD][AD]' + self.servers[s].server-port + '[/AD]');
-              console.log(msg)
-              if (!err)
-                udp_broadcaster.send(msg, 0, msg.length, udp_port, udp_dest, function(err, bytes) {
-                  console.error('[WEBUI] udp broadcast error', err, bytes);
-                })
-              console.log('broadcasted')
+                async.series({
+                  'port': function(cb) {
+                   instance.property('server-port', function(err, port) {
+                     cb(null, err ? {} : port);
+                   })
+                  },
+                  'motd': function(cb) {
+                	  instance.property('server-motd', function(err, motd){
+                		  cb(null, err ? {} : motd);
+                	  })
+                  },
+                }, function (err, retval) {
+                  if (err){ return(err) }
+                  var msg = new Buffer('[MOTD]'+ retval.motd + '[/MOTD][AD]' + retval.port + '[/AD]');
+                  if (!err)
+                    udp_broadcaster.send(msg, 0, msg.length, udp_port, udp_dest, function(err, bytes) {
+                      if (err)
+                    	  console.error('[WEBUI] udp broadcast error', err, bytes);
+                    })
+//                  console.log('broadcasted')
+                   });
             })
           }
         }
