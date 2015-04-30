@@ -103,7 +103,7 @@ mineos.dependencies = async.memoize(function(callback) {
     'screen': async.apply(which, 'screen'),
     'tar': async.apply(which, 'tar'),
     'java': async.apply(which, 'java'),
-    'rdiff-backup': async.apply(which, 'rdiff-backup')
+//    'rdiff-backup': async.apply(which, 'rdiff-backup')
   }, callback);
 })
 
@@ -657,6 +657,11 @@ mineos.mc = function(server_name, base_dir) {
           callback(err, dict['server-ip']);
         })
         break;
+      case 'server-motd':
+    	var motd = self.sp(function(err,dict){
+    	  callback(err, dict['motd']);
+    	})
+    	break;
       case 'memory':
         var pids = mineos.server_pids_up();
         if (self.server_name in pids) {
