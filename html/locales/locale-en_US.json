@@ -47,6 +47,7 @@
   "RELEASE_TIMESTAMP": "Release Timestamp",
   "RELEASE_TYPE": "Release Type",
   "RELEASE": "Release",
+  "OLD_VERSION": "Old Version",
   "SNAPSHOT": "Snapshot",
   "SHOW_ALL_RELEASES": "Show All",
   "DOWNLOADED_PROFILES": "Downloaded Profiles",

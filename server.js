@@ -579,8 +579,6 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         var request = require('request');
         var fs = require('fs-extra');
 
-        console.log('{0}-{1}'.format(args.profile.dir, args.profile.version.replace(/\./g, '_')))
-
         var dest_dir = '/var/games/minecraft/profiles/{0}-{1}'.format(args.profile.dir, args.profile.version.replace(/\./g, '_'));
         var filename = args.profile.url;
         var dest_filepath = path.join(dest_dir, filename);
@@ -678,8 +676,19 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
               item['type'] = 'release';
               item['id'] = '{0}-{1}'.format(item['dir'], item['version']);
               item['webui_desc'] = '{0} {1}'.format(item['name'], item['version']);
-
               p.push(item);
+
+              var old_versions = item['oldVersions'].split(';');
+              for (var idx in old_versions) {
+                var new_item = JSON.parse(JSON.stringify(item)); //deep copy object
+
+                if (old_versions[idx].length > 0 && old_versions[idx] != item['version']) {
+                  new_item['type'] = 'old_version';
+                  new_item['id'] = '{0}-{1}'.format(new_item['dir'], old_versions[idx]);
+                  new_item['webui_desc'] = '{0} {1}'.format(new_item['name'], old_versions[idx]);
+                  p.push(new_item);
+                }
+              }
             }
             callback(err || inner_err, p);
           })
