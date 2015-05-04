@@ -52,7 +52,6 @@
   "SHOW_ALL_RELEASES": "Show All",
   "DOWNLOADED_PROFILES": "Downloaded Profiles",
   "CURRENTLY_USING_PROFILE": "Currently using profile:",
-  "CHANGE_PROFILE_TO": "Change profile to:",
   "PROFILE": "Profile",
   "PROFILE_DESC": "Profile Description",
 
@@ -75,6 +74,8 @@
   "JAVA_XMS": "-Xms",
   "MB_ABBREVIATION": "MB",
   "SELECT_SERVER_PROFILE": "Select server profile",
+  "CHANGE_PROFILE_TO": "Change profile to:",
+  "CHANGE_JARFILE_TO": "Change runnable jar to:",
 
   "MOST_RECENT_RESTORE_POINT": "Most recent restore point",
   "OLDEST_RESTORE_POINT": "Oldest restore point",

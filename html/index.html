@@ -780,7 +780,6 @@
                                                                 <select class="span6" ng-model="myprofile" data-ng-options="p as p.id group by p.group for p in profiles | profile_filter:'downloaded' | orderBy:'-releaseTime'" ng-change="change_sc('minecraft', 'profile', myprofile.id)"></select>
                                                             </div>
                                                         </div><!--/ Select -->
-
                                                         <label class="checkbox">
                                                             <input icheck id="broadcast" class="icheck" type="checkbox" ng-model="broadcast_to_lan"> {{ 'BROADCAST_TO_LAN' | translate }}
                                                         </label>
@@ -819,6 +818,13 @@
                                                                 </div>
                                                             </div>
                                                         </div><!--/ Help Text -->
+                                                        <!-- Select -->
+                                                        <div class="control-group">
+                                                            <label class="control-label span3" translate="CHANGE_JARFILE_TO"></label>
+                                                            <div class="controls">
+                                                                <select class="span6" ng-model="myjarfile" data-ng-options="j for j in servers[current].page_data.glance.server_files" ng-change="change_sc('java', 'jarfile', myjarfile)"></select>
+                                                            </div>
+                                                        </div><!--/ Select -->
                                                     </p>
                                                 </div>
                                             </section>

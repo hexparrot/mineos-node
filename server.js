@@ -278,7 +278,8 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
                 'du_awd': async.apply(instance.property, 'du_awd'),
                 'du_bwd': async.apply(instance.property, 'du_bwd'),
                 'du_cwd': async.apply(instance.property, 'du_cwd'),
-                'owner': async.apply(instance.property, 'owner')
+                'owner': async.apply(instance.property, 'owner'),
+                'server_files': async.apply(instance.property, 'server_files')
               }, function(err, results) {
                 nsp.emit('page_data', {page: page, payload: results});
               })
