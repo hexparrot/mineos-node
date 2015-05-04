@@ -583,7 +583,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         var filename = args.profile.url;
         var dest_filepath = path.join(dest_dir, filename);
 
-        var url = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(args.profile.dir, args.profile.version.replace(/\./g, '_'), args.profile.url);
+        var url = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(args.profile.dir, args.profile.version.replace(/\./g, '_'), args.profile.serverPack);
 
         fs.ensureDir(dest_dir, function(err) {
           if (err) {
