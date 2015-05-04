@@ -11,8 +11,8 @@ var FS_DELAY_MS = 200;
 var PROC_START_DELAY_MS = 200;
 
 var OWNER_CREDS = {
-  uid: userid.uid(whoami),
-  gid: userid.gid(whoami)
+  uid: userid.uid(process.env.USER) || 1000,
+  gid: userid.gid(process.env.USER) || 1000
 }
 
 function delete_everything(callback) {
@@ -1321,6 +1321,38 @@ test.server_files_property = function(test) {
   ], function(err) {
     test.ifError(err);
     test.expect(7);
+    test.done();
+  })
+}
+
+
+test.copy_profile = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+  var owner_info = {};
+
+  async.waterfall([
+    function(callback) {
+      instance.create(OWNER_CREDS, function(err) {
+        test.ifError(err);
+        callback(err);
+      })
+    },
+    async.apply(instance.property, 'owner'),
+    function(owner, cb) {
+      owner_info = owner;
+      cb();
+    },
+    async.apply(instance.copy_profile, 
+      path.join(instance.env.pwd, '1.7.9') + '/', 
+      instance.env.cwd + '/',
+      owner_info.uid,
+      owner_info.gid
+      ),
+    async.apply(fs.stat, path.join(instance.env.cwd, 'minecraft_server.1.7.9.jar'))
+  ], function(err) {
+    test.ifError(err);
+    test.expect(2);
     test.done();
   })
 }
