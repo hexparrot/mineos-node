@@ -47,7 +47,8 @@
     "tmp": "0.0.x",
     "request": "2.55.x",
     "rsync": "0.4.x",
-    "etc-passwd": "0.1.x"
+    "etc-passwd": "0.1.x",
+    "xml2js": "0.4.x"
   },
   "devDependencies": {
     "nodeunit": "0.9.x"

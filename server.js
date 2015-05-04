@@ -620,7 +620,8 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
 
   self.send_profile_list = function() {
     async.parallel([
-      async.apply(self.check_profiles.mojang)
+      async.apply(self.check_profiles.mojang),
+      async.apply(self.check_profiles.ftb)
     ], function(err, results) {
       //http://stackoverflow.com/a/10865042/1191579
       var merged = [];
@@ -652,6 +653,34 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         callback(err, p);
       }
       request({ url: MOJANG_VERSIONS_URL, json: true }, handle_reply);
+    },
+    ftb: function(callback) {
+      var request = require('request');
+      var xml_parser = require('xml2js');
+      var fs = require('fs');
+
+      var FTB_VERSIONS_URL = 'http://ftb.cursecdn.com/FTB2/static/modpacks.xml';
+      var path_prefix = path.join(base_dir, mineos.DIRS['profiles']);
+
+      function handle_reply(err, response, body) {
+        var p = [];
+
+        if (!err && response.statusCode === 200)
+          xml_parser.parseString(body, function(inner_err, result) {
+            var packs = result['modpacks']['modpack'];
+            for (var index in packs) {
+              var item = packs[index]['$'];
+              item['group'] = 'ftb';
+              item['downloaded'] = false;
+
+              p.push(item);
+            }
+            callback(err || inner_err, p);
+          })
+        else
+          callback(null, p);
+      }
+      request({ url: FTB_VERSIONS_URL, json: false }, handle_reply);
     }
   }
 
