@@ -575,6 +575,41 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           }
         });
         break;
+      case 'ftb_download':
+        var request = require('request');
+        var fs = require('fs-extra');
+
+        var dest_dir = '/var/games/minecraft/profiles/{0}-{1}'.format(args['_dir'], args['_version'].replace(/\./g, '_'));
+        var filename = args['_url'];
+        var dest_filepath = path.join(dest_dir, filename);
+
+        var url = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(args['_dir'], args['_version'].replace(/\./g, '_'), args['_url']);
+
+        fs.ensureDir(dest_dir, function(err) {
+          if (err) {
+            console.error('[WEBUI] Error attempting download:', err);
+          } else {
+            request(url)
+              .on('complete', function(response) {
+                if (response.statusCode == 200) {
+                  console.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                  args['dest_dir'] = dest_dir;
+                  args['filename'] = filename;
+                  args['success'] = true;
+                  args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
+                  self.front_end.emit('file_download', args);
+                } else {
+                  console.error('[WEBUI] Server was unable to download file:', url);
+                  console.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                  args['success'] = false;
+                  args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                  self.front_end.emit('file_download', args);
+                }
+              })
+              .pipe(fs.createWriteStream(dest_filepath))
+          }
+        });
+        break;
       case 'notices':
         for (var server_name in self.servers) 
           self.servers[server_name].nsp.emit('notices', self.servers[server_name].notices);
