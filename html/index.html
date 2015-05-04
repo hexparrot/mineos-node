@@ -632,7 +632,7 @@
                         <!-- START Basic Table -->
                         <div class="span12 widget">
                             <header>
-                                <h4 class="title" translate="OFFICIAL_MOJANG_SERVER_JARS"></h4>
+                                <h4 class="title" translate="AVAILABLE_SERVER_JARS"></h4>
                                 <!-- START Toolbar -->
                                 <ul class="toolbar pull-right">
                                     <li>
@@ -652,8 +652,8 @@
                                     <table class="table">
                                         <thead>
                                             <tr>
-                                                <th translate="MOJANG_ID"></th>
-                                                <th translate="RELEASE_TIMESTAMP"></th>
+                                                <th translate="IDENTIFIER"></th>
+                                                <th translate="PROFILE_DESC"></th>
                                                 <th translate="RELEASE_TYPE"></th>
                                                 <th></th>
                                             </tr>
@@ -661,7 +661,7 @@
                                         <tbody>
                                             <tr ng-repeat="jar in profiles | profile_filter:showonly | orderBy:'-releaseTime'">
                                                 <td>{{ jar.id }}</td>
-                                                <td>{{ jar.releaseTime | amDateFormat: "dddd, MMMM Do YYYY, h:mm:ss a" }}</td>
+                                                <td>{{ jar.webui_desc }}</td>
                                                 <td>{{ jar.type }}</td>
                                                 <td>
                                                     <p>
