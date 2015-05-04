@@ -1175,7 +1175,6 @@ test.accept_eula = function(test) {
 
 test.chown = function(test) {
   var userid = require('userid');
-  var whoami = require('whoami');
 
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -1185,10 +1184,10 @@ test.chown = function(test) {
     gid: 1001
   }
 
-  if (userid.uid(whoami) != 0) {
+  if (userid.uid(process.env.USER) != 0) {
     NEW_OWNER_CREDS = {
-      uid: userid.uid(whoami),
-      gid: userid.uid(whoami)
+      uid: userid.uid(process.env.USER),
+      gid: userid.uid(process.env.USER)
     }
   }
 
