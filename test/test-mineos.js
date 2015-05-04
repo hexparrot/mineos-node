@@ -1324,30 +1324,19 @@ test.server_files_property = function(test) {
   })
 }
 
-
 test.copy_profile = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
   var owner_info = {};
 
-  async.waterfall([
+  async.series([
     function(callback) {
       instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
         callback(err);
       })
     },
-    async.apply(instance.property, 'owner'),
-    function(owner, cb) {
-      owner_info = owner;
-      cb();
-    },
-    async.apply(instance.copy_profile, 
-      path.join(instance.env.pwd, '1.7.9') + '/', 
-      instance.env.cwd + '/',
-      owner_info.uid,
-      owner_info.gid
-      ),
+    async.apply(instance.copy_profile),
     async.apply(fs.stat, path.join(instance.env.cwd, 'minecraft_server.1.7.9.jar'))
   ], function(err) {
     test.ifError(err);
