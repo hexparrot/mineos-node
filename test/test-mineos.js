@@ -1290,3 +1290,37 @@ test.broadcast_property = function(test) {
     test.done();
   })
 }
+
+test.server_files_property = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    function(callback) {
+      instance.create(OWNER_CREDS, function(err) {
+        test.ifError(err);
+        callback(err);
+      })
+    },
+    function(callback) {
+      instance.property('server_files', function(err, server_files) {
+        test.ifError(err);
+        test.equal(server_files.length, 0);
+        callback(err);
+      })
+    },
+    async.apply(fs.ensureFile, path.join(instance.env.cwd, 'myserver.jar')),
+    function(callback) {
+      instance.property('server_files', function(err, server_files) {
+        test.ifError(err);
+        test.equal(server_files.length, 1);
+        test.equal(server_files[0], 'myserver.jar');
+        callback(err);
+      })
+    }
+  ], function(err) {
+    test.ifError(err);
+    test.expect(7);
+    test.done();
+  })
+}

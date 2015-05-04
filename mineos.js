@@ -712,6 +712,13 @@ mineos.mc = function(server_name, base_dir) {
           callback(err, dict['minecraft']['broadcast']);
         })
         break;
+      case 'server_files':
+        fs.readdir(self.env.cwd, function(err, files) {
+          callback(err, files.filter(function(file) { 
+            return file.substr(-4) == '.jar'; 
+          }))
+        });
+        break;
     }
   }
 
