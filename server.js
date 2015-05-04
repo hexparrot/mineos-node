@@ -580,6 +580,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
       case 'ftb_download':
         var request = require('request');
         var fs = require('fs-extra');
+        var unzip = require('unzip');
 
         var dest_dir = '/var/games/minecraft/profiles/{0}-{1}'.format(args.profile.dir, args.profile.version.replace(/\./g, '_'));
         var filename = args.profile.url;
@@ -599,7 +600,11 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
                   args['filename'] = filename;
                   args['success'] = true;
                   args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
-                  self.front_end.emit('file_download', args);
+
+                  fs.createReadStream(dest_filepath)
+                    .pipe(unzip.Extract({ path: dest_dir }).on('close', function() {
+                      self.front_end.emit('file_download', args);
+                    }));
                 } else {
                   console.error('[WEBUI] Server was unable to download file:', url);
                   console.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
