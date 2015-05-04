@@ -582,8 +582,9 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         var fs = require('fs-extra');
         var unzip = require('unzip');
 
-        var dest_dir = '/var/games/minecraft/profiles/{0}-{1}'.format(args.profile.dir, args.profile.version.replace(/\./g, '_'));
-        var filename = args.profile.url;
+        var dir_concat = '{0}-{1}'.format(args.profile.dir, args.profile.version);
+        var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
+        var filename = args.profile.serverPack;
         var dest_filepath = path.join(dest_dir, filename);
 
         var url = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(args.profile.dir, args.profile.version.replace(/\./g, '_'), args.profile.serverPack);
@@ -676,23 +677,27 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         if (!err && response.statusCode === 200)
           xml_parser.parseString(body, function(inner_err, result) {
             var packs = result['modpacks']['modpack'];
+
             for (var index in packs) {
               var item = packs[index]['$'];
+              var dir_concat = '{0}-{1}'.format(item['dir'], item['version']);
               item['group'] = 'ftb';
-              item['downloaded'] = false;
               item['type'] = 'release';
-              item['id'] = '{0}-{1}'.format(item['dir'], item['version']);
+              item['id'] = dir_concat;
               item['webui_desc'] = '{0} {1}'.format(item['name'], item['version']);
+              item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item['serverPack']));
               p.push(item);
 
               var old_versions = item['oldVersions'].split(';');
               for (var idx in old_versions) {
                 var new_item = JSON.parse(JSON.stringify(item)); //deep copy object
+                var dir_concat = '{0}-{1}'.format(new_item['dir'], old_versions[idx]);
 
                 if (old_versions[idx].length > 0 && old_versions[idx] != item['version']) {
                   new_item['type'] = 'old_version';
-                  new_item['id'] = '{0}-{1}'.format(new_item['dir'], old_versions[idx]);
+                  new_item['id'] = dir_concat;
                   new_item['webui_desc'] = '{0} {1}'.format(new_item['name'], old_versions[idx]);
+                  new_item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, new_item['serverPack']));
                   p.push(new_item);
                 }
               }
