@@ -62,7 +62,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
 
   (function() {
     var server_path = path.join(base_dir, mineos.DIRS['servers']);
-    var regex_servers = new RegExp('{0}\/[a-zA-Z0-9_\.]+\/.+'.format(server_path));
+    var regex_servers = new RegExp('{0}\/[^\/]+\/.+'.format(server_path));
     self.watches['servers'] = chokidar.watch(server_path, { persistent: true, ignored: regex_servers });
     // ignores event updates from servers that have more path beyond the /servers/<dirhere>/<filehere>
 
@@ -124,9 +124,11 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
 
   (function() {
     var profile_path = path.join(base_dir, mineos.DIRS['profiles']);
-    var regex_profiles = new RegExp('{0}\/[a-zA-Z0-9_\.]+\/.+'.format(profile_path));
+    var regex_profiles = new RegExp('{0}\/[^\/]+\/.+'.format(profile_path));
     self.watches['profiles'] = chokidar.watch(profile_path, { persistent: true, ignored: regex_profiles });
     // ignores event updates from profiles that have more path beyond the /profiles/<dirhere>/<filehere>
+
+    //FIXME: on initial start, this will trigger for each profile, triggering x self.send_profile_lists (and x downloads)
 
     self.watches['profiles']
       .on('addDir', function(dirpath) {
