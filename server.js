@@ -544,11 +544,11 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         var request = require('request');
         var fs = require('fs-extra');
 
-        var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.id);
-        var filename = 'minecraft_server.{0}.jar'.format(args.id);
+        var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.profile.id);
+        var filename = 'minecraft_server.{0}.jar'.format(args.profile.id);
         var dest_filepath = path.join(dest_dir, filename);
 
-        var url = 'https://s3.amazonaws.com/Minecraft.Download/versions/{0}/{1}'.format(args.id, filename);
+        var url = 'https://s3.amazonaws.com/Minecraft.Download/versions/{0}/{1}'.format(args.profile.id, filename);
 
         fs.ensureDir(dest_dir, function(err) {
           if (err) {
@@ -579,11 +579,13 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         var request = require('request');
         var fs = require('fs-extra');
 
-        var dest_dir = '/var/games/minecraft/profiles/{0}-{1}'.format(args['_dir'], args['_version'].replace(/\./g, '_'));
-        var filename = args['_url'];
+        console.log('{0}-{1}'.format(args.profile.dir, args.profile.version.replace(/\./g, '_')))
+
+        var dest_dir = '/var/games/minecraft/profiles/{0}-{1}'.format(args.profile.dir, args.profile.version.replace(/\./g, '_'));
+        var filename = args.profile.url;
         var dest_filepath = path.join(dest_dir, filename);
 
-        var url = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(args['_dir'], args['_version'].replace(/\./g, '_'), args['_url']);
+        var url = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(args.profile.dir, args.profile.version.replace(/\./g, '_'), args.profile.url);
 
         fs.ensureDir(dest_dir, function(err) {
           if (err) {
