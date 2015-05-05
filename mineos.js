@@ -252,11 +252,11 @@ mineos.mc = function(server_name, base_dir) {
       },
       'jarfile': function (cb) {
         server_config(function (err, dict) {
-          var profile = (dict.minecraft || {}).profile;
-          if (!profile)
-            cb('Server not assigned a runnable jar')
+          var jarfile = (dict.java || {}).jarfile;
+          if (!jarfile)
+            cb('Server not assigned a runnable jar');
           else
-            cb(null, 'minecraft_server.{0}.jar'.format(profile));
+            cb(null, jarfile);
         });
       },
       'jar_args': function (cb) {
