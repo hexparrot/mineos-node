@@ -738,10 +738,12 @@ mineos.mc = function(server_name, base_dir) {
           },
           async.apply(self.sc),
           function(sc_data, cb) {
+            var active_profile_dir = '';
             try {
-              var active_profile_dir = path.join(self.env.pwd, sc_data.minecraft.profile);
+              active_profile_dir = path.join(self.env.pwd, sc_data.minecraft.profile);
             } catch (e) {
               cb();
+              return;
             }
 
             fs.readdir(active_profile_dir, function(err, files) {
@@ -749,7 +751,7 @@ mineos.mc = function(server_name, base_dir) {
                 cb();
               } else {
                 server_files.push.apply(server_files, files.filter(function(file) { 
-                  return file.substr(-4) == '.jar'; 
+                  return file.substr(-4) == '.jar' && server_files.indexOf(file) < 0; 
                 }))
                 cb();
               }
