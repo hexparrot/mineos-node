@@ -698,6 +698,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
             item['group'] = 'mojang';
             item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, 'minecraft_server.{0}.jar'.format(item.id)));
             item['webui_desc'] = 'Official Mojang Jar';
+            item['weight'] = 0;
 
             p.push(item);
           }
@@ -728,6 +729,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
               item['type'] = 'release';
               item['id'] = dir_concat;
               item['webui_desc'] = '{0} {1}'.format(item['name'], item['version']);
+              item['weight'] = 5;
               item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item['serverPack']));
               p.push(item);
 
@@ -774,6 +776,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
               item['type'] = 'release';
               item['id'] = dir_concat;
               item['webui_desc'] = '{0} {1}'.format(item['name'], item['version']);
+              item['weight'] = 10;
               item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item['serverPack']));
               p.push(item);
 
