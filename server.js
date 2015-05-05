@@ -619,6 +619,47 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           }
         });
         break;
+      case 'ftb_third_party_download':
+        var request = require('request');
+        var fs = require('fs-extra');
+        var unzip = require('unzip');
+
+        var dir_concat = '{0}-{1}'.format(args.profile.dir, args.profile.version);
+        var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
+        var filename = args.profile.serverPack;
+        var dest_filepath = path.join(dest_dir, filename);
+
+        var url = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(args.profile.dir, args.profile.version.replace(/\./g, '_'), args.profile.serverPack);
+
+        fs.ensureDir(dest_dir, function(err) {
+          if (err) {
+            console.error('[WEBUI] Error attempting download:', err);
+          } else {
+            request(url)
+              .on('complete', function(response) {
+                if (response.statusCode == 200) {
+                  console.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                  args['dest_dir'] = dest_dir;
+                  args['filename'] = filename;
+                  args['success'] = true;
+                  args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
+
+                  fs.createReadStream(dest_filepath)
+                    .pipe(unzip.Extract({ path: dest_dir }).on('close', function() {
+                      self.front_end.emit('file_download', args);
+                    }));
+                } else {
+                  console.error('[WEBUI] Server was unable to download file:', url);
+                  console.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                  args['success'] = false;
+                  args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                  self.front_end.emit('file_download', args);
+                }
+              })
+              .pipe(fs.createWriteStream(dest_filepath))
+          }
+        });
+        break;
       case 'notices':
         for (var server_name in self.servers) 
           self.servers[server_name].nsp.emit('notices', self.servers[server_name].notices);
@@ -630,7 +671,8 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
   self.send_profile_list = function() {
     async.parallel([
       async.apply(self.check_profiles.mojang),
-      async.apply(self.check_profiles.ftb)
+      async.apply(self.check_profiles.ftb),
+      async.apply(self.check_profiles.ftb_third_party)
     ], function(err, results) {
       //http://stackoverflow.com/a/10865042/1191579
       var merged = [];
@@ -683,6 +725,52 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
               var item = packs[index]['$'];
               var dir_concat = '{0}-{1}'.format(item['dir'], item['version']);
               item['group'] = 'ftb';
+              item['type'] = 'release';
+              item['id'] = dir_concat;
+              item['webui_desc'] = '{0} {1}'.format(item['name'], item['version']);
+              item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item['serverPack']));
+              p.push(item);
+
+              var old_versions = item['oldVersions'].split(';');
+              for (var idx in old_versions) {
+                var new_item = JSON.parse(JSON.stringify(item)); //deep copy object
+                var dir_concat = '{0}-{1}'.format(new_item['dir'], old_versions[idx]);
+
+                if (old_versions[idx].length > 0 && old_versions[idx] != item['version']) {
+                  new_item['type'] = 'old_version';
+                  new_item['id'] = dir_concat;
+                  new_item['webui_desc'] = '{0} {1}'.format(new_item['name'], old_versions[idx]);
+                  new_item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, new_item['serverPack']));
+                  p.push(new_item);
+                }
+              }
+            }
+            callback(err || inner_err, p);
+          })
+        else
+          callback(null, p);
+      }
+      request({ url: FTB_VERSIONS_URL, json: false }, handle_reply);
+    },
+    ftb_third_party: function(callback) {
+      var request = require('request');
+      var xml_parser = require('xml2js');
+      var fs = require('fs');
+
+      var FTB_VERSIONS_URL = 'http://ftb.cursecdn.com/FTB2/static/thirdparty.xml';
+      var path_prefix = path.join(base_dir, mineos.DIRS['profiles']);
+
+      function handle_reply(err, response, body) {
+        var p = [];
+
+        if (!err && response.statusCode === 200)
+          xml_parser.parseString(body, function(inner_err, result) {
+            var packs = result['modpacks']['modpack'];
+
+            for (var index in packs) {
+              var item = packs[index]['$'];
+              var dir_concat = '{0}-{1}'.format(item['dir'], item['version']);
+              item['group'] = 'ftb_third_party';
               item['type'] = 'release';
               item['id'] = dir_concat;
               item['webui_desc'] = '{0} {1}'.format(item['name'], item['version']);
