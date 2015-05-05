@@ -660,10 +660,10 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr ng-repeat="jar in profiles | profile_filter:showonly | orderBy:'-releaseTime'">
+                                            <tr ng-repeat="jar in profiles | profile_filter:showonly | orderBy:['+weight', '-releaseTime', 'id']">
                                                 <td>{{ jar.id }}</td>
                                                 <td>{{ jar.webui_desc }}</td>
-                                                <td>{{ jar.type }}</td>
+                                                <td>[{{ jar.group }}] <strong>{{ jar.type }}</strong></td>
                                                 <td>
                                                     <p>
                                                         <button type="button" class="btn btn-mini btn-success" ng-click="host_command(jar.group + '_download', {profile: jar})" translate="DOWNLOAD"></button> <span ng-show="jar.downloaded" class="icone-ok">DOWNLOADED</span>
