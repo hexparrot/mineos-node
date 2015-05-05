@@ -73,7 +73,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
           var server_name = mineos.extract_server_name(base_dir, dirpath);
         } catch (e) { return }
         if (server_name == path.basename(dirpath)) 
-          track_server(server_name);
+          async.nextTick(function() { track_server(server_name)} );
       })
       .on('unlinkDir', function(dirpath) {
         // event to trigger when server directory deleted
