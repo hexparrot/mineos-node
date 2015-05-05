@@ -67,6 +67,7 @@
   "STOP_AND_BACKUP": "Stop and Backup",
   "KILL": "Kill",
   "BROADCAST_TO_LAN": "Broadcast to LAN",
+  "COPY_PROFILE": "Copy profile to live server files",
 
   "JAVA_SETTINGS": "Java Settings",
   "MEMORY_ALLOCATION": "Memory Allocation (Heapsize)",
