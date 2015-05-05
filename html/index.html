@@ -666,7 +666,7 @@
                                                 <td>{{ jar.type }}</td>
                                                 <td>
                                                     <p>
-                                                        <button type="button" class="btn btn-mini btn-success" ng-click="host_command(jar.group + '_download', {profile: jar})" translate="DOWNLOAD"></button>
+                                                        <button type="button" class="btn btn-mini btn-success" ng-click="host_command(jar.group + '_download', {profile: jar})" translate="DOWNLOAD"></button> <span ng-show="jar.downloaded" class="icone-ok">DOWNLOADED</span>
                                                     </p>
                                                 </td>
                                             </tr>
