@@ -11,8 +11,8 @@ var FS_DELAY_MS = 200;
 var PROC_START_DELAY_MS = 200;
 
 var OWNER_CREDS = {
-  uid: userid.uid(whoami),
-  gid: userid.gid(whoami)
+  uid: userid.uid(process.env.USER) || 1000,
+  gid: userid.gid(process.env.USER) || 1000
 }
 
 function delete_everything(callback) {
@@ -1175,7 +1175,6 @@ test.accept_eula = function(test) {
 
 test.chown = function(test) {
   var userid = require('userid');
-  var whoami = require('whoami');
 
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -1185,10 +1184,10 @@ test.chown = function(test) {
     gid: 1001
   }
 
-  if (userid.uid(whoami) != 0) {
+  if (userid.uid(process.env.USER) != 0) {
     NEW_OWNER_CREDS = {
-      uid: userid.uid(whoami),
-      gid: userid.uid(whoami)
+      uid: userid.uid(process.env.USER),
+      gid: userid.uid(process.env.USER)
     }
   }
 
@@ -1297,6 +1296,13 @@ test.server_files_property = function(test) {
 
   async.series([
     function(callback) {
+      instance.property('server_files', function(err, server_files) {
+        test.ifError(!err);
+        test.equal(server_files.length, 0);
+        callback(!err);
+      })
+    },
+    function(callback) {
       instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
         callback(err);
@@ -1305,7 +1311,7 @@ test.server_files_property = function(test) {
     function(callback) {
       instance.property('server_files', function(err, server_files) {
         test.ifError(err);
-        test.equal(server_files.length, 0);
+        test.equal(server_files.length, 1);
         callback(err);
       })
     },
@@ -1313,14 +1319,46 @@ test.server_files_property = function(test) {
     function(callback) {
       instance.property('server_files', function(err, server_files) {
         test.ifError(err);
-        test.equal(server_files.length, 1);
-        test.equal(server_files[0], 'myserver.jar');
+        test.equal(server_files.length, 2);
+        test.ok(server_files.indexOf('myserver.jar') >= 0);
+        test.ok(server_files.indexOf('minecraft_server.1.7.9.jar') >= 0);
+        callback(err);
+      })
+    },
+    async.apply(instance.copy_profile),
+    function(callback) {
+      instance.property('server_files', function(err, server_files) {
+        test.ifError(err);
+        test.equal(server_files.length, 2);
+        test.ok(server_files.indexOf('myserver.jar') >= 0);
+        test.ok(server_files.indexOf('minecraft_server.1.7.9.jar') >= 0);
         callback(err);
       })
     }
   ], function(err) {
     test.ifError(err);
-    test.expect(7);
+    test.expect(14);
+    test.done();
+  })
+}
+
+test.copy_profile = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+  var owner_info = {};
+
+  async.series([
+    function(callback) {
+      instance.create(OWNER_CREDS, function(err) {
+        test.ifError(err);
+        callback(err);
+      })
+    },
+    async.apply(instance.copy_profile),
+    async.apply(fs.stat, path.join(instance.env.cwd, 'minecraft_server.1.7.9.jar'))
+  ], function(err) {
+    test.ifError(err);
+    test.expect(2);
     test.done();
   })
 }

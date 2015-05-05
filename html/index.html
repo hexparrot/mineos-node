@@ -632,7 +632,7 @@
                         <!-- START Basic Table -->
                         <div class="span12 widget">
                             <header>
-                                <h4 class="title" translate="OFFICIAL_MOJANG_SERVER_JARS"></h4>
+                                <h4 class="title" translate="AVAILABLE_SERVER_JARS"></h4>
                                 <!-- START Toolbar -->
                                 <ul class="toolbar pull-right">
                                     <li>
@@ -640,6 +640,7 @@
                                         <ul class="dropdown-menu pull-right">
                                             <li><a href="#" ng-click="showonly='release'"><span class="icon icone-star"></span> {{ 'RELEASE' | translate }}</a></li>
                                             <li><a href="#" ng-click="showonly='snapshot'"><span class="icon icone-camera"></span> {{ 'SNAPSHOT' | translate }}</a></li>
+                                            <li><a href="#" ng-click="showonly='old_version'"><span class="icon icone-camera"></span> {{ 'OLD_VERSION' | translate }}</a></li>
                                             <li><a href="#" ng-click="showonly=''"><span class="icon icone-asterisk"></span> {{ 'SHOW_ALL_RELEASES' | translate }}</a></li>
                                             <li><a href="#" ng-click="showonly='downloaded'"><span class="icon icone-cloud-download"></span> {{ 'DOWNLOADED_PROFILES' | translate }}</a></li>
                                         </ul>
@@ -652,8 +653,8 @@
                                     <table class="table">
                                         <thead>
                                             <tr>
-                                                <th translate="MOJANG_ID"></th>
-                                                <th translate="RELEASE_TIMESTAMP"></th>
+                                                <th translate="IDENTIFIER"></th>
+                                                <th translate="PROFILE_DESC"></th>
                                                 <th translate="RELEASE_TYPE"></th>
                                                 <th></th>
                                             </tr>
@@ -661,11 +662,11 @@
                                         <tbody>
                                             <tr ng-repeat="jar in profiles | profile_filter:showonly | orderBy:'-releaseTime'">
                                                 <td>{{ jar.id }}</td>
-                                                <td>{{ jar.releaseTime | amDateFormat: "dddd, MMMM Do YYYY, h:mm:ss a" }}</td>
+                                                <td>{{ jar.webui_desc }}</td>
                                                 <td>{{ jar.type }}</td>
                                                 <td>
                                                     <p>
-                                                        <button type="button" class="btn btn-mini btn-success" ng-click="host_command('mojang_download', {id: jar.id})" translate="DOWNLOAD"></button>
+                                                        <button type="button" class="btn btn-mini btn-success" ng-click="host_command(jar.group + '_download', {profile: jar})" translate="DOWNLOAD"></button>
                                                     </p>
                                                 </td>
                                             </tr>
@@ -779,7 +780,6 @@
                                                                 <select class="span6" ng-model="myprofile" data-ng-options="p as p.id group by p.group for p in profiles | profile_filter:'downloaded' | orderBy:'-releaseTime'" ng-change="change_sc('minecraft', 'profile', myprofile.id)"></select>
                                                             </div>
                                                         </div><!--/ Select -->
-
                                                         <label class="checkbox">
                                                             <input icheck id="broadcast" class="icheck" type="checkbox" ng-model="broadcast_to_lan"> {{ 'BROADCAST_TO_LAN' | translate }}
                                                         </label>
@@ -818,6 +818,13 @@
                                                                 </div>
                                                             </div>
                                                         </div><!--/ Help Text -->
+                                                        <!-- Select -->
+                                                        <div class="control-group">
+                                                            <label class="control-label span3" translate="CHANGE_JARFILE_TO"></label>
+                                                            <div class="controls">
+                                                                <select class="span6" ng-model="myjarfile" data-ng-options="j for j in servers[current].page_data.glance.server_files" ng-change="change_sc('java', 'jarfile', myjarfile)"></select>
+                                                            </div>
+                                                        </div><!--/ Select -->
                                                     </p>
                                                 </div>
                                             </section>
