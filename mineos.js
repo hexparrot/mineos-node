@@ -726,14 +726,38 @@ mineos.mc = function(server_name, base_dir) {
         })
         break;
       case 'server_files':
-        fs.readdir(self.env.cwd, function(err, files) {
-          if (err)
-            callback(err, []);
-          else
-            callback(err, files.filter(function(file) { 
+        var server_files = [];
+
+        async.waterfall([
+          async.apply(fs.readdir, self.env.cwd),
+          function(sf, cb) {
+            server_files.push.apply(server_files, sf.filter(function(file) { 
               return file.substr(-4) == '.jar'; 
             }))
-        });
+            cb();
+          },
+          async.apply(self.sc),
+          function(sc_data, cb) {
+            try {
+              var active_profile_dir = path.join(self.env.pwd, sc_data.minecraft.profile);
+            } catch (e) {
+              cb();
+            }
+
+            fs.readdir(active_profile_dir, function(err, files) {
+              if (err) {
+                cb();
+              } else {
+                server_files.push.apply(server_files, files.filter(function(file) { 
+                  return file.substr(-4) == '.jar'; 
+                }))
+                cb();
+              }
+            })
+          }
+        ], function(err) {
+          callback(err, server_files);
+        })
         break;
     }
   }

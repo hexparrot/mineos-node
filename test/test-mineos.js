@@ -1311,7 +1311,7 @@ test.server_files_property = function(test) {
     function(callback) {
       instance.property('server_files', function(err, server_files) {
         test.ifError(err);
-        test.equal(server_files.length, 0);
+        test.equal(server_files.length, 1);
         callback(err);
       })
     },
@@ -1319,14 +1319,15 @@ test.server_files_property = function(test) {
     function(callback) {
       instance.property('server_files', function(err, server_files) {
         test.ifError(err);
-        test.equal(server_files.length, 1);
-        test.equal(server_files[0], 'myserver.jar');
+        test.equal(server_files.length, 2);
+        test.ok(server_files.indexOf('myserver.jar') >= 0);
+        test.ok(server_files.indexOf('minecraft_server.1.7.9.jar') >= 0);
         callback(err);
       })
     }
   ], function(err) {
     test.ifError(err);
-    test.expect(9);
+    test.expect(10);
     test.done();
   })
 }
