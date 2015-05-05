@@ -727,9 +727,12 @@ mineos.mc = function(server_name, base_dir) {
         break;
       case 'server_files':
         fs.readdir(self.env.cwd, function(err, files) {
-          callback(err, files.filter(function(file) { 
-            return file.substr(-4) == '.jar'; 
-          }))
+          if (err)
+            callback(err, []);
+          else
+            callback(err, files.filter(function(file) { 
+              return file.substr(-4) == '.jar'; 
+            }))
         });
         break;
     }

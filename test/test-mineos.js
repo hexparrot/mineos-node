@@ -1296,6 +1296,13 @@ test.server_files_property = function(test) {
 
   async.series([
     function(callback) {
+      instance.property('server_files', function(err, server_files) {
+        test.ifError(!err);
+        test.equal(server_files.length, 0);
+        callback(!err);
+      })
+    },
+    function(callback) {
       instance.create(OWNER_CREDS, function(err) {
         test.ifError(err);
         callback(err);
@@ -1319,7 +1326,7 @@ test.server_files_property = function(test) {
     }
   ], function(err) {
     test.ifError(err);
-    test.expect(7);
+    test.expect(9);
     test.done();
   })
 }
