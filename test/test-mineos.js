@@ -266,11 +266,10 @@ test.get_start_args = function(test) {
 
   async.series([
     async.apply(instance.create, OWNER_CREDS),
-    async.apply(instance.get_start_args),
     async.apply(instance.modify_sc, 'java', 'java_xmx', '-256'),
     function(callback) {
       instance.get_start_args(function(err, args) {
-        test.ok(err); //testing for positive error
+        test.ifError(!err); //testing for positive error
         test.equal(Object.keys(args).length, 0);
         test.equal(err, 'XMX heapsize must be positive integer');
         callback(!err);
@@ -279,16 +278,25 @@ test.get_start_args = function(test) {
     async.apply(instance.modify_sc, 'java', 'java_xmx', '256'),
     function(callback) {
       instance.get_start_args(function(err, args) {
+        test.ifError(!err); //testing for positive error
+        test.equal(err, 'Server not assigned a runnable jar');
+        callback(!err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
         test.ifError(err);
         test.equal(args[4], '-Xmx256M');
         test.equal(args[5], '-Xms256M');
+        test.equal(args[7], 'minecraft_server.1.7.9.jar');
         callback(err);
       })
     },
     async.apply(instance.modify_sc, 'java', 'java_xms', '-256'),
     function(callback) {
       instance.get_start_args(function(err, args) {
-        test.ok(err); //testing for positive error
+        test.ifError(!err); //testing for positive error
         test.equal(Object.keys(args).length, 0);
         test.equal(err, 'XMS heapsize must be positive integer where XMX >= XMS > 0');
         callback(!err);
@@ -302,7 +310,7 @@ test.get_start_args = function(test) {
         test.equal(args[5], '-Xms128M');
         callback(err);
       })
-    },
+    }
   ], function(err) {
     test.ifError(err);
     test.done();
