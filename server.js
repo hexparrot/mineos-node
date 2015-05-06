@@ -497,7 +497,6 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
     /* cleans up all servers that are open, including all tails and watches */
     self.watches['server_added'].close();
     self.watches['server_removed'].close();
-    self.watches['profiles'].close();
     self.watches['eula'].close();
 
     for (var s in self.servers)
