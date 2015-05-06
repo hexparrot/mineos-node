@@ -329,6 +329,9 @@ test.start = function(test) {
       })
     },
     async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
+    async.apply(instance.copy_profile),
     async.apply(instance.start),
     function(callback) {
       instance.property('screen_pid', function(err, pid) {
@@ -372,6 +375,9 @@ test.stop = function(test) {
       })
     },
     async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
+    async.apply(instance.copy_profile),
     async.apply(instance.start),
     async.apply(instance.verify, 'up'),
     async.apply(instance.stop),
@@ -389,6 +395,9 @@ test.stop_and_backup = function(test) {
 
   async.series([
     async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
+    async.apply(instance.copy_profile),
     async.apply(instance.start),
     async.apply(instance.stop_and_backup),
     async.apply(instance.verify, '!up'),
@@ -409,6 +418,9 @@ test.restart = function(test) {
 
   async.series([
     async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
+    async.apply(instance.copy_profile),
     async.apply(instance.start),
     function(callback) {
       setTimeout(callback, 10000);
@@ -441,6 +453,9 @@ test.kill = function(test) {
         callback(!err);
       })
     },
+    async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
+    async.apply(instance.copy_profile),
     async.apply(instance.start),
     async.apply(instance.verify, 'up'),
     async.apply(instance.kill),
@@ -666,6 +681,9 @@ test.properties = function(test) {
         callback(!err);
       })
     },
+    async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
+    async.apply(instance.copy_profile),
     function(callback) {
       instance.start(function(err) {
         test.ifError(err);
@@ -795,6 +813,7 @@ test.verify = function(test) {
         callback(!err);
       })
     },
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
     async.apply(instance.start),
     function(callback) {
       instance.verify('!exists', function(err) {
@@ -825,6 +844,9 @@ test.ping = function(test) {
 
   async.series([
     async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
+    async.apply(instance.copy_profile),
     async.apply(instance.start),
     function(callback) {
       setTimeout(function() {
@@ -854,6 +876,9 @@ test.memory = function(test) {
 
   async.series([
     async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
+    async.apply(instance.copy_profile),
     async.apply(instance.start),
     function(callback) {
       instance.start(function() {
@@ -1149,6 +1174,9 @@ test.stuff = function(test) {
         callback(!err);
       })
     },
+    async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
+    async.apply(instance.copy_profile),
     async.apply(instance.start),
     function(callback) {
       setTimeout(callback, 10000);
@@ -1370,6 +1398,7 @@ test.copy_profile = function(test) {
       })
     },
     async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
     async.apply(instance.copy_profile),
     async.apply(fs.stat, jar_filepath)
   ], function(err) {
