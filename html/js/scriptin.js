@@ -286,6 +286,10 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     $scope.change_page('dashboard', server_name);
   }
 
+  $scope.modal_new_server = function() {
+    $('#modal_new_server').modal('show');
+  }
+
   $scope.accept_eula = function() {
     $('#modal_eula').modal('show');
   }

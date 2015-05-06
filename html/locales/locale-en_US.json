@@ -132,6 +132,9 @@
   "ACCEPT_EULA": "Accept EULA",
   "READ_THE_EULA": "Read the Minecraft EULA",
 
+  "STARTING_A_NEW_SERVER": "Starting a new server",
+  "NEW_SERVER_OVERVIEW": "Starting a new server requires at least the following initial configuration: Select a profile, a runnable server JAR, and the Java maximum heap size.",
+
   "CREATE_SERVER_FROM_ARCHIVE": "Create a new server from an existing archive",
   "SERVER_FROM_ARCHIVE_DESC": "Please type in the name of the new server to create",
 
