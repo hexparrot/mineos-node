@@ -128,27 +128,6 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
       })
   })();
 
-  (function() {
-    var profile_path = path.join(base_dir, mineos.DIRS['profiles']);
-    self.watches['profiles'] = chokidar.watch(profile_path, { persistent: true, depth: 0, ignoreInitial: true });
-    // ignores event updates from profiles that have more path beyond the /profiles/<dirhere>
-
-    self.watches['profiles']
-      .on('ready', function() {
-        self.send_profile_list();
-      })
-      .on('addDir', function(dirpath) {
-        // event to trigger when new profile detected, e.g., /var/games/minecraft/profiles/<newdirhere>
-        console.log('[WEBUI] new profile detected: {0}'.format(dirpath));
-        self.send_profile_list();
-      })
-      .on('unlinkDir', function(dirpath) {
-        // event to trigger when profile directory deleted
-        console.log('[WEBUI] profile directory deletion detected: {0}'.format(dirpath));
-        self.send_profile_list();
-      })
-  })();
-
   function host_heartbeat() {
     self.front_end.emit('host_heartbeat', {
       'uptime': os.uptime(),
@@ -573,6 +552,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
                   args['success'] = true;
                   args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
                   self.front_end.emit('file_download', args);
+                  self.send_profile_list();
                 } else {
                   console.error('[WEBUI] Server was unable to download file:', url);
                   console.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
@@ -613,6 +593,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
                   fs.createReadStream(dest_filepath)
                     .pipe(unzip.Extract({ path: dest_dir }).on('close', function() {
                       self.front_end.emit('file_download', args);
+                      self.send_profile_list();
                     }));
                 } else {
                   console.error('[WEBUI] Server was unable to download file:', url);
@@ -654,6 +635,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
                   fs.createReadStream(dest_filepath)
                     .pipe(unzip.Extract({ path: dest_dir }).on('close', function() {
                       self.front_end.emit('file_download', args);
+                      self.send_profile_list();
                     }));
                 } else {
                   console.error('[WEBUI] Server was unable to download file:', url);
