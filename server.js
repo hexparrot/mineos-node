@@ -61,20 +61,27 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
   })();
 
   (function() {
-    var server_path = path.join(base_dir, mineos.DIRS['servers']);
-    var regex_servers = new RegExp('{0}\/[^\/]+\/.+'.format(server_path));
-    self.watches['servers'] = chokidar.watch(server_path, { persistent: true, ignored: regex_servers });
-    // ignores event updates from servers that have more path beyond the /servers/<dirhere>/<filehere>
+    var server_path = path.join(base_dir, mineos.DIRS['servers'], '*', 'server.properties');
+    self.watches['server_added'] = chokidar.watch(server_path, { persistent: true, depth: 1 });
+    // ignores all events if string does not include 'server.properties'
 
-    self.watches['servers']
-      .on('addDir', function(dirpath) {
+    self.watches['server_added']
+      .on('add', function(dirpath) {
         // event to trigger when new server detected, e.g., /var/games/minecraft/servers/<newdirhere>
         try {
           var server_name = mineos.extract_server_name(base_dir, dirpath);
         } catch (e) { return }
-        if (server_name == path.basename(dirpath)) 
+        if (server_name == path.basename(path.dirname(dirpath)))
           async.nextTick(function() { track_server(server_name)} );
       })
+  })();
+
+  (function() {
+    var server_path = path.join(base_dir, mineos.DIRS['servers']);
+    self.watches['server_removed'] = chokidar.watch(server_path, { persistent: true, depth: 1 });
+    // ignores event updates from servers that have more path beyond the /servers/<dirhere>/<filehere>
+
+    self.watches['server_removed']
       .on('unlinkDir', function(dirpath) {
         // event to trigger when server directory deleted
         try {
@@ -86,13 +93,12 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
   })();
 
   (function() {
-    var server_path = path.join(base_dir, mineos.DIRS['servers']);
+    var server_path = path.join(base_dir, mineos.DIRS['servers'], '*', 'eula.txt');
     self.watches['eula'] = chokidar.watch(server_path, { persistent: true, depth: 1 });
-    // ignores event updates from servers that have more path beyond the /servers/<dirhere>/<filehere>
 
     self.watches['eula']
       .on('add', function(dirpath) {
-        // event to trigger when new eula.txt detected, e.g., /var/games/minecraft/servers/<newdirhere>
+        // event to trigger when new eula.txt detected, e.g., /var/games/minecraft/servers/<newdirhere>/eula.txt
 
         if (path.basename(dirpath) == 'eula.txt') {
           try {
@@ -124,13 +130,13 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
 
   (function() {
     var profile_path = path.join(base_dir, mineos.DIRS['profiles']);
-    var regex_profiles = new RegExp('{0}\/[^\/]+\/.+'.format(profile_path));
-    self.watches['profiles'] = chokidar.watch(profile_path, { persistent: true, ignored: regex_profiles });
-    // ignores event updates from profiles that have more path beyond the /profiles/<dirhere>/<filehere>
-
-    //FIXME: on initial start, this will trigger for each profile, triggering x self.send_profile_lists (and x downloads)
+    self.watches['profiles'] = chokidar.watch(profile_path, { persistent: true, depth: 0, ignoreInitial: true });
+    // ignores event updates from profiles that have more path beyond the /profiles/<dirhere>
 
     self.watches['profiles']
+      .on('ready', function() {
+        self.send_profile_list();
+      })
       .on('addDir', function(dirpath) {
         // event to trigger when new profile detected, e.g., /var/games/minecraft/profiles/<newdirhere>
         console.log('[WEBUI] new profile detected: {0}'.format(dirpath));
@@ -510,7 +516,8 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
 
   self.shutdown = function() {
     /* cleans up all servers that are open, including all tails and watches */
-    self.watches['servers'].close();
+    self.watches['server_added'].close();
+    self.watches['server_removed'].close();
     self.watches['profiles'].close();
     self.watches['eula'].close();
 
