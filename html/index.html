@@ -758,7 +758,8 @@
                                             <section class="body">
                                                 <div class="body-inner">
                                                     <p>
-                                                        <button type="button" class="btn btn-success" ng-click="server_command('start')" translate="START"></button>
+                                                        <button type="button" class="btn btn-success" ng-click="server_command('start')" translate="START" ng-show="!!(servers[current].sc.minecraft.profile && servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
+                                                        <button type="button" class="btn btn-success" ng-click="modal_new_server()" translate="START" ng-show="!(servers[current].sc.minecraft.profile && servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
 
                                                         <!-- Button Dropdown -->
                                                         <div class="btn-group">
@@ -1399,6 +1400,56 @@
                     <button class="btn btn-warning" data-dismiss="modal" translate="KILL" ng-click="server_command('kill')" ng-show="servers[current].heartbeat.up"></button>
                     <button class="btn btn-warning" data-dismiss="modal" translate="RESTART" ng-click="server_command('restart')" ng-show="servers[current].heartbeat.up"></button>
                     <button class="btn btn-warning" data-dismiss="modal" translate="START" ng-click="server_command('start')" ng-show="!servers[current].heartbeat.up"></button>
+                </div>
+            </div><!--/ Modal With Animation --> 
+
+            <!-- Modal With Animation -->
+            <div id="modal_new_server" class="modal hide fade">
+                <div class="modal-header">
+                    <h4 translate="STARTING_A_NEW_SERVER"></h4>
+                </div>
+                <div class="modal-body">
+                    <p translate="NEW_SERVER_OVERVIEW"></p>
+                    <div class="controls">
+                        <label class="control-label" translate="PROFILES"></label>
+                        <select class="" ng-model="myprofile" default-option="Select a profile" data-ng-options="p as p.id group by p.group for p in profiles | profile_filter:'downloaded' | orderBy:'-releaseTime'" ng-change="change_sc('minecraft', 'profile', myprofile.id)"></select>
+                        <!-- Select -->
+                        <div class="control-group">
+                            <label class="control-label" translate="CHANGE_JARFILE_TO"></label>
+                            <div class="controls">
+                                <select class="" ng-model="myjarfile" data-ng-options="j for j in servers[current].page_data.glance.server_files" ng-change="change_sc('java', 'jarfile', myjarfile)"></select>
+                            </div>
+                        </div><!--/ Select -->
+                    </div>
+                    <div class="controls">
+                        <label class="control-label" translate="MEMORY_ALLOCATION"></label>
+                        <!-- Help Text -->
+                        <div class="control-group">
+                            <div class="controls">
+                                <div class="input-prepend input-append">
+                                    <span class="add-on" translate="JAVA_XMX"></span>
+                                    <input type="text" 
+                                        ng-model="servers[current].sc.java.java_xmx" 
+                                        ng-change="change_sc('java', 'java_xmx', servers[current].sc.java.java_xmx)" 
+                                        ng-model-options="{ updateOn: 'default blur', debounce: {'default': 1500, 'blur': 0} }">
+                                    <span class="add-on" translate="MB_ABBREVIATION"></span>
+                                </div>
+                            </div>
+                            <div class="controls">
+                                <div class="input-prepend input-append">
+                                    <span class="add-on" translate="JAVA_XMS"></span>
+                                    <input type="text" 
+                                        ng-model="servers[current].sc.java.java_xms" 
+                                        ng-change="change_sc('java', 'java_xms', servers[current].sc.java.java_xms)"
+                                        ng-model-options="{ updateOn: 'default blur', debounce: {'default': 1500, 'blur': 0} }">
+                                    <span class="add-on" translate="MB_ABBREVIATION"></span>
+                                </div>
+                            </div>
+                        </div><!--/ Help Text -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" ng-click="server_command('start')" translate="START"></button>
                 </div>
             </div><!--/ Modal With Animation --> 
 
