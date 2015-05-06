@@ -758,8 +758,8 @@
                                             <section class="body">
                                                 <div class="body-inner">
                                                     <p>
-                                                        <button type="button" class="btn btn-success" ng-click="server_command('start')" translate="START"></button>
-                                                        <button type="button" class="btn btn-success" ng-click="modal_new_server()" translate="STARTING_A_NEW_SERVER" ng-show="!(myprofile.id && myjarfile && servers[current].sc.java.java_xmx)"></button>
+                                                        <button type="button" class="btn btn-success" ng-click="server_command('start')" translate="START" ng-show="!!(servers[current].sc.minecraft.profile && servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
+                                                        <button type="button" class="btn btn-success" ng-click="modal_new_server()" translate="START" ng-show="!(servers[current].sc.minecraft.profile && servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
 
                                                         <!-- Button Dropdown -->
                                                         <div class="btn-group">
