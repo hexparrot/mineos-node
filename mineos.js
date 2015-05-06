@@ -307,9 +307,13 @@ mineos.mc = function(server_name, base_dir) {
       },
       async.apply(self.sc),
       function(sc, cb) {
-        var source = path.join(self.env.pwd, sc.minecraft.profile) + '/';
-        var dest = self.env.cwd + '/';
-        rsync_profile(source, dest, owner_info['username'], owner_info['groupname'], cb);
+        if ((sc.minecraft || {}).profile) {
+          var source = path.join(self.env.pwd, sc.minecraft.profile) + '/';
+          var dest = self.env.cwd + '/';
+          rsync_profile(source, dest, owner_info['username'], owner_info['groupname'], cb);
+        } else {
+          cb(null);
+        }
       }
     ], callback);
   }

@@ -1353,7 +1353,7 @@ test.server_files_property = function(test) {
 test.copy_profile = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
-  var owner_info = {};
+  var jar_filepath = path.join(instance.env.cwd, 'minecraft_server.1.7.9.jar')
 
   async.series([
     function(callback) {
@@ -1363,10 +1363,17 @@ test.copy_profile = function(test) {
       })
     },
     async.apply(instance.copy_profile),
-    async.apply(fs.stat, path.join(instance.env.cwd, 'minecraft_server.1.7.9.jar'))
+    function(callback) {
+      fs.stat(jar_filepath, function(err) {
+        test.ifError(!err);
+        callback(!err);
+      })
+    },
+    async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
+    async.apply(instance.copy_profile),
+    async.apply(fs.stat, jar_filepath)
   ], function(err) {
     test.ifError(err);
-    test.expect(2);
     test.done();
   })
 }
