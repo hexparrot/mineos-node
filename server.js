@@ -40,7 +40,8 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
                 async.apply(instance.verify, 'up'),
                 async.apply(instance.sc),
                 function(sc_data, cb) {
-                  cb(!sc_data.minecraft.broadcast) //logically notted to make broadcast:true pass err cb
+                  var broadcast_value = (sc_data.minecraft || {}).broadcast;
+                  cb(!broadcast_value) //logically notted to make broadcast:true pass err cb
                 },
                 async.apply(instance.sp)
               ], function(err, sp_data) {
