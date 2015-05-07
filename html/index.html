@@ -829,6 +829,15 @@
                                                                 </div>
                                                             </div>
                                                         </div><!--/ Help Text -->
+                                                        <div class="controls">
+                                                            <label class="control-label" translate="ADDITIONAL_JAVA_ARGS"></label>
+                                                            <input type="text" 
+                                                                class="span6"
+                                                                placeholder="-XX:+DisableExplicitGC"
+                                                                ng-model="servers[current].sc.java.java_tweaks" 
+                                                                ng-change="change_sc('java', 'java_tweaks', servers[current].sc.java.java_tweaks)" 
+                                                                ng-model-options="{ updateOn: 'default blur', debounce: {'default': 1500, 'blur': 0} }">
+                                                        </div>
                                                         <!-- Select -->
                                                         <div class="control-group">
                                                             <div class="controls">
