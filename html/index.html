@@ -758,8 +758,8 @@
                                             <section class="body">
                                                 <div class="body-inner">
                                                     <p>
-                                                        <button type="button" class="btn btn-success" ng-click="server_command('start')" translate="START" ng-show="!!(servers[current].sc.minecraft.profile && servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
-                                                        <button type="button" class="btn btn-success" ng-click="modal_new_server()" translate="START" ng-show="!(servers[current].sc.minecraft.profile && servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
+                                                        <button type="button" class="btn btn-success" ng-click="server_command('start')" translate="START" ng-show="(servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
+                                                        <button type="button" class="btn btn-success" ng-click="modal_new_server()" translate="START" ng-show="!(servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
 
                                                         <!-- Button Dropdown -->
                                                         <div class="btn-group">
@@ -776,9 +776,10 @@
                                                     <p>
                                                         <!-- Select -->
                                                         <div class="control-group">
-                                                            <label class="control-label span3" translate="CHANGE_PROFILE_TO"></label>
                                                             <div class="controls">
-                                                                <select class="" ng-model="myprofile" data-ng-options="p as p.id group by p.group for p in profiles | profile_filter:'downloaded' | orderBy:'-releaseTime'" ng-change="change_sc('minecraft', 'profile', myprofile.id)"></select>
+                                                                <select class="" ng-model="myprofile" data-ng-options="p as p.id group by p.group for p in profiles | profile_filter:'downloaded' | orderBy:'-releaseTime'" ng-change="change_sc('minecraft', 'profile', myprofile.id)">
+                                                                    <option value="" disabled selected translate="CHANGE_PROFILE_TO"></option>
+                                                                </select>
                                                             </div>
                                                             <div class="controls">
                                                                 <button class="btn btn-default" ng-click="server_command('copy_profile')" translate="COPY_PROFILE"></button>
@@ -824,9 +825,10 @@
                                                         </div><!--/ Help Text -->
                                                         <!-- Select -->
                                                         <div class="control-group">
-                                                            <label class="control-label span3" translate="CHANGE_JARFILE_TO"></label>
                                                             <div class="controls">
-                                                                <select class="span6" ng-model="myjarfile" data-ng-options="j for j in servers[current].page_data.glance.server_files" ng-change="change_sc('java', 'jarfile', myjarfile)"></select>
+                                                                <select class="span6" ng-model="myjarfile" data-ng-options="j for j in servers[current].page_data.glance.server_files" ng-change="change_sc('java', 'jarfile', myjarfile)">
+                                                                    <option value="" disabled selected translate="CHANGE_JARFILE_TO"></option>
+                                                                </select>
                                                             </div>
                                                         </div><!--/ Select -->
                                                     </p>
@@ -1411,13 +1413,15 @@
                 <div class="modal-body">
                     <p translate="NEW_SERVER_OVERVIEW"></p>
                     <div class="controls">
-                        <label class="control-label" translate="PROFILES"></label>
-                        <select class="" ng-model="myprofile" default-option="Select a profile" data-ng-options="p as p.id group by p.group for p in profiles | profile_filter:'downloaded' | orderBy:'-releaseTime'" ng-change="change_sc('minecraft', 'profile', myprofile.id)"></select>
+                        <select class="" ng-model="myprofile" default-option="Select a profile" data-ng-options="p as p.id group by p.group for p in profiles | profile_filter:'downloaded' | orderBy:'-releaseTime'" ng-change="change_sc('minecraft', 'profile', myprofile.id)">
+                            <option value="" disabled selected translate="CHANGE_PROFILE_TO"></option>
+                        </select>
                         <!-- Select -->
                         <div class="control-group">
-                            <label class="control-label" translate="CHANGE_JARFILE_TO"></label>
                             <div class="controls">
-                                <select class="" ng-model="myjarfile" data-ng-options="j for j in servers[current].page_data.glance.server_files" ng-change="change_sc('java', 'jarfile', myjarfile)"></select>
+                                <select class="" ng-model="myjarfile" data-ng-options="j for j in servers[current].page_data.glance.server_files" ng-change="change_sc('java', 'jarfile', myjarfile)">
+                                    <option value="" disabled selected translate="CHANGE_JARFILE_TO"></option>
+                                </select>
                             </div>
                         </div><!--/ Select -->
                     </div>
