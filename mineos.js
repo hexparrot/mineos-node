@@ -859,7 +859,16 @@ mineos.mc = function(server_name, base_dir) {
         var legacy_split = splitBuffer(data, 0x00a7);
         var modern_split = modern_split = swapBytes(data.slice(3)).toString('ucs2').split('\u0000').splice(1);
 
-        if (legacy_split.length == 3) {
+        if (modern_split.length == 5) {
+          // modern ping to modern server
+          callback(null, {
+            protocol: parseInt(parseInt(modern_split[0])),
+            server_version: modern_split[1],
+            motd: modern_split[2],
+            players_online: parseInt(modern_split[3]),
+            players_max: parseInt(modern_split[4])
+          });
+        } else if (legacy_split.length == 3) {
           if (String.fromCharCode(legacy_split[0][-1]) == '\u0000') {
             // modern ping to legacy server
             callback(null, {
@@ -869,26 +878,8 @@ mineos.mc = function(server_name, base_dir) {
               players_online: parseInt(buffer_to_ascii(legacy_split[1])),
               players_max: parseInt(buffer_to_ascii(legacy_split[2]))
             });
-          } else {
-            // legacy ping to legacy server
-            callback(null, {
-              protocol: '',
-              server_version: '',
-              motd: buffer_to_ascii(legacy_split[0].slice(3)),
-              players_online: parseInt(buffer_to_ascii(legacy_split[1])),
-              players_max: parseInt(buffer_to_ascii(legacy_split[2]))
-            });
           }
-        } else if (modern_split.length == 5) {
-          // modern ping to modern server
-          callback(null, {
-            protocol: parseInt(parseInt(modern_split[0])),
-            server_version: modern_split[1],
-            motd: modern_split[2],
-            players_online: parseInt(modern_split[3]),
-            players_max: parseInt(modern_split[4])
-          });
-        }
+        } 
       });
 
       socket.on('error', function(err) {
