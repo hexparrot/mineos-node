@@ -759,19 +759,19 @@
                                                 <div class="body-inner">
 
                                                     <div class="span4">
-                                                        <button type="button" class="btn btn-success span12" ng-click="server_command('start')" translate="START" ng-show="(servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
-                                                        <button type="button" class="btn btn-success span12" ng-click="modal_new_server()" translate="START" ng-show="!(servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
+                                                        <button type="button" class="btn btn-success span12" ng-disabled="servers[current].heartbeat.up" ng-click="server_command('start')" translate="START" ng-show="(servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
+                                                        <button type="button" class="btn btn-success span12" ng-disabled="servers[current].heartbeat.up" ng-click="modal_new_server()" translate="START" ng-show="!(servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
                                                     </div>
 
                                                     <div class="span6">
                                                         <div class="btn-group btn-block">
-                                                            <button class="btn btn-danger" ng-click="server_command('stop')" translate="STOP"></button>
+                                                            <button class="btn btn-danger span4" ng-disabled="!servers[current].heartbeat.up" ng-click="server_command('stop')" translate="STOP"></button>
                                                             <button class="btn btn-danger dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
                                                             <ul class="dropdown-menu">
-                                                                <li><a href="#" ng-click="server_command('stop')" translate="STOP"></a></li>
+                                                                <li><a href="#" ng-click="server_command('stop')" translate="STOP" ng-disabled="!servers[current].heartbeat.up"></a></li>
                                                                 <li><a href="#" ng-click="server_command('stop_and_backup')" translate="STOP_AND_BACKUP"></a></li>
                                                                 <li><a href="#" ng-click="server_command('restart')" translate="RESTART"></a></li>
-                                                                <li><a href="#" ng-click="server_command('kill')" translate="KILL"></a></li>
+                                                                <li><a href="#" ng-click="server_command('kill')" translate="KILL" ng-disabled="!servers[current].heartbeat.up"></a></li>
                                                                 <li><a href="#" ng-click="accept_eula()" translate="ACCEPT_EULA"></a></li>
                                                             </ul>
                                                         </div>
@@ -986,7 +986,7 @@
                                                                 <input icheck class="icheck" type="checkbox" ng-model="delete_servers"> {{ 'DELETE_LIVE_FILES' | translate }} {{ '{0}/{1}/{2}'.format(servers[current].page_data.glance.base_dir, 'servers', current) }}
                                                             </label>
                                                         </div>
-                                                        <button type="button" class="btn btn-mini btn-danger" ng-disabled="!(delete_servers && delete_backup && delete_archive)" ng-click="server_command('delete')"><span class="icone-warning-sign"></span> {{ 'DELETE' | translate }}</button>
+                                                        <button type="button" class="btn btn-mini btn-danger" ng-disabled="!(delete_servers && delete_backup && delete_archive && !servers[current].heartbeat.up)" ng-click="server_command('delete')"><span class="icone-warning-sign"></span> {{ 'DELETE' | translate }}</button>
                                                     </div><!--/ Default Checkbox Inline -->
 
                                                 </div>
