@@ -899,6 +899,37 @@ test.ping = function(test) {
   })
 }
 
+test.ping_legacy = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.modify_sc, 'minecraft', 'profile', '1.2.5'),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.2.5.jar'),
+    async.apply(instance.copy_profile),
+    async.apply(instance.start),
+    function(callback) {
+      setTimeout(function() {
+        instance.ping(function(err, pingback) {
+          test.ifError(err);
+          test.equal(pingback.protocol, '');
+          test.equal(pingback.server_version, '');
+          test.equal(pingback.motd, 'A Minecraft Server');
+          test.equal(pingback.players_online, 0);
+          test.equal(pingback.players_max, 20);
+          callback(err);
+        })
+      }, 10000)
+    },
+    async.apply(instance.kill)
+  ], function(err) {
+    test.ifError(err);
+    test.expect(7);
+    test.done();
+  })
+}
+
 test.memory = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
