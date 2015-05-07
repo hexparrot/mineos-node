@@ -266,7 +266,7 @@ mineos.mc = function(server_name, base_dir) {
       },
       'java_tweaks': function (cb) {
         server_config(function (err, dict) {
-          var value = (dict.java || {}).java_tweaks || '';
+          var value = (dict.java || {}).java_tweaks || null;
           cb(null, value);
         });
       }
@@ -275,7 +275,9 @@ mineos.mc = function(server_name, base_dir) {
         callback(err, {});
       } else {
         var args = ['-dmS', 'mc-{0}'.format(self.server_name)];
-        args.push.apply(args, [results.binary, '-server', '-Xmx{0}M'.format(results.xmx), '-Xms{0}M'.format(results.xms), results.java_tweaks]);
+        args.push.apply(args, [results.binary, '-server', '-Xmx{0}M'.format(results.xmx), '-Xms{0}M'.format(results.xms)]);
+        if (results.java_tweaks)
+          args.push(results.java_tweaks);
         args.push.apply(args, ['-jar', results.jarfile, results.jar_args]);
 
         callback(null, args);
