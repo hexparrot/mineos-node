@@ -48,7 +48,7 @@ test.dependencies_met = function(test) {
     test.done();
   })
 }
-/*
+
 test.server_list = function (test) {
   var servers = mineos.server_list(BASE_DIR);
   var instance = new mineos.mc('testing', BASE_DIR);
@@ -899,8 +899,6 @@ test.ping = function(test) {
   })
 }
 
-*/
-
 test.ping_legacy = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -931,8 +929,6 @@ test.ping_legacy = function(test) {
     test.done();
   })
 }
-
-/*
 
 test.memory = function(test) {
   var server_name = 'testing';
@@ -1470,4 +1466,4 @@ test.copy_profile = function(test) {
     test.ifError(err);
     test.done();
   })
-}*/
+}

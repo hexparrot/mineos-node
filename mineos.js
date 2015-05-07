@@ -828,25 +828,25 @@ mineos.mc = function(server_name, base_dir) {
     function send_query_packet(port) {
       var net = require('net');
       var socket = net.connect({port: port});
-      var query = 'legacy';
+      var query = 'modern';
+      var QUERIES = {
+        'modern': '\xfe\x01',
+        'legacy': '\xfe' +
+                  '\x01' +
+                  '\xfa' +
+                  '\x00\x06' +
+                  '\x00\x6d\x00\x69\x00\x6e\x00\x65\x00\x6f\x00\x73' +
+                  '\x00\x19' +
+                  '\x49' +
+                  '\x00\x09' +
+                  '\x00\x6c\x00\x6f\x00\x63\x00\x61\x00\x6c\x00\x68' +
+                  '\x00\x6f\x00\x73\x00\x74' +
+                  '\x00\x00\x63\xdd'
+        }
+        
       socket.setTimeout(2500);
 
       socket.on('connect', function() {
-        var QUERIES = {
-          'modern': '\xfe\x01',
-          'legacy': '\xfe' +
-                    '\x01' +
-                    '\xfa' +
-                    '\x00\x06' +
-                    '\x00\x6d\x00\x69\x00\x6e\x00\x65\x00\x6f\x00\x73' +
-                    '\x00\x19' +
-                    '\x49' +
-                    '\x00\x09' +
-                    '\x00\x6c\x00\x6f\x00\x63\x00\x61\x00\x6c\x00\x68' +
-                    '\x00\x6f\x00\x73\x00\x74' +
-                    '\x00\x00\x63\xdd'
-        }
-
         var buf = new Buffer(2);
 
         buf.write(QUERIES[query], 0, query.length, 'binary');
@@ -856,27 +856,38 @@ mineos.mc = function(server_name, base_dir) {
       socket.on('data', function(data) {
         socket.end();
 
-        switch (query) {
-          case 'modern':
-            var split = swapBytes(data.slice(3)).toString('ucs2').split('\u0000').splice(1);
-            callback(null, {
-              protocol: parseInt(parseInt(split[0])),
-              server_version: split[1],
-              motd: split[2],
-              players_online: parseInt(split[3]),
-              players_max: parseInt(split[4])
-            });
-            break;
-          case 'legacy':
-            var split = splitBuffer(data, 0x00a7);
+        var legacy_split = splitBuffer(data, 0x00a7);
+        var modern_split = modern_split = swapBytes(data.slice(3)).toString('ucs2').split('\u0000').splice(1);
+
+        if (legacy_split.length == 3) {
+          if (String.fromCharCode(legacy_split[0][-1]) == '\u0000') {
+            // modern ping to legacy server
             callback(null, {
               protocol: '',
               server_version: '',
-              motd: buffer_to_ascii(split[0].slice(3)),
-              players_online: parseInt(buffer_to_ascii(split[1])),
-              players_max: parseInt(buffer_to_ascii(split[2]))
+              motd: buffer_to_ascii(legacy_split[0].slice(3, legacy_split[0].length-1)),
+              players_online: parseInt(buffer_to_ascii(legacy_split[1])),
+              players_max: parseInt(buffer_to_ascii(legacy_split[2]))
             });
-            break;
+          } else {
+            // legacy ping to legacy server
+            callback(null, {
+              protocol: '',
+              server_version: '',
+              motd: buffer_to_ascii(legacy_split[0].slice(3)),
+              players_online: parseInt(buffer_to_ascii(legacy_split[1])),
+              players_max: parseInt(buffer_to_ascii(legacy_split[2]))
+            });
+          }
+        } else if (modern_split.length == 5) {
+          // modern ping to modern server
+          callback(null, {
+            protocol: parseInt(parseInt(modern_split[0])),
+            server_version: modern_split[1],
+            motd: modern_split[2],
+            players_online: parseInt(modern_split[3]),
+            players_max: parseInt(modern_split[4])
+          });
         }
       });
 
