@@ -2,7 +2,6 @@ var fs = require('fs-extra');
 var path = require('path');
 var events = require('events');
 var async = require('async');
-var cf = require('./config_file');
 var child_process = require('child_process');
 var which = require('which');
 var mineos = exports;
@@ -28,8 +27,6 @@ mineos.SP_DEFAULTS = {
   'generator-settings': '',
   'server-ip': '0.0.0.0',
 }
-
-var JAR_PATH = process.env['HOME'];
 
 mineos.server_list = function(base_dir) {
   return fs.readdirSync(path.join(base_dir, mineos.DIRS['servers']));

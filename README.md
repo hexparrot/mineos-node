@@ -22,7 +22,7 @@ Using an apt-get based Linux distribution:
     git clone https://github.com/hexparrot/mineos-node.git
     cd mineos-node
     npm install --all
-    nodejs webui
+    sudo nodejs webui
 
 Developing and Contributing
 ------
@@ -42,27 +42,6 @@ Support
 
 Create an issue in github or start a post on the [http://discourse.codeemo.com/](MineOS support forums).
 
-
-TODO
--------
-
-* implement authentication model and web-ui login page
-* implement profiles or a replacement model for downloading jar files
-* remove restore points from the web-ui, allow rotation of restore points
-* save all user actions in web-ui to a file/database (log kept in working memory currently)
-* save cronjobs to portable format, e.g., server.config
-* macro often-repeated tasks from web-ui
-* daemonize with auto-restart capability
-* more fully document functions
-
-EVENTUALLY
--------
-
-* implement previous_versions: functionality to roll back or view particular files' previous state
-* command-line interface for scripting
-* PHAR support
-* identify java versions in web-ui, allow choice of utilized jvm
-
 CURRENTLY WORKING
 -------
 
@@ -77,3 +56,23 @@ The Angular.JS-based web user interface capable of:
 * delete previous archives to free up space
 * restore server from previous restore point
 * see filesystem usage of live server files, archives, and restore points
+* easy selection of server packs from FTB or Mojang official jars
+
+TODO
+-------
+
+* implement authentication model and web-ui login page
+* remove restore points from the web-ui, allow rotation of restore points
+* save all user actions in web-ui to a file/database (log kept in working memory currently)
+* save cronjobs to portable format, e.g., server.config
+* macro often-repeated tasks from web-ui
+* daemonize with auto-restart capability
+* more fully document functions
+
+EVENTUALLY
+-------
+
+* implement previous_versions: functionality to roll back or view particular files' previous state
+* command-line interface for scripting
+* PHAR support
+* identify java versions in web-ui, allow choice of utilized jvm
