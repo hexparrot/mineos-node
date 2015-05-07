@@ -783,7 +783,7 @@ mineos.mc = function(server_name, base_dir) {
 
   self.ping = function(callback) {
     function swapBytes(buffer) {
-      /*http://stackoverflow.com/a/7460958/1191579*/
+      //http://stackoverflow.com/a/7460958/1191579
       var l = buffer.length;
       if (l & 0x01) {
         throw new Error('Buffer length must be even');
@@ -796,29 +796,88 @@ mineos.mc = function(server_name, base_dir) {
       return buffer; 
     }
 
+    function splitBuffer(buf, delimiter) {
+      //http://stackoverflow.com/a/8920913/1191579
+      var arr = [], p = 0;
+
+      for (var i = 0, l = buf.length; i < l; i++) {
+        if (buf[i] !== delimiter) continue;
+        if (i === 0) {
+          p = 1;
+          continue; // skip if it's at the start of buffer
+        }
+        arr.push(buf.slice(p, i));
+        p = i + 1;
+      }
+
+      // add final part
+      if (p < l) {
+        arr.push(buf.slice(p, l));
+      }
+
+      return arr;
+    }
+
+    function buffer_to_ascii(buf) {
+      var retval = '';
+      for (var i=0; i < buf.length; i++)
+        retval += (buf[i] == 0x0000 ? '' : String.fromCharCode(buf[i]));
+      return retval;
+    }
+
     function send_query_packet(port) {
       var net = require('net');
       var socket = net.connect({port: port});
+      var query = 'legacy';
       socket.setTimeout(2500);
 
       socket.on('connect', function() {
-        var query = '\xfe\x01',
-            buf = new Buffer(2);
+        var QUERIES = {
+          'modern': '\xfe\x01',
+          'legacy': '\xfe' +
+                    '\x01' +
+                    '\xfa' +
+                    '\x00\x06' +
+                    '\x00\x6d\x00\x69\x00\x6e\x00\x65\x00\x6f\x00\x73' +
+                    '\x00\x19' +
+                    '\x49' +
+                    '\x00\x09' +
+                    '\x00\x6c\x00\x6f\x00\x63\x00\x61\x00\x6c\x00\x68' +
+                    '\x00\x6f\x00\x73\x00\x74' +
+                    '\x00\x00\x63\xdd'
+        }
 
-        buf.write(query, 0, query.length, 'binary');
+        var buf = new Buffer(2);
+
+        buf.write(QUERIES[query], 0, query.length, 'binary');
         socket.write(buf);
       });
 
       socket.on('data', function(data) {
         socket.end();
-        var split = swapBytes(data.slice(3)).toString('ucs2').split('\u0000').splice(1);
-        callback(null, {
-          protocol: parseInt(parseInt(split[0])),
-          server_version: split[1],
-          motd: split[2],
-          players_online: parseInt(split[3]),
-          players_max: parseInt(split[4])
-        });
+
+        switch (query) {
+          case 'modern':
+            var split = swapBytes(data.slice(3)).toString('ucs2').split('\u0000').splice(1);
+            callback(null, {
+              protocol: parseInt(parseInt(split[0])),
+              server_version: split[1],
+              motd: split[2],
+              players_online: parseInt(split[3]),
+              players_max: parseInt(split[4])
+            });
+            break;
+          case 'legacy':
+            var split = splitBuffer(data, 0x00a7);
+            callback(null, {
+              protocol: '',
+              server_version: '',
+              motd: buffer_to_ascii(split[0].slice(3)),
+              players_online: parseInt(buffer_to_ascii(split[1])),
+              players_max: parseInt(buffer_to_ascii(split[2]))
+            });
+            break;
+        }
       });
 
       socket.on('error', function(err) {
