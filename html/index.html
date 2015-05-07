@@ -804,49 +804,47 @@
                                             <header><h4 class="title"><span class="icon icone-ticket"></span>{{ 'JAVA_SETTINGS' | translate }}</h4></header>
                                             <section class="body">
                                                 <div class="body-inner">
-                                                    <p>
-                                                        <!-- Help Text -->
-                                                        <div class="control-group">
-                                                            <label class="control-label" translate="MEMORY_ALLOCATION"></label>
-                                                            <div class="controls">
-                                                                <div class="input-prepend input-append">
-                                                                    <span class="add-on" translate="JAVA_XMX"></span>
-                                                                    <input type="text" 
-                                                                        ng-model="servers[current].sc.java.java_xmx" 
-                                                                        ng-change="change_sc('java', 'java_xmx', servers[current].sc.java.java_xmx)" 
-                                                                        ng-model-options="{ updateOn: 'default blur', debounce: {'default': 1500, 'blur': 0} }">
-                                                                    <span class="add-on" translate="MB_ABBREVIATION"></span>
-                                                                </div>
-                                                            </div>
-                                                            <div class="controls">
-                                                                <div class="input-prepend input-append">
-                                                                    <span class="add-on" translate="JAVA_XMS"></span>
-                                                                    <input type="text" 
-                                                                        ng-model="servers[current].sc.java.java_xms" 
-                                                                        ng-change="change_sc('java', 'java_xms', servers[current].sc.java.java_xms)"
-                                                                        ng-model-options="{ updateOn: 'default blur', debounce: {'default': 1500, 'blur': 0} }">
-                                                                    <span class="add-on" translate="MB_ABBREVIATION"></span>
-                                                                </div>
-                                                            </div>
-                                                        </div><!--/ Help Text -->
+                                                    <!-- Select -->
+                                                    <div class="control-group">
                                                         <div class="controls">
-                                                            <label class="control-label" translate="ADDITIONAL_JAVA_ARGS"></label>
-                                                            <input type="text" 
-                                                                class="span6"
-                                                                placeholder="-XX:+DisableExplicitGC"
-                                                                ng-model="servers[current].sc.java.java_tweaks" 
-                                                                ng-change="change_sc('java', 'java_tweaks', servers[current].sc.java.java_tweaks)" 
-                                                                ng-model-options="{ updateOn: 'default blur', debounce: {'default': 1500, 'blur': 0} }">
+                                                            <select class="span6" ng-model="myjarfile" data-ng-options="j for j in servers[current].page_data.glance.server_files" ng-change="change_sc('java', 'jarfile', myjarfile)">
+                                                                <option value="" disabled selected translate="CHANGE_JARFILE_TO"></option>
+                                                            </select>
                                                         </div>
-                                                        <!-- Select -->
-                                                        <div class="control-group">
-                                                            <div class="controls">
-                                                                <select class="span6" ng-model="myjarfile" data-ng-options="j for j in servers[current].page_data.glance.server_files" ng-change="change_sc('java', 'jarfile', myjarfile)">
-                                                                    <option value="" disabled selected translate="CHANGE_JARFILE_TO"></option>
-                                                                </select>
+                                                    </div><!--/ Select -->
+                                                    <!-- Help Text -->
+                                                    <div class="control-group">
+                                                        <label class="control-label" translate="MEMORY_ALLOCATION"></label>
+                                                        <div class="controls">
+                                                            <div class="input-prepend input-append">
+                                                                <span class="add-on" translate="JAVA_XMX"></span>
+                                                                <input type="text" 
+                                                                    ng-model="servers[current].sc.java.java_xmx" 
+                                                                    ng-change="change_sc('java', 'java_xmx', servers[current].sc.java.java_xmx)" 
+                                                                    ng-model-options="{ updateOn: 'default blur', debounce: {'default': 1500, 'blur': 0} }">
+                                                                <span class="add-on" translate="MB_ABBREVIATION"></span>
                                                             </div>
-                                                        </div><!--/ Select -->
-                                                    </p>
+                                                        </div>
+                                                        <div class="controls">
+                                                            <div class="input-prepend input-append">
+                                                                <span class="add-on" translate="JAVA_XMS"></span>
+                                                                <input type="text" 
+                                                                    ng-model="servers[current].sc.java.java_xms" 
+                                                                    ng-change="change_sc('java', 'java_xms', servers[current].sc.java.java_xms)"
+                                                                    ng-model-options="{ updateOn: 'default blur', debounce: {'default': 1500, 'blur': 0} }">
+                                                                <span class="add-on" translate="MB_ABBREVIATION"></span>
+                                                            </div>
+                                                        </div>
+                                                    </div><!--/ Help Text -->
+                                                    <div class="controls">
+                                                        <label class="control-label" translate="ADDITIONAL_JAVA_ARGS"></label>
+                                                        <input type="text" 
+                                                            class="span6"
+                                                            placeholder="-XX:+DisableExplicitGC"
+                                                            ng-model="servers[current].sc.java.java_tweaks" 
+                                                            ng-change="change_sc('java', 'java_tweaks', servers[current].sc.java.java_tweaks)" 
+                                                            ng-model-options="{ updateOn: 'default blur', debounce: {'default': 1500, 'blur': 0} }">
+                                                    </div>
                                                 </div>
                                             </section>
                                         </div>
@@ -866,7 +864,7 @@
                                         <div class="span6 widget">
                                             <header>
                                                 <h4 class="title"><span class="icon icone-hdd"></span> {{ 'RESTORE_POINTS' | translate }}</h4>
-                                                <span class="badge badge-success pull-right">{{ servers[current].page_data.glance.increments.length }}</span>
+                                                <span class="badge badge-success pull-right" ng-click="change_page('restore_points')">{{ servers[current].page_data.glance.increments.length }}</span>
                                             </header>
                                             <section class="body">
                                                 <div class="body-inner">
@@ -893,7 +891,7 @@
                                         <div class="span6 widget">
                                             <header>
                                                 <h4 class="title"><span class="icon icone-hdd"></span> {{ 'ARCHIVES' | translate }}</h4>
-                                                <span class="badge badge-success pull-right">{{ servers[current].page_data.glance.archives.length }}</span>
+                                                <span class="badge badge-success pull-right" ng-click="change_page('archives')">{{ servers[current].page_data.glance.archives.length }}</span>
                                             </header>
                                             <section class="body">
                                                 <div class="body-inner">
@@ -979,13 +977,13 @@
                                                     <div class="control-group">
                                                         <div class="controls">
                                                             <label class="checkbox">
-                                                                <input icheck class="icheck" type="checkbox" ng-model="delete_archive"> archive/aaa
+                                                                <input icheck class="icheck" type="checkbox" ng-model="delete_archive"> {{ 'DELETE_ARCHIVES' | translate }} {{ '{0}/{1}/{2}'.format(servers[current].page_data.glance.base_dir, 'archive', current) }}
                                                             </label>
                                                             <label class="checkbox">
-                                                                <input icheck class="icheck" type="checkbox" ng-model="delete_backup"> backup/aaa
+                                                                <input icheck class="icheck" type="checkbox" ng-model="delete_backup"> {{ 'DELETE_RESTORE_POINTS' | translate }} {{ '{0}/{1}/{2}'.format(servers[current].page_data.glance.base_dir, 'backup', current) }}
                                                             </label>
                                                             <label class="checkbox">
-                                                                <input icheck class="icheck" type="checkbox" ng-model="delete_servers"> servers/aaa
+                                                                <input icheck class="icheck" type="checkbox" ng-model="delete_servers"> {{ 'DELETE_LIVE_FILES' | translate }} {{ '{0}/{1}/{2}'.format(servers[current].page_data.glance.base_dir, 'servers', current) }}
                                                             </label>
                                                         </div>
                                                         <button type="button" class="btn btn-mini btn-danger" ng-disabled="!(delete_servers && delete_backup && delete_archive)" ng-click="server_command('delete')"><span class="icone-warning-sign"></span> {{ 'DELETE' | translate }}</button>

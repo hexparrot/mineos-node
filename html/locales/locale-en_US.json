@@ -104,6 +104,9 @@
   "DELETE": "Delete",
   "EDIT": "Edit",
   "SETTINGS": "Settings",
+  "DELETE_ARCHIVES": "Delete Archives:",
+  "DELETE_RESTORE_POINTS": "Delete Restore Points:",
+  "DELETE_LIVE_FILES": "Delete Live Server Files:",
 
   "AVAILABLE_RESTORE_POINTS": "Available Restore Points",
   "STEP": "Step",
