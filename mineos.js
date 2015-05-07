@@ -264,12 +264,18 @@ mineos.mc = function(server_name, base_dir) {
           cb(null, value);
         });
       },
+      'java_tweaks': function (cb) {
+        server_config(function (err, dict) {
+          var value = (dict.java || {}).java_tweaks || '';
+          cb(null, value);
+        });
+      }
     }, function(err, results) {
       if (err) {
         callback(err, {});
       } else {
         var args = ['-dmS', 'mc-{0}'.format(self.server_name)];
-        args.push.apply(args, [results.binary, '-server', '-Xmx{0}M'.format(results.xmx), '-Xms{0}M'.format(results.xms)]);
+        args.push.apply(args, [results.binary, '-server', '-Xmx{0}M'.format(results.xmx), '-Xms{0}M'.format(results.xms), results.java_tweaks]);
         args.push.apply(args, ['-jar', results.jarfile, results.jar_args]);
 
         callback(null, args);

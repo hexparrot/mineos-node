@@ -48,7 +48,7 @@ test.dependencies_met = function(test) {
     test.done();
   })
 }
-
+/*
 test.server_list = function (test) {
   var servers = mineos.server_list(BASE_DIR);
   var instance = new mineos.mc('testing', BASE_DIR);
@@ -259,7 +259,7 @@ test.extract_server_name = function(test) {
   test.throws(function(){mineos.extract_server_name(BASE_DIR, '/var/games/minecraft')}, 'no server name in path');
   test.done();
 }
-
+*/
 test.get_start_args = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -287,9 +287,16 @@ test.get_start_args = function(test) {
     function(callback) {
       instance.get_start_args(function(err, args) {
         test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2].slice(-4), 'java');
+        test.equal(args[3], '-server');
         test.equal(args[4], '-Xmx256M');
         test.equal(args[5], '-Xms256M');
-        test.equal(args[7], 'minecraft_server.1.7.9.jar');
+        test.equal(args[6], '');
+        test.equal(args[7], '-jar');
+        test.equal(args[8], 'minecraft_server.1.7.9.jar');
+        test.equal(args[9], 'nogui');
         callback(err);
       })
     },
@@ -306,8 +313,33 @@ test.get_start_args = function(test) {
     function(callback) {
       instance.get_start_args(function(err, args) {
         test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2].slice(-4), 'java');
+        test.equal(args[3], '-server');
         test.equal(args[4], '-Xmx256M');
         test.equal(args[5], '-Xms128M');
+        test.equal(args[6], '');
+        test.equal(args[7], '-jar');
+        test.equal(args[8], 'minecraft_server.1.7.9.jar');
+        test.equal(args[9], 'nogui');
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'java_tweaks', '-Xmx2G -XX:MaxPermSize=256M'),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2].slice(-4), 'java');
+        test.equal(args[3], '-server');
+        test.equal(args[4], '-Xmx256M');
+        test.equal(args[5], '-Xms128M');
+        test.equal(args[6], '-Xmx2G -XX:MaxPermSize=256M');
+        test.equal(args[7], '-jar');
+        test.equal(args[8], 'minecraft_server.1.7.9.jar');
+        test.equal(args[9], 'nogui');
         callback(err);
       })
     }
@@ -316,7 +348,7 @@ test.get_start_args = function(test) {
     test.done();
   })
 }
-
+/*
 test.start = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -1405,4 +1437,4 @@ test.copy_profile = function(test) {
     test.ifError(err);
     test.done();
   })
-}
+}*/
