@@ -757,37 +757,43 @@
                                             <header><h4 class="title"><span class="icon icone-home"></span>{{ 'SERVER_ACTIONS' | translate }}</h4></header>
                                             <section class="body">
                                                 <div class="body-inner">
-                                                    <p>
-                                                        <button type="button" class="btn btn-success" ng-click="server_command('start')" translate="START" ng-show="(servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
-                                                        <button type="button" class="btn btn-success" ng-click="modal_new_server()" translate="START" ng-show="!(servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
 
-                                                        <!-- Button Dropdown -->
-                                                        <div class="btn-group">
+                                                    <div class="span4">
+                                                        <button type="button" class="btn btn-success span12" ng-click="server_command('start')" translate="START" ng-show="(servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
+                                                        <button type="button" class="btn btn-success span12" ng-click="modal_new_server()" translate="START" ng-show="!(servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
+                                                    </div>
+
+                                                    <div class="span6">
+                                                        <div class="btn-group btn-block">
                                                             <button class="btn btn-danger" ng-click="server_command('stop')" translate="STOP"></button>
                                                             <button class="btn btn-danger dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
                                                             <ul class="dropdown-menu">
-                                                                <li><a href="#" ng-click="server_command('restart')" translate="RESTART"></a></li>
+                                                                <li><a href="#" ng-click="server_command('stop')" translate="STOP"></a></li>
                                                                 <li><a href="#" ng-click="server_command('stop_and_backup')" translate="STOP_AND_BACKUP"></a></li>
+                                                                <li><a href="#" ng-click="server_command('restart')" translate="RESTART"></a></li>
                                                                 <li><a href="#" ng-click="server_command('kill')" translate="KILL"></a></li>
                                                                 <li><a href="#" ng-click="accept_eula()" translate="ACCEPT_EULA"></a></li>
                                                             </ul>
-                                                        </div><!--/ Button Dropdown -->
-                                                    </p>
-                                                    <p>
-                                                        <!-- Select -->
-                                                        <div class="control-group">
-                                                            <div class="controls">
-                                                                <select class="" ng-model="myprofile" data-ng-options="p as p.id group by p.group for p in profiles | profile_filter:'downloaded' | orderBy:'-releaseTime'" ng-change="change_sc('minecraft', 'profile', myprofile.id)">
-                                                                    <option value="" disabled selected translate="CHANGE_PROFILE_TO"></option>
-                                                                </select>
-                                                            </div>
-                                                            <div class="controls">
-                                                                <button class="btn btn-default" ng-click="server_command('copy_profile')" translate="COPY_PROFILE"></button>
-                                                            </div>
-                                                        </div><!--/ Select -->
-                                                        <label class="checkbox">
-                                                            <input icheck id="broadcast" class="icheck" type="checkbox" ng-model="broadcast_to_lan"> {{ 'BROADCAST_TO_LAN' | translate }}
-                                                        </label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="clearfix"></div><div class="span12"></div>
+
+                                                    <!-- Select -->
+                                                    <div class="control-group">
+                                                        <div class="controls">
+                                                            <select class="" ng-model="myprofile" data-ng-options="p as p.id group by p.group for p in profiles | profile_filter:'downloaded' | orderBy:'-releaseTime'" ng-change="change_sc('minecraft', 'profile', myprofile.id)">
+                                                                <option value="" disabled selected translate="CHANGE_PROFILE_TO"></option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="controls">
+                                                            <button class="btn btn-default" ng-click="server_command('copy_profile')" translate="COPY_PROFILE"></button>
+                                                        </div>
+                                                    </div><!--/ Select -->
+                                                    <label class="checkbox">
+                                                        <input icheck id="broadcast" class="icheck" type="checkbox" ng-model="broadcast_to_lan"> {{ 'BROADCAST_TO_LAN' | translate }}
+                                                    </label>
+
                                                 </div>
                                             </section>
                                         </div>
