@@ -286,12 +286,25 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     $scope.change_page('dashboard', server_name);
   }
 
-  $scope.modal_new_server = function() {
-    $('#modal_new_server').modal('show');
-  }
-
-  $scope.accept_eula = function() {
-    $('#modal_eula').modal('show');
+  $scope.modals = {
+    open_new_server: function() {
+      $('#modal_new_server').modal('show');
+    },
+    close_new_server_start: function() {
+      $('#modal_new_server').modal('hide');
+      socket.emit($scope.current, 'command', { 'command': 'start' });
+    },
+    open_accept_eula: function() {
+      $('#modal_eula').modal('show');
+    },
+    close_accept_eula_start: function() {
+      $('#modal_eula').modal('hide');
+      socket.emit($scope.current, 'command', { 'command': 'start' });
+    },
+    close_accept_eula_restart: function() {
+      $('#modal_eula').modal('hide');
+      socket.emit($scope.current, 'command', { 'command': 'restart' });
+    }
   }
 
   $scope.server_from_archive = function(archive_filename) {
@@ -436,11 +449,6 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
       me.notices[data.uuid] = data;
     })
 
-    me.channel.on(server_name, 'eula', function(data) {
-      if (!data)
-        $('#modal_eula').modal('show');
-    })
-
     me.channel.on(server_name, 'server.properties', function(data) {
       me['sp'] = data;
     })
@@ -459,6 +467,10 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
       me.channel.emit(server_name, 'page_data', 'glance');
 
       var suppress = ('suppress_popup' in data ? data.suppress_popup : false);
+
+      if (data.err == 'eula') 
+        $('#modal_eula').modal('show');
+
       if (!suppress) {
         var help_text = '';
         try {

@@ -760,7 +760,7 @@
 
                                                     <div class="span4">
                                                         <button type="button" class="btn btn-success span12" ng-disabled="servers[current].heartbeat.up" ng-click="server_command('start')" translate="START" ng-show="(servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
-                                                        <button type="button" class="btn btn-success span12" ng-disabled="servers[current].heartbeat.up" ng-click="modal_new_server()" translate="START" ng-show="!(servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
+                                                        <button type="button" class="btn btn-success span12" ng-disabled="servers[current].heartbeat.up" ng-click="modals.open_new_server()" translate="START" ng-show="!(servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
                                                     </div>
 
                                                     <div class="span6">
@@ -772,7 +772,7 @@
                                                                 <li><a href="#" ng-click="server_command('stop_and_backup')" translate="STOP_AND_BACKUP"></a></li>
                                                                 <li><a href="#" ng-click="server_command('restart')" translate="RESTART"></a></li>
                                                                 <li><a href="#" ng-click="server_command('kill')" translate="KILL" ng-disabled="!servers[current].heartbeat.up"></a></li>
-                                                                <li><a href="#" ng-click="accept_eula()" translate="ACCEPT_EULA"></a></li>
+                                                                <li><a href="#" ng-click="modals.open_accept_eula()" translate="ACCEPT_EULA"></a></li>
                                                             </ul>
                                                         </div>
                                                     </div>
@@ -1413,8 +1413,8 @@
                 <div class="modal-footer">
                     <button class="btn btn-success" aria-hidden="true" translate="ACCEPT_EULA" ng-click="server_command('accept_eula')"></button>
                     <button class="btn btn-warning" data-dismiss="modal" translate="KILL" ng-click="server_command('kill')" ng-show="servers[current].heartbeat.up"></button>
-                    <button class="btn btn-warning" data-dismiss="modal" translate="RESTART" ng-click="server_command('restart')" ng-show="servers[current].heartbeat.up"></button>
-                    <button class="btn btn-warning" data-dismiss="modal" translate="START" ng-click="server_command('start')" ng-show="!servers[current].heartbeat.up"></button>
+                    <button class="btn btn-warning" data-dismiss="modal" translate="RESTART" ng-click="modals.close_accept_eula_restart()" ng-show="servers[current].heartbeat.up"></button>
+                    <button class="btn btn-warning" data-dismiss="modal" translate="START" ng-click="modals.close_accept_eula_start()" ng-show="!servers[current].heartbeat.up"></button>
                 </div>
             </div><!--/ Modal With Animation --> 
 
@@ -1466,7 +1466,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success" ng-click="server_command('start')" translate="START"></button>
+                    <button type="button" class="btn btn-success" ng-click="modals.close_new_server_start()" translate="START"></button>
                 </div>
             </div><!--/ Modal With Animation --> 
 

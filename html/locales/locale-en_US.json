@@ -147,5 +147,6 @@
   "!up": "Server may not be up when performing this action.",
   "up": "Server must be up when performing this action.",
   "!exists": "Server may not exist when performing this action.",
-  "exists": "Cannot find server to act on."
+  "exists": "Cannot find server to act on.",
+  "eula": "The Mojang End-User Licesnce Agreement must be accepted to start this server."
 }
