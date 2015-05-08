@@ -1361,12 +1361,7 @@ test.broadcast_property = function(test) {
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   async.series([
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.create, OWNER_CREDS),
     function(callback) {
       instance.property('broadcast', function(err, will_broadcast) {
         test.ifError(err);
@@ -1384,7 +1379,6 @@ test.broadcast_property = function(test) {
     }
   ], function(err) {
     test.ifError(err);
-    test.expect(6);
     test.done();
   })
 }
@@ -1401,20 +1395,24 @@ test.server_files_property = function(test) {
         callback(!err);
       })
     },
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.create, OWNER_CREDS),
     function(callback) {
       instance.property('server_files', function(err, server_files) {
         test.ifError(err);
-        test.equal(server_files.length, 1);
+        test.equal(server_files.length, 0);
         callback(err);
       })
     },
     async.apply(fs.ensureFile, path.join(instance.env.cwd, 'myserver.jar')),
+    function(callback) {
+      instance.property('server_files', function(err, server_files) {
+        test.ifError(err);
+        test.equal(server_files.length, 1);
+        test.ok(server_files.indexOf('myserver.jar') >= 0);
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
     function(callback) {
       instance.property('server_files', function(err, server_files) {
         test.ifError(err);
@@ -1436,7 +1434,6 @@ test.server_files_property = function(test) {
     }
   ], function(err) {
     test.ifError(err);
-    test.expect(14);
     test.done();
   })
 }

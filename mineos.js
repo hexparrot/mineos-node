@@ -731,7 +731,7 @@ mineos.mc = function(server_name, base_dir) {
         break;
       case 'broadcast':
         self.sc(function(err, dict) {
-          callback(err, dict['minecraft']['broadcast']);
+          callback(err, (dict['minecraft'] || {}).broadcast);
         })
         break;
       case 'eula':
