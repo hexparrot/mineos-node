@@ -330,6 +330,7 @@ mineos.mc = function(server_name, base_dir) {
     async.waterfall([
       async.apply(self.verify, 'exists'),
       async.apply(self.verify, '!up'),
+      async.apply(self.verify, 'eula'),
       async.apply(self.property, 'owner'),
       function(owner, cb) {
         params['uid'] = owner['uid'];
@@ -731,6 +732,18 @@ mineos.mc = function(server_name, base_dir) {
       case 'broadcast':
         self.sc(function(err, dict) {
           callback(err, dict['minecraft']['broadcast']);
+        })
+        break;
+      case 'eula':
+        // returns false if and only if the file exists and finds 'eula=false'
+        // absent file and eula=true return true
+        var ini = require('ini');
+
+        fs.readFile(path.join(self.env.cwd, 'eula.txt'), function(err, data) {
+          if (err)
+            callback(null, true);
+          else
+            callback(err, ini.parse(data.toString()).eula);
         })
         break;
       case 'server_files':
