@@ -374,7 +374,7 @@ function server_container(server_name, base_dir, socket_io) {
         }
       }
 
-      if (args.command == 'delete' && server_name in servers)
+      if (args.command == 'delete')
         self.cleanup();
 
       console.info('[{0}] received request "{1}"'.format(server_name, args.command))
@@ -391,10 +391,129 @@ function server_container(server_name, base_dir, socket_io) {
       server_dispatcher(args);
     }
 
+    function get_file_contents(rel_filepath) {
+      if (rel_filepath in tails) { //this is the protection from malicious client
+        // a tail would only exist for a file the server itself has opened
+        var fs = require('fs');
+        var abs_filepath = path.join(instance.env['cwd'], rel_filepath);
+
+        fs.readFile(abs_filepath, function (err, data) {
+          if (!err) {
+            console.info('[{0}] {1} transmittting existing file contents: {2} ({3} bytes)'.format(server_name, ip_address, rel_filepath, data.length));
+            nsp.emit('file head', {filename: rel_filepath, payload: data.toString()});
+          }
+        });
+      }
+    }
+
+    function get_prop(requested) {
+      console.info('[{0}] {1} requesting property: {2}'.format(server_name, ip_address, requested.property));
+      instance.property(requested.property, function(err, retval) {
+        console.info('[{0}] returned to {1}: {2}'.format(server_name, ip_address, retval));
+        nsp.emit('server_fin', {'server_name': server_name, 'property': requested.property, 'payload': retval});
+      })
+    }
+
+    function get_page_data(page) {
+      switch (page) {
+        case 'glance':
+          console.info('[{0}] {1} requesting server at a glance info'.format(server_name, ip_address));
+
+          async.parallel({
+            'increments': async.apply(instance.list_increments),
+            'archives': async.apply(instance.list_archives),
+            'du_awd': async.apply(instance.property, 'du_awd'),
+            'du_bwd': async.apply(instance.property, 'du_bwd'),
+            'du_cwd': async.apply(instance.property, 'du_cwd'),
+            'owner': async.apply(instance.property, 'owner'),
+            'server_files': async.apply(instance.property, 'server_files'),
+            'base_dir': function(cb) {
+              cb(null, base_dir)
+            }
+          }, function(err, results) {
+            nsp.emit('page_data', {page: page, payload: results});
+          })
+          break;
+        case 'cron':
+          console.info('[{0}] {1} requesting cron info'.format(server_name, ip_address));
+          var cron_table = {};
+          for (var hash in cron) 
+            cron_table[hash] = cron[hash].definition;
+
+          nsp.emit('page_data', {page: page, payload: cron_table});
+          break;
+        default:
+          nsp.emit('page_data', {page: page});
+          break;
+      }
+    }
+
+    function manage_cron(opts) {
+      var uuid = require('node-uuid');
+      var CronJob = require('cron').CronJob;
+
+      var operation = opts.operation;
+      delete opts.operation;
+
+      switch (operation) {
+        case 'create':
+          var hash = require('object-hash');
+          console.log('[{0}] {1} requests cron creation:'.format(server_name, ip_address), opts);
+
+          try {
+            var cronjob = new CronJob(opts.source, function (){
+              server_dispatcher(opts);
+            }, null, false);
+          } catch (e) {
+            console.log('[{0}] rejected invalid cron format: "{1}"'.format(server_name, opts.source));
+            opts.uuid = uuid.v1();
+            opts.time_initiated = Date.now();
+            opts.command = '{0} cron'.format(operation);
+            opts.success = false;
+            opts.err = 'invalid cron format: "{0}"'.format(opts.source);
+            opts.time_resolved = Date.now();
+            nsp.emit('server_fin', opts);
+            return;
+          }
+
+          cron[hash(opts)] = {
+            definition: opts,
+            instance: cronjob
+          }
+          break;
+        case 'delete':
+          console.log('[{0}] {1} requests cron deletion: {2}'.format(server_name, ip_address, opts.hash));
+
+          cron[opts.hash].instance.stop();
+          delete self.servers[server_name].cron[opts.hash];
+          break;
+        case 'start':
+          console.log('[{0}] {1} starting cron: {2}'.format(server_name, ip_address, opts.hash));
+
+          cron[opts.hash].instance.start();
+          break;
+        case 'suspend':
+          console.log('[{0}] {1} suspending cron: {2}'.format(server_name, ip_address, opts.hash));
+
+          cron[opts.hash].instance.stop();
+          break;
+        default:
+          console.warn('[{0}] {1} requested unexpected cron operation: {2}'.format(server_name, ip_address, operation), opts);
+      }
+      get_page_data('cron');
+    }
+
+
     console.info('[{0}] {1} connected to namespace'.format(server_name, ip_address));
     broadcast_sp();
     broadcast_sc();
 
     socket.on('command', produce_receipt);
+    socket.on('get_file_contents', get_file_contents);
+    socket.on('property', get_prop);
+    socket.on('page_data', get_page_data);
+    socket.on('cron', manage_cron);
+    console.info('[{0}] broadcasting {1} previous notices'.format(server_name, notices.length));
+    nsp.emit('notices', notices);
   })
 }
