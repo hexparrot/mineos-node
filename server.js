@@ -14,8 +14,6 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
   self.watches = {};
   self.front_end = socket_emitter;
 
-  var HEARTBEAT_INTERVAL_MS = 5000;
-
   /* insert udp4 here */
 
   (function() {
@@ -210,12 +208,14 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
 function server_container(server_name, base_dir, socket_io) {
   // when evoked, creates a permanent 'mc' instance, namespace, and place for file tails/watches. 
   var self = this;
-  self.instance = new mineos.mc(server_name, base_dir);
-  self.nsp = socket_io.of('/{0}'.format(server_name));
-  self.tails = {};
-  self.watches = {};
-  self.notices = [];
-  self.cron = {};
+  var instance = new mineos.mc(server_name, base_dir),
+      nsp = socket_io.of('/{0}'.format(server_name)),
+      tails = {},
+      watches = {},
+      notices = [],
+      cron = {},
+      heartbeat_interval = null,
+      HEARTBEAT_INTERVAL_MS = 5000;
 
   console.log('Discovered server: {0}'.format(server_name));
   make_tail('logs/latest.log');
@@ -223,27 +223,43 @@ function server_container(server_name, base_dir, socket_io) {
   make_watch('server.properties', broadcast_sp);
   make_watch('server.config', broadcast_sc);
 
+  heartbeat_interval = setInterval(heartbeat, HEARTBEAT_INTERVAL_MS);
+
+  function heartbeat() {
+    async.series({
+      'up': function(cb) { instance.property('up', function(err, is_up) { cb(null, is_up) }) },
+      'memory': function(cb) { instance.property('memory', function(err, mem) { cb(null, err ? {} : mem) }) },
+      'ping': function(cb) { instance.property('ping', function(err, ping) { cb(null, err ? {} : ping) }) }
+    }, function(err, retval) {
+      nsp.emit('heartbeat', {
+        'server_name': server_name,
+        'timestamp': Date.now(),
+        'payload': retval
+      })
+    })
+  }
+
   self.cleanup = function () {
-    for (var t in self.tails)
-      self.tails[t].unwatch();
+    for (var t in tails)
+      tails[t].unwatch();
 
-    for (var w in self.watches)
-      self.watches[w].close();
+    for (var w in watches)
+      watches[w].close();
 
-    self.nsp.removeAllListeners();
+    nsp.removeAllListeners();
   }
 
   function broadcast_sp() {
-    self.instance.sp(function(err, sp_data) {
+    instance.sp(function(err, sp_data) {
       //console.log('[{0}] broadcasting server.properties'.format(server_name));
-      self.nsp.emit('server.properties', sp_data);
+      nsp.emit('server.properties', sp_data);
     })
   }
 
   function broadcast_sc() {
-    self.instance.sc(function(err, sc_data) {
+    instance.sc(function(err, sc_data) {
       //console.log('[{0}] broadcasting server.config'.format(server_name));
-      self.nsp.emit('server.config', sc_data);
+      nsp.emit('server.config', sc_data);
     })
   }
 
@@ -255,9 +271,9 @@ function server_container(server_name, base_dir, socket_io) {
        once the watch is satisfied, the watch is closed and a tail is finally created.
     */
     var tail = require('tail').Tail;
-    var abs_filepath = path.join(self.instance.env.cwd, rel_filepath);
+    var abs_filepath = path.join(instance.env.cwd, rel_filepath);
 
-    if (rel_filepath in self.tails) {
+    if (rel_filepath in tails) {
       console.warn('[{0}] Tail already exists for {1}'.format(server_name, rel_filepath));
       return;
     }
@@ -267,14 +283,14 @@ function server_container(server_name, base_dir, socket_io) {
       console.info('[{0}] Created tail on {1}'.format(server_name, rel_filepath));
       new_tail.on('line', function(data) {
         //console.info('[{0}] {1}: transmitting new tail data'.format(server_name, rel_filepath));
-        self.nsp.emit('tail_data', {'filepath': rel_filepath, 'payload': data});
+        nsp.emit('tail_data', {'filepath': rel_filepath, 'payload': data});
       })
-      self.tails[rel_filepath] = new_tail;
+      tails[rel_filepath] = new_tail;
     } catch (e) {
       console.error('[{0}] Create tail on {1} failed'.format(server_name, rel_filepath));
       console.info('[{0}] Watching for file generation: {1}'.format(server_name, rel_filepath));
 
-      var tail_lookout = chokidar.watch(self.instance.env.cwd, {persistent: true, ignoreInitial: true});
+      var tail_lookout = chokidar.watch(instance.env.cwd, {persistent: true, ignoreInitial: true});
       tail_lookout
         .on('add', function(fp) {
           var file = path.basename(fp);
@@ -291,9 +307,9 @@ function server_container(server_name, base_dir, socket_io) {
     /* creates a watch for a file relative to the CWD, e.g., /var/games/minecraft/servers/myserver.
        watches are used for detecting file creation and changes.
     */
-    var abs_filepath = path.join(self.instance.env.cwd, rel_filepath);
+    var abs_filepath = path.join(instance.env.cwd, rel_filepath);
 
-    if (rel_filepath in self.watches) {
+    if (rel_filepath in watches) {
       console.warn('[{0}] Watch already exists for {1}'.format(server_name, rel_filepath));
       return;
     }
@@ -304,13 +320,13 @@ function server_container(server_name, base_dir, socket_io) {
         callback();
       })
       console.info('[{0}] Started watch on {1}'.format(server_name, rel_filepath));
-      self.watches[rel_filepath] = watcher;
+      watches[rel_filepath] = watcher;
     } catch (e) {
       console.log(e) //handle error or ignore
     }
   }
 
-  self.nsp.on('connection', function(socket) {
+  nsp.on('connection', function(socket) {
     var ip_address = socket.request.connection.remoteAddress;
 
     function server_dispatcher(args) {
@@ -319,7 +335,7 @@ function server_container(server_name, base_dir, socket_io) {
       var arg_array = [];
 
       try {
-        fn = self.instance[args.command];
+        fn = instance[args.command];
         required_args = introspect(fn);
         // receives an array of all expected arguments, using introspection.
         // they are in order as listed by the function definition, which makes iteration possible.
@@ -327,9 +343,9 @@ function server_container(server_name, base_dir, socket_io) {
         args.success = false;
         args.error = e;
         args.time_resolved = Date.now();
-        self.nsp.emit('server_fin', args);
+        nsp.emit('server_fin', args);
         console.error('server_fin', args);
-        self.notices.push(args);
+        notices.push(args);
         return;
       }
 
@@ -340,11 +356,11 @@ function server_container(server_name, base_dir, socket_io) {
             args.success = !err;
             args.err = err;
             args.time_resolved = Date.now();
-            self.nsp.emit('server_fin', args);
+            nsp.emit('server_fin', args);
             console.log('server_fin', args)
 
             if (args.command != 'delete')
-              self.notices.push(args);
+              notices.push(args);
           })
         else if (required_args[i] in args) {
           arg_array.push(args[required_args[i]])
@@ -352,16 +368,16 @@ function server_container(server_name, base_dir, socket_io) {
           args.success = false;
           console.error('Provided values missing required argument', required_args[i]);
           args.error = 'Provided values missing required argument: {0}'.format(required_args[i]);
-          self.nsp.emit('server_fin', args);
+          nsp.emit('server_fin', args);
           return;
         }
       }
 
-      if (args.command == 'delete' && server_name in self.servers)
+      if (args.command == 'delete' && server_name in servers)
         self.cleanup();
 
       console.info('[{0}] received request "{1}"'.format(server_name, args.command))
-      fn.apply(self.instance, arg_array);
+      fn.apply(instance, arg_array);
     }
 
     function produce_receipt(args) {
@@ -370,7 +386,7 @@ function server_container(server_name, base_dir, socket_io) {
       console.info('[{0}] {1} issued command : "{2}"'.format(server_name, ip_address, args.command))
       args.uuid = uuid.v1();
       args.time_initiated = Date.now();
-      self.nsp.emit('server_ack', args)
+      nsp.emit('server_ack', args)
       server_dispatcher(args);
     }
 
