@@ -492,18 +492,8 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
     return me;
   }
 
-  socket.on('/', 'server_list', function(servers) {
-    angular.forEach(servers, function(server_name) {
-      this[server_name] = new server_model(server_name);
-    }, self)
-  })
-
   socket.on('/', 'track_server', function(server_name) {
     self[server_name] = new server_model(server_name);
-  })
-
-  socket.on('/', 'untrack_server', function(server_name) {
-    delete self[server_name];
   })
 
   return self;
