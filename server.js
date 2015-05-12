@@ -41,6 +41,11 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
 
   /* insert host heartbeat here */
 
+  self.shutdown = function() {
+    for (var server_name in self.servers)
+      self.servers[server_name].cleanup();
+  }
+
   self.front_end.on('connection', function(socket) {
     var ip_address = socket.request.connection.remoteAddress;
 
@@ -198,6 +203,8 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
     //self.send_profile_list();
     //self.send_user_list();
   })
+
+  return self;
 }
 
 function server_container(server_name, base_dir, socket_io) {
@@ -207,16 +214,24 @@ function server_container(server_name, base_dir, socket_io) {
   self.nsp = socket_io.of('/{0}'.format(server_name));
   self.tails = {};
   self.watches = {};
-  self.notices = {};
+  self.notices = [];
   self.cron = {};
-
-  /* insert heartbeat here */
 
   console.log('Discovered server: {0}'.format(server_name));
   make_tail('logs/latest.log');
 
   make_watch('server.properties', broadcast_sp);
   make_watch('server.config', broadcast_sc);
+
+  self.cleanup = function () {
+    for (var t in self.tails)
+      self.tails[t].unwatch();
+
+    for (var w in self.watches)
+      self.watches[w].close();
+
+    self.nsp.removeAllListeners();
+  }
 
   function broadcast_sp() {
     self.instance.sp(function(err, sp_data) {
@@ -298,8 +313,71 @@ function server_container(server_name, base_dir, socket_io) {
   self.nsp.on('connection', function(socket) {
     var ip_address = socket.request.connection.remoteAddress;
 
+    function server_dispatcher(args) {
+      var introspect = require('introspect');
+      var fn, required_args;
+      var arg_array = [];
+
+      try {
+        fn = self.instance[args.command];
+        required_args = introspect(fn);
+        // receives an array of all expected arguments, using introspection.
+        // they are in order as listed by the function definition, which makes iteration possible.
+      } catch (e) { 
+        args.success = false;
+        args.error = e;
+        args.time_resolved = Date.now();
+        self.nsp.emit('server_fin', args);
+        console.error('server_fin', args);
+        self.notices.push(args);
+        return;
+      }
+
+      for (var i in required_args) {
+        // all callbacks expected to follow the pattern (success, payload).
+        if (required_args[i] == 'callback') 
+          arg_array.push(function(err, payload) {
+            args.success = !err;
+            args.err = err;
+            args.time_resolved = Date.now();
+            self.nsp.emit('server_fin', args);
+            console.log('server_fin', args)
+
+            if (args.command != 'delete')
+              self.notices.push(args);
+          })
+        else if (required_args[i] in args) {
+          arg_array.push(args[required_args[i]])
+        } else {
+          args.success = false;
+          console.error('Provided values missing required argument', required_args[i]);
+          args.error = 'Provided values missing required argument: {0}'.format(required_args[i]);
+          self.nsp.emit('server_fin', args);
+          return;
+        }
+      }
+
+      if (args.command == 'delete' && server_name in self.servers)
+        self.cleanup();
+
+      console.info('[{0}] received request "{1}"'.format(server_name, args.command))
+      fn.apply(self.instance, arg_array);
+    }
+
+    function produce_receipt(args) {
+      /* when a command is received, immediately respond to client it has been received */
+      var uuid = require('node-uuid');
+      console.info('[{0}] {1} issued command : "{2}"'.format(server_name, ip_address, args.command))
+      args.uuid = uuid.v1();
+      args.time_initiated = Date.now();
+      self.nsp.emit('server_ack', args)
+      server_dispatcher(args);
+    }
+
     console.info('[{0}] {1} connected to namespace'.format(server_name, ip_address));
     broadcast_sp();
     broadcast_sc();
+
+    socket.on('command', produce_receipt);
   })
 }
