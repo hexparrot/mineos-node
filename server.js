@@ -3,12 +3,7 @@ var async = require('async');
 var chokidar = require('chokidar');
 var path = require('path');
 var events = require('events');
-var introspect = require('introspect');
-var tail = require('tail').Tail;
-var uuid = require('node-uuid');
 var os = require('os');
-var CronJob = require('cron').CronJob;
-var dgram = require('dgram');
 var server = exports;
 
 server.backend = function(base_dir, socket_emitter, dir_owner) {
@@ -17,11 +12,12 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
   self.servers = {};
   self.profiles = {};
   self.watches = {};
-  self.front_end = socket_emitter || new events.EventEmitter();
+  self.front_end = socket_emitter;
   
 
   (function() {
     //thanks to https://github.com/flareofghast/node-advertiser/blob/master/advert.js
+    var dgram = require('dgram');
     var udp_broadcaster = dgram.createSocket('udp4');
     var udp_dest = '255.255.255.255';
     var udp_port = 4445;
@@ -221,6 +217,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
 
         function produce_receipt(args) {
           /* when a command is received, immediately respond to client it has been received */
+          var uuid = require('node-uuid');
           console.info('[{0}] {1} issued command : "{2}"'.format(server_name, ip_address, args.command))
           args.uuid = uuid.v1();
           args.time_initiated = Date.now();
@@ -288,6 +285,9 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         }
 
         function manage_cron(opts) {
+          var uuid = require('node-uuid');
+          var CronJob = require('cron').CronJob;
+
           var operation = opts.operation;
           delete opts.operation;
 
@@ -354,6 +354,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
     }
 
     function server_dispatcher(args) {
+      var introspect = require('introspect');
       var fn, required_args;
       var arg_array = [];
 
@@ -416,6 +417,7 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
          if the server does not exist, a watch is made in the interim, waiting for its creation.  
          once the watch is satisfied, the watch is closed and a tail is finally created.
       */
+      var tail = require('tail').Tail;
       var abs_filepath = path.join(instance.env.cwd, rel_filepath);
 
       if (rel_filepath in self.servers[server_name].tails) {
