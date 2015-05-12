@@ -246,6 +246,7 @@ function server_container(server_name, base_dir, socket_io) {
     for (var w in watches)
       watches[w].close();
 
+    clearInterval(heartbeat_interval);
     nsp.removeAllListeners();
   }
 
