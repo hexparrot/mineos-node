@@ -965,6 +965,56 @@ test.memory = function(test) {
   })  
 }
 
+
+test.delete_increments = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  var saved_increment = null;
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    function(callback) {
+      instance.backup(function() {
+        setTimeout(callback, 400);
+      })
+    },
+    function(callback) {
+      instance.modify_sp('server-port', 25570, function() {
+        setTimeout(callback, 400);
+      })
+    },
+    async.apply(instance.modify_sp, 'server-port', 25570),
+    function(callback) {
+      instance.backup(function() {
+        setTimeout(callback, 400);
+      })
+    },
+    function(callback) {
+      instance.list_increments(function(err, increments) {
+        test.equal(increments.length, 2);
+        test.equal(increments[0].step, '0B');
+        test.equal(increments[1].step, '1B');
+        saved_increment = increments[0].time;
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*3);
+      })
+    },
+    async.apply(instance.prune, '0B'),
+    function(callback) {
+      instance.list_increments(function(err, increments) {
+        test.equal(increments.length, 1);
+        test.equal(increments[0].step, '0B');
+        test.equal(saved_increment, increments[0].time);
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*3);
+      })
+    }
+  ], function(err, results) {
+    test.ifError(err);
+    test.done();
+  })  
+}
+
+
 test.list_increments = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);

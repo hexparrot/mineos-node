@@ -593,6 +593,30 @@ mineos.mc = function(server_name, base_dir) {
     ], callback);
   }
 
+  self.prune = function(step, callback) {
+    var binary = which.sync('rdiff-backup');
+    var args = ['--force', '--remove-older-than', step, self.env.bwd];
+    var params = { cwd: self.env.bwd };
+    var proc = child_process.spawn(binary, args, params);
+
+    proc.on('error', function(code) {
+      callback(code, null);
+    })
+
+    proc.on('error', function(code) {
+      // branch if path does not exist
+      if (code != 0)
+        callback(true);
+    });
+
+    proc.on('exit', function(code) {
+      if (code == 0) // branch if all is well
+        callback(code);
+      else // branch if dir exists, not an rdiff-backup dir
+        callback(true);
+    });
+  }
+
   self.delete_archive = function(filename, callback) {
     var fs = require('fs-extra');
     var archive_path = path.join(self.env['awd'], filename);
