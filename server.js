@@ -779,6 +779,7 @@ function server_container(server_name, base_dir, socket_io) {
     socket.on('cron', manage_cron);
     socket.on('server.properties', broadcast_sp);
     socket.on('server.config', broadcast_sc);
+    socket.on('server-icon.png', broadcast_icon);
     console.info('[{0}] broadcasting {1} previous notices'.format(server_name, notices.length));
     nsp.emit('notices', notices);
   })

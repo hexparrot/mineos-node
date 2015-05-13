@@ -496,6 +496,7 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
 
     me.channel.emit(server_name, 'server.properties');
     me.channel.emit(server_name, 'server.config');
+    me.channel.emit(server_name, 'server-icon.png');
     me.channel.emit(server_name, 'page_data', 'glance');
     me.channel.emit(server_name, 'page_data', 'cron');
     me.channel.emit(server_name, 'get_file_contents', 'logs/latest.log');
