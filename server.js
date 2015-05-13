@@ -29,11 +29,25 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
         var server_name = path.basename(path.dirname(dirpath));
         async.nextTick(function() {
           self.servers[server_name] = new server_container(server_name, base_dir, self.front_end);
+          self.front_end.emit('track_server', server_name);
         });
       })
   })();
 
-  /* insert chokidar: server removal detection here */
+  (function() {
+    var server_path = path.join(base_dir, mineos.DIRS['servers']);
+    self.watches['server_removed'] = chokidar.watch(server_path, { persistent: true, depth: 1 });
+    // ignores event updates from servers that have more path beyond the /servers/<dirhere>/<filehere>
+
+    self.watches['server_removed']
+      .on('unlinkDir', function(dirpath) {
+        // event to trigger when server directory deleted
+        var server_name = path.basename(dirpath);
+        self.servers[server_name].cleanup();
+        delete self.servers[server_name];
+        self.front_end.emit('untrack_server', server_name);
+      })
+  })();
 
   /* insert chokidar: eula detection here */
 
@@ -503,16 +517,15 @@ function server_container(server_name, base_dir, socket_io) {
       get_page_data('cron');
     }
 
-
     console.info('[{0}] {1} connected to namespace'.format(server_name, ip_address));
-    broadcast_sp();
-    broadcast_sc();
 
     socket.on('command', produce_receipt);
     socket.on('get_file_contents', get_file_contents);
     socket.on('property', get_prop);
     socket.on('page_data', get_page_data);
     socket.on('cron', manage_cron);
+    socket.on('server.properties', broadcast_sp);
+    socket.on('server.config', broadcast_sc);
     console.info('[{0}] broadcasting {1} previous notices'.format(server_name, notices.length));
     nsp.emit('notices', notices);
   })
