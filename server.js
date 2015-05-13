@@ -83,7 +83,15 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
       })
   })();
 
-  /* insert host heartbeat here */
+  function host_heartbeat() {
+    self.front_end.emit('host_heartbeat', {
+      'uptime': os.uptime(),
+      'freemem': os.freemem(),
+      'loadavg': os.loadavg()
+    })
+  }
+
+  setInterval(host_heartbeat, 1000);
 
   self.shutdown = function() {
     for (var server_name in self.servers)
