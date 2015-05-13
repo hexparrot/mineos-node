@@ -49,21 +49,6 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
       })
   })();
 
-  (function() {
-    var server_path = path.join(base_dir, mineos.DIRS['servers'], '*', 'eula.txt');
-    self.watches['eula'] = chokidar.watch(server_path, { persistent: true, depth: 1 });
-
-    self.watches['eula']
-      .on('add', function(dirpath) {
-        // event to trigger when new eula.txt detected, e.g., /var/games/minecraft/servers/<newdirhere>/eula.txt
-
-        if (path.basename(dirpath) == 'eula.txt') {
-          var server_name = path.basename(path.dirname(dirpath));
-          self.servers[server_name].emit_eula();
-        }
-      })
-  })();
-
   function host_heartbeat() {
     self.front_end.emit('host_heartbeat', {
       'uptime': os.uptime(),
@@ -426,6 +411,7 @@ function server_container(server_name, base_dir, socket_io) {
 
   make_watch('server.properties', broadcast_sp);
   make_watch('server.config', broadcast_sc);
+  make_watch('eula.txt', emit_eula);
 
   heartbeat_interval = setInterval(heartbeat, HEARTBEAT_INTERVAL_MS);
 
@@ -454,7 +440,7 @@ function server_container(server_name, base_dir, socket_io) {
     nsp.removeAllListeners();
   }
 
-  self.emit_eula = function () {
+  function emit_eula() {
     var ini = require('ini');
     var fs = require('fs-extra');
     var eula_path = path.join(instance.env.cwd, 'eula.txt');
