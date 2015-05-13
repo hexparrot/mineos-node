@@ -14,7 +14,30 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
   self.watches = {};
   self.front_end = socket_emitter;
 
-  /* insert udp4 here */
+  (function() {
+    //thanks to https://github.com/flareofghast/node-advertiser/blob/master/advert.js
+    var dgram = require('dgram');
+    var udp_broadcaster = dgram.createSocket('udp4');
+    var udp_dest = '255.255.255.255';
+    var udp_port = 4445;
+    var broadcast_delay_ms = 2000;
+
+    udp_broadcaster.bind();
+    udp_broadcaster.on("listening", function () {
+      udp_broadcaster.setBroadcast(true);
+      async.forever(
+        function(next) {
+          for (var s in self.servers) {
+            self.servers[s].broadcast_to_lan(function(msg) {
+              if (msg)
+                udp_broadcaster.send(msg, 0, msg.length, udp_port, udp_dest);
+            })
+          }
+          setTimeout(next, broadcast_delay_ms);
+        }
+      )
+    });
+  })();
 
   (function() {
     var server_path = path.join(base_dir, mineos.DIRS['servers'], '*', 'server.properties');
@@ -428,6 +451,26 @@ function server_container(server_name, base_dir, socket_io) {
       })
     })
   }
+
+  self.broadcast_to_lan = function(callback) {
+    async.waterfall([
+      async.apply(instance.verify, 'exists'),
+      async.apply(instance.verify, 'up'),
+      async.apply(instance.sc),
+      function(sc_data, cb) {
+        var broadcast_value = (sc_data.minecraft || {}).broadcast;
+        cb(!broadcast_value) //logically notted to make broadcast:true pass err cb
+      },
+      async.apply(instance.sp)
+    ], function(err, sp_data) {
+      if (err)
+        callback(null);
+      else {
+        var msg = new Buffer("[MOTD]" + sp_data.motd + "[/MOTD][AD]" + sp_data['server-port'] + "[/AD]");
+        callback(msg);
+      }
+    })
+  } 
 
   self.cleanup = function () {
     for (var t in tails)
