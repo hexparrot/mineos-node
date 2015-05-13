@@ -965,8 +965,7 @@ test.memory = function(test) {
   })  
 }
 
-
-test.delete_increments = function(test) {
+test.prune = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
@@ -974,20 +973,16 @@ test.delete_increments = function(test) {
 
   async.series([
     async.apply(instance.create, OWNER_CREDS),
-    function(callback) {
-      instance.backup(function() {
-        setTimeout(callback, 400);
-      })
-    },
-    function(callback) {
-      instance.modify_sp('server-port', 25570, function() {
-        setTimeout(callback, 400);
-      })
-    },
     async.apply(instance.modify_sp, 'server-port', 25570),
     function(callback) {
       instance.backup(function() {
-        setTimeout(callback, 400);
+        setTimeout(callback, FS_DELAY_MS*5);
+      })
+    },
+    async.apply(instance.modify_sp, 'server-port', 25575),
+    function(callback) {
+      instance.backup(function() {
+        setTimeout(callback, FS_DELAY_MS*5);
       })
     },
     function(callback) {
@@ -996,16 +991,21 @@ test.delete_increments = function(test) {
         test.equal(increments[0].step, '0B');
         test.equal(increments[1].step, '1B');
         saved_increment = increments[0].time;
-        setTimeout(function() { callback(err) }, FS_DELAY_MS*3);
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*5);
       })
     },
-    async.apply(instance.prune, '0B'),
+    function(callback) {
+      instance.prune('0B', function(err) {
+        test.ifError(err);
+        callback();
+      })
+    },
     function(callback) {
       instance.list_increments(function(err, increments) {
         test.equal(increments.length, 1);
         test.equal(increments[0].step, '0B');
         test.equal(saved_increment, increments[0].time);
-        setTimeout(function() { callback(err) }, FS_DELAY_MS*3);
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*5);
       })
     }
   ], function(err, results) {
@@ -1013,7 +1013,6 @@ test.delete_increments = function(test) {
     test.done();
   })  
 }
-
 
 test.list_increments = function(test) {
   var server_name = 'testing';
@@ -1181,7 +1180,6 @@ test.delete_archive = function(test) {
 }
 
 test.previous_version = function(test) {
-  var cf = require('../config_file');
   var ini = require('ini');
   
   var server_name = 'testing';
