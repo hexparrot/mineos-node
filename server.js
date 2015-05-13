@@ -435,6 +435,7 @@ function server_container(server_name, base_dir, socket_io) {
   make_watch('server.properties', broadcast_sp);
   make_watch('server.config', broadcast_sc);
   make_watch('eula.txt', emit_eula);
+  make_watch('server-icon.png', broadcast_icon);
 
   heartbeat_interval = setInterval(heartbeat, HEARTBEAT_INTERVAL_MS);
 
@@ -504,6 +505,16 @@ function server_container(server_name, base_dir, socket_io) {
         nsp.emit('eula', accepted);
       }
     ])
+  }
+
+  function broadcast_icon() {
+    // function to encode file data to base64 encoded string
+    //http://www.hacksparrow.com/base64-encoding-decoding-in-node-js.html
+    var fs = require('fs');
+    var filepath = path.join(instance.env.cwd, 'server-icon.png');
+    fs.readFile(filepath, function(err, data) {
+      nsp.emit('server-icon.png', new Buffer(data).toString('base64'));
+    });
   }
 
   function broadcast_sp() {

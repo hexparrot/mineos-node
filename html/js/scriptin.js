@@ -449,6 +449,10 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
       me.notices[data.uuid] = data;
     })
 
+    me.channel.on(server_name, 'server-icon.png', function(data) {
+      me['icon'] = data;
+    })
+
     me.channel.on(server_name, 'server.properties', function(data) {
       me['sp'] = data;
     })

@@ -388,8 +388,11 @@
                                         </thead>
                                         <tbody>
                                             <tr ng-repeat="(server_name, instance) in servers">
-                                                <td><a ng-click="$parent.change_page('server_status', server_name)">{{ server_name }}</a></td>
-                                                <td><a ng-attr-title="{{ 'MC Protocol: ' + instance.heartbeat.ping.protocol }}">{{ servers[server_name].sc.minecraft.profile }}</a></td>
+                                                <td>
+                                                    <img ng-show="instance.icon.length" style="width:32px;height:32px;" ng-attr-src="{{ 'data:image/png;base64, ' + instance.icon }}" />
+                                                    <a ng-click="$parent.change_page('server_status', server_name)">{{ server_name }}</a>
+                                                </td>
+                                                <td><a ng-attr-title="{{ 'MC Protocol: ' + instance.heartbeat.ping.protocol }}">{{ instance.sc.minecraft.profile }}</a></td>
                                                 <td class="hidden-phone">{{ instance.sp['server-port'] }}</td>
                                                 <td><span class="label" ng-show="instance.heartbeat" ng-class="{'label-success': instance.heartbeat.up, 'label-important': !instance.heartbeat.up}">{{ instance.heartbeat.up ? 'up' : 'down' }}</span></td>
                                                 <td>{{ instance.heartbeat.memory.VmRSS }}</td>
