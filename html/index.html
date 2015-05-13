@@ -104,36 +104,11 @@
                     <!-- START Profile -->
                     <li class="profile">
                         <a href="#" data-toggle="dropdown">
-                            <span class="text hidden-phone">will</span>
+                            <span class="text hidden-phone">admin</span>
                             <span class="arrow icone-caret-down"></span>
                         </a>
                         <!-- START Dropdown Menu -->
                         <div class="dropdown-menu" role="menu">
-                            <header>
-                                Your Profile 
-                                <ul class="toolbar">
-                                    <li><a href="#" class="btn btn-small" ng-click="$parent.change_locale('test')"><span class="icon icone-pencil"></span></a></li>
-                                    <li><a href="#" class="btn btn-small"><span class="icon icone-cog"></span></a></li>
-                                </ul>
-                            </header>
-                            <ul class="body">
-                                <li>
-                                    <a href="#" class="text"><span class="icon iconm-facebook"></span> Facebook</a>
-                                    <span class="action show">john_doe</span>
-                                </li>
-                                <li>
-                                    <a href="#" class="text"><span class="icon iconm-twitter-3"></span> Twitter</a>
-                                    <span class="action show">@john_doe</span>
-                                </li>
-                                <li>
-                                    <a href="#" class="text"><span class="icon iconm-google-plus"></span> Google+</a>
-                                    <span class="action show"><a href="" class="label label-important">OFF</a></span>
-                                </li>
-                                <li>
-                                    <a href="#" class="text"><span class="icon iconm-paypal-2"></span> Paypal</a>
-                                    <span class="action show"><a href="" class="label label-important">OFF</a></span>
-                                </li>
-                            </ul>
                             <footer>
                                 <a href="#" class="text"><span class="icon icone-off"></span> Sign Off</a>
                             </footer>
@@ -150,13 +125,6 @@
             <aside id="sidebar">
                 <!-- START Sidebar Content -->
                 <div class="sidebar-content">
-                    <!-- START Sidebar Tab -->
-                    <ul class="nav nav-tabs">
-                        <li class="active"><a href="#tab-menu" data-toggle="tab"><span class="icon icone-file"></span></a></li>
-                        <li class=""><a href="#tab-overview" data-toggle="tab"><span class="icon icone-beaker"></span></a></li>
-                    </ul>
-                    <!--/ END Sidebar Tab -->
-
                     <!-- START Tab Content -->
                     <div class="tab-content">
                         <!-- START Tab Pane(menu) -->
@@ -275,67 +243,6 @@
                             <!--/ END Sidebar Menu -->
                         </div>
                         <!--/ END Tab Pane(menu) -->
-
-                        <!-- START Tab Pane(overview) -->
-                        <div class="tab-pane" id="tab-overview">
-                            <!-- START Accound Status -->
-                            <div class="divider">Account Status</div>
-                            <!-- START sparkline 1 -->
-                            <figure class="stats sparkline">
-                                <span class="chart sparkline-bar" sparkBarColor="#dc143c">5,6,7,2,9,2,1,4,8</span>
-                                <figcaption>
-                                    <h4><small>My Balance</small>$16,763</h4>
-                                </figcaption>
-                            </figure><!--/ END sparkline 1 -->
-
-                            <!-- START sparkline 2 -->
-                            <figure class="stats sparkline">
-                                <span class="chart sparkline-bar" sparkBarColor="#2E8DEF">2,7,3,8,3,2,1,2,4</span>
-                                <figcaption>
-                                    <h4><small>Impression</small>125k+</h4>
-                                </figcaption>
-                            </figure><!--/ END sparkline 2 -->
-                            <!--/ END Accound Status -->
-
-                            <!-- START sparkline 2 -->
-                            <figure class="stats sparkline">
-                                <span class="chart sparkline-bar" sparkBarColor="#8CBF26">5,2,8,8,2,1,1,6,4</span>
-                                <figcaption>
-                                    <h4><small>Subscribers</small>5,212</h4>
-                                </figcaption>
-                            </figure><!--/ END sparkline 2 -->
-                            <!--/ END Accound Status -->
-
-                            <!-- START Other Stuff -->
-                            <div class="divider">Other Stuff</div>
-                            <!-- START Summary 1 -->
-                            <figure class="stats summary stacked">
-                                <div class="up"><span class="icon icone-caret-up"></span></div>
-                                <div class="icon circle red"><span class="icone-ticket"></span></div>
-                                <figcaption>
-                                    <h3>+230<small>Open tickets</small></h3>
-                                </figcaption>
-                            </figure><!--/ END Summary 1 -->
-
-                            <!-- START Summary 2 -->
-                            <figure class="stats summary stacked">
-                                <div class="down"><span class="icon icone-caret-down"></span></div>
-                                <div class="icon circle lime"><span class="icone-bug"></span></div>
-                                <figcaption>
-                                    <h3>-20<small>Bug Killed</small></h3>
-                                </figcaption>
-                            </figure><!--/ END Summary 2 -->
-                            
-                            <!-- START Summary 3 -->
-                            <figure class="stats summary stacked">
-                                <div class="icon circle teal"><span class="icone-trophy"></span></div>
-                                <figcaption>
-                                    <h3>1,432<small>Trophy Won</small></h3>
-                                </figcaption>
-                            </figure><!--/ END Summary 3 -->
-                            <!--/ END Other Stuff -->
-                        </div>
-                        <!--/ END Tab Pane(overview) -->
                     </div>
                     <!--/ END Tab Content -->
                 </div>
@@ -1264,81 +1171,10 @@
                     </div>
                     <!--/ END Row -->
 
-                    
-
                 </div>
                 <!--/ END Content -->
 
-                <!-- START Content - JAVA -->
-                <div class="container-fluid" ng-show="page == 'java'">
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <!-- START Button Default -->
-                        <div class="span6 widget">
-                            <header><h4 class="title"><span class="icon icone-home"></span>{{ 'SELECT_SERVER_PROFILE' | translate }}</h4></header>
-                            <section class="body">
-                                <div class="body-inner">
-                                    <p>
-                                        <!-- Select -->
-                                        <div class="control-group">
-                                            <div class="controls">
-                                                <label class="control-label">{{ 'CURRENTLY_USING_PROFILE' | translate}} {{ servers[current].sc.minecraft.profile }}</label>
-                                                <div class="control-group">
-                                                    <label class="control-label span3" translate="CHANGE_PROFILE_TO"></label>
-                                                    <div class="controls">
-                                                        <select class="span6" ng-model="myprofile" data-ng-options="p as p.id group by p.group for p in profiles | profile_filter:'downloaded' | orderBy:'-releaseTime'" ng-change="change_sc('minecraft', 'profile', myprofile.id)"></select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    <!--/ Select -->
-                                    </p>
-                                </div>
-                            </section>
-                        </div>
-                        <!--/ END Button Default -->
 
-                        <!-- START Button Default -->
-                        <div class="span6 widget">
-                            <header><h4 class="title"><span class="icon icone-ticket"></span>{{ 'MEMORY_ALLOCATION' | translate }}</h4></header>
-                            <section class="body">
-                                <div class="body-inner">
-                                    <p>
-                                        <!-- Help Text -->
-                                        <div class="control-group">
-                                            <label class="control-label" translate="MEMORY_ALLOCATION"></label>
-                                            <div class="controls">
-                                                <div class="input-prepend input-append">
-                                                    <span class="add-on" translate="JAVA_XMX"></span>
-                                                    <input type="text" ng-model="servers[current].sc.java.java_xmx" ng-enter="change_sc('java', 'java_xmx', servers[current].sc.java.java_xmx)">
-                                                    <span class="add-on" translate="MB_ABBREVIATION"></span>
-                                                </div>
-                                            </div>
-                                            <div class="controls">
-                                                <div class="input-prepend input-append">
-                                                    <span class="add-on" translate="JAVA_XMS"></span>
-                                                    <input type="text" ng-model="servers[current].sc.java.java_xms" ng-enter="change_sc('java', 'java_xms', servers[current].sc.java.java_xms)">
-                                                    <span class="add-on" translate="MB_ABBREVIATION"></span>
-                                                </div>
-                                            </div>
-                                        </div><!--/ Help Text -->
-                                    </p>
-                                </div>
-                            </section>
-                        </div>
-                        <!--/ END Button Default -->
-                    </div>
-                    <!--/ END Row -->
-
-                </div>
-                <!--/ END Content -->
-
-                <!-- START Content - GAME_MAINTENANCE -->
-                <div class="container-fluid" ng-show="page == 'maintenance'">
-
-
-                </div>
-                <!--/ END Content -->
 
                 <!-- START Content - CONSOLE -->
                 <div class="container-fluid" ng-show="page == 'console'">
