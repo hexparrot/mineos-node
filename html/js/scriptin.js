@@ -485,18 +485,19 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
       }
     })
 
+    me.channel.on(server_name, 'eula', function(accepted) {
+      if (!accepted)
+        $('#modal_eula').modal('show');
+    })
+
+    me.channel.emit(server_name, 'server.properties');
+    me.channel.emit(server_name, 'server.config');
     me.channel.emit(server_name, 'page_data', 'glance');
     me.channel.emit(server_name, 'page_data', 'cron');
     me.channel.emit(server_name, 'get_file_contents', 'logs/latest.log');
 
     return me;
   }
-
-  socket.on('/', 'server_list', function(servers) {
-    angular.forEach(servers, function(server_name) {
-      this[server_name] = new server_model(server_name);
-    }, self)
-  })
 
   socket.on('/', 'track_server', function(server_name) {
     self[server_name] = new server_model(server_name);

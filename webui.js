@@ -22,7 +22,7 @@ mineos.dependencies(function(err, binaries) {
 		console.log('MineOS is missing dependencies:', err);
 		console.log(binaries);
 	} else {
-		var be = server.backend(BASE_DIR, io, OWNER_CREDS);
+		var be = new server.backend(BASE_DIR, io, OWNER_CREDS);
 
 		app.get('/', function(req, res){
 			res.sendFile('index.html', response_options);
