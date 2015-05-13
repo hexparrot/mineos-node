@@ -485,6 +485,11 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
       }
     })
 
+    me.channel.on(server_name, 'eula', function(accepted) {
+      if (!accepted)
+        $('#modal_eula').modal('show');
+    })
+
     me.channel.emit(server_name, 'server.properties');
     me.channel.emit(server_name, 'server.config');
     me.channel.emit(server_name, 'page_data', 'glance');
