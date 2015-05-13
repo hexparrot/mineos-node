@@ -114,6 +114,7 @@
   "SIZE": "Size",
   "CUMULATIVE_SIZE": "Cumulative Size",
   "RESTORE": "Restore",
+  "PRUNE": "Prune older than this",
 
   "AVAILABLE_ARCHIVES": "Available Archives",
   "FILENAME": "Filename",
