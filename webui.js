@@ -24,14 +24,16 @@ var response_options = {root: __dirname};
 
 var localAuth = function (username, password) {
   var Q = require('q');
+  var auth = require('./auth');
   var deferred = Q.defer();
 
-  if (username == 'will' && password == 'pass')
-    deferred.resolve({
-      username: username
-    })
-  else
-    deferred.reject(new Error('incorrect password'))
+  auth.authenticate_shadow(username, password, function(authed_user) {
+  	if (authed_user)
+		deferred.resolve({ username: authed_user });
+	else
+		deferred.reject(new Error('incorrect password'));
+  })
+
   return deferred.promise;
 }
 
