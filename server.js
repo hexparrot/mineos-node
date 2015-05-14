@@ -596,6 +596,7 @@ function server_container(server_name, base_dir, socket_io) {
 
   nsp.on('connection', function(socket) {
     var ip_address = socket.request.connection.remoteAddress;
+    console.log(ip_address, socket.request.user);
 
     function server_dispatcher(args) {
       var introspect = require('introspect');
