@@ -513,7 +513,8 @@ function server_container(server_name, base_dir, socket_io) {
     var fs = require('fs');
     var filepath = path.join(instance.env.cwd, 'server-icon.png');
     fs.readFile(filepath, function(err, data) {
-      nsp.emit('server-icon.png', new Buffer(data).toString('base64'));
+      if (!err)
+        nsp.emit('server-icon.png', new Buffer(data).toString('base64'));
     });
   }
 
