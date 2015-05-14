@@ -16,15 +16,9 @@ var cookieParser = require('cookie-parser');
 var sessionStore = new expressSession.MemoryStore();
 var app = express();
 var http = require('http').Server(app);
-var userid = require('userid');
 
 var BASE_DIR = '/var/games/minecraft';
 var response_options = {root: __dirname};
-
-var OWNER_CREDS = {
-	uid: userid.uid(process.env.USER) || 1000,
-	gid: userid.gid(process.env.USER) || 1000
-}
 
 // Authorization
 
@@ -125,7 +119,7 @@ mineos.dependencies(function(err, binaries) {
 		console.log('MineOS is missing dependencies:', err);
 		console.log(binaries);
 	} else {
-		var be = new server.backend(BASE_DIR, io, OWNER_CREDS);
+		var be = new server.backend(BASE_DIR, io);
 
 		app.get('/', ensureAuthenticated, function(req, res){
 			res.redirect('/admin/index.html');

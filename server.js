@@ -88,17 +88,27 @@ server.backend = function(base_dir, socket_emitter, dir_owner) {
   }
 
   self.front_end.on('connection', function(socket) {
+    var userid = require('userid');
+
     var ip_address = socket.request.connection.remoteAddress;
+    var username = socket.request.user.username;
+
+    console.log(ip_address, username, userid.uid(username))
+    
+    var OWNER_CREDS = {
+      uid: userid.uid(username),
+      gid: userid.gid(username)
+    } 
 
     function webui_dispatcher (args) {
-      console.info('[WEBUI] Received emit command', args);
+      console.info('[WEBUI] Received emit command from {0}:{1}'.format(ip_address, username), args);
       switch (args.command) {
         case 'create':
           var instance = new mineos.mc(args.server_name, base_dir);
 
           async.series([
             async.apply(instance.verify, '!exists'),
-            async.apply(instance.create, dir_owner),
+            async.apply(instance.create, OWNER_CREDS),
             async.apply(instance.overlay_sp, args.properties),
           ], function(err, results) {
             if (!err)
@@ -597,7 +607,6 @@ function server_container(server_name, base_dir, socket_io) {
 
   nsp.on('connection', function(socket) {
     var ip_address = socket.request.connection.remoteAddress;
-    console.log(ip_address, socket.request.user);
 
     function server_dispatcher(args) {
       var introspect = require('introspect');
