@@ -101,7 +101,7 @@ mineos.dependencies(function(err, binaries) {
 	} else {
 		var be = new server.backend(BASE_DIR, io);
 
-		app.get('/', ensureAuthenticated, function(req, res){
+		app.get('/', function(req, res){
 			res.redirect('/admin/index.html');
 		});
 
@@ -120,11 +120,8 @@ mineos.dependencies(function(err, binaries) {
 		);
 
 		app.get('/logout', function(req, res){
-			var name = req.user.username;
-			console.log("LOGGING OUT " + req.user.username)
 			req.logout();
 			res.redirect('/admin/login.html');
-			req.session.notice = "You have successfully been logged out!";
 		});
 
 		app.use('/socket.io', express.static(__dirname + '/node_modules/socket.io'));
