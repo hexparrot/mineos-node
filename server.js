@@ -413,6 +413,7 @@ server.backend = function(base_dir, socket_emitter) {
     }
 
     console.info('[WEBUI] {0} connected from {1}'.format(username, ip_address));
+    socket.emit('whoami', username);
 
     for (var server_name in self.servers)
       socket.emit('track_server', server_name);

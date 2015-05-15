@@ -173,6 +173,10 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
 
   /* socket handlers */
 
+  socket.on('/', 'whoami', function(username) {
+    $scope.username = username;
+  })
+
   socket.on('/', 'host_heartbeat', function(data) {
     $scope.host_heartbeat = data;
     $scope.update_loadavg(data.loadavg);
