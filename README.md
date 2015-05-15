@@ -22,7 +22,7 @@ Using an apt-get based Linux distribution:
     git clone https://github.com/hexparrot/mineos-node.git
     cd mineos-node
     npm install --all
-    sudo nodejs webui
+    sudo nodejs webui.js
 
 Developing and Contributing
 ------
@@ -53,16 +53,15 @@ The Angular.JS-based web user interface capable of:
 * reading ingame console in real-time and submitting commands
 * create cronjobs for the most common tasks
 * modifying server.properties
-* delete previous archives to free up space
+* delete previous archives and restore poitns to free up space
 * restore server from previous restore point
 * see filesystem usage of live server files, archives, and restore points
 * easy selection of server packs from FTB or Mojang official jars
+* authentication via shadow passwords (/etc/shadow) of underlying Linux system
 
 TODO
 -------
 
-* implement authentication model and web-ui login page
-* remove restore points from the web-ui, allow rotation of restore points
 * save all user actions in web-ui to a file/database (log kept in working memory currently)
 * save cronjobs to portable format, e.g., server.config
 * macro often-repeated tasks from web-ui
