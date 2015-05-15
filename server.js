@@ -6,7 +6,7 @@ var events = require('events');
 var os = require('os');
 var server = exports;
 
-server.backend = function(base_dir, socket_emitter, dir_owner) {
+server.backend = function(base_dir, socket_emitter) {
   var self = this;
 
   self.servers = {};
@@ -605,6 +605,8 @@ function server_container(server_name, base_dir, socket_io) {
 
   nsp.on('connection', function(socket) {
     var ip_address = socket.request.connection.remoteAddress;
+    var username = socket.request.user.username;
+    console.info('[{0}] {1} connected from {2}'.format(server_name, username, ip_address));
 
     function server_dispatcher(args) {
       var introspect = require('introspect');
@@ -778,8 +780,6 @@ function server_container(server_name, base_dir, socket_io) {
       }
       get_page_data('cron');
     }
-
-    console.info('[{0}] {1} connected to namespace'.format(server_name, ip_address));
 
     socket.on('command', produce_receipt);
     socket.on('get_file_contents', get_file_contents);

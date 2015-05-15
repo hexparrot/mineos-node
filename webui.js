@@ -56,12 +56,9 @@ passport.use('local-signin', new LocalStrategy(
     localAuth(username, password)
     .then(function (user) {
       if (user) {
-        console.log("LOGGED IN AS: " + user.username);
         req.session.success = 'You are successfully logged in ' + user.username + '!';
         done(null, user);
-      }
-      if (!user) {
-        console.log("COULD NOT LOG IN");
+      } else {
         req.session.error = 'Could not log user in. Please try again.'; //inform user could not log them in
         done(null, user);
       }
@@ -88,25 +85,6 @@ app.use(expressSession({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-
-// Session-persisted message middleware
-app.use(function(req, res, next){
-  var err = req.session.error,
-      msg = req.session.notice,
-      success = req.session.success;
-
-  delete req.session.error;
-  delete req.session.success;
-  delete req.session.notice;
-
-  if (err) res.locals.error = err;
-  if (msg) res.locals.notice = msg;
-  if (success) res.locals.success = success;
-
-  next();
-});
-
-app.use('/socket.io', express.static(__dirname + '/node_modules/socket.io'));
 
 var io = require('socket.io')(http)
 io.use(passportSocketIO.authorize({
