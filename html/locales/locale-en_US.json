@@ -1,6 +1,7 @@
 {
   "WEBSITE_TITLE": "MineOS Web User Interface",
   "NOTIFICATIONS": "Notifications",
+  "LOG_OFF": "Log Off",
 
   "HOST_SETTINGS": "Host Settings",
   "DASHBOARD": "Dashboard",
@@ -11,6 +12,7 @@
   "SERVER_SETTINGS": "Server Settings",
   "SERVER_STATUS": "Server Status",
   "BACKUPS_AND_RESTORES": "Backups and Restores",
+  "SERVER.PROPERTIES": "server.properties",
   "RESTORE_POINT": "Restore point",
   "RESTORE_POINTS": "Restore Points",
   "ARCHIVES": "Archives",
@@ -54,6 +56,7 @@
   "CURRENTLY_USING_PROFILE": "Currently using profile:",
   "PROFILE": "Profile",
   "PROFILE_DESC": "Profile Description",
+  "DOWNLOADED": "Downloaded",
 
   "GLANCE": "Server at a Glance", 
   "VERSION": "Version",

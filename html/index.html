@@ -110,7 +110,7 @@
                         <!-- START Dropdown Menu -->
                         <div class="dropdown-menu" role="menu">
                             <footer>
-                                <a href="/logout" class="text"><span class="icon icone-off"></span> Sign Off</a>
+                                <a href="/logout" class="text"><span class="icon icone-off"></span> {{ 'LOGOFF' | translate }}f</a>
                             </footer>
                         </div>
                         <!--/ END Dropdown Menu -->
@@ -190,7 +190,7 @@
                                     <li class="accordion-group" ng-show="current">
                                         <a ng-click="change_page('server_properties')">
                                             <span class="icon iconm-pencil-5"></span>
-                                            <span class="text">server.properties</span>
+                                            <span class="text" translate="SERVER.PROPERTIES"></span>
                                         </a>
                                     </li>
                                     <!--/ END Menu -->
@@ -576,7 +576,7 @@
                                                 <td>[{{ jar.group }}] <strong>{{ jar.type }}</strong></td>
                                                 <td>
                                                     <p>
-                                                        <button type="button" class="btn btn-mini btn-success" ng-click="host_command(jar.group + '_download', {profile: jar})" translate="DOWNLOAD"></button> <span ng-show="jar.downloaded" class="icone-ok">DOWNLOADED</span>
+                                                        <button type="button" class="btn btn-mini btn-success" ng-click="host_command(jar.group + '_download', {profile: jar})" translate="DOWNLOAD"></button> <span ng-show="jar.downloaded" class="icone-ok">{{ 'DOWNLOADED' | translate }}</span>
                                                     </p>
                                                 </td>
                                             </tr>
