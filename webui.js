@@ -84,12 +84,14 @@ function ensureAuthenticated(req, res, next) {
   res.redirect('/admin/login.html');
 }
 
-app.use(bodyParser());
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(methodOverride());
 app.use(expressSession({ 
   secret: 'session_secret', 
   key:'express.sid', 
-  store: sessionStore 
+  store: sessionStore,
+  resave: false,
+  saveUninitialized: false
 }));
 app.use(passport.initialize());
 app.use(passport.session());
