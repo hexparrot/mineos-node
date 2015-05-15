@@ -385,7 +385,7 @@ server.backend = function(base_dir, socket_emitter) {
 
       var gu = passwd.getUsers()
         .on('user', function(user_data) {
-          if (user_data.uid >= 1000 && user_data.gid >= 1000)
+          if (user_data.username == username)
             users.push({
               username: user_data.username,
               uid: user_data.uid,
@@ -399,13 +399,14 @@ server.backend = function(base_dir, socket_emitter) {
 
       var gg = passwd.getGroups()
         .on('group', function(group_data) {
-
-          if (group_data.gid >= 1000)
-            groups.push({
-              groupname: group_data.groupname,
-              gid: group_data.gid,
-              users: group_data.users
-            })
+          if (group_data.users.indexOf(username) >= 0 || group_data.gid == userid.gid(username)) {
+            if (group_data.gid > 0) {
+              groups.push({
+                groupname: group_data.groupname,
+                gid: group_data.gid
+              })
+            }
+          }
         })
         .on('end', function() {
           self.front_end.emit('group_list', groups);
