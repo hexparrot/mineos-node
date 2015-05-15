@@ -21,7 +21,6 @@ var BASE_DIR = '/var/games/minecraft';
 var response_options = {root: __dirname};
 
 // Authorization
-
 var localAuth = function (username, password) {
   var Q = require('q');
   var auth = require('./auth');
@@ -38,7 +37,6 @@ var localAuth = function (username, password) {
 }
 
 // Passport init
-
 passport.serializeUser(function(user, done) {
   //console.log("serializing " + user.username);
   done(null, user);
@@ -68,6 +66,16 @@ passport.use('local-signin', new LocalStrategy(
     });
   }
 ));
+
+// clean up sessions that go stale over time
+function session_cleanup() {
+  //http://stackoverflow.com/a/10761522/1191579
+  sessionStore.all(function(err, sessions) {
+    for (var i = 0; i < sessions.length; i++) {
+      sessionStore.get(sessions[i], function() {} );
+    }
+  });
+}
 
 // Simple route middleware to ensure user is authenticated.
 function ensureAuthenticated(req, res, next) {
@@ -141,6 +149,8 @@ mineos.dependencies(function(err, binaries) {
 		http.listen(3000, function(){
 			console.log('listening on *:3000');
 		});
+
+    setInterval(session_cleanup, 3600000); //check for expired sessions every hour
 	}
 })
 
