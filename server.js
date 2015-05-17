@@ -523,7 +523,7 @@ function server_container(server_name, base_dir, socket_io) {
     var fs = require('fs');
     var filepath = path.join(instance.env.cwd, 'server-icon.png');
     fs.readFile(filepath, function(err, data) {
-      if (!err)
+      if (!err && data.toString('hex',0,4) == '89504e47') //magic number for png first 4B
         nsp.emit('server-icon.png', new Buffer(data).toString('base64'));
     });
   }
