@@ -1107,9 +1107,9 @@
                                                 <td>{{ definition.msg }}</td>
                                                 <td>
                                                     <p>
-                                                        <button type="button" class="btn btn-success" ng-click="cron_command('start', {hash: hash})" translate="START"></button>
-                                                        <button type="button" class="btn btn-warning" ng-click="cron_command('suspend', {hash: hash})" translate="SUSPEND"></button>
-                                                        <button type="button" class="btn btn-danger" ng-click="cron_command('delete', {hash: hash})" translate="DELETE"></button>
+                                                        <button type="button" class="btn btn-success" ng-click="cron_command('start', {hash: hash})" translate="START" ng-disabled="definition.enabled != false"></button>
+                                                        <button type="button" class="btn btn-warning" ng-click="cron_command('suspend', {hash: hash})" translate="SUSPEND" ng-disabled="definition.enabled == false"></button>
+                                                        <button type="button" class="btn btn-danger" ng-click="cron_command('delete', {hash: hash})" translate="DELETE" ng-disabled="definition.enabled != false"></button>
                                                     </p>
                                                 </td>
                                             </tr>

@@ -1551,3 +1551,88 @@ test.eula_false = function(test) {
     test.done();
   })
 }
+
+test.crons = function(test) {
+  var hash = require('object-hash');
+
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  var cron_def1 = {
+    action: 'stuff',
+    source: '* * * * * *',
+    msg: 'hello everybody'
+  }
+
+  var cron_def2 = {
+    action: 'stuff',
+    source: '* * * * * *',
+    msg: 'killing everything!'
+  }
+
+  var cron_hash1 = hash(cron_def1);
+  var cron_hash2 = hash(cron_def2);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.add_cron, cron_hash1, cron_def1),
+    function(callback) {
+      instance.crons(function(err, dict) {
+        test.ifError(err);
+        test.equal(dict[cron_hash1].action, cron_def1.action);
+        test.equal(dict[cron_hash1].source, cron_def1.source);
+        test.equal(dict[cron_hash1].msg, cron_def1.msg);
+        callback(err);
+      })
+    },
+    async.apply(instance.add_cron, hash(cron_def2), cron_def2),
+    function(callback) {
+      instance.crons(function(err, dict) {
+        test.ifError(err);
+        test.equal(dict[cron_hash2].action, cron_def2.action);
+        test.equal(dict[cron_hash2].source, cron_def2.source);
+        test.equal(dict[cron_hash2].msg, cron_def2.msg);
+        callback(err);
+      })
+    },
+    async.apply(instance.delete_cron, cron_hash2),
+    function(callback) {
+      instance.crons(function(err, dict) {
+        test.ifError(err);
+        test.equal(cron_hash1 in dict, true);
+        test.equal(cron_hash2 in dict, false);
+        test.equal(Object.keys(dict).length, 1);
+        callback(err);
+      })
+    },
+    function(callback) {
+      instance.crons(function(err, dict) {
+        test.ifError(err);
+        test.equal(cron_hash1 in dict, true);
+        test.equal(dict[cron_hash1].enabled, false);
+        callback(err);
+      })
+    },
+    async.apply(instance.set_cron, cron_hash1, true),
+    function(callback) {
+      instance.crons(function(err, dict) {
+        test.ifError(err);
+        test.equal(cron_hash1 in dict, true);
+        test.equal(dict[cron_hash1].enabled, true);
+        callback(err);
+      })
+    },
+    async.apply(instance.set_cron, cron_hash1, false),
+    function(callback) {
+      instance.crons(function(err, dict) {
+        test.ifError(err);
+        test.equal(cron_hash1 in dict, true);
+        test.equal(dict[cron_hash1].enabled, false);
+        callback(err);
+      })
+    }
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}

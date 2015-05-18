@@ -115,7 +115,8 @@ mineos.mc = function(server_name, base_dir) {
     awd: path.join(base_dir, mineos.DIRS['archive'], server_name),
     pwd: path.join(base_dir, mineos.DIRS['profiles']),
     sp: path.join(base_dir, mineos.DIRS['servers'], server_name, 'server.properties'),
-    sc: path.join(base_dir, mineos.DIRS['servers'], server_name, 'server.config')
+    sc: path.join(base_dir, mineos.DIRS['servers'], server_name, 'server.config'),
+    cron: path.join(base_dir, mineos.DIRS['servers'], server_name, 'cron.config')
   }
 
   // server properties functions
@@ -185,6 +186,66 @@ mineos.mc = function(server_name, base_dir) {
       },
       function(sc_data, cb) {
         fs.writeFile(self.env.sc, ini.stringify(sc_data), cb);
+      }
+    ], callback)
+  }
+
+  self.crons = function(callback) {
+    var ini = require('ini');
+
+    fs.readFile(self.env.cron, function(err, data) {
+      if (err) {
+        fs.writeFile(self.env.cron, '', function(inner_err) {
+          callback(inner_err, {});
+        });
+      } else {
+        callback(err, ini.parse(data.toString()));
+      }
+    })
+  }
+
+  self.add_cron = function(identifier, definition, callback) {
+    var ini = require('ini');
+
+    async.waterfall([
+      async.apply(self.crons),
+      function(cron_data, cb) {
+        cron_data[identifier] = definition;
+        cron_data[identifier]['enabled'] = false;
+        cb(null, cron_data);
+      },
+      function(cron_data, cb) {
+        fs.writeFile(self.env.cron, ini.stringify(cron_data), cb);
+      }
+    ], callback)
+  }
+
+  self.delete_cron = function(identifier, callback) {
+    var ini = require('ini');
+
+    async.waterfall([
+      async.apply(self.crons),
+      function(cron_data, cb) {
+        delete cron_data[identifier];
+        cb(null, cron_data);
+      },
+      function(cron_data, cb) {
+        fs.writeFile(self.env.cron, ini.stringify(cron_data), cb);
+      }
+    ], callback)
+  }
+
+  self.set_cron = function(identifier, enabled, callback) {
+    var ini = require('ini');
+
+    async.waterfall([
+      async.apply(self.crons),
+      function(cron_data, cb) {
+        cron_data[identifier]['enabled'] = enabled;
+        cb(null, cron_data);
+      },
+      function(cron_data, cb) {
+        fs.writeFile(self.env.cron, ini.stringify(cron_data), cb);
       }
     ], callback)
   }
