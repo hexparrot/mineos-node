@@ -219,6 +219,21 @@ mineos.mc = function(server_name, base_dir) {
     ], callback)
   }
 
+  self.delete_cron = function(identifier, callback) {
+    var ini = require('ini');
+
+    async.waterfall([
+      async.apply(self.crons),
+      function(cron_data, cb) {
+        delete cron_data[identifier];
+        cb(null, cron_data);
+      },
+      function(cron_data, cb) {
+        fs.writeFile(self.env.cron, ini.stringify(cron_data), cb);
+      }
+    ], callback)
+  }
+
   self.create = function(owner, callback) {
     async.series([
       async.apply(self.verify, '!exists'),

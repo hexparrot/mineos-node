@@ -1594,6 +1594,16 @@ test.crons = function(test) {
         test.equal(dict[cron_hash2].msg, cron_def2.msg);
         callback(err);
       })
+    },
+    async.apply(instance.delete_cron, cron_hash2),
+    function(callback) {
+      instance.crons(function(err, dict) {
+        test.ifError(err);
+        test.equal(cron_hash1 in dict, true);
+        test.equal(cron_hash2 in dict, false);
+        test.equal(Object.keys(dict).length, 1);
+        callback(err);
+      })
     }
   ], function(err) {
     test.ifError(err);
