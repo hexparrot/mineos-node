@@ -732,7 +732,7 @@ function server_container(server_name, base_dir, socket_io) {
       var hash = require('object-hash');
       var CronJob = require('cron').CronJob;
 
-      function reload_cron() {
+      function reload_cron(callback) {
         for (var c in cron) {
           try {
             cron[c].stop();
@@ -741,18 +741,21 @@ function server_container(server_name, base_dir, socket_io) {
         cron = {};
 
         instance.crons(function(err, cron_dict) {
-          console.log(1)
           for (var c in cron_dict) {
             var cloned = JSON.parse(JSON.stringify(cron_dict[c])); //clones!
+            var enabled = cloned['enabled'];
             delete cloned['enabled'];
             var cronjob = new CronJob(cloned.source, function (){
-              server_dispatcher(cloned.opts);
+              server_dispatcher(cloned);
             }, null, false);
+
+            if (enabled)
+              cronjob.start();
 
             cron[hash(cloned)] = cronjob;
           }
-          console.log(2)
           get_page_data('cron');
+          callback();
         })
       }
 
@@ -761,13 +764,13 @@ function server_container(server_name, base_dir, socket_io) {
 
       switch (operation) {
         case 'create':
-          console.log('[{0}] {1} requests cron creation:'.format(server_name, ip_address), opts);
-
           var cron_hash = hash(opts);
+          console.log('[{0}] {1} requests cron creation:'.format(server_name, ip_address), cron_hash, opts);
+
           opts['enabled'] = false;
 
           instance.add_cron(cron_hash, opts, function(err) {
-            reload_cron();
+            reload_cron(function() {});
           })
           break;
         case 'delete':
@@ -782,21 +785,23 @@ function server_container(server_name, base_dir, socket_io) {
           } catch (e) {}
 
           instance.delete_cron(opts.hash, function() {
-            reload_cron();
+            reload_cron(function() {});
           })
           break;
         case 'start':
-          reload_cron(function() {
-            console.log('[{0}] {1} starting cron: {2}'.format(server_name, ip_address, opts.hash));
-
-            cron[opts.hash].start();
-          })
+          console.log('[{0}] {1} starting cron: {2}'.format(server_name, ip_address, opts.hash));
+          console.log(cron)
           
+          reload_cron(function() {
+            cron[opts.hash].start();
+          }); 
           break;
         case 'suspend':
           console.log('[{0}] {1} suspending cron: {2}'.format(server_name, ip_address, opts.hash));
 
-          cron[opts.hash].stop();
+          reload_cron(function() {
+            cron[opts.hash].stop();
+          });  
           break;
         default:
           console.warn('[{0}] {1} requested unexpected cron operation: {2}'.format(server_name, ip_address, operation), opts);
