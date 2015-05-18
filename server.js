@@ -716,11 +716,12 @@ function server_container(server_name, base_dir, socket_io) {
           break;
         case 'cron':
           console.info('[{0}] {1} requesting cron info'.format(server_name, ip_address));
-          var cron_table = {};
-          for (var hash in cron) 
-            cron_table[hash] = cron[hash].definition;
-
-          nsp.emit('page_data', {page: page, payload: cron_table});
+          instance.crons(function(err, cron_dict) {
+            if (!err)
+              nsp.emit('page_data', {page: page, payload: cron_dict});
+            console.log(cron_dict)
+          })
+          
           break;
         default:
           nsp.emit('page_data', {page: page});
@@ -732,6 +733,24 @@ function server_container(server_name, base_dir, socket_io) {
       var uuid = require('node-uuid');
       var CronJob = require('cron').CronJob;
 
+      function reload_cron() {
+        for (var c in cron)
+          cron[c].stop();
+        cron = {};        
+
+        instance.crons(function(err, cron_dict) {
+          for (var c in cron_dict) {
+            var cronjob = new CronJob(cron_dict[c].source, function (){
+              server_dispatcher(cron_dict[c].opts);
+            }, null, false);
+
+            if (cronjob.enabled)
+              cronjob.start();
+            cron[hash(opts)] = cronjob;
+          }
+        })
+      }
+
       var operation = opts.operation;
       delete opts.operation;
 
@@ -740,26 +759,7 @@ function server_container(server_name, base_dir, socket_io) {
           var hash = require('object-hash');
           console.log('[{0}] {1} requests cron creation:'.format(server_name, ip_address), opts);
 
-          try {
-            var cronjob = new CronJob(opts.source, function (){
-              server_dispatcher(opts);
-            }, null, false);
-          } catch (e) {
-            console.log('[{0}] rejected invalid cron format: "{1}"'.format(server_name, opts.source));
-            opts.uuid = uuid.v1();
-            opts.time_initiated = Date.now();
-            opts.command = '{0} cron'.format(operation);
-            opts.success = false;
-            opts.err = 'invalid cron format: "{0}"'.format(opts.source);
-            opts.time_resolved = Date.now();
-            nsp.emit('server_fin', opts);
-            return;
-          }
-
-          cron[hash(opts)] = {
-            definition: opts,
-            instance: cronjob
-          }
+          instance.add_cron(hash(opts), opts, function() {});
           break;
         case 'delete':
           console.log('[{0}] {1} requests cron deletion: {2}'.format(server_name, ip_address, opts.hash));
