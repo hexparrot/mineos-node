@@ -790,18 +790,25 @@ function server_container(server_name, base_dir, socket_io) {
           break;
         case 'start':
           console.log('[{0}] {1} starting cron: {2}'.format(server_name, ip_address, opts.hash));
-          console.log(cron)
           
-          reload_cron(function() {
-            cron[opts.hash].start();
-          }); 
+          async.series([
+            reload_cron,
+            async.apply(instance.set_cron, opts.hash, true)
+          ], function(err) {
+            if (!err)
+              cron[opts.hash].start();
+          })
           break;
         case 'suspend':
           console.log('[{0}] {1} suspending cron: {2}'.format(server_name, ip_address, opts.hash));
 
-          reload_cron(function() {
-            cron[opts.hash].stop();
-          });  
+          async.series([
+            reload_cron,
+            async.apply(instance.set_cron, opts.hash, false)
+          ], function(err) {
+            if (!err)
+              cron[opts.hash].stop();
+          })
           break;
         default:
           console.warn('[{0}] {1} requested unexpected cron operation: {2}'.format(server_name, ip_address, operation), opts);
