@@ -772,7 +772,6 @@ function server_container(server_name, base_dir, socket_io) {
           break;
         case 'delete':
           console.log('[{0}] {1} requests cron deletion: {2}'.format(server_name, ip_address, opts.hash));
-          console.log(cron[opts.hash])
 
           try {
             cron[opts.hash].stop();
@@ -782,7 +781,9 @@ function server_container(server_name, base_dir, socket_io) {
             delete cron[opts.hash];
           } catch (e) {}
 
-          reload_cron();
+          instance.delete_cron(opts.hash, function() {
+            reload_cron();
+          })
           break;
         case 'start':
           reload_cron(function() {
