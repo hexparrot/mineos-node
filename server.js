@@ -795,9 +795,10 @@ function server_container(server_name, base_dir, socket_io) {
           
           async.series([
             reload_cron,
-            async.apply(instance.set_cron, opts.hash, true)
+            async.apply(instance.set_cron, opts.hash, true),
+            async.apply(reload_cron)
           ], function(err) {
-            if (!err)
+            if (!err) 
               cron[opts.hash].start();
           })
           break;
@@ -806,9 +807,10 @@ function server_container(server_name, base_dir, socket_io) {
 
           async.series([
             reload_cron,
-            async.apply(instance.set_cron, opts.hash, false)
+            async.apply(instance.set_cron, opts.hash, false),
+            async.apply(reload_cron)
           ], function(err) {
-            if (!err)
+            if (!err) 
               cron[opts.hash].stop();
           })
           break;
