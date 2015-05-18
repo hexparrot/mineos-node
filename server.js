@@ -814,6 +814,9 @@ function server_container(server_name, base_dir, socket_io) {
               cron[opts.hash].stop();
           })
           break;
+        case 'reload':
+          reload_cron(function() {});
+          break;
         default:
           console.warn('[{0}] {1} requested unexpected cron operation: {2}'.format(server_name, ip_address, operation), opts);
       }
@@ -830,5 +833,6 @@ function server_container(server_name, base_dir, socket_io) {
     socket.on('server-icon.png', broadcast_icon);
     console.info('[{0}] broadcasting {1} previous notices'.format(server_name, notices.length));
     nsp.emit('notices', notices);
+    manage_cron({ operation: 'reload' });
   })
 }
