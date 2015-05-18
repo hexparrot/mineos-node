@@ -769,9 +769,10 @@ function server_container(server_name, base_dir, socket_io) {
 
           opts['enabled'] = false;
 
-          instance.add_cron(cron_hash, opts, function(err) {
-            reload_cron(function() {});
-          })
+          async.series([
+            async.apply(instance.add_cron, cron_hash, opts),
+            async.apply(reload_cron)
+          ])
           break;
         case 'delete':
           console.log('[{0}] {1} requests cron deletion: {2}'.format(server_name, ip_address, opts.hash));
@@ -784,9 +785,10 @@ function server_container(server_name, base_dir, socket_io) {
             delete cron[opts.hash];
           } catch (e) {}
 
-          instance.delete_cron(opts.hash, function() {
-            reload_cron(function() {});
-          })
+          async.series([
+            async.apply(instance.delete_cron, opts.hash),
+            async.apply(reload_cron)
+          ])
           break;
         case 'start':
           console.log('[{0}] {1} starting cron: {2}'.format(server_name, ip_address, opts.hash));
