@@ -211,6 +211,7 @@ mineos.mc = function(server_name, base_dir) {
       async.apply(self.crons),
       function(cron_data, cb) {
         cron_data[identifier] = definition;
+        cron_data[identifier]['enabled'] = false;
         cb(null, cron_data);
       },
       function(cron_data, cb) {
@@ -226,6 +227,21 @@ mineos.mc = function(server_name, base_dir) {
       async.apply(self.crons),
       function(cron_data, cb) {
         delete cron_data[identifier];
+        cb(null, cron_data);
+      },
+      function(cron_data, cb) {
+        fs.writeFile(self.env.cron, ini.stringify(cron_data), cb);
+      }
+    ], callback)
+  }
+
+  self.set_cron = function(identifier, enabled, callback) {
+    var ini = require('ini');
+
+    async.waterfall([
+      async.apply(self.crons),
+      function(cron_data, cb) {
+        cron_data[identifier]['enabled'] = enabled;
         cb(null, cron_data);
       },
       function(cron_data, cb) {

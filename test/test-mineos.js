@@ -1604,6 +1604,32 @@ test.crons = function(test) {
         test.equal(Object.keys(dict).length, 1);
         callback(err);
       })
+    },
+    function(callback) {
+      instance.crons(function(err, dict) {
+        test.ifError(err);
+        test.equal(cron_hash1 in dict, true);
+        test.equal(dict[cron_hash1].enabled, false);
+        callback(err);
+      })
+    },
+    async.apply(instance.set_cron, cron_hash1, true),
+    function(callback) {
+      instance.crons(function(err, dict) {
+        test.ifError(err);
+        test.equal(cron_hash1 in dict, true);
+        test.equal(dict[cron_hash1].enabled, true);
+        callback(err);
+      })
+    },
+    async.apply(instance.set_cron, cron_hash1, false),
+    function(callback) {
+      instance.crons(function(err, dict) {
+        test.ifError(err);
+        test.equal(cron_hash1 in dict, true);
+        test.equal(dict[cron_hash1].enabled, false);
+        callback(err);
+      })
     }
   ], function(err) {
     test.ifError(err);
