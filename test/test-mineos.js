@@ -112,18 +112,21 @@ test.create_server = function(test) {
     async.apply(fs.stat, instance.env.awd),
     async.apply(fs.stat, instance.env.sp),
     async.apply(fs.stat, instance.env.sc),
+    async.apply(fs.stat, instance.env.cc),
     function(callback) {
       test.equal(fs.statSync(instance.env.cwd).uid, OWNER_CREDS['uid']);
       test.equal(fs.statSync(instance.env.bwd).uid, OWNER_CREDS['uid']);
       test.equal(fs.statSync(instance.env.awd).uid, OWNER_CREDS['uid']);
       test.equal(fs.statSync(instance.env.sp).uid, OWNER_CREDS['uid']);
       test.equal(fs.statSync(instance.env.sc).uid, OWNER_CREDS['uid']);
+      test.equal(fs.statSync(instance.env.cc).uid, OWNER_CREDS['uid']);
 
       test.equal(fs.statSync(instance.env.cwd).gid, OWNER_CREDS['gid']);
       test.equal(fs.statSync(instance.env.bwd).gid, OWNER_CREDS['gid']);
       test.equal(fs.statSync(instance.env.awd).gid, OWNER_CREDS['gid']);
       test.equal(fs.statSync(instance.env.sp).gid, OWNER_CREDS['gid']);
       test.equal(fs.statSync(instance.env.sc).gid, OWNER_CREDS['gid']);
+      test.equal(fs.statSync(instance.env.cc).gid, OWNER_CREDS['gid']);
 
       test.equal(mineos.server_list(BASE_DIR)[0], server_name);
       test.equal(mineos.server_list(BASE_DIR).length, 1);
@@ -137,7 +140,6 @@ test.create_server = function(test) {
     }
   ], function(err) {
     test.ifError(err);
-    test.expect(15);
     test.done();
   })
 }

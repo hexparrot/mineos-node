@@ -116,7 +116,7 @@ mineos.mc = function(server_name, base_dir) {
     pwd: path.join(base_dir, mineos.DIRS['profiles']),
     sp: path.join(base_dir, mineos.DIRS['servers'], server_name, 'server.properties'),
     sc: path.join(base_dir, mineos.DIRS['servers'], server_name, 'server.config'),
-    cron: path.join(base_dir, mineos.DIRS['servers'], server_name, 'cron.config')
+    cc: path.join(base_dir, mineos.DIRS['servers'], server_name, 'cron.config')
   }
 
   // server properties functions
@@ -193,9 +193,9 @@ mineos.mc = function(server_name, base_dir) {
   self.crons = function(callback) {
     var ini = require('ini');
 
-    fs.readFile(self.env.cron, function(err, data) {
+    fs.readFile(self.env.cc, function(err, data) {
       if (err) {
-        fs.writeFile(self.env.cron, '', function(inner_err) {
+        fs.writeFile(self.env.cc, '', function(inner_err) {
           callback(inner_err, {});
         });
       } else {
@@ -215,7 +215,7 @@ mineos.mc = function(server_name, base_dir) {
         cb(null, cron_data);
       },
       function(cron_data, cb) {
-        fs.writeFile(self.env.cron, ini.stringify(cron_data), cb);
+        fs.writeFile(self.env.cc, ini.stringify(cron_data), cb);
       }
     ], callback)
   }
@@ -230,7 +230,7 @@ mineos.mc = function(server_name, base_dir) {
         cb(null, cron_data);
       },
       function(cron_data, cb) {
-        fs.writeFile(self.env.cron, ini.stringify(cron_data), cb);
+        fs.writeFile(self.env.cc, ini.stringify(cron_data), cb);
       }
     ], callback)
   }
@@ -245,7 +245,7 @@ mineos.mc = function(server_name, base_dir) {
         cb(null, cron_data);
       },
       function(cron_data, cb) {
-        fs.writeFile(self.env.cron, ini.stringify(cron_data), cb);
+        fs.writeFile(self.env.cc, ini.stringify(cron_data), cb);
       }
     ], callback)
   }
@@ -258,6 +258,8 @@ mineos.mc = function(server_name, base_dir) {
       async.apply(fs.ensureDir, self.env.bwd),
       async.apply(fs.ensureDir, self.env.awd),
       async.apply(fs.ensureFile, self.env.sp),
+      async.apply(fs.ensureFile, self.env.sc),
+      async.apply(fs.ensureFile, self.env.cc),
       async.apply(self.overlay_sp, mineos.SP_DEFAULTS),
       async.apply(self.sc),
       async.apply(self.modify_sc, 'java', 'java_xmx', '256'),
@@ -265,7 +267,8 @@ mineos.mc = function(server_name, base_dir) {
       async.apply(fs.chown, self.env.bwd, owner['uid'], owner['gid']),
       async.apply(fs.chown, self.env.awd, owner['uid'], owner['gid']),
       async.apply(fs.chown, self.env.sp, owner['uid'], owner['gid']),
-      async.apply(fs.chown, self.env.sc, owner['uid'], owner['gid'])
+      async.apply(fs.chown, self.env.sc, owner['uid'], owner['gid']),
+      async.apply(fs.chown, self.env.cc, owner['uid'], owner['gid'])
     ], callback)
   }
 
