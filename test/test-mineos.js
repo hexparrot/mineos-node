@@ -531,7 +531,7 @@ test.backup = function(test) {
     async.apply(instance.create, OWNER_CREDS),
     async.apply(instance.backup),
     function(callback) {
-      test.equal(fs.readdirSync(instance.env.bwd).length, 3);
+      test.equal(fs.readdirSync(instance.env.bwd).length, 4);
       callback(null);
     }
   ], function(err) {
@@ -552,7 +552,7 @@ test.restore = function(test) {
     async.apply(instance.verify, '!exists'),
     async.apply(instance.restore, 'now'),
     function(callback) {
-      test.equal(fs.readdirSync(instance.env.cwd).length, 2);
+      test.equal(fs.readdirSync(instance.env.cwd).length, 3);
       callback(null);
     }
   ], function(err) {
