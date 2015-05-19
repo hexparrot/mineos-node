@@ -712,7 +712,7 @@
                                                             <select class="" 
                                                                 ng-model="myprofile" 
                                                                 data-ng-options="p as p.id group by p.group for p in profiles | 
-                                                                profile_downloaded: serverprofiles.downloaded | 
+                                                                profile_downloaded: 'only_downloaded' | 
                                                                 orderBy:'-releaseTime'" 
                                                                 ng-change="change_sc('minecraft', 'profile', myprofile.id)">
                                                                 <option value="" disabled selected translate="CHANGE_PROFILE_TO"></option>
