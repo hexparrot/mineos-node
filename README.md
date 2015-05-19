@@ -58,14 +58,15 @@ The Angular.JS-based web user interface capable of:
 * see filesystem usage of live server files, archives, and restore points
 * easy selection of server packs from FTB or Mojang official jars
 * authentication via shadow passwords (/etc/shadow) of underlying Linux system
+* logs all user actions to file
+* cronjobs saved to portable format cron.config
+* server can be daemonized to background
 
 TODO
 -------
 
-* save all user actions in web-ui to a file/database (log kept in working memory currently)
-* save cronjobs to portable format, e.g., server.config
 * macro often-repeated tasks from web-ui
-* daemonize with auto-restart capability
+* auto-restart on unhandled exceptions
 * more fully document functions
 
 EVENTUALLY
