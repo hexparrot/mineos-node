@@ -445,6 +445,7 @@ function server_container(server_name, base_dir, socket_io) {
 
   make_watch('server.properties', broadcast_sp);
   make_watch('server.config', broadcast_sc);
+  make_watch('cron.config', broadcast_cc);
   make_watch('eula.txt', emit_eula);
   make_watch('server-icon.png', broadcast_icon);
 
@@ -539,7 +540,16 @@ function server_container(server_name, base_dir, socket_io) {
   function broadcast_sc() {
     instance.sc(function(err, sc_data) {
       //console.log('[{0}] broadcasting server.config'.format(server_name));
-      nsp.emit('server.config', sc_data);
+      if (!err)
+        nsp.emit('server.config', sc_data);
+    })
+  }
+
+  function broadcast_cc() {
+    console.info('[{0}] broadcasting cron.config'.format(server_name));
+    instance.crons(function(err, cc_data) {
+      if (!err)
+        nsp.emit('cron.config', cc_data);
     })
   }
 
@@ -715,13 +725,6 @@ function server_container(server_name, base_dir, socket_io) {
             nsp.emit('page_data', {page: page, payload: results});
           })
           break;
-        case 'cron':
-          console.info('[{0}] {1} requesting cron info'.format(server_name, ip_address));
-          instance.crons(function(err, cron_dict) {
-            if (!err)
-              nsp.emit('page_data', {page: page, payload: cron_dict});
-          })
-          break;
         default:
           nsp.emit('page_data', {page: page});
           break;
@@ -755,7 +758,6 @@ function server_container(server_name, base_dir, socket_io) {
 
             cron[hash(cloned)] = cronjob;
           }
-          get_page_data('cron');
           callback();
         })
       }
@@ -795,28 +797,27 @@ function server_container(server_name, base_dir, socket_io) {
           console.log('[{0}] {1} starting cron: {2}'.format(server_name, ip_address, opts.hash));
           
           async.series([
-            reload_cron,
             async.apply(instance.set_cron, opts.hash, true),
             async.apply(reload_cron)
           ], function(err) {
-            if (!err) 
+            if (!err) {
               cron[opts.hash].start();
+              broadcast_cc();
+            }
           })
           break;
         case 'suspend':
           console.log('[{0}] {1} suspending cron: {2}'.format(server_name, ip_address, opts.hash));
 
           async.series([
-            reload_cron,
             async.apply(instance.set_cron, opts.hash, false),
             async.apply(reload_cron)
           ], function(err) {
-            if (!err) 
+            if (!err) {
               cron[opts.hash].stop();
+              broadcast_cc();
+            }
           })
-          break;
-        case 'reload':
-          reload_cron(function() {});
           break;
         default:
           console.warn('[{0}] {1} requested unexpected cron operation: {2}'.format(server_name, ip_address, operation), opts);
@@ -831,9 +832,9 @@ function server_container(server_name, base_dir, socket_io) {
     socket.on('cron', manage_cron);
     socket.on('server.properties', broadcast_sp);
     socket.on('server.config', broadcast_sc);
+    socket.on('cron.config', broadcast_cc);
     socket.on('server-icon.png', broadcast_icon);
     console.info('[{0}] broadcasting {1} previous notices'.format(server_name, notices.length));
     nsp.emit('notices', notices);
-    manage_cron({ operation: 'reload' });
   })
 }
