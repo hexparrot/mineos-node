@@ -119,21 +119,24 @@ mineos.mc = function(server_name, base_dir) {
     cc: path.join(base_dir, mineos.DIRS['servers'], server_name, 'cron.config')
   }
 
-  // server properties functions
-  self.sp = function(callback) {
+  function read_ini(filepath, callback) {
     var ini = require('ini');
 
-    fs.readFile(self.env.sp, function(err, data) {
+    fs.readFile(filepath, function(err, data) {
       if (err) {
-        self._sp = {};
-        fs.writeFile(self.env.sp, ini.stringify(self._sp), function(inner_err) {
-          callback(inner_err, self._sp);
+        fs.writeFile(filepath, '', function(inner_err) {
+          callback(inner_err, {});
         });
       } else {
-        self._sp = ini.parse(data.toString());
-        callback(err, self._sp);
+        callback(err, ini.parse(data.toString()));
       }
     })
+  }
+
+  // server properties functions
+
+  self.sp = function(callback) {
+    read_ini(self.env.sp, callback);
   }
 
   self.modify_sp = function(property, new_value, callback) {
@@ -157,17 +160,7 @@ mineos.mc = function(server_name, base_dir) {
 
   // server config functions
   self.sc = function(callback) {
-    var ini = require('ini');
-
-    fs.readFile(self.env.sc, function(err, data) {
-      if (err) {
-        fs.writeFile(self.env.sc, '', function(inner_err) {
-          callback(inner_err, {});
-        });
-      } else {
-        callback(err, ini.parse(data.toString()));
-      }
-    })
+    read_ini(self.env.sc, callback);
   }
 
   self.modify_sc = function(section, property, new_value, callback) {
@@ -190,18 +183,9 @@ mineos.mc = function(server_name, base_dir) {
     ], callback)
   }
 
+  // cron config functions
   self.crons = function(callback) {
-    var ini = require('ini');
-
-    fs.readFile(self.env.cc, function(err, data) {
-      if (err) {
-        fs.writeFile(self.env.cc, '', function(inner_err) {
-          callback(inner_err, {});
-        });
-      } else {
-        callback(err, ini.parse(data.toString()));
-      }
-    })
+    read_ini(self.env.cc, callback);
   }
 
   self.add_cron = function(identifier, definition, callback) {
