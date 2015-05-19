@@ -4,7 +4,13 @@ var chokidar = require('chokidar');
 var path = require('path');
 var events = require('events');
 var os = require('os');
+var logging = require('winston');
 var server = exports;
+
+logging.add(logging.transports.File, {
+  filename: 'mineos.log',
+  handleExceptions: true
+});
 
 server.backend = function(base_dir, socket_emitter) {
   var self = this;
@@ -99,7 +105,7 @@ server.backend = function(base_dir, socket_emitter) {
     } 
 
     function webui_dispatcher (args) {
-      console.info('[WEBUI] Received emit command from {0}:{1}'.format(ip_address, username), args);
+      logging.info('[WEBUI] Received emit command from {0}:{1}'.format(ip_address, username), args);
       switch (args.command) {
         case 'create':
           var instance = new mineos.mc(args.server_name, base_dir);
@@ -110,9 +116,9 @@ server.backend = function(base_dir, socket_emitter) {
             async.apply(instance.overlay_sp, args.properties),
           ], function(err, results) {
             if (!err)
-              console.info('[{0}] Server created in filesystem.'.format(args.server_name));
+              logging.info('[{0}] Server created in filesystem.'.format(args.server_name));
             else
-              console.error(err);
+              logging.error(err);
           })
           break;
         case 'mojang_download':
@@ -127,12 +133,12 @@ server.backend = function(base_dir, socket_emitter) {
 
           fs.ensureDir(dest_dir, function(err) {
             if (err) {
-              console.error('[WEBUI] Error attempting download:', err);
+              logging.error('[WEBUI] Error attempting download:', err);
             } else {
               request(url)
                 .on('complete', function(response) {
                   if (response.statusCode == 200) {
-                    console.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                    logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
                     args['dest_dir'] = dest_dir;
                     args['filename'] = filename;
                     args['success'] = true;
@@ -140,8 +146,8 @@ server.backend = function(base_dir, socket_emitter) {
                     self.front_end.emit('file_download', args);
                     self.send_profile_list();
                   } else {
-                    console.error('[WEBUI] Server was unable to download file:', url);
-                    console.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                    logging.error('[WEBUI] Server was unable to download file:', url);
+                    logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
                     args['success'] = false;
                     args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
                     self.front_end.emit('file_download', args);
@@ -165,12 +171,12 @@ server.backend = function(base_dir, socket_emitter) {
 
           fs.ensureDir(dest_dir, function(err) {
             if (err) {
-              console.error('[WEBUI] Error attempting download:', err);
+              logging.error('[WEBUI] Error attempting download:', err);
             } else {
               request(url)
                 .on('complete', function(response) {
                   if (response.statusCode == 200) {
-                    console.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                    logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
                     args['dest_dir'] = dest_dir;
                     args['filename'] = filename;
                     args['success'] = true;
@@ -182,8 +188,8 @@ server.backend = function(base_dir, socket_emitter) {
                         self.send_profile_list();
                       }));
                   } else {
-                    console.error('[WEBUI] Server was unable to download file:', url);
-                    console.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                    logging.error('[WEBUI] Server was unable to download file:', url);
+                    logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
                     args['success'] = false;
                     args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
                     self.front_end.emit('file_download', args);
@@ -207,12 +213,12 @@ server.backend = function(base_dir, socket_emitter) {
 
           fs.ensureDir(dest_dir, function(err) {
             if (err) {
-              console.error('[WEBUI] Error attempting download:', err);
+              logging.error('[WEBUI] Error attempting download:', err);
             } else {
               request(url)
                 .on('complete', function(response) {
                   if (response.statusCode == 200) {
-                    console.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                    logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
                     args['dest_dir'] = dest_dir;
                     args['filename'] = filename;
                     args['success'] = true;
@@ -224,8 +230,8 @@ server.backend = function(base_dir, socket_emitter) {
                         self.send_profile_list();
                       }));
                   } else {
-                    console.error('[WEBUI] Server was unable to download file:', url);
-                    console.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                    logging.error('[WEBUI] Server was unable to download file:', url);
+                    logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
                     args['success'] = false;
                     args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
                     self.front_end.emit('file_download', args);
@@ -414,7 +420,7 @@ server.backend = function(base_dir, socket_emitter) {
         })
     }
 
-    console.info('[WEBUI] {0} connected from {1}'.format(username, ip_address));
+    logging.info('[WEBUI] {0} connected from {1}'.format(username, ip_address));
     socket.emit('whoami', username);
 
     for (var server_name in self.servers)
@@ -440,7 +446,7 @@ function server_container(server_name, base_dir, socket_io) {
       heartbeat_interval = null,
       HEARTBEAT_INTERVAL_MS = 5000;
 
-  console.log('Discovered server: {0}'.format(server_name));
+  logging.log('Discovered server: {0}'.format(server_name));
   make_tail('logs/latest.log');
 
   make_watch('server.properties', broadcast_sp);
@@ -511,7 +517,7 @@ function server_container(server_name, base_dir, socket_io) {
         if (!accepted)
           accepted = parsed_ini['eula'] && parsed_ini['eula'].toString().toLowerCase() == 'true';
 
-        console.log('[{0}] eula.txt detected: {1} (eula={2})'.format(server_name,
+        logging.log('[{0}] eula.txt detected: {1} (eula={2})'.format(server_name,
                                                                      (accepted ? 'ACCEPTED' : 'NOT YET ACCEPTED'),
                                                                      parsed_ini['eula']));
         nsp.emit('eula', accepted);
@@ -532,21 +538,21 @@ function server_container(server_name, base_dir, socket_io) {
 
   function broadcast_sp() {
     instance.sp(function(err, sp_data) {
-      //console.log('[{0}] broadcasting server.properties'.format(server_name));
+      //logging.log('[{0}] broadcasting server.properties'.format(server_name));
       nsp.emit('server.properties', sp_data);
     })
   }
 
   function broadcast_sc() {
     instance.sc(function(err, sc_data) {
-      //console.log('[{0}] broadcasting server.config'.format(server_name));
+      //logging.log('[{0}] broadcasting server.config'.format(server_name));
       if (!err)
         nsp.emit('server.config', sc_data);
     })
   }
 
   function broadcast_cc() {
-    console.info('[{0}] broadcasting cron.config'.format(server_name));
+    logging.info('[{0}] broadcasting cron.config'.format(server_name));
     instance.crons(function(err, cc_data) {
       if (!err)
         nsp.emit('cron.config', cc_data);
@@ -564,21 +570,21 @@ function server_container(server_name, base_dir, socket_io) {
     var abs_filepath = path.join(instance.env.cwd, rel_filepath);
 
     if (rel_filepath in tails) {
-      console.warn('[{0}] Tail already exists for {1}'.format(server_name, rel_filepath));
+      logging.warn('[{0}] Tail already exists for {1}'.format(server_name, rel_filepath));
       return;
     }
 
     try {
       var new_tail = new tail(abs_filepath);
-      console.info('[{0}] Created tail on {1}'.format(server_name, rel_filepath));
+      logging.info('[{0}] Created tail on {1}'.format(server_name, rel_filepath));
       new_tail.on('line', function(data) {
-        //console.info('[{0}] {1}: transmitting new tail data'.format(server_name, rel_filepath));
+        //logging.info('[{0}] {1}: transmitting new tail data'.format(server_name, rel_filepath));
         nsp.emit('tail_data', {'filepath': rel_filepath, 'payload': data});
       })
       tails[rel_filepath] = new_tail;
     } catch (e) {
-      console.error('[{0}] Create tail on {1} failed'.format(server_name, rel_filepath));
-      console.info('[{0}] Watching for file generation: {1}'.format(server_name, rel_filepath));
+      logging.error('[{0}] Create tail on {1} failed'.format(server_name, rel_filepath));
+      logging.info('[{0}] Watching for file generation: {1}'.format(server_name, rel_filepath));
 
       var tail_lookout = chokidar.watch(instance.env.cwd, {persistent: true, ignoreInitial: true});
       tail_lookout
@@ -586,7 +592,7 @@ function server_container(server_name, base_dir, socket_io) {
           var file = path.basename(fp);
           if (path.basename(rel_filepath) == file) {
             tail_lookout.close();
-            console.info('[{0}] {1} created! Watchfile {2} closed'.format(server_name, file, rel_filepath));
+            logging.info('[{0}] {1} created! Watchfile {2} closed'.format(server_name, file, rel_filepath));
             make_tail(rel_filepath);
           }
         })
@@ -600,7 +606,7 @@ function server_container(server_name, base_dir, socket_io) {
     var abs_filepath = path.join(instance.env.cwd, rel_filepath);
 
     if (rel_filepath in watches) {
-      console.warn('[{0}] Watch already exists for {1}'.format(server_name, rel_filepath));
+      logging.warn('[{0}] Watch already exists for {1}'.format(server_name, rel_filepath));
       return;
     }
 
@@ -609,17 +615,17 @@ function server_container(server_name, base_dir, socket_io) {
       watcher.on('change', function(fp) {
         callback();
       })
-      console.info('[{0}] Started watch on {1}'.format(server_name, rel_filepath));
+      logging.info('[{0}] Started watch on {1}'.format(server_name, rel_filepath));
       watches[rel_filepath] = watcher;
     } catch (e) {
-      console.log(e) //handle error or ignore
+      logging.log(e) //handle error or ignore
     }
   }
 
   nsp.on('connection', function(socket) {
     var ip_address = socket.request.connection.remoteAddress;
     var username = socket.request.user.username;
-    console.info('[{0}] {1} connected from {2}'.format(server_name, username, ip_address));
+    logging.info('[{0}] {1} connected from {2}'.format(server_name, username, ip_address));
 
     function server_dispatcher(args) {
       var introspect = require('introspect');
@@ -636,7 +642,7 @@ function server_container(server_name, base_dir, socket_io) {
         args.error = e;
         args.time_resolved = Date.now();
         nsp.emit('server_fin', args);
-        console.error('server_fin', args);
+        logging.error('server_fin', args);
         notices.push(args);
         return;
       }
@@ -649,7 +655,7 @@ function server_container(server_name, base_dir, socket_io) {
             args.err = err;
             args.time_resolved = Date.now();
             nsp.emit('server_fin', args);
-            console.log('server_fin', args)
+            logging.log('server_fin', args)
 
             if (args.command != 'delete')
               notices.push(args);
@@ -658,7 +664,7 @@ function server_container(server_name, base_dir, socket_io) {
           arg_array.push(args[required_args[i]])
         } else {
           args.success = false;
-          console.error('Provided values missing required argument', required_args[i]);
+          logging.error('Provided values missing required argument', required_args[i]);
           args.error = 'Provided values missing required argument: {0}'.format(required_args[i]);
           nsp.emit('server_fin', args);
           return;
@@ -668,14 +674,14 @@ function server_container(server_name, base_dir, socket_io) {
       if (args.command == 'delete')
         self.cleanup();
 
-      console.info('[{0}] received request "{1}"'.format(server_name, args.command))
+      logging.info('[{0}] received request "{1}"'.format(server_name, args.command))
       fn.apply(instance, arg_array);
     }
 
     function produce_receipt(args) {
       /* when a command is received, immediately respond to client it has been received */
       var uuid = require('node-uuid');
-      console.info('[{0}] {1} issued command : "{2}"'.format(server_name, ip_address, args.command))
+      logging.info('[{0}] {1} issued command : "{2}"'.format(server_name, ip_address, args.command))
       args.uuid = uuid.v1();
       args.time_initiated = Date.now();
       nsp.emit('server_ack', args)
@@ -690,7 +696,7 @@ function server_container(server_name, base_dir, socket_io) {
 
         fs.readFile(abs_filepath, function (err, data) {
           if (!err) {
-            console.info('[{0}] {1} transmittting existing file contents: {2} ({3} bytes)'.format(server_name, ip_address, rel_filepath, data.length));
+            logging.info('[{0}] {1} transmittting existing file contents: {2} ({3} bytes)'.format(server_name, ip_address, rel_filepath, data.length));
             nsp.emit('file head', {filename: rel_filepath, payload: data.toString()});
           }
         });
@@ -698,9 +704,9 @@ function server_container(server_name, base_dir, socket_io) {
     }
 
     function get_prop(requested) {
-      console.info('[{0}] {1} requesting property: {2}'.format(server_name, ip_address, requested.property));
+      logging.info('[{0}] {1} requesting property: {2}'.format(server_name, ip_address, requested.property));
       instance.property(requested.property, function(err, retval) {
-        console.info('[{0}] returned to {1}: {2}'.format(server_name, ip_address, retval));
+        logging.info('[{0}] returned to {1}: {2}'.format(server_name, ip_address, retval));
         nsp.emit('server_fin', {'server_name': server_name, 'property': requested.property, 'payload': retval});
       })
     }
@@ -708,7 +714,7 @@ function server_container(server_name, base_dir, socket_io) {
     function get_page_data(page) {
       switch (page) {
         case 'glance':
-          console.info('[{0}] {1} requesting server at a glance info'.format(server_name, ip_address));
+          logging.info('[{0}] {1} requesting server at a glance info'.format(server_name, ip_address));
 
           async.parallel({
             'increments': async.apply(instance.list_increments),
@@ -768,7 +774,7 @@ function server_container(server_name, base_dir, socket_io) {
       switch (operation) {
         case 'create':
           var cron_hash = hash(opts);
-          console.log('[{0}] {1} requests cron creation:'.format(server_name, ip_address), cron_hash, opts);
+          logging.log('[{0}] {1} requests cron creation:'.format(server_name, ip_address), cron_hash, opts);
 
           opts['enabled'] = false;
 
@@ -778,7 +784,7 @@ function server_container(server_name, base_dir, socket_io) {
           ])
           break;
         case 'delete':
-          console.log('[{0}] {1} requests cron deletion: {2}'.format(server_name, ip_address, opts.hash));
+          logging.log('[{0}] {1} requests cron deletion: {2}'.format(server_name, ip_address, opts.hash));
 
           try {
             cron[opts.hash].stop();
@@ -794,7 +800,7 @@ function server_container(server_name, base_dir, socket_io) {
           ])
           break;
         case 'start':
-          console.log('[{0}] {1} starting cron: {2}'.format(server_name, ip_address, opts.hash));
+          logging.log('[{0}] {1} starting cron: {2}'.format(server_name, ip_address, opts.hash));
           
           async.series([
             async.apply(instance.set_cron, opts.hash, true),
@@ -807,7 +813,7 @@ function server_container(server_name, base_dir, socket_io) {
           })
           break;
         case 'suspend':
-          console.log('[{0}] {1} suspending cron: {2}'.format(server_name, ip_address, opts.hash));
+          logging.log('[{0}] {1} suspending cron: {2}'.format(server_name, ip_address, opts.hash));
 
           async.series([
             async.apply(instance.set_cron, opts.hash, false),
@@ -820,7 +826,7 @@ function server_container(server_name, base_dir, socket_io) {
           })
           break;
         default:
-          console.warn('[{0}] {1} requested unexpected cron operation: {2}'.format(server_name, ip_address, operation), opts);
+          logging.warn('[{0}] {1} requested unexpected cron operation: {2}'.format(server_name, ip_address, operation), opts);
       }
       
     }
@@ -834,7 +840,7 @@ function server_container(server_name, base_dir, socket_io) {
     socket.on('server.config', broadcast_sc);
     socket.on('cron.config', broadcast_cc);
     socket.on('server-icon.png', broadcast_icon);
-    console.info('[{0}] broadcasting {1} previous notices'.format(server_name, notices.length));
+    logging.info('[{0}] broadcasting {1} previous notices'.format(server_name, notices.length));
     nsp.emit('notices', notices);
   })
 }
