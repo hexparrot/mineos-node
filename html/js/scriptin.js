@@ -95,28 +95,26 @@ app.filter('profile_filter', function() {
   return function(profiles, criteria) {
     var keep = [];
 
-    switch(criteria) {
-      case 'downloaded':
-        for (var index in profiles)
-          if (profiles[index].downloaded)
-            keep.push(profiles[index]);
-        break;
-      case undefined:
-        //showonly is unset by user
-        for (var index in profiles)
-          if (profiles[index].type == 'release')
-            keep.push(profiles[index]);
-        break;
-      case '':
-        keep = profiles;
-        break;
-      default:
-        for (var index in profiles)
-          if (profiles[index].type == criteria)
-            keep.push(profiles[index]);
-        break;
-    }
-      
+    for (var index in profiles)
+      if (criteria.value === undefined || 
+          criteria.value == profiles[index][criteria.field] || 
+          criteria.value == 'all')
+        keep.push(profiles[index]);
+
+    return keep;
+  }
+})
+
+app.filter('profile_downloaded', function() {
+  return function(profiles, criteria) {
+    var keep = [];
+
+    for (var index in profiles)
+      if (criteria === undefined ||
+          criteria == 'all' ||
+          (criteria == 'only_downloaded' && profiles[index].downloaded))
+        keep.push(profiles[index]);
+
     return keep;
   }
 })

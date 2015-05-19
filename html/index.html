@@ -542,21 +542,7 @@
                         <!-- START Basic Table -->
                         <div class="span12 widget">
                             <header>
-                                <h4 class="title" translate="AVAILABLE_SERVER_JARS"></h4>
-                                <!-- START Toolbar -->
-                                <ul class="toolbar pull-right">
-                                    <li>
-                                        <a href="#" class="link" data-toggle="dropdown"><span class="icon icone-filter"></span></a>
-                                        <ul class="dropdown-menu pull-right">
-                                            <li><a href="#" ng-click="showonly='release'"><span class="icon icone-star"></span> {{ 'RELEASE' | translate }}</a></li>
-                                            <li><a href="#" ng-click="showonly='snapshot'"><span class="icon icone-camera"></span> {{ 'SNAPSHOT' | translate }}</a></li>
-                                            <li><a href="#" ng-click="showonly='old_version'"><span class="icon icone-camera"></span> {{ 'OLD_VERSION' | translate }}</a></li>
-                                            <li><a href="#" ng-click="showonly=''"><span class="icon icone-asterisk"></span> {{ 'SHOW_ALL_RELEASES' | translate }}</a></li>
-                                            <li><a href="#" ng-click="showonly='downloaded'"><span class="icon icone-cloud-download"></span> {{ 'DOWNLOADED_PROFILES' | translate }}</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                                <!--/ END Toolbar -->
+                                <h4 class="title" translate="AVAILABLE_SERVER_JARS"></h4> 
                             </header>
                             <section class="body">
                                 <div class="body-inner no-padding">
@@ -570,7 +556,38 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr ng-repeat="jar in profiles | profile_filter:showonly | orderBy:['+weight', '-releaseTime', 'id']">
+                                            <tr>
+                                                <td>
+                                                    <select ng-model="serverprofiles.group" class="span12">
+                                                        <option selected value="mojang">Mojang</option>
+                                                        <option value="ftb">Feed the Beast</option>
+                                                        <option value="ftb_third_party">FTB-3rd Party</option>
+                                                        <option value="all">Show All</option>
+                                                    </select>
+                                                </td>
+                                                <td></td>
+                                                <td>
+                                                    <select ng-model="serverprofiles.type" class="span12">
+                                                        <option selected value="release">Release</option>
+                                                        <option value="snapshot">Snapshot</option>
+                                                        <option value="old_version">Old Versions</option>
+                                                        <option value="all">Show All</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select ng-model="serverprofiles.downloaded">
+                                                        <option value="all" selected>Show All</option>
+                                                        <option value="only_downloaded">Only Downloaded</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tbody>
+                                            <tr ng-repeat="jar in profiles | 
+                                                           profile_filter: {field: 'group', value: serverprofiles.group} | 
+                                                           profile_filter: {field: 'type', value: serverprofiles.type} | 
+                                                           profile_downloaded: serverprofiles.downloaded | 
+                                                           orderBy:['+weight', '-releaseTime', 'id']">
                                                 <td>{{ jar.id }}</td>
                                                 <td>{{ jar.webui_desc }}</td>
                                                 <td>[{{ jar.group }}] <strong>{{ jar.type }}</strong></td>
@@ -692,7 +709,12 @@
                                                     <!-- Select -->
                                                     <div class="control-group">
                                                         <div class="controls">
-                                                            <select class="" ng-model="myprofile" data-ng-options="p as p.id group by p.group for p in profiles | profile_filter:'downloaded' | orderBy:'-releaseTime'" ng-change="change_sc('minecraft', 'profile', myprofile.id)">
+                                                            <select class="" 
+                                                                ng-model="myprofile" 
+                                                                data-ng-options="p as p.id group by p.group for p in profiles | 
+                                                                profile_downloaded: serverprofiles.downloaded | 
+                                                                orderBy:'-releaseTime'" 
+                                                                ng-change="change_sc('minecraft', 'profile', myprofile.id)">
                                                                 <option value="" disabled selected translate="CHANGE_PROFILE_TO"></option>
                                                             </select>
                                                         </div>
@@ -1266,7 +1288,7 @@
                 <div class="modal-body">
                     <p translate="NEW_SERVER_OVERVIEW"></p>
                     <div class="controls">
-                        <select class="" ng-model="myprofile" default-option="Select a profile" data-ng-options="p as p.id group by p.group for p in profiles | profile_filter:'downloaded' | orderBy:'-releaseTime'" ng-change="change_sc('minecraft', 'profile', myprofile.id)">
+                        <select class="" ng-model="myprofile" default-option="Select a profile" data-ng-options="p as p.id group by p.group for p in profiles | profile_downloaded: 'only_downloaded' | orderBy:'-releaseTime'" ng-change="change_sc('minecraft', 'profile', myprofile.id)">
                             <option value="" disabled selected translate="CHANGE_PROFILE_TO"></option>
                         </select>
                         <!-- Select -->
