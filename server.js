@@ -244,14 +244,15 @@ server.backend = function(base_dir, socket_emitter) {
     }
 
     self.send_profile_list = function() {
-      async.parallel([
-        async.apply(self.check_profiles.mojang),
-        async.apply(self.check_profiles.ftb),
-        async.apply(self.check_profiles.ftb_third_party)
-      ], function(err, results) {
-        //http://stackoverflow.com/a/10865042/1191579
+      async.auto({
+        'mojang': async.retry(2, self.check_profiles.mojang),
+        'ftb': async.retry(2, self.check_profiles.ftb),
+        'ftb_3rd': async.retry(2, self.check_profiles.ftb_third_party)
+      }, function(err, results) {
         var merged = [];
-        merged = merged.concat.apply(merged, results);
+        for (var source in results)
+          merged = merged.concat.apply(merged, results[source]);
+
         self.front_end.emit('profile_list', merged);
       })
     }
