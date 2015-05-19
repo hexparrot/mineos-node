@@ -95,13 +95,15 @@ app.filter('profile_filter', function() {
   return function(profiles, criteria) {
     var keep = [];
 
-    for (var index in profiles)
-      if (criteria.value === undefined || 
-          criteria.value == profiles[index][criteria.field] || 
-          criteria.value == 'all')
-        keep.push(profiles[index]);
+    if (criteria.value == 'all')
+      return profiles;
+    else {
+      for (var index in profiles)
+        if (criteria.value == profiles[index][criteria.field])
+          keep.push(profiles[index]);
 
-    return keep;
+      return keep;
+    }
   }
 })
 
@@ -109,13 +111,15 @@ app.filter('profile_downloaded', function() {
   return function(profiles, criteria) {
     var keep = [];
 
-    for (var index in profiles)
-      if (criteria === undefined ||
-          criteria == 'all' ||
-          (criteria == 'only_downloaded' && profiles[index].downloaded))
-        keep.push(profiles[index]);
+    if (criteria == 'all')
+      return profiles;
+    else {
+      for (var index in profiles)
+        if (criteria == 'only_downloaded' && profiles[index].downloaded)
+          keep.push(profiles[index]);
 
-    return keep;
+      return keep;
+    }
   }
 })
 
@@ -125,6 +129,12 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
   $scope.page = 'dashboard';
   $scope.servers = Servers;
   $scope.current = null;
+
+  $scope.serverprofiles = {
+    group: 'mojang',
+    type: 'release',
+    downloaded: 'all'
+  }
 
   /* watches */
   $scope.$watch(function(scope) { return scope.page },
