@@ -1,5 +1,4 @@
 var app = angular.module("mineos", ['angularMoment', 'pascalprecht.translate']);
-var connect_string = ':443/';
 
 app.run(['$rootScope', '$translate', function($rootScope, $translate) {
   $rootScope.change_locale = function (locale) {
@@ -534,6 +533,11 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
 app.factory('socket', function ($rootScope) {
   //http://briantford.com/blog/angular-socket-io
   var sockets = {};
+  if (window.location.protocol == "https:")
+    var connect_string = ':8443/';
+  else
+    var connect_string = ':8080/';
+
   return {
     on: function (server_name, eventName, callback) {
       if (!(server_name in sockets)) {
