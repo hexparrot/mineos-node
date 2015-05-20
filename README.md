@@ -16,13 +16,21 @@ Installation
 MineOS is distributed (right now) through github and downloads its dependencies with npm.
 In the future, MineOS will be it's own NPM project which should facilitate even easier installation.
 
+MineOS requires root-privileges, as the authentication relies on the underlying system's /etc/shadow.
+
 Using an apt-get based Linux distribution:
 
-    apt-get install -y nodejs nodejs-legacy npm git rdiff-backup openjdk-7-jre-headless
+    sudo apt-get install -y nodejs nodejs-legacy npm git rdiff-backup openjdk-7-jre-headless
     git clone https://github.com/hexparrot/mineos-node.git
     cd mineos-node
+    chmod +x generate-sslcert.sh
+    sudo ./generate-sslcert.sh
     npm install --all
     sudo nodejs webui.js
+
+This installs--then runs--the webui in the foreground. service.js is a background daemon,
+but in the early development and deployments of this new webui, it is likely more valuable
+to have the errors immediately accessible.
 
 Developing and Contributing
 ------
