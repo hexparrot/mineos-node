@@ -1,5 +1,5 @@
 var app = angular.module("mineos", ['angularMoment', 'pascalprecht.translate']);
-var connect_string = ':3000/';
+var connect_string = ':443/';
 
 app.run(['$rootScope', '$translate', function($rootScope, $translate) {
   $rootScope.change_locale = function (locale) {
@@ -538,9 +538,9 @@ app.factory('socket', function ($rootScope) {
     on: function (server_name, eventName, callback) {
       if (!(server_name in sockets)) {
         if (server_name == '/')
-          sockets[server_name] = io(connect_string);
+          sockets[server_name] = io(connect_string, {secure: true});
         else
-          sockets[server_name] = io(connect_string + server_name);
+          sockets[server_name] = io(connect_string + server_name, {secure: true});
       }
 
       sockets[server_name].on(eventName, function () {  
@@ -553,9 +553,9 @@ app.factory('socket', function ($rootScope) {
     emit: function (server_name, eventName, data, callback) {
       if (!(server_name in sockets)) {
         if (server_name == '/')
-          sockets[server_name] = io(connect_string);
+          sockets[server_name] = io(connect_string, {secure: true});
         else
-          sockets[server_name] = io(connect_string + server_name);
+          sockets[server_name] = io(connect_string + server_name, {secure: true});
       }
 
       sockets[server_name].emit(eventName, data, function () {

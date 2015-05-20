@@ -148,11 +148,29 @@ mineos.dependencies(function(err, binaries) {
 			process.exit();
 		});
 
-		http.listen(3000, function(){
-			console.log('listening on *:3000');
-		});
+    var fs = require('fs');
+
+    async.parallel({
+      key: async.apply(fs.readFile, '/etc/ssl/certs/mineos.key'),
+      cert: async.apply(fs.readFile, '/etc/ssl/certs/mineos.crt')
+    }, function(err, ssl) {
+      if (err) {
+        var HOSTING_PORT = 8080;
+        console.error('Could not locate required SSL files /etc/ssl/certs/mineos.{key,crt}, starting HTTP server');
+        http.listen(HOSTING_PORT, function(){
+          console.log('MineOS webui listening on *:' + HOSTING_PORT);
+        });
+      } else {
+        var https = require('https');
+
+        var HOSTING_PORT = 8443;
+        var https_server = https.createServer(ssl, app).listen(HOSTING_PORT);
+        io.attach(https_server);
+        console.log("MineOS webui listening on *:" + HOSTING_PORT);
+      }
+    })
 
     setInterval(session_cleanup, 3600000); //check for expired sessions every hour
-	}
+  }
 })
 
