@@ -49,20 +49,20 @@ server.backend = function(base_dir, socket_emitter) {
   })();
 
   (function() {
-    var server_path = path.join(base_dir, mineos.DIRS['servers'], '*', 'server.properties');
-    self.watches['server_added'] = chokidar.watch(server_path, { 
-                                                  persistent: true, 
-                                                  depth: 1});
-    // ignores all events if string does not include 'server.properties'
-
+    var server_path = path.join(base_dir, mineos.DIRS['servers']);
+    self.watches['server_added'] = chokidar.watch(server_path, { persistent: true, depth: 2 });
+    
     self.watches['server_added']
       .on('add', function(dirpath) {
-        // event to trigger when new server detected, e.g., /var/games/minecraft/servers/asdf/server.properties
-        var server_name = path.basename(path.dirname(dirpath));
-        async.nextTick(function() {
-          self.servers[server_name] = new server_container(server_name, base_dir, self.front_end);
-          self.front_end.emit('track_server', server_name);
-        });
+        if (/\/server\.properties$/.test(dirpath)) {
+          // event to trigger when new server detected, e.g., /var/games/minecraft/servers/asdf/server.properties
+          // ignores all events if string does not include 'server.properties'
+          var server_name = path.basename(path.dirname(dirpath));
+          async.nextTick(function() {
+            self.servers[server_name] = new server_container(server_name, base_dir, self.front_end);
+            self.front_end.emit('track_server', server_name);
+          });
+        }
       })
   })();
 
