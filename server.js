@@ -244,9 +244,6 @@ server.backend = function(base_dir, socket_emitter) {
             }
           });
           break;
-        case 'notices':
-          for (var server_name in self.servers) 
-            self.servers[server_name].nsp.emit('notices', self.servers[server_name].notices);
         default:
           break;
       }
@@ -537,6 +534,10 @@ function server_container(server_name, base_dir, socket_io) {
       if (!err && data.toString('hex',0,4) == '89504e47') //magic number for png first 4B
         nsp.emit('server-icon.png', new Buffer(data).toString('base64'));
     });
+  }
+
+  function broadcast_notices() {
+    nsp.emit('notices', notices);
   }
 
   function broadcast_sp() {
@@ -843,7 +844,6 @@ function server_container(server_name, base_dir, socket_io) {
     socket.on('server.config', broadcast_sc);
     socket.on('cron.config', broadcast_cc);
     socket.on('server-icon.png', broadcast_icon);
-    logging.info('[{0}] broadcasting {1} previous notices'.format(server_name, notices.length));
-    nsp.emit('notices', notices);
+    socket.on('req_server_activity', broadcast_notices);
   })
 }
