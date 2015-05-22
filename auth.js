@@ -25,3 +25,21 @@ auth.authenticate_shadow = function(user, plaintext, callback) {
       callback(false);
   })
 }
+
+auth.test_membership = function(username, group, callback) {
+  var passwd = require('etc-passwd');
+  var userid = require('userid');
+
+  var membership_valid = false;
+  var gg = passwd.getGroups()
+    .on('group', function(group_data) {
+      if (group == group_data.groupname)
+        try {
+          if (group_data.users.indexOf(username) >= 0 || group_data.gid == userid.gid(username)) 
+            membership_valid = true;
+        } catch (e) {}
+    })
+    .on('end', function() {
+      callback(membership_valid);
+    })
+}
