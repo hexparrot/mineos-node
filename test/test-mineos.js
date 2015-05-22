@@ -33,7 +33,14 @@ function delete_everything(callback) {
 }
 
 test.setUp = function(callback) {
-  delete_everything(callback);
+  async.parallel([
+    async.apply(fs.ensureDir, path.join(BASE_DIR, mineos.DIRS['servers'])),
+    async.apply(fs.ensureDir, path.join(BASE_DIR, mineos.DIRS['archive'])),
+    async.apply(fs.ensureDir, path.join(BASE_DIR, mineos.DIRS['backup'])),
+    async.apply(fs.ensureDir, path.join(BASE_DIR, mineos.DIRS['profiles'])),
+  ], function() {
+    delete_everything(callback);
+  })
 }
 
 test.tearDown = function(callback) {
