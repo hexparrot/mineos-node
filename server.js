@@ -5,6 +5,7 @@ var path = require('path');
 var events = require('events');
 var os = require('os');
 var logging = require('winston');
+var fs = require('fs-extra');
 var server = exports;
 
 logging.add(logging.transports.File, {
@@ -19,6 +20,8 @@ server.backend = function(base_dir, socket_emitter) {
   self.profiles = {};
   self.watches = {};
   self.front_end = socket_emitter;
+
+  fs.ensureDirSync(base_dir);
 
   (function() {
     //thanks to https://github.com/flareofghast/node-advertiser/blob/master/advert.js
