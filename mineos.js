@@ -259,7 +259,7 @@ mineos.mc = function(server_name, base_dir) {
   self.create_from_archive = function(owner, filepath, callback) {
     var binary = which.sync('tar');
     var args = ['xf', filepath];
-    var params = { cwd: path.dirname(filepath) };
+    var params = { cwd: self.env.cwd };
 
     async.series([
       async.apply(self.create, owner),

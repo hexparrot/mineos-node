@@ -55,7 +55,7 @@ test.dependencies_met = function(test) {
     test.done();
   })
 }
-
+/*
 test.server_list = function (test) {
   var servers = mineos.server_list(BASE_DIR);
   var instance = new mineos.mc('testing', BASE_DIR);
@@ -1604,7 +1604,7 @@ test.crons = function(test) {
     test.done();
   })
 }
-
+*/
 test.create_server_from_awd = function(test) {
   var server_name = 'testing';
   var temporary_instance = new mineos.mc(server_name, BASE_DIR);
@@ -1619,6 +1619,14 @@ test.create_server_from_awd = function(test) {
       test.equal(servers.length, 1);
       callback();
     },
+    async.apply(temporary_instance.modify_sc, 'java', 'java_xmx', '1024'),
+    function(callback) {
+      temporary_instance.sc(function(err, dict) {
+        test.ifError(err);
+        test.equal(dict.java.java_xmx, '1024');
+        callback(err);
+      })
+    },
     async.apply(temporary_instance.archive),
     function(callback) {
       var created_archive = fs.readdirSync(temporary_instance.env.awd)[0];
@@ -1628,6 +1636,13 @@ test.create_server_from_awd = function(test) {
     function(callback) {
       new_instance.create_from_archive(OWNER_CREDS, archive_filepath, function(err) {
         callback();
+      })
+    },
+    function(callback) {
+      new_instance.sc(function(err, dict) {
+        test.ifError(err);
+        test.equal(dict.java.java_xmx, '1024');
+        callback(err);
       })
     },
     function(callback) {
@@ -1642,7 +1657,7 @@ test.create_server_from_awd = function(test) {
         test.ifError(!err);
         callback(!err);
       });
-    },
+    }
   ], function(err) {
     test.ifError(err);
     test.done();
