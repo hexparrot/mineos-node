@@ -124,6 +124,24 @@ server.backend = function(base_dir, socket_emitter) {
               logging.error(err);
           })
           break;
+        case 'create_from_archive':
+          var instance = new mineos.mc(args.new_server_name, base_dir);
+
+          if (args.awd_dir)
+            var filepath = path.join(instance.env.base_dir, mineos.DIRS['archive'], args.awd_dir, args.filename);
+          else
+            var filepath = path.join(instance.env.base_dir, mineos.DIRS['import'], args.filename);
+
+          async.series([
+            async.apply(instance.verify, '!exists'),
+            async.apply(instance.create_from_archive, OWNER_CREDS, filepath)
+          ], function(err, results) {
+            if (!err)
+              logging.info('[{0}] Server created in filesystem.'.format(args.new_server_name));
+            else
+              logging.error(err);
+          })
+          break;
         case 'mojang_download':
           var request = require('request');
           var fs = require('fs-extra');

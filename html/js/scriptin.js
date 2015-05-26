@@ -323,10 +323,11 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     $('#modal_server_from_archive').modal('show');
   }
 
-  $scope.server_from_archive_create = function(new_server_name) {
-    socket.emit($scope.current, 'command', {
-      'command': 'server_from_archive',
-      'new_server_name': new_server_name,
+  $scope.server_from_archive_create = function(awd_dir) {
+    socket.emit('/', 'command', {
+      'command': 'create_from_archive',
+      'new_server_name': $scope.new_server_name,
+      'awd_dir': (awd_dir && $scope.current.length ? $scope.current : null),
       'filename': $scope.archive_filename
     });
   }
