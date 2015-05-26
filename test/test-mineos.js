@@ -1372,47 +1372,6 @@ test.chown = function(test) {
   })
 }
 
-test.create_server_from_archive = function(test) {
-  var server_name = 'testing';
-  var instance = new mineos.mc(server_name, BASE_DIR);
-
-  var created_archive = null;
-
-  async.series([
-    async.apply(instance.create, OWNER_CREDS),
-    function(callback) {
-      var servers = mineos.server_list(BASE_DIR);
-      test.equal(servers.length, 1);
-      callback();
-    },
-    async.apply(instance.archive),
-    function(callback) {
-      created_archive = fs.readdirSync(instance.env.awd)[0];
-      callback(null);
-    },
-    function(callback) {
-      instance.server_from_archive('testing_server_2', created_archive, callback);
-    },
-    function(callback) {
-      var servers = mineos.server_list(BASE_DIR);
-      test.equal(servers.length, 2);
-      test.ok(servers.indexOf('testing') >= 0);
-      test.ok(servers.indexOf('testing_server_2') >= 0);
-      callback();
-    },
-    function(callback) {
-      instance.server_from_archive('testing_server_2', created_archive, function(err){
-        test.ifError(!err);
-        callback(!err);
-      });
-    },
-  ], function(err) {
-    test.ifError(err);
-    test.expect(6);
-    test.done();
-  })
-}
-
 test.broadcast_property = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -1640,6 +1599,50 @@ test.crons = function(test) {
         callback(err);
       })
     }
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
+test.create_server_from_awd = function(test) {
+  var server_name = 'testing';
+  var temporary_instance = new mineos.mc(server_name, BASE_DIR);
+  var new_instance = new mineos.mc('testing_server_2', BASE_DIR);
+
+  var archive_filepath = null;
+
+  async.series([
+    async.apply(temporary_instance.create, OWNER_CREDS),
+    function(callback) {
+      var servers = mineos.server_list(BASE_DIR);
+      test.equal(servers.length, 1);
+      callback();
+    },
+    async.apply(temporary_instance.archive),
+    function(callback) {
+      var created_archive = fs.readdirSync(temporary_instance.env.awd)[0];
+      archive_filepath = path.join(temporary_instance.env.awd, created_archive);
+      callback(null);
+    },
+    function(callback) {
+      new_instance.create_from_archive(OWNER_CREDS, archive_filepath, function(err) {
+        callback();
+      })
+    },
+    function(callback) {
+      var servers = mineos.server_list(BASE_DIR);
+      test.equal(servers.length, 2);
+      test.ok(servers.indexOf('testing') >= 0);
+      test.ok(servers.indexOf('testing_server_2') >= 0);
+      callback();
+    },
+    function(callback) {
+      new_instance.create_from_archive(OWNER_CREDS, archive_filepath, function(err){
+        test.ifError(!err);
+        callback(!err);
+      });
+    },
   ], function(err) {
     test.ifError(err);
     test.done();
