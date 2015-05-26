@@ -256,6 +256,22 @@ mineos.mc = function(server_name, base_dir) {
     ], callback)
   }
 
+  self.create_from_archive = function(owner, filepath, callback) {
+    var binary = which.sync('tar');
+    var args = ['xf', filepath];
+    var params = { cwd: self.env.cwd };
+
+    async.series([
+      async.apply(self.create, owner),
+      function(cb) {
+        var proc = child_process.spawn(binary, args, params);
+        proc.once('exit', function(code) {
+          cb(code);
+        })
+      }
+    ], callback)
+  }
+
   self.accept_eula = function(callback) {
     fs.outputFile(path.join(self.env.cwd, 'eula.txt'), 'eula=true', callback);
   }
@@ -615,30 +631,6 @@ mineos.mc = function(server_name, base_dir) {
         callback(err, all_info);
       }
     }) 
-  }
-
-  self.server_from_archive = function(new_server_name, filename, callback) {
-    var binary = which.sync('tar');
-    var new_server_dir = path.join(base_dir, mineos.DIRS['servers'], new_server_name);
-    var args = ['xf', path.join(self.env.awd, filename)];
-    var params = { cwd: new_server_dir }; //awd!
-
-    async.series([
-      function(cb) {
-        fs.stat(new_server_dir, function(err, stat_data) {
-          cb(!err);
-        })
-      },
-      async.apply(fs.ensureDir, new_server_dir),
-      async.apply(fs.ensureDir, path.join(base_dir, mineos.DIRS['archive'], new_server_name)),
-      async.apply(fs.ensureDir, path.join(base_dir, mineos.DIRS['backup'], new_server_name)),
-      function(cb) {
-        var proc = child_process.spawn(binary, args, params);
-        proc.once('exit', function(code) {
-          cb(code);
-        })
-      }
-    ], callback);
   }
 
   self.prune = function(step, callback) {
