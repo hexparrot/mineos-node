@@ -552,16 +552,6 @@
                         <div class="span12 widget">
                             <header>
                                 <h4 class="title" translate="AVAILABLE_ARCHIVES"></h4>
-                                <!-- START Toolbar -->
-                                <ul class="toolbar pull-right">
-                                    <li>
-                                        <a href="#" class="link" data-toggle="dropdown"><span class="icon icone-ellipsis-vertical"></span></a>
-                                        <ul class="dropdown-menu pull-right">
-                                            <li><a href="#" ng-click="server_command('archive')"><span class="icon icone-hdd"></span> {{ 'CREATE_NEW_ARCHIVE' | translate }}</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                                <!--/ END Toolbar -->
                             </header>
                             <section class="body">
                                 <div class="body-inner no-padding">
@@ -581,7 +571,7 @@
                                                 <td>
                                                     <p>
                                                         <div class="btn-group">
-                                                            <button class="btn btn-small" ng-click="server_from_archive(archive.filename, null)">{{ 'CREATE_FROM_ARCHIVE' | translate }} </button>
+                                                            <button class="btn btn-small btn-primary" ng-click="server_from_archive(archive.filename, null)">{{ 'CREATE_FROM_ARCHIVE' | translate }} </button>
                                                         </div>
                                                     </p>
                                                 </td>
