@@ -157,6 +157,15 @@
 
                                     <!-- START Menu -->
                                     <li class="accordion-group">
+                                        <a ng-click="change_page('import')">
+                                            <span class="icon icone-share"></span>
+                                            <span class="text" translate="IMPORT_SERVER"></span>
+                                        </a>
+                                    </li>
+                                    <!--/ END Menu -->
+
+                                    <!-- START Menu -->
+                                    <li class="accordion-group">
                                         <a ng-click="change_page('profiles')">
                                             <span class="icon icone-tags"></span>
                                             <span class="text" translate="PROFILES"></span>
@@ -531,6 +540,60 @@
                     </section>
                 
                 <!--/ END General Elements -->
+                </div>
+                <!--/ END Content -->
+
+
+                <!-- START Content - IMPORTS -->
+                <div class="container-fluid" ng-show="page == 'import'">
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Basic Table -->
+                        <div class="span12 widget">
+                            <header>
+                                <h4 class="title" translate="AVAILABLE_ARCHIVES"></h4>
+                                <!-- START Toolbar -->
+                                <ul class="toolbar pull-right">
+                                    <li>
+                                        <a href="#" class="link" data-toggle="dropdown"><span class="icon icone-ellipsis-vertical"></span></a>
+                                        <ul class="dropdown-menu pull-right">
+                                            <li><a href="#" ng-click="server_command('archive')"><span class="icon icone-hdd"></span> {{ 'CREATE_NEW_ARCHIVE' | translate }}</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                <!--/ END Toolbar -->
+                            </header>
+                            <section class="body">
+                                <div class="body-inner no-padding">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th translate="TIMESTAMP"></th>
+                                                <th translate="SIZE"></th>
+                                                <th translate="FILENAME"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="archive in archive_list">
+                                                <td>{{ archive.time | amDateFormat: "dddd, MMMM Do YYYY, h:mm:ss a"  }}</td>
+                                                <td>{{ archive.size | bytes_to_mb }}</td>
+                                                <td>{{ archive.filename }}</td>
+                                                <td>
+                                                    <p>
+                                                        <div class="btn-group">
+                                                            <button class="btn btn-small" ng-click="server_from_archive(archive.filename, null)">{{ 'CREATE_FROM_ARCHIVE' | translate }} </button>
+                                                        </div>
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Basic Table -->
+                    </div>
+                    <!--/ END Row -->
                 </div>
                 <!--/ END Content -->
 
@@ -1040,7 +1103,7 @@
                                                             <ul class="dropdown-menu">
                                                                 <li><a ng-click="server_command('delete_archive', {filename: archive.filename})" translate="DELETE_THIS_ARCHIVE"></a></li>
                                                                 <li><a href="#"></a></li>
-                                                                <li><a ng-click="server_from_archive(archive.filename)" translate="CREATE_FROM_ARCHIVE"></a></li>
+                                                                <li><a ng-click="server_from_archive(archive.filename, current)" translate="CREATE_FROM_ARCHIVE"></a></li>
                                                             </ul>
                                                         </div><!--/ Button Dropdown -->
                                                         <!-- Button Dropdown -->
@@ -1342,7 +1405,7 @@
                     <input type="text" class="span2" ng-model="new_server_name">
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-success" aria-hidden="true" translate="CREATE_FROM_ARCHIVE" ng-click="server_from_archive_create(true)"></button>
+                    <button class="btn btn-success" aria-hidden="true" translate="CREATE_FROM_ARCHIVE" ng-click="server_from_archive_create()"></button>
                 </div>
             </div><!--/ Modal With Animation --> 
 

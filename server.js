@@ -22,6 +22,7 @@ server.backend = function(base_dir, socket_emitter) {
   self.front_end = socket_emitter;
 
   fs.ensureDirSync(base_dir);
+  fs.ensureDirSync(path.join(base_dir, mineos.DIRS['import']));
 
   (function() {
     //thanks to https://github.com/flareofghast/node-advertiser/blob/master/advert.js
@@ -80,6 +81,49 @@ server.backend = function(base_dir, socket_emitter) {
         self.front_end.emit('untrack_server', server_name);
       })
   })();
+
+  (function() {
+    var importable_archives = path.join(base_dir, mineos.DIRS['import']);
+    self.watches['importables'] = chokidar.watch(importable_archives, { 
+      persistent: true, 
+      depth: 1, 
+      ignoreInitial: true });
+    
+    self.watches['importables']
+      .on('ready', function() {
+        self.send_importable_list();
+      })
+  })();
+
+  self.send_importable_list = function() {
+    var importable_archives = path.join(base_dir, mineos.DIRS['import']);
+    var all_info = [];
+
+    fs.readdir(importable_archives, function(err, files) {
+      if (!err) {
+        var fullpath = files.map(function(value, index) {
+          return path.join(importable_archives, value);
+        });
+
+        var stat = fs.stat;
+        async.map(fullpath, stat, function(inner_err, results){
+          results.forEach(function(value, index) {
+            all_info.push({
+              time: value.mtime,
+              size: value.size,
+              filename: files[index]
+            })
+          })
+
+          all_info.sort(function(a, b) {
+            return a.time.getTime() - b.time.getTime();
+          });
+
+          self.front_end.emit('archive_list', all_info);
+        }); 
+      }
+    })
+  }
 
   function host_heartbeat() {
     self.front_end.emit('host_heartbeat', {
@@ -447,6 +491,7 @@ server.backend = function(base_dir, socket_emitter) {
     socket.on('command', webui_dispatcher);
     self.send_profile_list();
     self.send_user_list();
+    self.send_importable_list();
   })
 
   return self;
