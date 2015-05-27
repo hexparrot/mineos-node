@@ -142,8 +142,16 @@ mineos.mc = function(server_name, base_dir) {
   self.modify_sp = function(property, new_value, callback) {
     var ini = require('ini');
 
-    self._sp[property] = new_value;
-    fs.writeFile(self.env.sp, ini.stringify(self._sp), callback);
+    async.waterfall([
+      async.apply(self.sp),
+      function(sp_data, cb) {
+        sp_data[property] = new_value;
+        cb(null, sp_data);
+      },
+      function(sp_data, cb) {
+        fs.writeFile(self.env.sp, ini.stringify(sp_data), cb);
+      }
+    ], callback)
   }
 
   self.overlay_sp = function(dict, callback) {
