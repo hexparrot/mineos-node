@@ -63,6 +63,18 @@ app.directive('icheck', function($timeout, $parse) {
 
 /* filters */
 
+app.filter('membership', function() {
+  return function(servers) {
+    var keep = {};
+
+    for (var s in servers)
+      if (servers[s].sp)
+        keep[s] = servers[s];
+
+    return keep;
+  }
+})
+
 app.filter('bytes_to_mb', function() {
   return function(bytes) {
     if (bytes == 0)
