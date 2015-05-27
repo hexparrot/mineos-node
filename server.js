@@ -692,7 +692,6 @@ function server_container(server_name, base_dir, socket_io) {
   nsp.on('connection', function(socket) {
     var ip_address = socket.request.connection.remoteAddress;
     var username = socket.request.user.username;
-    logging.info('[{0}] {1} connected from {2}'.format(server_name, username, ip_address));
 
     function server_dispatcher(args) {
       var introspect = require('introspect');
@@ -895,18 +894,34 @@ function server_container(server_name, base_dir, socket_io) {
         default:
           logging.warn('[{0}] {1} requested unexpected cron operation: {2}'.format(server_name, ip_address, operation), opts);
       }
-      
     }
 
-    socket.on('command', produce_receipt);
-    socket.on('get_file_contents', get_file_contents);
-    socket.on('property', get_prop);
-    socket.on('page_data', get_page_data);
-    socket.on('cron', manage_cron);
-    socket.on('server.properties', broadcast_sp);
-    socket.on('server.config', broadcast_sc);
-    socket.on('cron.config', broadcast_cc);
-    socket.on('server-icon.png', broadcast_icon);
-    socket.on('req_server_activity', broadcast_notices);
+    async.waterfall([
+      async.apply(instance.property, 'owner'),
+      function(ownership_data, cb) {
+        var auth = require('./auth');
+        auth.test_membership(username, ownership_data.groupname, function(is_valid) {
+          cb(null, is_valid);
+        });
+      },
+      function(is_valid, cb) {
+        cb(!is_valid); //logical NOT to allow continued functions below
+      },
+      function(cb) {
+        console.info('[{0}] {1} connected from {2}'.format(server_name, username, ip_address));
+
+        socket.on('command', produce_receipt);
+        socket.on('get_file_contents', get_file_contents);
+        socket.on('property', get_prop);
+        socket.on('page_data', get_page_data);
+        socket.on('cron', manage_cron);
+        socket.on('server.properties', broadcast_sp);
+        socket.on('server.config', broadcast_sc);
+        socket.on('cron.config', broadcast_cc);
+        socket.on('server-icon.png', broadcast_icon);
+        socket.on('req_server_activity', broadcast_notices);
+      }
+    ])
+
   })
 }
