@@ -535,13 +535,13 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
         $('#modal_eula').modal('show');
     })
 
-    me.channel.emit(server_name, 'server.properties');
-    me.channel.emit(server_name, 'server.config');
-    me.channel.emit(server_name, 'cron.config');
     me.channel.emit(server_name, 'server-icon.png');
     me.channel.emit(server_name, 'page_data', 'glance');
     me.channel.emit(server_name, 'get_file_contents', 'logs/latest.log');
     me.channel.emit(server_name, 'req_server_activity');
+    me.channel.emit(server_name, 'cron.config');
+    me.channel.emit(server_name, 'server.config');
+    me.channel.emit(server_name, 'server.properties');
 
     return me;
   }
