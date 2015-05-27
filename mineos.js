@@ -239,20 +239,19 @@ mineos.mc = function(server_name, base_dir) {
       async.apply(self.verify, '!exists'),
       async.apply(self.verify, '!up'),
       async.apply(fs.ensureDir, self.env.cwd),
-      async.apply(fs.ensureDir, self.env.bwd),
-      async.apply(fs.ensureDir, self.env.awd),
-      async.apply(fs.ensureFile, self.env.sp),
-      async.apply(fs.ensureFile, self.env.sc),
-      async.apply(fs.ensureFile, self.env.cc),
-      async.apply(self.overlay_sp, mineos.SP_DEFAULTS),
-      async.apply(self.sc),
-      async.apply(self.modify_sc, 'java', 'java_xmx', '256'),
       async.apply(fs.chown, self.env.cwd, owner['uid'], owner['gid']),
+      async.apply(fs.ensureDir, self.env.bwd),
       async.apply(fs.chown, self.env.bwd, owner['uid'], owner['gid']),
+      async.apply(fs.ensureDir, self.env.awd),
       async.apply(fs.chown, self.env.awd, owner['uid'], owner['gid']),
+      async.apply(fs.ensureFile, self.env.sp),
       async.apply(fs.chown, self.env.sp, owner['uid'], owner['gid']),
+      async.apply(fs.ensureFile, self.env.sc),
       async.apply(fs.chown, self.env.sc, owner['uid'], owner['gid']),
-      async.apply(fs.chown, self.env.cc, owner['uid'], owner['gid'])
+      async.apply(fs.ensureFile, self.env.cc),
+      async.apply(fs.chown, self.env.cc, owner['uid'], owner['gid']),
+      async.apply(self.overlay_sp, mineos.SP_DEFAULTS),
+      async.apply(self.modify_sc, 'java', 'java_xmx', '256'),
     ], callback)
   }
 
