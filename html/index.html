@@ -396,7 +396,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr ng-repeat="(server_name, instance) in servers">
+                                            <tr ng-repeat="(server_name, instance) in servers" ng-show="!!instance.sp">
                                                 <td>
                                                     <img ng-show="instance.icon.length" style="width:32px;height:32px;" ng-attr-src="{{ 'data:image/png;base64, ' + instance.icon }}" />
                                                     <a ng-click="$parent.change_page('server_status', server_name)">{{ server_name }}</a>
