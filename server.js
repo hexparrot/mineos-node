@@ -509,7 +509,7 @@ function server_container(server_name, base_dir, socket_io) {
       heartbeat_interval = null,
       HEARTBEAT_INTERVAL_MS = 5000;
 
-  logging.log('Discovered server: {0}'.format(server_name));
+  logging.info('[{0}] Discovered server'.format(server_name));
   make_tail('logs/latest.log');
 
   make_watch('server.properties', broadcast_sp);
@@ -580,7 +580,7 @@ function server_container(server_name, base_dir, socket_io) {
         if (!accepted)
           accepted = parsed_ini['eula'] && parsed_ini['eula'].toString().toLowerCase() == 'true';
 
-        logging.log('[{0}] eula.txt detected: {1} (eula={2})'.format(server_name,
+        logging.info('[{0}] eula.txt detected: {1} (eula={2})'.format(server_name,
                                                                      (accepted ? 'ACCEPTED' : 'NOT YET ACCEPTED'),
                                                                      parsed_ini['eula']));
         nsp.emit('eula', accepted);
@@ -605,22 +605,22 @@ function server_container(server_name, base_dir, socket_io) {
 
   function broadcast_sp() {
     instance.sp(function(err, sp_data) {
-      //logging.log('[{0}] broadcasting server.properties'.format(server_name));
+      logging.debug('[{0}] broadcasting server.properties'.format(server_name));
       nsp.emit('server.properties', sp_data);
     })
   }
 
   function broadcast_sc() {
     instance.sc(function(err, sc_data) {
-      //logging.log('[{0}] broadcasting server.config'.format(server_name));
+      logging.debug('[{0}] broadcasting server.config'.format(server_name));
       if (!err)
         nsp.emit('server.config', sc_data);
     })
   }
 
   function broadcast_cc() {
-    logging.info('[{0}] broadcasting cron.config'.format(server_name));
     instance.crons(function(err, cc_data) {
+      logging.debug('[{0}] broadcasting cron.config'.format(server_name));
       if (!err)
         nsp.emit('cron.config', cc_data);
     })
@@ -659,7 +659,7 @@ function server_container(server_name, base_dir, socket_io) {
           var file = path.basename(fp);
           if (path.basename(rel_filepath) == file) {
             tail_lookout.close();
-            logging.info('[{0}] {1} created! Watchfile {2} closed'.format(server_name, file, rel_filepath));
+            logging.debug('[{0}] {1} created! Watchfile {2} closed'.format(server_name, file, rel_filepath));
             make_tail(rel_filepath);
           }
         })
@@ -682,7 +682,7 @@ function server_container(server_name, base_dir, socket_io) {
       watcher.on('change', function(fp) {
         callback();
       })
-      logging.info('[{0}] Started watch on {1}'.format(server_name, rel_filepath));
+      logging.debug('[{0}] Started watch on {1}'.format(server_name, rel_filepath));
       watches[rel_filepath] = watcher;
     } catch (e) {
       logging.log(e) //handle error or ignore
@@ -762,7 +762,7 @@ function server_container(server_name, base_dir, socket_io) {
 
         fs.readFile(abs_filepath, function (err, data) {
           if (!err) {
-            logging.info('[{0}] {1} transmittting existing file contents: {2} ({3} bytes)'.format(server_name, ip_address, rel_filepath, data.length));
+            logging.info('[{0}] transmittting existing file contents: {1} ({2} bytes)'.format(server_name, rel_filepath, data.length));
             nsp.emit('file head', {filename: rel_filepath, payload: data.toString()});
           }
         });
@@ -780,7 +780,7 @@ function server_container(server_name, base_dir, socket_io) {
     function get_page_data(page) {
       switch (page) {
         case 'glance':
-          logging.info('[{0}] {1} requesting server at a glance info'.format(server_name, ip_address));
+          logging.debug('[{0}] {1} requesting server at a glance info'.format(server_name, username));
 
           async.parallel({
             'increments': async.apply(instance.list_increments),
@@ -908,7 +908,7 @@ function server_container(server_name, base_dir, socket_io) {
         cb(!is_valid); //logical NOT to allow continued functions below
       },
       function(cb) {
-        console.info('[{0}] {1} connected from {2}'.format(server_name, username, ip_address));
+        logging.info('[{0}] {1} ({2}) joined server namespace'.format(server_name, username, ip_address));
 
         socket.on('command', produce_receipt);
         socket.on('get_file_contents', get_file_contents);
