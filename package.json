@@ -60,7 +60,9 @@
     "method-override": "2.3.x",
     "q": "1.4.x",
     "sha512crypt-node": "0.1.x",
-    "winston": "1.0.x"
+    "winston": "1.0.x",
+    "uname": "0.0.x",
+    "urllib": "2.3.x"
   },
   "devDependencies": {
     "nodeunit": "0.9.x"
