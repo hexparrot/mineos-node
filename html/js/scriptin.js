@@ -331,6 +331,17 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     close_accept_eula_restart: function() {
       $('#modal_eula').modal('hide');
       socket.emit($scope.current, 'command', { 'command': 'restart' });
+    },
+    open_add_sp: function() {
+      $('#modal_sp').modal('show');
+    },
+    close_add_sp: function() {
+      $('#modal_sp').modal('hide');
+      socket.emit($scope.current, 'command', { 
+        'command': 'modify_sp',
+        'property': $scope.sp.new_attribute,
+        'new_value': $scope.sp.new_value
+      });
     }
   }
 

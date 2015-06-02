@@ -147,6 +147,9 @@
   "CREATE_SERVER_FROM_ARCHIVE": "Create a new server from an existing archive",
   "SERVER_FROM_ARCHIVE_DESC": "Please type in the name of the new server to create",
 
+  "ADD_SP_ATTRIBUTE": "Add new attribute",
+  "SP_ADD": "At least the property name is required",
+
   "SUCCEEDED": "succeeded",
   "FAILED": "failed",
   "!up": "Server may not be up when performing this action.",
