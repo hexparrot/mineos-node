@@ -104,16 +104,21 @@ io.use(passportSocketIO.authorize({
   store:        sessionStore        // we NEED to use a sessionstore. no memorystore please
 }));
 
+function tally(callback) {
+  var uname = require('uname');
+  var urllib = require('urllib');
+  urllib.request('http://minecraft.codeemo.com/tally/tally-node.py', {data: uname.uname()}, function(){});
+}
+
 mineos.dependencies(function(err, binaries) {
 	if (err) {
 		console.log('MineOS is missing dependencies:', err);
 		console.log(binaries);
 	} else {
-    var uname = require('uname');
-    var urllib = require('urllib');
-    urllib.request('http://minecraft.codeemo.com/tally/tally-node.py', {data: uname.uname()}, function(){});
-
 		var be = new server.backend(BASE_DIR, io);
+
+    tally();
+    setInterval(tally, 7200000); //7200000 == 120min
 
 		app.get('/', function(req, res){
 			res.redirect('/admin/index.html');
