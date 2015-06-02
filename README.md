@@ -20,7 +20,7 @@ MineOS requires root-privileges, as the authentication relies on the underlying 
 
 Using an apt-get based Linux distribution:
 
-    sudo apt-get install -y nodejs nodejs-legacy npm git rdiff-backup openjdk-7-jre-headless
+    sudo apt-get install -y nodejs nodejs-legacy npm git rdiff-backup screen openjdk-7-jre-headless
     git clone https://github.com/hexparrot/mineos-node.git
     cd mineos-node
     chmod +x generate-sslcert.sh
