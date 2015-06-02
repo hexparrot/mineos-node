@@ -148,7 +148,8 @@
   "SERVER_FROM_ARCHIVE_DESC": "Please type in the name of the new server to create",
 
   "ADD_SP_ATTRIBUTE": "Add new attribute",
-  "SP_ADD": "At least the property name is required",
+  "SP_DESCRIPTION": "Add a new attribute/value pair to server.properties.",
+  "SP_ADD": "Add",
 
   "SUCCEEDED": "succeeded",
   "FAILED": "failed",
