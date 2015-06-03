@@ -8,25 +8,27 @@ by leveraging the event-triggering, asyncronous model of Node.JS and websockets.
 This allows the front-end to provide system health, disk and memory usage, and logging in real-time.
 
 The ultimate goal will be for this to work on all Linux and BSD distros, but so
-far testing and development has only occurred on Linux.
+far testing and development has only occurred on Debian-based Linux distributions.
 
 Installation
 ------------
 
 MineOS is distributed (right now) through github and downloads its dependencies with npm.
-In the future, MineOS will be it's own NPM project which should facilitate even easier installation.
 
 MineOS requires root-privileges, as the authentication relies on the underlying system's /etc/shadow.
 
-Using an apt-get based Linux distribution:
+Do not install this atop an existing MineOS system, since the installation location is the same /usr/games/minecraft. Using an apt-get based Linux distribution:
 
-    sudo apt-get install -y nodejs nodejs-legacy npm git rdiff-backup screen openjdk-7-jre-headless
-    git clone https://github.com/hexparrot/mineos-node.git
-    cd mineos-node
+    apt-get update
+    apt-get install -y nodejs nodejs-legacy npm git rdiff-backup screen openjdk-7-jre-headless
+    mkdir -p /usr/games
+    cd /usr/games
+    git clone https://github.com/hexparrot/mineos-node.git minecraft
+    cd minecraft
     chmod +x generate-sslcert.sh
-    sudo ./generate-sslcert.sh
+    ./generate-sslcert.sh
     npm install --all
-    sudo nodejs webui.js
+    nodejs webui.js
 
 This installs--then runs--the webui in the foreground. service.js is a background daemon,
 but in the early development and deployments of this new webui, it is likely more valuable
@@ -36,7 +38,7 @@ Developing and Contributing
 ------
 
 I'd love to get contributions from you! Whether you are most comfortable writing
-HTML, CSS, or Javascript (either Node or Angular), feel free to reach out to me about
+HTML, CSS, or Javascript (either Nodejs or Angular), feel free to reach out to me about
 some of my design goals and we'll see where your efforts can best be used.
 
 
@@ -48,7 +50,7 @@ See [LICENSE.md](LICENSE.md) file.
 Support
 -------
 
-Create an issue in github or start a post on the [http://discourse.codeemo.com/](MineOS support forums).
+Create an issue in github or start a post on the [MineOS support forums](http://discourse.codeemo.com).
 
 CURRENTLY WORKING
 -------
@@ -60,7 +62,7 @@ The Angular.JS-based web user interface capable of:
 * backup, archive, wait-for-stop-and-backup
 * reading ingame console in real-time and submitting commands
 * create cronjobs for the most common tasks
-* modifying server.properties
+* adding and modifying server.properties
 * delete previous archives and restore poitns to free up space
 * restore server from previous restore point
 * see filesystem usage of live server files, archives, and restore points
