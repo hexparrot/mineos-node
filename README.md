@@ -28,7 +28,19 @@ Do not install this atop an existing MineOS system, since the installation locat
     chmod +x generate-sslcert.sh
     ./generate-sslcert.sh
     npm install --all
+    
+To have MineOS start on system boot (only for systems using upstart):
+
+    cp /usr/games/minecraft/init/mineos.conf /etc/init/
+    start mineos
+
+To start the server in the foreground:
+
     nodejs webui.js
+    
+To interact with the server as a background daemon:
+
+    nodejs service.js [start|stop|status]
 
 This installs--then runs--the webui in the foreground. service.js is a background daemon,
 but in the early development and deployments of this new webui, it is likely more valuable
