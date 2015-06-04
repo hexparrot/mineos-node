@@ -921,7 +921,10 @@ function server_container(server_name, base_dir, socket_io) {
         socket.on('server-icon.png', broadcast_icon);
         socket.on('req_server_activity', broadcast_notices);
       }
-    ])
+    ], function(err) {
+      if (err)
+        socket.disconnect();
+    })
 
   })
 }
