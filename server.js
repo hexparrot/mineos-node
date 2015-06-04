@@ -905,9 +905,12 @@ function server_container(server_name, base_dir, socket_io) {
         });
       },
       function(is_valid, cb) {
-        cb(!is_valid); //logical NOT to allow continued functions below
-      },
-      function(cb) {
+        cb(!is_valid); //logical NOT'ted:  is_valid ? falsy error, !is_valid ? truthy error
+      }
+    ], function(err) {
+      if (err)
+        socket.disconnect();
+      else {
         logging.info('[{0}] {1} ({2}) joined server namespace'.format(server_name, username, ip_address));
 
         socket.on('command', produce_receipt);
@@ -921,9 +924,6 @@ function server_container(server_name, base_dir, socket_io) {
         socket.on('server-icon.png', broadcast_icon);
         socket.on('req_server_activity', broadcast_notices);
       }
-    ], function(err) {
-      if (err)
-        socket.disconnect();
     })
 
   })
