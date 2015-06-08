@@ -41,17 +41,13 @@ For hosts using 'supervisord':
     supervisorctl update
     supervisorctl start mineos
 
-To start the server in the foreground:
-
-    nodejs webui.js
-    
-To interact with the server as a background daemon:
+To use the webui as a background daemon:
 
     nodejs service.js [start|stop|status]
 
-This installs--then runs--the webui in the foreground. service.js is a background daemon,
-but in the early development and deployments of this new webui, it is likely more valuable
-to have the errors immediately accessible.
+To start the webui in the foreground:
+
+    nodejs webui.js
 
 Developing and Contributing
 ------
@@ -90,12 +86,12 @@ The Angular.JS-based web user interface capable of:
 * logs all user actions to file
 * cronjobs saved to portable format cron.config
 * server can be daemonized to background
+* upstart/supervisord restart process on unhandled exceptions
 
 TODO
 -------
 
 * macro often-repeated tasks from web-ui
-* auto-restart on unhandled exceptions
 * more fully document functions
 
 EVENTUALLY
