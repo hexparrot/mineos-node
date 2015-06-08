@@ -394,6 +394,47 @@ mineos.mc = function(server_name, base_dir) {
     ], callback);
   }
 
+  self.profile_delta = function(profile, callback) {
+    var rsync = require('rsync');
+    var stdout = [];
+    var stderr = [];
+
+    async.waterfall([
+      function(cb) {
+        var obj = rsync.build({
+          source: path.join(self.env.pwd, profile) + '/',
+          destination: self.env.cwd + '/',
+          flags: 'vrun',
+          shell:'ssh',
+          output: [function(output) {
+                    stdout.push(output);
+                  }, 
+                  function(output) {
+                    stderr.push(output);
+                  }]
+        });
+
+        obj.execute(function(error, code, cmd) {
+          if (error)
+            cb(code, stderr)
+          else
+            cb(code, stdout);
+        });
+      },
+      function(incr_file_list, cb) {
+        incr_file_list.shift();
+        incr_file_list.pop();
+
+        var all_files = [];
+
+        for (var i in incr_file_list)
+          all_files = all_files.concat(incr_file_list[i].toString().split('\n'))
+        
+        cb(null, all_files.filter(function(n){ return n.length }));
+      }
+    ], callback)
+  }
+
   self.start = function(callback) {
     var args = null;
     var params = { cwd: self.env.cwd };
