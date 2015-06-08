@@ -454,7 +454,21 @@ mineos.mc = function(server_name, base_dir) {
         args = start_args;
         cb();
       },
-      async.apply(self.copy_profile),
+      async.apply(self.sc),
+      function(sc_data, cb) {
+        if ((sc_data.minecraft || {}).profile) {
+          self.profile_delta(sc_data.minecraft.profile, function(err, changed_files) {
+            if (err)
+              cb(err);
+            else if (changed_files)
+              self.copy_profile(cb);
+            else
+              cb();
+          })
+        } else {
+          cb();
+        }
+      },
       async.apply(which, 'screen'),
       function(binary, cb) {
         var proc = child_process.spawn(binary, args, params);
