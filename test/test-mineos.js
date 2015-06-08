@@ -1663,3 +1663,32 @@ test.create_server_from_awd = function(test) {
     test.done();
   })
 }
+
+test.copy_profile_delta = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    function(callback) {
+      instance.profile_delta('1.7.9', function(err, profile_delta) {
+        test.ifError(err);
+        test.equal(profile_delta.length, 1);
+        test.equal(profile_delta[0], 'minecraft_server.1.7.9.jar');
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
+    async.apply(instance.copy_profile),
+    function(callback) {
+      instance.profile_delta('1.7.9', function(err, profile_delta) {
+        test.ifError(err);
+        test.equal(profile_delta.length, 0);
+        callback(err);
+      })
+    }
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
