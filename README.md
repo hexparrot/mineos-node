@@ -29,10 +29,17 @@ Do not install this atop an existing MineOS system, since the installation locat
     ./generate-sslcert.sh
     npm install --all
     
-To have MineOS start on system boot (only for systems using upstart):
+For hosts using 'upstart':
 
-    cp /usr/games/minecraft/init/mineos.conf /etc/init/
+    cp /usr/games/minecraft/init/upstart_conf /etc/init/mineos.conf
     start mineos
+
+For hosts using 'supervisord':
+
+    cp /usr/games/minecraft/init/supervisor_conf /etc/supervisor/conf.d/mineos.conf
+    supervisorctl reread
+    supervisorctl update
+    supervisorctl start mineos
 
 To start the server in the foreground:
 
