@@ -762,13 +762,13 @@ mineos.mc = function(server_name, base_dir) {
         })
         break;
       case 'exists': 
-        fs.exists(self.env.sp, function(exists) {
-          callback(null, exists);
+        fs.stat(self.env.sp, function(err, stat_info) {
+          callback(null, !!stat_info);
         });
         break;
       case '!exists': 
-        fs.exists(self.env.sp, function(exists) {
-          callback(null, !exists);
+        fs.stat(self.env.sp, function(err, stat_info) {
+          callback(null, !stat_info);
         });
         break;
       case 'up':
