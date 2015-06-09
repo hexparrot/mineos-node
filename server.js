@@ -721,6 +721,8 @@ function server_container(server_name, base_dir, socket_io) {
             args.err = err;
             args.time_resolved = Date.now();
             nsp.emit('server_fin', args);
+            if (err)
+              logging.error('[{0}] command "{1}" errored out:'.format(server_name, args.command), args);
             logging.log('server_fin', args)
 
             if (args.command != 'delete')
