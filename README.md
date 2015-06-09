@@ -34,16 +34,22 @@ For hosts using 'upstart':
     cp /usr/games/minecraft/init/upstart_conf /etc/init/mineos.conf
     start mineos
 
-For hosts using 'supervisord':
+For hosts using 'supervisor':
 
     cp /usr/games/minecraft/init/supervisor_conf /etc/supervisor/conf.d/mineos.conf
     supervisorctl reread
     supervisorctl update
     supervisorctl start mineos
 
+For hosts using 'systemd':
+
+    cp /usr/games/minecraft/init/systemd_conf /etc/systemd/system/mineos.service
+    systemctl enable mineos
+    systemctl start mineos
+
 To use the webui as a background daemon:
 
-    nodejs service.js [start|stop|status]
+    nodejs service.js [start|stop|restart|status]
 
 To start the webui in the foreground:
 

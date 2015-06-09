@@ -3,7 +3,7 @@
 var daemon = require("daemonize2").setup({
     main: "webui.js",
     name: "mineos",
-    pidfile: "mineos.pid"
+    pidfile: "/var/run/mineos.pid"
 });
 
 if (process.getuid() != 0) {
