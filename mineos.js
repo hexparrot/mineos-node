@@ -367,7 +367,7 @@ mineos.mc = function(server_name, base_dir) {
       obj.set('--chown', '{0}:{1}'.format(username, groupname));
 
       obj.execute(function(error, code, cmd) {
-        callback_er(error);
+        callback_er(code);
       });
     }
 
@@ -458,9 +458,12 @@ mineos.mc = function(server_name, base_dir) {
       function(sc_data, cb) {
         if ((sc_data.minecraft || {}).profile) {
           self.profile_delta(sc_data.minecraft.profile, function(err, changed_files) {
-            if (err)
-              cb(err);
-            else if (changed_files)
+            if (err) {
+              if (err == 23) //source dir of profile non-existent
+                cb(); //ignore issue; profile non-essential to start (server_jar is req'd only)
+              else
+                cb(err);
+            } else if (changed_files)
               self.copy_profile(cb);
             else
               cb();

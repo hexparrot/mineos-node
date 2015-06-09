@@ -1460,12 +1460,7 @@ test.copy_profile = function(test) {
   var jar_filepath = path.join(instance.env.cwd, 'minecraft_server.1.7.9.jar')
 
   async.series([
-    function(callback) {
-      instance.create(OWNER_CREDS, function(err) {
-        test.ifError(err);
-        callback(err);
-      })
-    },
+    async.apply(instance.create, OWNER_CREDS),
     async.apply(instance.copy_profile),
     function(callback) {
       fs.stat(jar_filepath, function(err) {
@@ -1476,13 +1471,19 @@ test.copy_profile = function(test) {
     async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
     async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
     async.apply(instance.copy_profile),
-    async.apply(fs.stat, jar_filepath)
+    async.apply(fs.stat, jar_filepath),
+    async.apply(instance.modify_sc, 'minecraft', 'profile', 'madeupprofile'),
+    function(callback) {
+      instance.copy_profile(function(err) {
+        test.equal(err, 23); // [Error: rsync exited with code 23] (for source dir not existing)
+        callback();
+      })
+    }
   ], function(err) {
     test.ifError(err);
     test.done();
   })
 }
-
 
 test.eula_false = function(test) {
   var server_name = 'testing';
