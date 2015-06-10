@@ -160,6 +160,12 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     }
   )
 
+  $scope.$watch(function(scope) { return scope.onrebootstart },
+    function(new_value, previous_value) {
+      $scope.change_sc('onreboot', 'start', new_value);
+    }
+  )
+
   /* computed variables */
 
   $scope.servers_up = function() {
@@ -511,6 +517,12 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
         $('#broadcast').iCheck('check');
       else
         $('#broadcast').iCheck('uncheck');
+
+      if ((data.onreboot || {}).start)
+        $('#onrebootstart').iCheck('check');
+      else
+        $('#onrebootstart').iCheck('uncheck');
+
     })
 
     me.channel.on(server_name, 'cron.config', function(data) {
