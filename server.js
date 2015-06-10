@@ -65,6 +65,9 @@ server.backend = function(base_dir, socket_emitter) {
           });
         }
       })
+      .on('ready', function() {
+        setTimeout(self.start_servers, 2000);
+      })
   })();
 
   (function() {
@@ -134,6 +137,26 @@ server.backend = function(base_dir, socket_emitter) {
   }
 
   setInterval(host_heartbeat, 1000);
+
+  self.start_servers = function() {
+    var MS_TO_PAUSE = 10000;
+
+    async.eachLimit(
+      Object.keys(self.servers),
+      1,
+      function(server_name, callback) {
+        self.servers[server_name].onreboot_start(function(err) {
+          if (err)
+            logging.error('[{0}] Aborted server startup; condition not met:'.format(server_name), err);
+          else
+            logging.info('[{0}] Server started. Waiting {1} ms...'.format(server_name, MS_TO_PAUSE));
+            
+          setTimeout(callback, (err ? 1 : MS_TO_PAUSE));
+        });
+      },
+      function(err) {}
+    )
+  }
 
   self.shutdown = function() {
     for (var server_name in self.servers)
@@ -552,7 +575,20 @@ function server_container(server_name, base_dir, socket_io) {
         callback(msg);
       }
     })
-  } 
+  }
+
+  self.onreboot_start = function(callback) {
+    async.waterfall([
+      async.apply(instance.property, 'onreboot_start'),
+      function(autostart, cb) {
+        logging.info('[{0}] autostart = {1}'.format(server_name, autostart));
+        cb(!autostart); //logically NOT'ing so that autostart = true continues to next func
+      },
+      async.apply(instance.start)
+    ], function(err) {
+      callback(err);
+    })
+  }
 
   self.cleanup = function () {
     for (var t in tails)
