@@ -360,7 +360,7 @@ mineos.mc = function(server_name, base_dir) {
       var obj = rsync.build({
         source: source,
         destination: dest,
-        flags: 'a',
+        flags: 'au',
         shell:'ssh'
       });
 
