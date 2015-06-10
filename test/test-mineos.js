@@ -1665,7 +1665,7 @@ test.create_server_from_awd = function(test) {
   })
 }
 
-test.copy_profile_delta = function(test) {
+test.profile_delta = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
@@ -1686,6 +1686,12 @@ test.copy_profile_delta = function(test) {
         test.ifError(err);
         test.equal(profile_delta.length, 0);
         callback(err);
+      })
+    },
+    function(callback) {
+      instance.profile_delta('madeupprofile', function(err, profile_delta) {
+        test.equal(err, 23); // [Error: rsync exited with code 23] (for source dir not existing)
+        callback();
       })
     }
   ], function(err) {
