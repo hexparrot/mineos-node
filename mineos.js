@@ -260,6 +260,7 @@ mineos.mc = function(server_name, base_dir) {
       async.apply(fs.chown, self.env.cc, owner['uid'], owner['gid']),
       async.apply(self.overlay_sp, mineos.SP_DEFAULTS),
       async.apply(self.modify_sc, 'java', 'java_xmx', '256'),
+      async.apply(self.modify_sc, 'onreboot', 'start', false),
     ], callback)
   }
 
@@ -861,6 +862,11 @@ mineos.mc = function(server_name, base_dir) {
       case 'broadcast':
         self.sc(function(err, dict) {
           callback(err, (dict['minecraft'] || {}).broadcast);
+        })
+        break;
+      case 'onreboot_start':
+        self.sc(function(err, dict) {
+          callback(err, !!(dict['onreboot'] || {}).start);
         })
         break;
       case 'eula':

@@ -137,6 +137,12 @@ test.create_server = function(test) {
 
       test.equal(mineos.server_list(BASE_DIR)[0], server_name);
       test.equal(mineos.server_list(BASE_DIR).length, 1);
+
+      instance.sc(function(err, dict) {
+        test.equal(dict.java.java_xmx, '256');
+        test.equal(dict.onreboot.start, false);
+      })
+
       callback();
     },
     function(callback) {
@@ -1692,6 +1698,41 @@ test.profile_delta = function(test) {
       instance.profile_delta('madeupprofile', function(err, profile_delta) {
         test.equal(err, 23); // [Error: rsync exited with code 23] (for source dir not existing)
         callback();
+      })
+    }
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
+test.onreboot = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    function(callback) {
+      instance.property('onreboot_start', function(err, val) {
+        test.ifError(err);
+        test.equal(val, false);
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'onreboot', 'start', 'false'),
+    function(callback) {
+      instance.property('onreboot_start', function(err, val) {
+        test.ifError(err);
+        test.equal(val, false);
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'onreboot', 'start', 'true'),
+    function(callback) {
+      instance.property('onreboot_start', function(err, val) {
+        test.ifError(err);
+        test.equal(val, true);
+        callback(err);
       })
     }
   ], function(err) {
