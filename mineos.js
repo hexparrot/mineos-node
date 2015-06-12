@@ -298,9 +298,9 @@ mineos.mc = function(server_name, base_dir) {
     async.waterfall([
       async.apply(self.sc),
       function(sc_data, cb) {
-        if (sc_data.java.jarfile.slice(-4) == '.jar')
+        if (sc_data.java.jarfile.slice(-4).toLowerCase() == '.jar')
           self.get_start_args_java(cb)
-        else if (sc_data.java.jarfile.slice(-5) == '.phar')
+        else if (sc_data.java.jarfile.slice(-5).toLowerCase() == '.phar')
           self.get_start_args_phar(cb)
       }
     ], callback)
@@ -860,14 +860,25 @@ mineos.mc = function(server_name, base_dir) {
         }
         break;
       case 'ping':
-        var pids = mineos.server_pids_up();
-        if (self.server_name in pids) {
-          self.ping(function(err, ping){
-            callback(null, ping);
-          })
-        } else {
-          callback(true, null);
-        }
+        async.waterfall([
+          async.apply(self.sc),
+          function(sc_data, cb) {
+            var jarfile = (sc_data.java || {}).jarfile;
+
+            if (jarfile && jarfile.slice(-5).toLowerCase() == '.phar')
+              cb(true, null);
+            else {
+              var pids = mineos.server_pids_up();
+              if (self.server_name in pids) {
+                self.ping(function(err, ping){
+                  cb(null, ping);
+                })
+              } else {
+                cb(true, null);
+              }
+            }
+          }
+        ], callback)
         break;
       case 'server.properties':
         self.sp(function(err, dict) {

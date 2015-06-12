@@ -1007,6 +1007,26 @@ test.ping_legacy = function(test) {
   })
 }
 
+test.ping_phar = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'pocketmine.phar'),
+    function(callback) {
+      instance.property('ping', function(err, pingback) {
+        test.ifError(!err); //expected error
+        test.equal(pingback, null);
+        callback(!err);
+      })
+    }
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
 test.memory = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
