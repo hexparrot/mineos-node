@@ -330,24 +330,25 @@ test.get_start_args_java = function(test) {
     async.apply(instance.create, OWNER_CREDS),
     async.apply(instance.modify_sc, 'java', 'java_xmx', '-256'),
     function(callback) {
-      instance.get_start_args_java(function(err, args) {
+      instance.get_start_args(function(err, args) {
         test.ifError(!err); //testing for positive error
-        test.equal(Object.keys(args).length, 0);
-        test.equal(err, 'XMX heapsize must be positive integer');
+        test.equal(args, null);
+        test.equal(err, 'Cannot start server without a designated jar/phar.');
         callback(!err);
       })
     },
     async.apply(instance.modify_sc, 'java', 'java_xmx', '256'),
     function(callback) {
-      instance.get_start_args_java(function(err, args) {
+      instance.get_start_args(function(err, args) {
         test.ifError(!err); //testing for positive error
-        test.equal(err, 'Server not assigned a runnable jar');
+        test.equal(args, null);
+        test.equal(err, 'Cannot start server without a designated jar/phar.');
         callback(!err);
       })
     },
     async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
     function(callback) {
-      instance.get_start_args_java(function(err, args) {
+      instance.get_start_args(function(err, args) {
         test.ifError(err);
         test.equal(args[0], '-dmS');
         test.equal(args[1], 'mc-testing');
@@ -363,7 +364,7 @@ test.get_start_args_java = function(test) {
     },
     async.apply(instance.modify_sc, 'java', 'java_xms', '-256'),
     function(callback) {
-      instance.get_start_args_java(function(err, args) {
+      instance.get_start_args(function(err, args) {
         test.ifError(!err); //testing for positive error
         test.equal(Object.keys(args).length, 0);
         test.equal(err, 'XMS heapsize must be positive integer where XMX >= XMS > 0');
@@ -372,7 +373,7 @@ test.get_start_args_java = function(test) {
     },
     async.apply(instance.modify_sc, 'java', 'java_xms', '128'),
     function(callback) {
-      instance.get_start_args_java(function(err, args) {
+      instance.get_start_args(function(err, args) {
         test.ifError(err);
         test.equal(args[0], '-dmS');
         test.equal(args[1], 'mc-testing');
@@ -388,7 +389,7 @@ test.get_start_args_java = function(test) {
     },
     async.apply(instance.modify_sc, 'java', 'java_tweaks', '-Xmx2G -XX:MaxPermSize=256M'),
     function(callback) {
-      instance.get_start_args_java(function(err, args) {
+      instance.get_start_args(function(err, args) {
         test.ifError(err);
         test.equal(args[0], '-dmS');
         test.equal(args[1], 'mc-testing');
@@ -417,7 +418,7 @@ test.get_start_args_phar = function(test) {
     async.apply(instance.create, OWNER_CREDS),
     async.apply(instance.modify_sc, 'java', 'jarfile', 'PocketMine-MP.phar'),
     function(callback) {
-      instance.get_start_args_phar(function(err, args) {
+      instance.get_start_args(function(err, args) {
         test.ifError(err);
         test.equal(args[0], '-dmS');
         test.equal(args[1], 'mc-testing');
