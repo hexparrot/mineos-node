@@ -294,7 +294,7 @@ mineos.mc = function(server_name, base_dir) {
     ], callback)
   }
 
-  self.get_start_args = function(callback) {
+  self.get_start_args_java = function(callback) {
     var server_config = async.memoize(self.sc);
     var java_binary = which.sync('java');
 
@@ -349,6 +349,32 @@ mineos.mc = function(server_name, base_dir) {
           args.push(results.java_tweaks);
         args.push.apply(args, ['-jar', results.jarfile, results.jar_args]);
 
+        callback(null, args);
+      }
+    })
+  }
+
+  self.get_start_args_phar = function(callback) {
+    var server_config = async.memoize(self.sc);
+
+    async.series({
+      'binary': function (cb) {
+        cb(null, './bin/php5/bin/php')
+      },
+      'pharfile': function (cb) {
+        server_config(function (err, dict) {
+          var pharfile = (dict.java || {}).jarfile;
+          if (!pharfile)
+            cb('Server not assigned a runnable phar');
+          else
+            cb(null, pharfile);
+        });
+      }
+    }, function(err, results) {
+      if (err) {
+        callback(err, {});
+      } else {
+        var args = ['-dmS', 'mc-{0}'.format(self.server_name), results.binary, results.pharfile];
         callback(null, args);
       }
     })
