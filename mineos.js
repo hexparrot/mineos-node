@@ -298,9 +298,12 @@ mineos.mc = function(server_name, base_dir) {
     async.waterfall([
       async.apply(self.sc),
       function(sc_data, cb) {
-        if (sc_data.java.jarfile.slice(-4).toLowerCase() == '.jar')
+        var jarfile = (sc_data.java || {}).jarfile;
+        if (!jarfile)
+          cb('Cannot start server without a designated jar/phar.', null);
+        else if (jarfile.slice(-4).toLowerCase() == '.jar')
           self.get_start_args_java(cb)
-        else if (sc_data.java.jarfile.slice(-5).toLowerCase() == '.phar')
+        else if (jarfile.slice(-5).toLowerCase() == '.phar')
           self.get_start_args_phar(cb)
       }
     ], callback)

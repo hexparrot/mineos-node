@@ -281,9 +281,17 @@ test.get_start_args = function(test) {
 
   async.series([
     async.apply(instance.create, OWNER_CREDS),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(!err); //expected error
+        test.equal(err, 'Cannot start server without a designated jar/phar.');
+        test.equal(args, null);
+        callback(!err);
+      })
+    },
     async.apply(instance.modify_sc, 'java', 'jarfile', 'PocketMine-MP.phar'),
     function(callback) {
-      instance.get_start_args_phar(function(err, args) {
+      instance.get_start_args(function(err, args) {
         test.ifError(err);
         test.equal(args[0], '-dmS');
         test.equal(args[1], 'mc-testing');
@@ -294,7 +302,7 @@ test.get_start_args = function(test) {
     },
     async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
     function(callback) {
-      instance.get_start_args_java(function(err, args) {
+      instance.get_start_args(function(err, args) {
         test.ifError(err);
         test.equal(args[0], '-dmS');
         test.equal(args[1], 'mc-testing');
