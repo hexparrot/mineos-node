@@ -1515,6 +1515,42 @@ test.server_files_property = function(test) {
         test.ok(server_files.indexOf('minecraft_server.1.7.9.jar') >= 0);
         callback(err);
       })
+    },
+    async.apply(fs.ensureFile, path.join(instance.env.cwd, 'pocket.phar')),
+    function(callback) {
+      instance.property('server_files', function(err, server_files) {
+        test.ifError(err);
+        test.equal(server_files.length, 3);
+        test.ok(server_files.indexOf('myserver.jar') >= 0);
+        test.ok(server_files.indexOf('pocket.phar') >= 0);
+        test.ok(server_files.indexOf('minecraft_server.1.7.9.jar') >= 0);
+        callback(err);
+      })
+    },
+    async.apply(fs.ensureFile, path.join(instance.env.cwd, 'pocket.PHAR')),
+    function(callback) {
+      instance.property('server_files', function(err, server_files) {
+        test.ifError(err);
+        test.equal(server_files.length, 4);
+        test.ok(server_files.indexOf('myserver.jar') >= 0);
+        test.ok(server_files.indexOf('pocket.phar') >= 0);
+        test.ok(server_files.indexOf('pocket.PHAR') >= 0);
+        test.ok(server_files.indexOf('minecraft_server.1.7.9.jar') >= 0);
+        callback(err);
+      })
+    },
+    async.apply(fs.ensureFile, path.join(instance.env.cwd, 'another.JAR')),
+    function(callback) {
+      instance.property('server_files', function(err, server_files) {
+        test.ifError(err);
+        test.equal(server_files.length, 5);
+        test.ok(server_files.indexOf('myserver.jar') >= 0);
+        test.ok(server_files.indexOf('pocket.phar') >= 0);
+        test.ok(server_files.indexOf('pocket.PHAR') >= 0);
+        test.ok(server_files.indexOf('minecraft_server.1.7.9.jar') >= 0);
+        test.ok(server_files.indexOf('another.JAR') >= 0);
+        callback(err);
+      })
     }
   ], function(err) {
     test.ifError(err);

@@ -926,7 +926,10 @@ mineos.mc = function(server_name, base_dir) {
           async.apply(fs.readdir, self.env.cwd),
           function(sf, cb) {
             server_files.push.apply(server_files, sf.filter(function(file) { 
-              return file.substr(-4) == '.jar'; 
+              return file.substr(-4).toLowerCase() == '.jar'; 
+            }))
+            server_files.push.apply(server_files, sf.filter(function(file) { 
+              return file.substr(-5).toLowerCase() == '.phar'; 
             }))
             cb();
           },
