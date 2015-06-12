@@ -275,6 +275,45 @@ test.extract_server_name = function(test) {
   test.done();
 }
 
+test.get_start_args = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'PocketMine-MP.phar'),
+    function(callback) {
+      instance.get_start_args_phar(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2], './bin/php5/bin/php');
+        test.equal(args[3], 'PocketMine-MP.phar');
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
+    function(callback) {
+      instance.get_start_args_java(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2].slice(-4), 'java');
+        test.equal(args[3], '-server');
+        test.equal(args[4], '-Xmx256M');
+        test.equal(args[5], '-Xms256M');
+        test.equal(args[6], '-jar');
+        test.equal(args[7], 'minecraft_server.1.7.9.jar');
+        test.equal(args[8], 'nogui');
+        callback(err);
+      })
+    },
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
 test.get_start_args_java = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);

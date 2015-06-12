@@ -294,6 +294,18 @@ mineos.mc = function(server_name, base_dir) {
     ], callback)
   }
 
+  self.get_start_args = function(callback) {
+    async.waterfall([
+      async.apply(self.sc),
+      function(sc_data, cb) {
+        if (sc_data.java.jarfile.slice(-4) == '.jar')
+          self.get_start_args_java(cb)
+        else if (sc_data.java.jarfile.slice(-5) == '.phar')
+          self.get_start_args_phar(cb)
+      }
+    ], callback)
+  }
+
   self.get_start_args_java = function(callback) {
     var server_config = async.memoize(self.sc);
     var java_binary = which.sync('java');
