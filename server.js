@@ -329,7 +329,54 @@ server.backend = function(base_dir, socket_emitter) {
             }
           });
           break;
+        case 'pocketmine_download':
+          var request = require('request');
+          var fs = require('fs-extra');
+          var unzip = require('unzip');
+
+          var dir_concat = args.profile.name;
+          var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
+          var filename = '{0}.tar.gz'.format(args.profile.name);
+          var dest_filepath = path.join(dest_dir, filename);
+
+          var url = 'https://api.github.com/repos/PocketMine/PocketMine-MP/zipball/{0}'.format(args.profile.name);;
+
+          fs.ensureDir(dest_dir, function(err) {
+            if (err) {
+              logging.error('[WEBUI] Error attempting download:', err);
+            } else {
+              var options = {
+                url: url,
+                headers: { 'User-Agent': 'MineOS Release Browser' }
+              };
+              request(options)
+                .on('complete', function(response) {
+                  if (response.statusCode == 200) {
+                    logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                    args['dest_dir'] = dest_dir;
+                    args['filename'] = filename;
+                    args['success'] = true;
+                    args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
+
+                    fs.createReadStream(dest_filepath)
+                      .pipe(unzip.Extract({ path: dest_dir }).on('close', function() {
+                        self.front_end.emit('file_download', args);
+                        self.send_profile_list();
+                      }));
+                  } else {
+                    logging.error('[WEBUI] Server was unable to download file:', url);
+                    logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                    args['success'] = false;
+                    args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                    self.front_end.emit('file_download', args);
+                  }
+                })
+                .pipe(fs.createWriteStream(dest_filepath))
+            }
+          });
+          break;
         default:
+          logging.warning('Command ignored: no such command {0}'.format(args.command));
           break;
       }
     }
