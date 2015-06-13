@@ -338,7 +338,8 @@ server.backend = function(base_dir, socket_emitter) {
       async.auto({
         'mojang': async.retry(2, self.check_profiles.mojang),
         'ftb': async.retry(2, self.check_profiles.ftb),
-        'ftb_3rd': async.retry(2, self.check_profiles.ftb_third_party)
+        'ftb_3rd': async.retry(2, self.check_profiles.ftb_third_party),
+        'pocketmine': async.retry(2, self.check_profiles.pocketmine)
       }, function(err, results) {
         var merged = [];
         for (var source in results)
@@ -467,6 +468,36 @@ server.backend = function(base_dir, socket_emitter) {
             callback(null, p);
         }
         request({ url: FTB_VERSIONS_URL, json: false }, handle_reply);
+      },
+      pocketmine: function(callback) {
+        var request = require('request');
+        var options = {
+          url: 'https://api.github.com/repos/PocketMine/PocketMine-MP/tags',
+          headers: {
+            'User-Agent': 'MineOS Release Browser'
+          }
+        };
+
+        var p = [];
+
+        function handle_reply(err, response, body) {
+          if (!err && response.statusCode == 200) {
+            var releases = JSON.parse(body);
+
+            for (var index in releases) {
+              var item = releases[index];
+              item['group'] = 'pocketmine';
+              item['type'] = 'release';
+              item['id'] = releases[index].name;
+              item['webui_desc'] = 'Pocketmine ' + releases[index].name.replace('_', ' ');
+              item['weight'] = 10;
+              item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], releases[index].name));
+              p.push(item);
+            }
+          }
+          callback(err, p);
+        }
+        request(options, handle_reply);
       }
     }
 
