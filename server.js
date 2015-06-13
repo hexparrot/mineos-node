@@ -358,10 +358,60 @@ server.backend = function(base_dir, socket_emitter) {
                     args['success'] = true;
                     args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
 
+                    function move_from_parent_dir(callback) {
+                      var remainder = null;
+                      async.waterfall([
+                        async.apply(fs.readdir, dest_dir),
+                        function(files, cb) {
+                          var file_idx = files.indexOf(filename);
+                          files.splice(file_idx, 1);
+                          
+                          if (files.length == 1) {
+                            remainder = files[0];
+                            cb(null);
+                          } else
+                            cb(true);
+                        },
+                        function(cb) {
+                          var inside_dir = path.join(dest_dir, remainder);
+                          fs.lstat(inside_dir, function(err, stat) {
+                            if (stat.isDirectory)
+                              cb(null);
+                            else
+                              cb(true);
+                          })
+                        },
+                        function(cb) {
+                          var old_dir = path.join(dest_dir, remainder);
+
+                          fs.readdir(old_dir, function(err, files) {
+                            if (!err)
+                              async.each(files, function(file, inner_cb) {
+                                var old_filepath = path.join(old_dir, file);
+                                var new_filepath = path.join(dest_dir, file);
+
+                                fs.move(old_filepath, new_filepath, inner_cb)
+                              }, cb);
+                            else
+                              cb(err);
+                          })
+                        }
+                      ], function(err, results) {
+                        if (err) 
+                          logging.error(err);
+                        callback(err);
+                      })
+                    }
+
                     fs.createReadStream(dest_filepath)
-                      .pipe(unzip.Extract({ path: dest_dir }).on('close', function() {
-                        self.front_end.emit('file_download', args);
-                        self.send_profile_list();
+                      .pipe(unzip.Extract({ path: dest_dir })
+                      .on('close', function() {
+                        move_from_parent_dir(function(code) {
+                          if (!code) {
+                            self.front_end.emit('file_download', args);
+                            self.send_profile_list();
+                          }
+                        })
                       }));
                   } else {
                     logging.error('[WEBUI] Server was unable to download file:', url);
