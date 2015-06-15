@@ -373,10 +373,10 @@ server.backend = function(base_dir, socket_emitter) {
 
           var dir_concat = args.profile.id;
           var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
-          var filename = args.profile.filename;
+          var filename = '{0}.tar.gz'.format(args.profile.id);
           var dest_filepath = path.join(dest_dir, filename);
 
-          var url = 'http://hivelocity.dl.sourceforge.net/project/pocketmine/builds/{0}'.format(filename);
+          var url = 'https://dl.bintray.com/pocketmine/PocketMine/{0}'.format(filename);
 
           fs.ensureDir(dest_dir, function(err) {
             if (err) {
@@ -590,43 +590,30 @@ server.backend = function(base_dir, socket_emitter) {
         request(options, handle_reply);
       },
       php: function(callback) {
-        var request = require('request');
-        var xml2js = require('xml2js');
-        var options = {
-          url: 'http://sourceforge.net/projects/pocketmine/rss?path=/builds',
-          headers: {
-            'User-Agent': 'MineOS Release Browser'
-          }
-        };
+        var BUILDS = [
+          "PHP_5.6.10_x86_Linux",
+          "PHP_5.6.10_x86-64_Linux",
+          "PHP_5.6.2_x86_CentOS",
+          "PHP_5.6.2_x86-64_CentOS",
+          "PHP_5.6.4_x86_MacOS",
+          "PHP_5.6.4_x86-64_MacOS",
+          "PHP_5.6.10_ARM_Raspbian_hard"
+        ]
 
-        var BUILD_REGEX = /\/builds\/(PHP_\d+\.\d+\.\d+[^\.]+)/;
-        var FILENAME_REGEX = /\/builds\/(.+)/;
         var p = [];
 
-        function handle_reply(err, response, body) {
-          if (!err && response.statusCode == 200) {
-            xml2js.parseString(body, function(inner_err, jsonified) {
-              if (!inner_err) {
-                var releases = jsonified.rss.channel[0].item;
-                for (var index in releases) {
-                  var short_name = releases[index].title[0].match(BUILD_REGEX)[1];
-                  var item = {};
-                  item['group'] = 'php';
-                  item['type'] = 'release';
-                  item['id'] = short_name
-                  item['webui_desc'] = 'PHP binary for Pocketmine'
-                  item['weight'] = 12;
-                  item['url'] = releases[index].link;
-                  item['filename'] = releases[index].title[0].match(FILENAME_REGEX)[1];
-                  item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], short_name));
-                  p.push(item);
-                }
-              }
-            })
-          }
-          callback(err, p);
+        for (var index in BUILDS) {
+          var item = {};
+          item['group'] = 'php';
+          item['type'] = 'release';
+          item['id'] = BUILDS[index];
+          item['webui_desc'] = 'PHP binary for Pocketmine';
+          item['weight'] = 12;
+          item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], BUILDS[index], '{0}.tar.gz'.format(BUILDS[index])));
+          p.push(item);
         }
-        request(options, handle_reply);
+
+        callback(null, p);
       }
     }
 
