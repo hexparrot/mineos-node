@@ -93,6 +93,7 @@ The Angular.JS-based web user interface capable of:
 * cronjobs saved to portable format cron.config
 * server can be daemonized to background
 * upstart/supervisord restart process on unhandled exceptions
+* PHAR support for Pocketmine servers
 
 TODO
 -------
@@ -105,5 +106,4 @@ EVENTUALLY
 
 * implement previous_versions: functionality to roll back or view particular files' previous state
 * command-line interface for scripting
-* PHAR support
 * identify java versions in web-ui, allow choice of utilized jvm
