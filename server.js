@@ -436,7 +436,8 @@ server.backend = function(base_dir, socket_emitter) {
         'mojang': async.retry(2, self.check_profiles.mojang),
         'ftb': async.retry(2, self.check_profiles.ftb),
         'ftb_3rd': async.retry(2, self.check_profiles.ftb_third_party),
-        'pocketmine': async.retry(2, self.check_profiles.pocketmine)
+        'pocketmine': async.retry(2, self.check_profiles.pocketmine),
+        'php': async.retry(2, self.check_profiles.php)
       }, function(err, results) {
         var merged = [];
         for (var source in results)
@@ -591,6 +592,43 @@ server.backend = function(base_dir, socket_emitter) {
               item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], releases[index].name));
               p.push(item);
             }
+          }
+          callback(err, p);
+        }
+        request(options, handle_reply);
+      },
+      php: function(callback) {
+        var request = require('request');
+        var xml2js = require('xml2js');
+        var options = {
+          url: 'http://sourceforge.net/projects/pocketmine/rss?path=/builds',
+          headers: {
+            'User-Agent': 'MineOS Release Browser'
+          }
+        };
+
+        var BUILD_REGEX = /\/builds\/(PHP_\d+\.\d+\.\d+[^\.]+)/;
+        var p = [];
+
+        function handle_reply(err, response, body) {
+          if (!err && response.statusCode == 200) {
+            xml2js.parseString(body, function(inner_err, jsonified) {
+              if (!inner_err) {
+                var releases = jsonified.rss.channel[0].item;
+                for (var index in releases) {
+                  var short_name = releases[index].title[0].match(BUILD_REGEX)[1];
+                  var item = {};
+                  item['group'] = 'php';
+                  item['type'] = 'release';
+                  item['id'] = short_name
+                  item['webui_desc'] = short_name
+                  item['weight'] = 10;
+                  item['url'] = releases[index].link;
+                  item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], short_name));
+                  p.push(item);
+                }
+              }
+            })
           }
           callback(err, p);
         }
