@@ -295,63 +295,103 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.get_start_args = function(callback) {
-    var server_config = async.memoize(self.sc);
-    var java_binary = which.sync('java');
 
-    async.series({
-      'binary': function (cb) {
-        server_config(function (err, dict) {
-          var value = (dict.java || {}).java_binary || java_binary;
-          cb((value.length ? null : 'No java binary assigned for server.'), value);
-        });
-      },
-      'xmx': function (cb) {
-        server_config(function (err, dict) {
-          var value = parseInt((dict.java || {}).java_xmx) || 0;
-          cb((value > 0 ? null : 'XMX heapsize must be positive integer'), value);
-        });
-      },
-      'xms': function (cb) {
-        server_config(function (err, dict) {
-          var xmx = parseInt((dict.java || {}).java_xmx) || 0;
-          var xms = parseInt((dict.java || {}).java_xms) || xmx;
-          cb((xmx >= xms && xms > 0 ? null : 'XMS heapsize must be positive integer where XMX >= XMS > 0'), xms);
-        });
-      },
-      'jarfile': function (cb) {
-        server_config(function (err, dict) {
-          var jarfile = (dict.java || {}).jarfile;
-          if (!jarfile)
-            cb('Server not assigned a runnable jar');
-          else
-            cb(null, jarfile);
-        });
-      },
-      'jar_args': function (cb) {
-        server_config(function (err, dict) {
-          var value = (dict.java || {}).jar_args || 'nogui';
-          cb(null, value);
-        });
-      },
-      'java_tweaks': function (cb) {
-        server_config(function (err, dict) {
-          var value = (dict.java || {}).java_tweaks || null;
-          cb(null, value);
-        });
-      }
-    }, function(err, results) {
-      if (err) {
-        callback(err, {});
-      } else {
-        var args = ['-dmS', 'mc-{0}'.format(self.server_name)];
-        args.push.apply(args, [results.binary, '-server', '-Xmx{0}M'.format(results.xmx), '-Xms{0}M'.format(results.xms)]);
-        if (results.java_tweaks)
-          args.push(results.java_tweaks);
-        args.push.apply(args, ['-jar', results.jarfile, results.jar_args]);
+    function type_jar(inner_callback) {
+      var server_config = async.memoize(self.sc);
+      var java_binary = which.sync('java');
 
-        callback(null, args);
+      async.series({
+        'binary': function (cb) {
+          server_config(function (err, dict) {
+            var value = (dict.java || {}).java_binary || java_binary;
+            cb((value.length ? null : 'No java binary assigned for server.'), value);
+          });
+        },
+        'xmx': function (cb) {
+          server_config(function (err, dict) {
+            var value = parseInt((dict.java || {}).java_xmx) || 0;
+            cb((value > 0 ? null : 'XMX heapsize must be positive integer'), value);
+          });
+        },
+        'xms': function (cb) {
+          server_config(function (err, dict) {
+            var xmx = parseInt((dict.java || {}).java_xmx) || 0;
+            var xms = parseInt((dict.java || {}).java_xms) || xmx;
+            cb((xmx >= xms && xms > 0 ? null : 'XMS heapsize must be positive integer where XMX >= XMS > 0'), xms);
+          });
+        },
+        'jarfile': function (cb) {
+          server_config(function (err, dict) {
+            var jarfile = (dict.java || {}).jarfile;
+            if (!jarfile)
+              cb('Server not assigned a runnable jar');
+            else
+              cb(null, jarfile);
+          });
+        },
+        'jar_args': function (cb) {
+          server_config(function (err, dict) {
+            var value = (dict.java || {}).jar_args || 'nogui';
+            cb(null, value);
+          });
+        },
+        'java_tweaks': function (cb) {
+          server_config(function (err, dict) {
+            var value = (dict.java || {}).java_tweaks || null;
+            cb(null, value);
+          });
+        }
+      }, function(err, results) {
+        if (err) {
+          inner_callback(err, {});
+        } else {
+          var args = ['-dmS', 'mc-{0}'.format(self.server_name)];
+          args.push.apply(args, [results.binary, '-server', '-Xmx{0}M'.format(results.xmx), '-Xms{0}M'.format(results.xms)]);
+          if (results.java_tweaks)
+            args.push(results.java_tweaks);
+          args.push.apply(args, ['-jar', results.jarfile, results.jar_args]);
+
+          inner_callback(null, args);
+        }
+      })
+    }
+
+    function type_phar(inner_callback) {
+      async.series({
+        'binary': function (cb) {
+          cb(null, './bin/php5/bin/php')
+        },
+        'pharfile': function (cb) {
+          self.sc(function (err, dict) {
+            var pharfile = (dict.java || {}).jarfile;
+            if (!pharfile)
+              cb('Server not assigned a runnable phar');
+            else
+              cb(null, pharfile);
+          });
+        }
+      }, function(err, results) {
+        if (err) {
+          inner_callback(err, {});
+        } else {
+          var args = ['-dmS', 'mc-{0}'.format(self.server_name), results.binary, results.pharfile];
+          inner_callback(null, args);
+        }
+      })
+    }
+
+    async.waterfall([
+      async.apply(self.sc),
+      function(sc_data, cb) {
+        var jarfile = (sc_data.java || {}).jarfile;
+        if (!jarfile)
+          cb('Cannot start server without a designated jar/phar.', null);
+        else if (jarfile.slice(-4).toLowerCase() == '.jar')
+          type_jar(cb);
+        else if (jarfile.slice(-5).toLowerCase() == '.phar')
+          type_phar(cb);
       }
-    })
+    ], callback)
   }
 
   self.copy_profile = function(callback) {
@@ -822,14 +862,25 @@ mineos.mc = function(server_name, base_dir) {
         }
         break;
       case 'ping':
-        var pids = mineos.server_pids_up();
-        if (self.server_name in pids) {
-          self.ping(function(err, ping){
-            callback(null, ping);
-          })
-        } else {
-          callback(true, null);
-        }
+        async.waterfall([
+          async.apply(self.sc),
+          function(sc_data, cb) {
+            var jarfile = (sc_data.java || {}).jarfile;
+
+            if (jarfile && jarfile.slice(-5).toLowerCase() == '.phar')
+              cb(true, null);
+            else {
+              var pids = mineos.server_pids_up();
+              if (self.server_name in pids) {
+                self.ping(function(err, ping){
+                  cb(null, ping);
+                })
+              } else {
+                cb(true, null);
+              }
+            }
+          }
+        ], callback)
         break;
       case 'server.properties':
         self.sp(function(err, dict) {
@@ -888,7 +939,10 @@ mineos.mc = function(server_name, base_dir) {
           async.apply(fs.readdir, self.env.cwd),
           function(sf, cb) {
             server_files.push.apply(server_files, sf.filter(function(file) { 
-              return file.substr(-4) == '.jar'; 
+              return file.substr(-4).toLowerCase() == '.jar'; 
+            }))
+            server_files.push.apply(server_files, sf.filter(function(file) { 
+              return file.substr(-5).toLowerCase() == '.phar'; 
             }))
             cb();
           },

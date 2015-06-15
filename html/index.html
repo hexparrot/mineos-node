@@ -235,10 +235,19 @@
                                     <li class="accordion-group" ng-show="current">
                                         <a ng-click="change_page('console')">
                                             <span class="icon icone-desktop"></span>
-                                            <span class="text" translate="CONSOLE"></span>
+                                            <span class="text">logs/latest.log</span>
                                         </a>
                                     </li>
                                     <!--/ END Menu -->                                    
+
+                                    <!-- START Menu -->
+                                    <li class="accordion-group" ng-show="current">
+                                        <a ng-click="change_page('console2')">
+                                            <span class="icon icone-desktop"></span>
+                                            <span class="text">server.log</span>
+                                        </a>
+                                    </li>
+                                    <!--/ END Menu -->  
                                 </ul>
                             </nav>
                             <!--/ END Sidebar Menu -->
@@ -603,6 +612,8 @@
                                                         <option selected value="mojang">Mojang</option>
                                                         <option value="ftb">Feed the Beast</option>
                                                         <option value="ftb_third_party">FTB-3rd Party</option>
+                                                        <option value="pocketmine">Pocketmine</option>
+                                                        <option value="php">Pocketmine-php</option>
                                                         <option value="all">Show All</option>
                                                     </select>
                                                 </td>
@@ -1243,8 +1254,6 @@
                 </div>
                 <!--/ END Content -->
 
-
-
                 <!-- START Content - CONSOLE -->
                 <div class="container-fluid" ng-show="page == 'console'">
 
@@ -1273,6 +1282,61 @@
                                     <table class="table">
                                         <tbody>
                                             <tr ng-repeat="line in servers[current].live_logs['logs/latest.log'] track by $index">
+                                                <td>{{ line }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Basic Table -->
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <div class="body-inner">
+                            <div class="control-group">
+                                <div class="controls">
+                                    <input type="text" class="span12" ng-model="user_input" ng-enter="console_input()">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!--/ END Row -->
+
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content - CONSOLE2 -->
+                <div class="container-fluid" ng-show="page == 'console2'">
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <div class="body-inner">
+                            <div class="control-group">
+                                <div class="controls">
+                                    <input type="text" class="span12" ng-model="user_input" ng-enter="console_input()">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Basic Table -->
+                        <div class="span12 widget dark stacked">
+                            <header>
+                                <h4 class="title">server.log</h4>
+                            </header>
+                            <section class="body">
+                                <div class="body-inner no-padding">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr ng-repeat="line in servers[current].live_logs['server.log'] track by $index">
                                                 <td>{{ line }}</td>
                                             </tr>
                                         </tbody>

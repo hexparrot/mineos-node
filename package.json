@@ -63,7 +63,8 @@
     "winston": "1.0.x",
     "uname": "0.0.x",
     "urllib": "2.3.x",
-    "daemonize2": "0.4.x"
+    "daemonize2": "0.4.x",
+    "tarball-extract": "0.0.3"
   },
   "devDependencies": {
     "nodeunit": "0.9.x"

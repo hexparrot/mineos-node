@@ -281,12 +281,59 @@ test.get_start_args = function(test) {
 
   async.series([
     async.apply(instance.create, OWNER_CREDS),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(!err); //expected error
+        test.equal(err, 'Cannot start server without a designated jar/phar.');
+        test.equal(args, null);
+        callback(!err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'PocketMine-MP.phar'),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2], './bin/php5/bin/php');
+        test.equal(args[3], 'PocketMine-MP.phar');
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2].slice(-4), 'java');
+        test.equal(args[3], '-server');
+        test.equal(args[4], '-Xmx256M');
+        test.equal(args[5], '-Xms256M');
+        test.equal(args[6], '-jar');
+        test.equal(args[7], 'minecraft_server.1.7.9.jar');
+        test.equal(args[8], 'nogui');
+        callback(err);
+      })
+    },
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
+test.get_start_args_java = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
     async.apply(instance.modify_sc, 'java', 'java_xmx', '-256'),
     function(callback) {
       instance.get_start_args(function(err, args) {
         test.ifError(!err); //testing for positive error
-        test.equal(Object.keys(args).length, 0);
-        test.equal(err, 'XMX heapsize must be positive integer');
+        test.equal(args, null);
+        test.equal(err, 'Cannot start server without a designated jar/phar.');
         callback(!err);
       })
     },
@@ -294,7 +341,8 @@ test.get_start_args = function(test) {
     function(callback) {
       instance.get_start_args(function(err, args) {
         test.ifError(!err); //testing for positive error
-        test.equal(err, 'Server not assigned a runnable jar');
+        test.equal(args, null);
+        test.equal(err, 'Cannot start server without a designated jar/phar.');
         callback(!err);
       })
     },
@@ -353,6 +401,29 @@ test.get_start_args = function(test) {
         test.equal(args[7], '-jar');
         test.equal(args[8], 'minecraft_server.1.7.9.jar');
         test.equal(args[9], 'nogui');
+        callback(err);
+      })
+    }
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
+test.get_start_args_phar = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'PocketMine-MP.phar'),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2], './bin/php5/bin/php');
+        test.equal(args[3], 'PocketMine-MP.phar');
         callback(err);
       })
     }
@@ -945,6 +1016,26 @@ test.ping_legacy = function(test) {
   })
 }
 
+test.ping_phar = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'pocketmine.phar'),
+    function(callback) {
+      instance.property('ping', function(err, pingback) {
+        test.ifError(!err); //expected error
+        test.equal(pingback, null);
+        callback(!err);
+      })
+    }
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
 test.memory = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -1451,6 +1542,42 @@ test.server_files_property = function(test) {
         test.equal(server_files.length, 2);
         test.ok(server_files.indexOf('myserver.jar') >= 0);
         test.ok(server_files.indexOf('minecraft_server.1.7.9.jar') >= 0);
+        callback(err);
+      })
+    },
+    async.apply(fs.ensureFile, path.join(instance.env.cwd, 'pocket.phar')),
+    function(callback) {
+      instance.property('server_files', function(err, server_files) {
+        test.ifError(err);
+        test.equal(server_files.length, 3);
+        test.ok(server_files.indexOf('myserver.jar') >= 0);
+        test.ok(server_files.indexOf('pocket.phar') >= 0);
+        test.ok(server_files.indexOf('minecraft_server.1.7.9.jar') >= 0);
+        callback(err);
+      })
+    },
+    async.apply(fs.ensureFile, path.join(instance.env.cwd, 'pocket.PHAR')),
+    function(callback) {
+      instance.property('server_files', function(err, server_files) {
+        test.ifError(err);
+        test.equal(server_files.length, 4);
+        test.ok(server_files.indexOf('myserver.jar') >= 0);
+        test.ok(server_files.indexOf('pocket.phar') >= 0);
+        test.ok(server_files.indexOf('pocket.PHAR') >= 0);
+        test.ok(server_files.indexOf('minecraft_server.1.7.9.jar') >= 0);
+        callback(err);
+      })
+    },
+    async.apply(fs.ensureFile, path.join(instance.env.cwd, 'another.JAR')),
+    function(callback) {
+      instance.property('server_files', function(err, server_files) {
+        test.ifError(err);
+        test.equal(server_files.length, 5);
+        test.ok(server_files.indexOf('myserver.jar') >= 0);
+        test.ok(server_files.indexOf('pocket.phar') >= 0);
+        test.ok(server_files.indexOf('pocket.PHAR') >= 0);
+        test.ok(server_files.indexOf('minecraft_server.1.7.9.jar') >= 0);
+        test.ok(server_files.indexOf('another.JAR') >= 0);
         callback(err);
       })
     }

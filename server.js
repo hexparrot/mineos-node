@@ -329,7 +329,89 @@ server.backend = function(base_dir, socket_emitter) {
             }
           });
           break;
+        case 'pocketmine_download':
+          var request = require('request');
+          var fs = require('fs-extra');
+
+          var dir_concat = args.profile.id;
+          var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
+          var filename = args.profile.name;
+          var dest_filepath = path.join(dest_dir, filename);
+
+          var url = 'https://github.com/PocketMine/PocketMine-MP/releases/download/{0}/{1}'.format(args.profile.version, args.profile.name);;
+
+          fs.ensureDir(dest_dir, function(err) {
+            if (err) {
+              logging.error('[WEBUI] Error attempting download:', err);
+            } else {
+              request(url)
+                .on('complete', function(response) {
+                  if (response.statusCode == 200) {
+                    logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                    args['dest_dir'] = dest_dir;
+                    args['filename'] = filename;
+                    args['success'] = true;
+                    args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
+                    self.front_end.emit('file_download', args);
+                    self.send_profile_list();
+                  } else {
+                    logging.error('[WEBUI] Server was unable to download file:', url);
+                    logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                    args['success'] = false;
+                    args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                    self.front_end.emit('file_download', args);
+                  }
+                })
+                .pipe(fs.createWriteStream(dest_filepath))
+            }
+          });
+          break;
+        case 'php_download':
+          var request = require('request');
+          var fs = require('fs-extra');
+          var tarball = require('tarball-extract')
+
+          var dir_concat = args.profile.id;
+          var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
+          var filename = '{0}.tar.gz'.format(args.profile.id);
+          var dest_filepath = path.join(dest_dir, filename);
+
+          var url = 'https://dl.bintray.com/pocketmine/PocketMine/{0}'.format(filename);
+
+          fs.ensureDir(dest_dir, function(err) {
+            if (err) {
+              logging.error('[WEBUI] Error attempting download:', err);
+            } else {
+              request(url)
+                .on('complete', function(response) {
+                  if (response.statusCode == 200) {
+                    logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                    args['dest_dir'] = dest_dir;
+                    args['filename'] = filename;
+                    args['success'] = true;
+                    args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
+
+                    async.series([
+                      async.apply(tarball.extractTarball, dest_filepath, dest_dir),
+                      function(cb) {
+                        self.front_end.emit('file_download', args);
+                        self.send_profile_list();
+                      }
+                    ])
+                  } else {
+                    logging.error('[WEBUI] Server was unable to download file:', url);
+                    logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                    args['success'] = false;
+                    args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                    self.front_end.emit('file_download', args);
+                  }
+                })
+                .pipe(fs.createWriteStream(dest_filepath))
+            }
+          });
+          break;
         default:
+          logging.warning('Command ignored: no such command {0}'.format(args.command));
           break;
       }
     }
@@ -338,7 +420,9 @@ server.backend = function(base_dir, socket_emitter) {
       async.auto({
         'mojang': async.retry(2, self.check_profiles.mojang),
         'ftb': async.retry(2, self.check_profiles.ftb),
-        'ftb_3rd': async.retry(2, self.check_profiles.ftb_third_party)
+        'ftb_3rd': async.retry(2, self.check_profiles.ftb_third_party),
+        'pocketmine': async.retry(2, self.check_profiles.pocketmine),
+        'php': async.retry(2, self.check_profiles.php)
       }, function(err, results) {
         var merged = [];
         for (var source in results)
@@ -467,6 +551,69 @@ server.backend = function(base_dir, socket_emitter) {
             callback(null, p);
         }
         request({ url: FTB_VERSIONS_URL, json: false }, handle_reply);
+      },
+      pocketmine: function(callback) {
+        var request = require('request');
+        var options = {
+          url: 'https://api.github.com/repos/PocketMine/PocketMine-MP/releases',
+          headers: {
+            'User-Agent': 'MineOS Release Browser'
+          }
+        };
+
+        var p = [];
+
+        function handle_reply(err, response, body) {
+          if (!err && response.statusCode == 200) {
+            var releases = JSON.parse(body);
+
+            for (var index in releases) {
+              for (var asset in releases[index].assets) {
+                if (releases[index].assets[asset].name.slice(-5).toLowerCase() == '.phar') {
+                  var item = releases[index].assets[asset];
+                  var version = releases[index].tag_name;
+                  var dir_concat = 'Pocketmine-{0}'.format(version);
+                  item['group'] = 'pocketmine';
+                  item['type'] = (releases[index].prerelease ? 'snapshot' : 'release');
+                  item['id'] = dir_concat;
+                  item['version'] = releases[index].tag_name;
+                  item['webui_desc'] = 'Pocketmine phar download';
+                  item['weight'] = 10;
+                  item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item.name));
+                  p.push(item);
+                }
+              }
+            }
+          }
+          callback(err, p);
+        }
+        request(options, handle_reply);
+      },
+      php: function(callback) {
+        var BUILDS = [
+          "PHP_5.6.10_x86_Linux",
+          "PHP_5.6.10_x86-64_Linux",
+          "PHP_5.6.2_x86_CentOS",
+          "PHP_5.6.2_x86-64_CentOS",
+          "PHP_5.6.4_x86_MacOS",
+          "PHP_5.6.4_x86-64_MacOS",
+          "PHP_5.6.10_ARM_Raspbian_hard"
+        ]
+
+        var p = [];
+
+        for (var index in BUILDS) {
+          var item = {};
+          item['group'] = 'php';
+          item['type'] = 'release';
+          item['id'] = BUILDS[index];
+          item['webui_desc'] = 'PHP binary for Pocketmine';
+          item['weight'] = 12;
+          item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], BUILDS[index], '{0}.tar.gz'.format(BUILDS[index])));
+          p.push(item);
+        }
+
+        callback(null, p);
       }
     }
 
@@ -534,6 +681,7 @@ function server_container(server_name, base_dir, socket_io) {
 
   logging.info('[{0}] Discovered server'.format(server_name));
   make_tail('logs/latest.log');
+  make_tail('server.log');
 
   make_watch('server.properties', broadcast_sp);
   make_watch('server.config', broadcast_sc);
