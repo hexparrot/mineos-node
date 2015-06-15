@@ -332,24 +332,19 @@ server.backend = function(base_dir, socket_emitter) {
         case 'pocketmine_download':
           var request = require('request');
           var fs = require('fs-extra');
-          var unzip = require('unzip');
 
-          var dir_concat = args.profile.name;
+          var dir_concat = args.profile.id;
           var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
-          var filename = '{0}.tar.gz'.format(args.profile.name);
+          var filename = args.profile.name;
           var dest_filepath = path.join(dest_dir, filename);
 
-          var url = 'https://api.github.com/repos/PocketMine/PocketMine-MP/zipball/{0}'.format(args.profile.name);;
+          var url = 'https://github.com/PocketMine/PocketMine-MP/releases/download/{0}/{1}'.format(args.profile.version, args.profile.name);;
 
           fs.ensureDir(dest_dir, function(err) {
             if (err) {
               logging.error('[WEBUI] Error attempting download:', err);
             } else {
-              var options = {
-                url: url,
-                headers: { 'User-Agent': 'MineOS Release Browser' }
-              };
-              request(options)
+              request(url)
                 .on('complete', function(response) {
                   if (response.statusCode == 200) {
                     logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
@@ -357,62 +352,8 @@ server.backend = function(base_dir, socket_emitter) {
                     args['filename'] = filename;
                     args['success'] = true;
                     args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
-
-                    function move_from_parent_dir(callback) {
-                      var remainder = null;
-                      async.waterfall([
-                        async.apply(fs.readdir, dest_dir),
-                        function(files, cb) {
-                          var file_idx = files.indexOf(filename);
-                          files.splice(file_idx, 1);
-                          
-                          if (files.length == 1) {
-                            remainder = files[0];
-                            cb(null);
-                          } else
-                            cb(true);
-                        },
-                        function(cb) {
-                          var inside_dir = path.join(dest_dir, remainder);
-                          fs.lstat(inside_dir, function(err, stat) {
-                            if (stat.isDirectory)
-                              cb(null);
-                            else
-                              cb(true);
-                          })
-                        },
-                        function(cb) {
-                          var old_dir = path.join(dest_dir, remainder);
-
-                          fs.readdir(old_dir, function(err, files) {
-                            if (!err)
-                              async.each(files, function(file, inner_cb) {
-                                var old_filepath = path.join(old_dir, file);
-                                var new_filepath = path.join(dest_dir, file);
-
-                                fs.move(old_filepath, new_filepath, inner_cb)
-                              }, cb);
-                            else
-                              cb(err);
-                          })
-                        }
-                      ], function(err, results) {
-                        if (err) 
-                          logging.error(err);
-                        callback(err);
-                      })
-                    }
-
-                    fs.createReadStream(dest_filepath)
-                      .pipe(unzip.Extract({ path: dest_dir })
-                      .on('close', function() {
-                        move_from_parent_dir(function(code) {
-                          if (!code) {
-                            self.front_end.emit('file_download', args);
-                            self.send_profile_list();
-                          }
-                        })
-                      }));
+                    self.front_end.emit('file_download', args);
+                    self.send_profile_list();
                   } else {
                     logging.error('[WEBUI] Server was unable to download file:', url);
                     logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
@@ -614,7 +555,7 @@ server.backend = function(base_dir, socket_emitter) {
       pocketmine: function(callback) {
         var request = require('request');
         var options = {
-          url: 'https://api.github.com/repos/PocketMine/PocketMine-MP/tags',
+          url: 'https://api.github.com/repos/PocketMine/PocketMine-MP/releases',
           headers: {
             'User-Agent': 'MineOS Release Browser'
           }
@@ -627,14 +568,21 @@ server.backend = function(base_dir, socket_emitter) {
             var releases = JSON.parse(body);
 
             for (var index in releases) {
-              var item = releases[index];
-              item['group'] = 'pocketmine';
-              item['type'] = 'release';
-              item['id'] = releases[index].name;
-              item['webui_desc'] = 'Pocketmine ' + releases[index].name.replace('_', ' ');
-              item['weight'] = 10;
-              item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], releases[index].name));
-              p.push(item);
+              for (var asset in releases[index].assets) {
+                if (releases[index].assets[asset].name.slice(-5).toLowerCase() == '.phar') {
+                  var item = releases[index].assets[asset];
+                  var version = releases[index].tag_name;
+                  var dir_concat = 'Pocketmine-{0}'.format(version);
+                  item['group'] = 'pocketmine';
+                  item['type'] = (releases[index].prerelease ? 'snapshot' : 'release');
+                  item['id'] = dir_concat;
+                  item['version'] = releases[index].tag_name;
+                  item['webui_desc'] = 'Pocketmine phar download';
+                  item['weight'] = 10;
+                  item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item.name));
+                  p.push(item);
+                }
+              }
             }
           }
           callback(err, p);
