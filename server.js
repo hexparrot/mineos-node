@@ -590,30 +590,30 @@ server.backend = function(base_dir, socket_emitter) {
         request(options, handle_reply);
       },
       php: function(callback) {
-        var BUILDS = [
-          "PHP_5.6.10_x86_Linux",
-          "PHP_5.6.10_x86-64_Linux",
-          "PHP_5.6.2_x86_CentOS",
-          "PHP_5.6.2_x86-64_CentOS",
-          "PHP_5.6.4_x86_MacOS",
-          "PHP_5.6.4_x86-64_MacOS",
-          "PHP_5.6.10_ARM_Raspbian_hard"
-        ]
-
+        var request = require('request');
+        BUILD_REGEX = /^[\w]+BUILD="([^"]+)"/
         var p = [];
 
-        for (var index in BUILDS) {
-          var item = {};
-          item['group'] = 'php';
-          item['type'] = 'release';
-          item['id'] = BUILDS[index];
-          item['webui_desc'] = 'PHP binary for Pocketmine';
-          item['weight'] = 12;
-          item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], BUILDS[index], '{0}.tar.gz'.format(BUILDS[index])));
-          p.push(item);
+        function handle_reply(err, response, body) {
+          if (!err && response.statusCode == 200) {
+            var lines = body.split('\n');
+            for (var i in lines) {
+              var matching = lines[i].match(BUILD_REGEX);
+              if (matching) {
+                var item = {};
+                item['group'] = 'php';
+                item['type'] = 'release';
+                item['id'] = matching[1];
+                item['webui_desc'] = 'PHP binary for Pocketmine';
+                item['weight'] = 12;
+                item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], matching[1], '{0}.tar.gz'.format(matching[1])));
+                p.push(item);
+              }
+            }
+          }
+          callback(err, p);
         }
-
-        callback(null, p);
+        request('http://get.pocketmine.net', handle_reply);
       }
     }
 
