@@ -961,7 +961,8 @@ mineos.mc = function(server_name, base_dir) {
                 cb();
               } else {
                 server_files.push.apply(server_files, files.filter(function(file) { 
-                  return file.substr(-4) == '.jar' && server_files.indexOf(file) < 0; 
+                  return ((file.substr(-4).toLowerCase() == '.jar' && server_files.indexOf(file) < 0)
+                       || (file.substr(-5).toLowerCase() == '.phar' && server_files.indexOf(file) < 0)); 
                 }))
                 cb();
               }
