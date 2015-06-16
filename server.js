@@ -980,7 +980,8 @@ function server_container(server_name, base_dir, socket_io) {
               cb(null, base_dir)
             }
           }, function(err, results) {
-            logging.error('[{0}] Error with get_page_data'.format(server_name), err, results);
+            if (err)
+              logging.error('[{0}] Error with get_page_data'.format(server_name), err, results);
             nsp.emit('page_data', {page: page, payload: results});
           })
           break;
