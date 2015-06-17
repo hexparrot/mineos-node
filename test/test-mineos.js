@@ -1580,6 +1580,20 @@ test.server_files_property = function(test) {
         test.ok(server_files.indexOf('another.JAR') >= 0);
         callback(err);
       })
+    },
+    async.apply(instance.modify_sc, 'minecraft', 'profile', 'Pocketmine-1.4.1'),
+    function(callback) {
+      instance.property('server_files', function(err, server_files) {
+        test.ifError(err);
+        test.equal(server_files.length, 6);
+        test.ok(server_files.indexOf('myserver.jar') >= 0);
+        test.ok(server_files.indexOf('pocket.phar') >= 0);
+        test.ok(server_files.indexOf('pocket.PHAR') >= 0);
+        test.ok(server_files.indexOf('minecraft_server.1.7.9.jar') >= 0);
+        test.ok(server_files.indexOf('another.JAR') >= 0);
+        test.ok(server_files.indexOf('PocketMine-MP_1.4.1.phar') >= 0);
+        callback(err);
+      })
     }
   ], function(err) {
     test.ifError(err);
