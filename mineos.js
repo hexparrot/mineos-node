@@ -309,8 +309,15 @@ mineos.mc = function(server_name, base_dir) {
     else // if it doesn't treat it as being from /import/
       var dest_filepath = path.join(self.env.base_dir, mineos.DIRS['import'], filepath);
 
-    switch (dest_filepath.slice(-4).toLowerCase()) {
-      case '.zip':
+    var split = dest_filepath.split('.');
+    var extension = split.pop();
+
+    if (extension == 'gz')
+      if (split.pop() == 'tar')
+        extension = 'tar.gz';
+
+    switch (extension) {
+      case 'zip':
         var DecompressZip = require('decompress-zip');
         var unzipper = new DecompressZip(dest_filepath);
 
@@ -334,9 +341,9 @@ mineos.mc = function(server_name, base_dir) {
           path: self.env.cwd
         });
         break;
-      case '.tar.gz':
-      case '.tgz':
-      case '.tar':
+      case 'tar.gz':
+      case 'tgz':
+      case 'tar':
         var binary = which.sync('tar');
         var args = ['xf', dest_filepath];
         var params = { cwd: self.env.cwd };
