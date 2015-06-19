@@ -265,7 +265,7 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.create_from_archive = function(owner, filepath, callback) {
-    
+
     function move_to_parent_dir(source_dir, inner_callback) {
       var remainder = null;
       async.waterfall([
@@ -304,10 +304,14 @@ mineos.mc = function(server_name, base_dir) {
       ], inner_callback);
     }
 
-    switch (filepath.slice(-4).toLowerCase()) {
+    if (filepath.match(/\//))  //if it has a '/', its hopefully an absolute path
+      var dest_filepath = filepath;
+    else // if it doesn't treat it as being from /import/
+      var dest_filepath = path.join(self.env.base_dir, mineos.DIRS['import'], filepath);
+
+    switch (dest_filepath.slice(-4).toLowerCase()) {
       case '.zip':
         var DecompressZip = require('decompress-zip');
-        var dest_filepath = path.join(self.env.base_dir, mineos.DIRS['import'], filepath);
         var unzipper = new DecompressZip(dest_filepath);
 
         unzipper.on('error', function (err) {
@@ -332,7 +336,7 @@ mineos.mc = function(server_name, base_dir) {
       case '.tgz':
       case '.tar':
         var binary = which.sync('tar');
-        var args = ['xf', filepath];
+        var args = ['xf', dest_filepath];
         var params = { cwd: self.env.cwd };
 
         async.series([
