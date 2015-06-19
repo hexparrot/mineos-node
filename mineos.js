@@ -265,19 +265,97 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.create_from_archive = function(owner, filepath, callback) {
-    var binary = which.sync('tar');
-    var args = ['xf', filepath];
-    var params = { cwd: self.env.cwd };
+    switch (filepath.slice(-4).toLowerCase()) {
+      case '.zip':
+        function check_if_same_root(file_array) {
+          var REGEX_ROOT_DIR = /([^\/]*\/)/
 
-    async.series([
-      async.apply(self.create, owner),
-      function(cb) {
-        var proc = child_process.spawn(binary, args, params);
-        proc.once('exit', function(code) {
-          cb(code);
-        })
-      }
-    ], callback)
+          file_array.sort();
+          var first = file_array[0].match(REGEX_ROOT_DIR);
+          var last = file_array[file_array.length-1].match(REGEX_ROOT_DIR);
+
+          return (first && last && first[1] == last[1] ? 1 : 0)
+        }
+
+        function move_to_parent_dir(source_dir, inner_callback) {
+          var remainder = null;
+          async.waterfall([
+            async.apply(fs.readdir, source_dir),
+            function(files, cb) {
+              if (files.length == 1) {
+                remainder = files[0];
+                cb(null);
+              } else
+                cb(true);
+            },
+            function(cb) {
+              var inside_dir = path.join(source_dir, remainder);
+              fs.lstat(inside_dir, function(err, stat) {
+                if (stat.isDirectory)
+                  cb(null);
+                else
+                  cb(true);
+              })
+            },
+            function(cb) {
+              var old_dir = path.join(source_dir, remainder);
+
+              fs.readdir(old_dir, function(err, files) {
+                if (!err)
+                  async.each(files, function(file, inner_cb) {
+                    var old_filepath = path.join(old_dir, file);
+                    var new_filepath = path.join(source_dir, file);
+
+                    fs.move(old_filepath, new_filepath, inner_cb)
+                  }, cb);
+                else
+                  cb(err);
+              })
+            }
+          ], inner_callback);
+        }
+
+        var DecompressZip = require('decompress-zip');
+        var dest_filepath = path.join(self.env.base_dir, mineos.DIRS['import'], filepath);
+        var unzipper = new DecompressZip(dest_filepath);
+
+        unzipper.on('error', function (err) {
+          callback(err);
+        });
+         
+        unzipper.on('extract', function (log) {
+          unzipper.list();
+        });
+
+        unzipper.on('list', function (files) {
+          var strip_components = check_if_same_root(files);
+          async.series([
+            async.apply(move_to_parent_dir, self.env.cwd)
+          ], callback)
+        });
+
+        unzipper.extract({
+          path: self.env.cwd
+        });
+        break;
+      case '.tar.gz':
+      case '.tgz':
+      case '.tar':
+        var binary = which.sync('tar');
+        var args = ['xf', filepath];
+        var params = { cwd: self.env.cwd };
+
+        async.series([
+          async.apply(self.create, owner),
+          function(cb) {
+            var proc = child_process.spawn(binary, args, params);
+            proc.once('exit', function(code) {
+              cb(code);
+            })
+          }
+        ], callback)
+        break;
+    }
   }
 
   self.accept_eula = function(callback) {
