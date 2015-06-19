@@ -1812,6 +1812,47 @@ test.create_server_from_awd = function(test) {
   })
 }
 
+test.create_server_from_awd_zip = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  var archive_filepath = 'jm36.zip';
+
+  async.series([
+    function(callback) {
+      instance.create_from_archive(OWNER_CREDS, archive_filepath, function(err) {
+        var files = fs.readdir(instance.env.base_dir)
+        callback();
+      })
+    },
+    function(callback) {
+      instance.sc(function(err, dict) {
+        test.ifError(err);
+        test.equal(dict.java.java_xmx, 'MaxRAM');
+        callback(err);
+      })
+    },
+    function(callback) {
+      async.parallel([
+        async.apply(fs.stat, instance.env.sp),
+        async.apply(fs.stat, instance.env.sc),
+        async.apply(fs.stat, instance.env.cc)
+      ], callback)
+    },
+    function(callback) {
+      instance.property('owner', function(err, result) {
+        test.ifError(err);
+        test.equal(OWNER_CREDS['uid'], result['uid']);
+        test.equal(OWNER_CREDS['gid'], result['gid']);
+        callback(err);
+      })
+    }
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
 test.profile_delta = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
