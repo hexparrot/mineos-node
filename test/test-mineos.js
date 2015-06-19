@@ -1838,6 +1838,14 @@ test.create_server_from_awd_zip = function(test) {
         async.apply(fs.stat, instance.env.sc),
         async.apply(fs.stat, instance.env.cc)
       ], callback)
+    },
+    function(callback) {
+      instance.property('owner', function(err, result) {
+        test.ifError(err);
+        test.equal(OWNER_CREDS['uid'], result['uid']);
+        test.equal(OWNER_CREDS['gid'], result['gid']);
+        callback(err);
+      })
     }
   ], function(err) {
     test.ifError(err);

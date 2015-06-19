@@ -333,7 +333,8 @@ mineos.mc = function(server_name, base_dir) {
             async.apply(move_to_parent_dir, self.env.cwd),
             async.apply(self.sp),
             async.apply(self.sc),
-            async.apply(self.crons)
+            async.apply(self.crons),
+            async.apply(self.chown, owner.uid, owner.gid)
           ], callback)
         });
 
