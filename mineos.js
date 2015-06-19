@@ -328,9 +328,13 @@ mineos.mc = function(server_name, base_dir) {
         });
 
         unzipper.on('list', function (files) {
-          var strip_components = check_if_same_root(files);
           async.series([
-            async.apply(move_to_parent_dir, self.env.cwd),
+            function(cb) {
+              if (check_if_same_root(files))
+                move_to_parent_dir(self.env.cwd, cb);
+              else
+                cb();
+            },
             async.apply(self.sp),
             async.apply(self.sc),
             async.apply(self.crons),
