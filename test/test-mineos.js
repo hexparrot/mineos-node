@@ -1831,6 +1831,13 @@ test.create_server_from_awd_zip = function(test) {
         test.equal(dict.java.java_xmx, 'MaxRAM');
         callback(err);
       })
+    },
+    function(callback) {
+      async.parallel([
+        async.apply(fs.stat, instance.env.sp),
+        async.apply(fs.stat, instance.env.sc),
+        async.apply(fs.stat, instance.env.cc)
+      ], callback)
     }
   ], function(err) {
     test.ifError(err);

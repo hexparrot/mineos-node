@@ -330,7 +330,10 @@ mineos.mc = function(server_name, base_dir) {
         unzipper.on('list', function (files) {
           var strip_components = check_if_same_root(files);
           async.series([
-            async.apply(move_to_parent_dir, self.env.cwd)
+            async.apply(move_to_parent_dir, self.env.cwd),
+            async.apply(self.sp),
+            async.apply(self.sc),
+            async.apply(self.crons)
           ], callback)
         });
 
