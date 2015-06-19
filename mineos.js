@@ -324,6 +324,8 @@ mineos.mc = function(server_name, base_dir) {
             async.apply(self.sp),
             async.apply(self.sc),
             async.apply(self.crons),
+            async.apply(fs.ensureDir, self.env.bwd),
+            async.apply(fs.ensureDir, self.env.awd),
             async.apply(self.chown, owner.uid, owner.gid)
           ], callback)
         });

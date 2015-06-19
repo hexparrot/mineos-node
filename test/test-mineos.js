@@ -1836,7 +1836,9 @@ test.create_server_from_awd_zip = function(test) {
       async.parallel([
         async.apply(fs.stat, instance.env.sp),
         async.apply(fs.stat, instance.env.sc),
-        async.apply(fs.stat, instance.env.cc)
+        async.apply(fs.stat, instance.env.cc),
+        async.apply(fs.stat, instance.env.bwd),
+        async.apply(fs.stat, instance.env.awd)
       ], callback)
     },
     function(callback) {
