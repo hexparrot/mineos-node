@@ -1805,6 +1805,23 @@ test.create_server_from_awd = function(test) {
         test.ifError(!err);
         callback(!err);
       });
+    },
+    function(callback) {
+      async.parallel([
+        async.apply(fs.stat, new_instance.env.sp),
+        async.apply(fs.stat, new_instance.env.sc),
+        async.apply(fs.stat, new_instance.env.cc),
+        async.apply(fs.stat, new_instance.env.bwd),
+        async.apply(fs.stat, new_instance.env.awd)
+      ], callback)
+    },
+    function(callback) {
+      new_instance.property('owner', function(err, result) {
+        test.ifError(err);
+        test.equal(OWNER_CREDS['uid'], result['uid']);
+        test.equal(OWNER_CREDS['gid'], result['gid']);
+        callback(err);
+      })
     }
   ], function(err) {
     test.ifError(err);

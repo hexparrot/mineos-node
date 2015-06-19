@@ -348,7 +348,8 @@ mineos.mc = function(server_name, base_dir) {
             proc.once('exit', function(code) {
               cb(code);
             })
-          }
+          },
+          async.apply(self.chown, owner.uid, owner.gid)
         ], callback)
         break;
     }
