@@ -344,17 +344,27 @@ mineos.mc = function(server_name, base_dir) {
       case 'tar.gz':
       case 'tgz':
       case 'tar':
-        var binary = which.sync('tar');
-        var args = ['xf', dest_filepath];
-        var params = { cwd: self.env.cwd };
+        var tar = require('tar');
+        var zlib = require('zlib');
 
         async.series([
           async.apply(self.create, owner),
           function(cb) {
-            var proc = child_process.spawn(binary, args, params);
-            proc.once('exit', function(code) {
-              cb(code);
+            var extractor = tar.Extract({
+              path: self.env.cwd
             })
+              .on('error', function(err) {
+                cb(err);
+              })
+              .on('end', function() {
+                cb();
+              });
+
+            var gunzip = zlib.createGunzip();
+            fs.createReadStream(dest_filepath)
+              .pipe(gunzip)
+              .pipe(extractor);
+
           },
           async.apply(self.chown, owner.uid, owner.gid)
         ], callback)

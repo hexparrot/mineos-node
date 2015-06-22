@@ -65,6 +65,8 @@
     "urllib": "2.3.x",
     "daemonize2": "0.4.x",
     "tarball-extract": "0.0.3",
+    "tar": "2.1.x",
+    "zlib": "1.0.x",
     "decompress-zip": "0.2.x"
   },
   "devDependencies": {
