@@ -53,7 +53,6 @@ server.backend = function(base_dir, socket_emitter) {
     var fireworm = require('fireworm');
     var server_path = path.join(base_dir, mineos.DIRS['servers']);
     
-
     var fw = fireworm(server_path);
     fw.add('**/server.properties');
 
@@ -75,14 +74,22 @@ server.backend = function(base_dir, socket_emitter) {
   })();
 
   (function() {
+    var fireworm = require('fireworm');
     var importable_archives = path.join(base_dir, mineos.DIRS['import']);
-    self.watches['importables'] = chokidar.watch(importable_archives, { 
-      persistent: true, 
-      depth: 1, 
-      ignoreInitial: true });
+
+    var fw = fireworm(importable_archives);
+    fw.add('**/*.zip');
+    fw.add('**/*.tar');
+    fw.add('**/*.tgz');
+    fw.add('**/*.tar.gz');
     
-    self.watches['importables']
-      .on('ready', function() {
+    fw
+      .on('add', function(fp) {
+        logging.info('[WEBUI] New file found in import directory', fp);
+        self.send_importable_list();
+      })
+      .on('remove', function(fp) {
+        logging.info('[WEBUI] File removed from import directory', fp);
         self.send_importable_list();
       })
   })();
