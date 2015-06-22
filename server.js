@@ -679,11 +679,37 @@ function server_container(server_name, base_dir, socket_io) {
   make_tail('logs/latest.log');
   make_tail('server.log');
 
-  make_watch('server.properties', broadcast_sp);
-  make_watch('server.config', broadcast_sc);
-  make_watch('cron.config', broadcast_cc);
-  make_watch('eula.txt', emit_eula);
-  make_watch('server-icon.png', broadcast_icon);
+  (function() {
+    var fireworm = require('fireworm');
+    var fw = fireworm(instance.env.cwd);
+
+    fw.add('**/server.properties');
+    fw.add('**/server.config');
+    fw.add('**/cron.config');
+    fw.add('**/eula.txt');
+    fw.add('**/server-icon.png');
+    
+    fw.on('add', function(fp) {
+      var file_name = path.basename(fp);
+      switch (file_name) {
+        case 'server.properties':
+          broadcast_sp();
+          break;
+        case 'server.config':
+          broadcast_sc();
+          break;
+        case 'cron.config':
+          broadcast_cc();
+          break;
+        case 'eula.txt':
+          emit_eula();
+          break;
+        case 'server-icon.png':
+          broadcast_icon();
+          break;
+      }
+    })
+  })();
 
   heartbeat_interval = setInterval(heartbeat, HEARTBEAT_INTERVAL_MS);
 
