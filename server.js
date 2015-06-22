@@ -54,28 +54,20 @@ server.backend = function(base_dir, socket_emitter) {
     var server_path = path.join(base_dir, mineos.DIRS['servers']);
     
 
-    var fw = fireworm(server_path, {ignoreInitial: true});
+    var fw = fireworm(server_path);
     fw.add('**/server.properties');
 
     fw
       .on('add', function(fp){
         var server_name = path.basename(path.dirname(fp));
-        async.nextTick(function() {
-          self.servers[server_name] = new server_container(server_name, base_dir, self.front_end);
-          self.front_end.emit('track_server', server_name);
-        });
+        if (!(server_name in self.servers))
+          async.nextTick(function() {
+            self.servers[server_name] = new server_container(server_name, base_dir, self.front_end);
+            self.front_end.emit('track_server', server_name);
+          });
       })
-  })();
-
-  (function() {
-    var server_path = path.join(base_dir, mineos.DIRS['servers']);
-    self.watches['server_removed'] = chokidar.watch(server_path, { persistent: true, depth: 1 });
-    // ignores event updates from servers that have more path beyond the /servers/<dirhere>/<filehere>
-
-    self.watches['server_removed']
-      .on('unlinkDir', function(dirpath) {
-        // event to trigger when server directory deleted
-        var server_name = path.basename(dirpath);
+      .on('remove', function(fp) {
+        var server_name = path.basename(path.dirname(fp));
         self.servers[server_name].cleanup();
         delete self.servers[server_name];
         self.front_end.emit('untrack_server', server_name);
