@@ -184,10 +184,10 @@ input.search-query {
 ----------------------------------------------------------------------------- */
 .form-actions {
 	padding: 19px 20px 20px;
-	border-top: 1px solid #eaeaea;
-	-webkit-border-radius: 0px 0px 3px 3px;
-	border-radius: 0px 0px 3px 3px;
-	background-color: #f5f5f5;
+	border: 0;
+	-webkit-border-radius: 0px;
+	border-radius: 0px;
+	background-color: #ffffff;
 	-webkit-box-shadow: inset 0px 5px 5px -5px rgba(0, 0, 0, 0.05);
 	box-shadow: inset 0px 5px 5px -5px rgba(0, 0, 0, 0.05);
 }
