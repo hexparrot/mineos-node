@@ -1120,60 +1120,6 @@ test.prune = function(test) {
   })  
 }
 
-test.list_increments = function(test) {
-  var server_name = 'testing';
-  var instance = new mineos.mc(server_name, BASE_DIR);
-
-  async.series([
-    function(callback) {
-      instance.list_increments(function(err, increments) {
-        test.ok(err); // testing for error
-        callback(!err);
-      })
-    },
-    async.apply(instance.create, OWNER_CREDS),
-    function(callback) {
-      instance.list_increments(function(err, increments) {
-        test.ok(err); // testing for error
-        callback(!err);
-      })
-    },
-    function(callback) {
-      instance.backup(function() {
-        setTimeout(callback, 400);
-      })
-    },
-    function(callback) {
-      instance.modify_sp('server-port', 25570, function() {
-        setTimeout(callback, 400);
-      })
-    },
-    async.apply(instance.modify_sp, 'server-port', 25570),
-    function(callback) {
-      instance.backup(function() {
-        setTimeout(callback, 400);
-      })
-    },
-    function(callback) {
-      instance.list_increments(function(err, increments) {
-        test.equal(increments[0].step, '0B');
-        test.equal(increments[1].step, '1B');
-        for (var i in increments) {
-          test.ok('step' in increments[i]);
-          test.ok('time' in increments[i]);
-          test.ok('size' in increments[i]);
-          test.ok('cum' in increments[i]);
-        }
-        setTimeout(function() { callback(err) }, FS_DELAY_MS*3);
-      })
-    }
-  ], function(err, results) {
-    test.ifError(err);
-    test.expect(13);
-    test.done();
-  })  
-}
-
 test.modify_sp = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -1940,4 +1886,58 @@ test.onreboot = function(test) {
     test.ifError(err);
     test.done();
   })
+}
+
+test.list_increments = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    function(callback) {
+      instance.list_increments(function(err, increments) {
+        test.ok(err); // testing for error
+        callback(!err);
+      })
+    },
+    async.apply(instance.create, OWNER_CREDS),
+    function(callback) {
+      instance.list_increments(function(err, increments) {
+        test.ok(err); // testing for error
+        callback(!err);
+      })
+    },
+    function(callback) {
+      instance.backup(function() {
+        setTimeout(callback, FS_DELAY_MS*5);
+      })
+    },
+    function(callback) {
+      instance.modify_sp('server-port', 25570, function() {
+        setTimeout(callback, FS_DELAY_MS*5);
+      })
+    },
+    async.apply(instance.modify_sp, 'server-port', 25570),
+    function(callback) {
+      instance.backup(function() {
+        setTimeout(callback, FS_DELAY_MS*5);
+      })
+    },
+    function(callback) {
+      instance.list_increments(function(err, increments) {
+        test.equal(increments[0].step, '0B');
+        test.equal(increments[1].step, '1B');
+        for (var i in increments) {
+          test.ok('step' in increments[i]);
+          test.ok('time' in increments[i]);
+          test.ok('size' in increments[i]);
+          test.ok('cum' in increments[i]);
+        }
+        setTimeout(function() { callback(err) }, FS_DELAY_MS*3);
+      })
+    }
+  ], function(err, results) {
+    test.ifError(err);
+    test.expect(13);
+    test.done();
+  })  
 }
