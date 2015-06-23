@@ -18,7 +18,6 @@
   },
   "homepage": "https://github.com/hexparrot/mineos-node",
   "dependencies": {
-    "chokidar": "1.0.0-rc3",
     "introspect": "0.0.x",
     "tail": "0.4.x",
     "node-uuid": "1.4.x",

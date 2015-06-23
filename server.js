@@ -1,6 +1,5 @@
 var mineos = require('./mineos');
 var async = require('async');
-var chokidar = require('chokidar');
 var path = require('path');
 var events = require('events');
 var os = require('os');
@@ -50,35 +49,23 @@ server.backend = function(base_dir, socket_emitter) {
   })();
 
   (function() {
+    var fireworm = require('fireworm');
     var server_path = path.join(base_dir, mineos.DIRS['servers']);
-    self.watches['server_added'] = chokidar.watch(server_path, { persistent: true, depth: 2 });
     
-    self.watches['server_added']
-      .on('add', function(dirpath) {
-        if (/\/server\.properties$/.test(dirpath)) {
-          // event to trigger when new server detected, e.g., /var/games/minecraft/servers/asdf/server.properties
-          // ignores all events if string does not include 'server.properties'
-          var server_name = path.basename(path.dirname(dirpath));
+    var fw = fireworm(server_path);
+    fw.add('**/server.properties');
+
+    fw
+      .on('add', function(fp){
+        var server_name = path.basename(path.dirname(fp));
+        if (!(server_name in self.servers))
           async.nextTick(function() {
             self.servers[server_name] = new server_container(server_name, base_dir, self.front_end);
             self.front_end.emit('track_server', server_name);
           });
-        }
       })
-      .on('ready', function() {
-        setTimeout(self.start_servers, 2000);
-      })
-  })();
-
-  (function() {
-    var server_path = path.join(base_dir, mineos.DIRS['servers']);
-    self.watches['server_removed'] = chokidar.watch(server_path, { persistent: true, depth: 1 });
-    // ignores event updates from servers that have more path beyond the /servers/<dirhere>/<filehere>
-
-    self.watches['server_removed']
-      .on('unlinkDir', function(dirpath) {
-        // event to trigger when server directory deleted
-        var server_name = path.basename(dirpath);
+      .on('remove', function(fp) {
+        var server_name = path.basename(path.dirname(fp));
         self.servers[server_name].cleanup();
         delete self.servers[server_name];
         self.front_end.emit('untrack_server', server_name);
@@ -86,14 +73,22 @@ server.backend = function(base_dir, socket_emitter) {
   })();
 
   (function() {
+    var fireworm = require('fireworm');
     var importable_archives = path.join(base_dir, mineos.DIRS['import']);
-    self.watches['importables'] = chokidar.watch(importable_archives, { 
-      persistent: true, 
-      depth: 1, 
-      ignoreInitial: true });
+
+    var fw = fireworm(importable_archives);
+    fw.add('**/*.zip');
+    fw.add('**/*.tar');
+    fw.add('**/*.tgz');
+    fw.add('**/*.tar.gz');
     
-    self.watches['importables']
-      .on('ready', function() {
+    fw
+      .on('add', function(fp) {
+        logging.info('[WEBUI] New file found in import directory', fp);
+        self.send_importable_list();
+      })
+      .on('remove', function(fp) {
+        logging.info('[WEBUI] File removed from import directory', fp);
         self.send_importable_list();
       })
   })();
@@ -683,11 +678,37 @@ function server_container(server_name, base_dir, socket_io) {
   make_tail('logs/latest.log');
   make_tail('server.log');
 
-  make_watch('server.properties', broadcast_sp);
-  make_watch('server.config', broadcast_sc);
-  make_watch('cron.config', broadcast_cc);
-  make_watch('eula.txt', emit_eula);
-  make_watch('server-icon.png', broadcast_icon);
+  (function() {
+    var fireworm = require('fireworm');
+    var fw = fireworm(instance.env.cwd);
+
+    fw.add('**/server.properties');
+    fw.add('**/server.config');
+    fw.add('**/cron.config');
+    fw.add('**/eula.txt');
+    fw.add('**/server-icon.png');
+    
+    fw.on('add', function(fp) {
+      var file_name = path.basename(fp);
+      switch (file_name) {
+        case 'server.properties':
+          broadcast_sp();
+          break;
+        case 'server.config':
+          broadcast_sc();
+          break;
+        case 'cron.config':
+          broadcast_cc();
+          break;
+        case 'eula.txt':
+          emit_eula();
+          break;
+        case 'server-icon.png':
+          broadcast_icon();
+          break;
+      }
+    })
+  })();
 
   heartbeat_interval = setInterval(heartbeat, HEARTBEAT_INTERVAL_MS);
 
@@ -836,40 +857,16 @@ function server_container(server_name, base_dir, socket_io) {
     } catch (e) {
       logging.error('[{0}] Create tail on {1} failed'.format(server_name, rel_filepath));
       logging.info('[{0}] Watching for file generation: {1}'.format(server_name, rel_filepath));
+      
+      var fireworm = require('fireworm');
+      var fw = fireworm(instance.env.cwd);
 
-      var tail_lookout = chokidar.watch(instance.env.cwd, {persistent: true, ignoreInitial: true});
-      tail_lookout
-        .on('add', function(fp) {
-          var file = path.basename(fp);
-          if (path.basename(rel_filepath) == file) {
-            tail_lookout.close();
-            logging.debug('[{0}] {1} created! Watchfile {2} closed'.format(server_name, file, rel_filepath));
-            make_tail(rel_filepath);
-          }
-        })
-    }
-  }
-
-  function make_watch(rel_filepath, callback) {
-    /* creates a watch for a file relative to the CWD, e.g., /var/games/minecraft/servers/myserver.
-       watches are used for detecting file creation and changes.
-    */
-    var abs_filepath = path.join(instance.env.cwd, rel_filepath);
-
-    if (rel_filepath in watches) {
-      logging.warn('[{0}] Watch already exists for {1}'.format(server_name, rel_filepath));
-      return;
-    }
-
-    try {
-      var watcher = chokidar.watch(abs_filepath, {persistent: true});
-      watcher.on('change', function(fp) {
-        callback();
+      fw.add('**/{0}'.format(rel_filepath));
+      fw.on('add', function(fp) {
+        fw.clear();
+        logging.info('[{0}] {1} created! Watchfile {2} closed'.format(server_name, path.basename(fp), rel_filepath));
+        make_tail(rel_filepath);
       })
-      logging.debug('[{0}] Started watch on {1}'.format(server_name, rel_filepath));
-      watches[rel_filepath] = watcher;
-    } catch (e) {
-      logging.log(e) //handle error or ignore
     }
   }
 
