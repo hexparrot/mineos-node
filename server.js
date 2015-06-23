@@ -860,10 +860,11 @@ function server_container(server_name, base_dir, socket_io) {
       
       var fireworm = require('fireworm');
       var fw = fireworm(instance.env.cwd);
+
       fw.add('**/{0}'.format(rel_filepath));
       fw.on('add', function(fp) {
         fw.clear();
-        logging.log('[{0}] {1} created! Watchfile {2} closed'.format(server_name, path.basename(fp), rel_filepath));
+        logging.info('[{0}] {1} created! Watchfile {2} closed'.format(server_name, path.basename(fp), rel_filepath));
         make_tail(rel_filepath);
       })
     }
