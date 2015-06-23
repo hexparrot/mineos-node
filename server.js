@@ -1,6 +1,5 @@
 var mineos = require('./mineos');
 var async = require('async');
-var chokidar = require('chokidar');
 var path = require('path');
 var events = require('events');
 var os = require('os');
@@ -858,40 +857,15 @@ function server_container(server_name, base_dir, socket_io) {
     } catch (e) {
       logging.error('[{0}] Create tail on {1} failed'.format(server_name, rel_filepath));
       logging.info('[{0}] Watching for file generation: {1}'.format(server_name, rel_filepath));
-
-      var tail_lookout = chokidar.watch(instance.env.cwd, {persistent: true, ignoreInitial: true});
-      tail_lookout
-        .on('add', function(fp) {
-          var file = path.basename(fp);
-          if (path.basename(rel_filepath) == file) {
-            tail_lookout.close();
-            logging.debug('[{0}] {1} created! Watchfile {2} closed'.format(server_name, file, rel_filepath));
-            make_tail(rel_filepath);
-          }
-        })
-    }
-  }
-
-  function make_watch(rel_filepath, callback) {
-    /* creates a watch for a file relative to the CWD, e.g., /var/games/minecraft/servers/myserver.
-       watches are used for detecting file creation and changes.
-    */
-    var abs_filepath = path.join(instance.env.cwd, rel_filepath);
-
-    if (rel_filepath in watches) {
-      logging.warn('[{0}] Watch already exists for {1}'.format(server_name, rel_filepath));
-      return;
-    }
-
-    try {
-      var watcher = chokidar.watch(abs_filepath, {persistent: true});
-      watcher.on('change', function(fp) {
-        callback();
+      
+      var fireworm = require('fireworm');
+      var fw = fireworm(instance.env.cwd);
+      fw.add('**/{0}'.format(rel_filepath));
+      fw.on('add', function(fp) {
+        fw.clear();
+        logging.log('[{0}] {1} created! Watchfile {2} closed'.format(server_name, path.basename(fp), rel_filepath));
+        make_tail(rel_filepath);
       })
-      logging.debug('[{0}] Started watch on {1}'.format(server_name, rel_filepath));
-      watches[rel_filepath] = watcher;
-    } catch (e) {
-      logging.log(e) //handle error or ignore
     }
   }
 
