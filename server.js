@@ -186,6 +186,10 @@ server.backend = function(base_dir, socket_emitter) {
               logging.error(err);
           })
           break;
+        case 'refresh_server_list':
+          for (var s in self.servers)
+            self.front_end.emit('track_server', s);
+          break;
         case 'create_from_archive':
           var instance = new mineos.mc(args.new_server_name, base_dir);
 

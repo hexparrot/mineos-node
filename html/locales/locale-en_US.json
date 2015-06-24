@@ -1,6 +1,7 @@
 {
   "WEBSITE_TITLE": "MineOS Web User Interface",
   "NOTIFICATIONS": "Notifications",
+  "REFRESH_SERVER_LIST": "Refresh Server List",
   "LOG_OFF": "Log Off",
 
   "HOST_SETTINGS": "Host Settings",
