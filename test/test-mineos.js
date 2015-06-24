@@ -1371,8 +1371,6 @@ test.accept_eula = function(test) {
 }
 
 test.chown = function(test) {
-  test.done();
-  return;
   var userid = require('userid');
 
   var server_name = 'testing';
@@ -1408,9 +1406,24 @@ test.chown = function(test) {
         test.equal(NEW_OWNER_CREDS['gid'], result['gid']);
         callback(err);
       })
-    }
+    },
+    function(callback) {
+      instance.chown(8877, 8877, function(err) {
+        test.ifError(!err);
+        callback(!err);
+      })
+    },
+    function(callback) {
+      instance.property('owner', function(err, result) {
+        test.ifError(err);
+        test.equal(NEW_OWNER_CREDS['uid'], result['uid']);
+        test.equal(NEW_OWNER_CREDS['gid'], result['gid']);
+        callback(err);
+      })
+    },
+
   ], function(err) {
-    test.expect(6);
+    test.ifError(err);
     test.done();
   })
 }
