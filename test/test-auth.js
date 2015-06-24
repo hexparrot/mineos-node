@@ -71,3 +71,32 @@ test.test_membership = function(test) {
     test.done();
   })
 }
+
+test.verify_ids = function(test) {
+  async.series([
+    async.apply(auth.verify_ids, 1000, 1000),
+    function(callback) {
+      auth.verify_ids(9876, 1000, function(err) {
+        test.equal(err, 'UID 9876 does not exist on this system');
+        callback();
+      })
+    },
+    function(callback) {
+      auth.verify_ids(1000, 9876, function(err) {
+        test.equal(err, 'GID 9876 does not exist on this system');
+        callback();
+      })
+    },
+    function(callback) {
+      auth.verify_ids(9876, 9876, function(err) {
+        test.equal(err, 'UID 9876 does not exist on this system');
+        callback();
+      })
+    }
+  ], function(err, results) {
+    console.lo
+    test.ifError(err);
+    test.done();
+  })
+}
+

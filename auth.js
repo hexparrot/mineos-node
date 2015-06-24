@@ -43,3 +43,39 @@ auth.test_membership = function(username, group, callback) {
       callback(membership_valid);
     })
 }
+
+auth.verify_ids = function(uid, gid, callback) {
+  var passwd = require('etc-passwd');
+
+  var uid_present = false;
+  var gid_present = false;
+
+  async.series([
+    function(cb) {
+      var gg = passwd.getUsers()
+        .on('user', function(user_data) {
+          if (user_data.uid == uid)
+            uid_present = true;
+        })
+        .on('end', function() {
+          if (!uid_present)
+            cb('UID ' + uid + ' does not exist on this system');
+          else
+            cb();
+        })
+    },
+    function(cb) {
+      var gg = passwd.getGroups()
+        .on('group', function(group_data) {
+          if (group_data.gid == gid)
+            gid_present = true;
+        })
+        .on('end', function() {
+          if (!gid_present)
+            cb('GID ' + gid + ' does not exist on this system');
+          else
+            cb();
+        })
+    }
+  ], callback)
+}
