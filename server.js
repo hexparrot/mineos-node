@@ -334,16 +334,24 @@ server.backend = function(base_dir, socket_emitter) {
 
           var dir_concat = args.profile.id;
           var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
-          var filename = args.profile.name;
+          var filename = args.profile.filename;
           var dest_filepath = path.join(dest_dir, filename);
 
-          var url = 'https://github.com/PocketMine/PocketMine-MP/releases/download/{0}/{1}'.format(args.profile.version, args.profile.name);;
+          var URL_STABLE = 'https://github.com/PocketMine/PocketMine-MP/releases/download/{0}/{1}';
+          var URL_DEVELOPMENT = 'http://jenkins.pocketmine.net/job/PocketMine-MP/{0}/artifact/{1}';
 
           fs.ensureDir(dest_dir, function(err) {
             if (err) {
               logging.error('[WEBUI] Error attempting download:', err);
             } else {
-              request(url)
+              var url_to_use = '';
+
+              if (args.profile.channel == 'stable')
+                url_to_use = URL_STABLE.format(args.profile.short_version, args.profile.filename);
+              else
+                url_to_use = URL_DEVELOPMENT.format(args.profile.build, args.profile.filename);
+
+              request(url_to_use)
                 .on('complete', function(response) {
                   if (response.statusCode == 200) {
                     logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
@@ -553,40 +561,49 @@ server.backend = function(base_dir, socket_emitter) {
       },
       pocketmine: function(callback) {
         var request = require('request');
-        var options = {
-          url: 'https://api.github.com/repos/PocketMine/PocketMine-MP/releases',
-          headers: {
-            'User-Agent': 'MineOS Release Browser'
-          }
-        };
+
+        var URL_DEVELOPMENT = "http://www.pocketmine.net/api/?channel=development";
+        var URL_STABLE = "http://www.pocketmine.net/api/?channel=stable";
 
         var p = [];
 
-        function handle_reply(err, response, body) {
-          if (!err && response.statusCode == 200) {
-            var releases = JSON.parse(body);
+        function handle_reply(err, retval) {
+          for (var r in retval) 
+            if (retval[r].statusCode == 200) {
+              var releases = JSON.parse(retval[r].body);
 
-            for (var index in releases) {
-              for (var asset in releases[index].assets) {
-                if (releases[index].assets[asset].name.slice(-5).toLowerCase() == '.phar') {
-                  var item = releases[index].assets[asset];
-                  var version = releases[index].tag_name;
-                  var dir_concat = 'Pocketmine-{0}'.format(version);
-                  item['group'] = 'pocketmine';
-                  item['type'] = (releases[index].prerelease ? 'snapshot' : 'release');
-                  item['id'] = dir_concat;
-                  item['version'] = releases[index].tag_name;
-                  item['webui_desc'] = 'Pocketmine phar download';
-                  item['weight'] = 10;
-                  item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item.name));
-                  p.push(item);
-                }
+              var item = releases;
+              var version = releases.version;
+              var dir_concat = 'Pocketmine-{0}'.format(version);
+              item['channel'] = r;
+              item['filename'] = path.basename(item.download_url);
+              item['group'] = 'pocketmine';
+              item['id'] = dir_concat;
+              item['version'] = version;
+              switch (item.channel) {
+                case 'stable':
+                  item['short_version'] = path.basename(item.details_url);
+                  item['type'] = 'release';
+                  break;
+                case 'development':
+                  item['short_version'] = version;
+                  item['type'] = 'snapshot';
+                  break;
               }
+              item['webui_desc'] = 'phar build {0}, api {1}'.format(item.build, item.api_version);
+              item['weight'] = 10;
+              item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item.filename));
+              p.push(item);
+
             }
-          }
-          callback(err, p);
+          callback(null, p)
         }
-        request(options, handle_reply);
+
+        async.auto({
+          'stable': async.retry(2, async.apply(request, URL_STABLE)),
+          'development': async.retry(2, async.apply(request, URL_DEVELOPMENT)),
+        }, handle_reply)
+
       },
       php: function(callback) {
         var request = require('request');
