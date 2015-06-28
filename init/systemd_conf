@@ -5,9 +5,9 @@ After=network.target
 [Service]
 WorkingDirectory=/usr/games/minecraft
 Type=forking
-ExecStart=/usr/bin/nodejs service.js start
-ExecStop=/usr/bin/nodejs service.js stop
-ExecReload=/usr/bin/nodejs service.js restart
+ExecStart=/usr/bin/node service.js start
+ExecStop=/usr/bin/node service.js stop
+ExecReload=/usr/bin/node service.js restart
 PIDFile=/var/run/mineos.pid
 Restart=always
 

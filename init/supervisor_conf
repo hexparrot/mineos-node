@@ -1,5 +1,5 @@
 [program:mineos]
-command=/usr/bin/nodejs webui.js
+command=/usr/bin/node webui.js
 directory=/usr/games/minecraft
 user=root
 autostart=true
