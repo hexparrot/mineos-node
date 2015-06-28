@@ -65,7 +65,8 @@
     "tarball-extract": "0.0.3",
     "tar": "2.1.x",
     "decompress-zip": "0.2.x",
-    "fireworm": "0.6.x"
+    "fireworm": "0.6.x",
+    "request-progress": "0.3.x"
   },
   "devDependencies": {
     "nodeunit": "0.9.x"

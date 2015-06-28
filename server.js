@@ -213,6 +213,7 @@ server.backend = function(base_dir, socket_emitter) {
           break;
         case 'mojang_download':
           var request = require('request');
+          var progress = require('request-progress');
           var fs = require('fs-extra');
 
           var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.profile.id);
@@ -225,13 +226,17 @@ server.backend = function(base_dir, socket_emitter) {
             if (err) {
               logging.error('[WEBUI] Error attempting download:', err);
             } else {
-              request(url)
+              progress(request(url), {
+                throttle: 1000,
+                delay: 100
+              })
                 .on('complete', function(response) {
                   if (response.statusCode == 200) {
                     logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
                     args['dest_dir'] = dest_dir;
                     args['filename'] = filename;
                     args['success'] = true;
+                    args['progress']['percent'] = 100;
                     args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
                     self.front_end.emit('file_download', args);
                     self.send_profile_list();
@@ -242,6 +247,10 @@ server.backend = function(base_dir, socket_emitter) {
                     args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
                     self.front_end.emit('file_download', args);
                   }
+                })
+                .on('progress', function(state) {
+                  args['progress'] = state;
+                  self.front_end.emit('file_progress', args);
                 })
                 .pipe(fs.createWriteStream(dest_filepath))
             }

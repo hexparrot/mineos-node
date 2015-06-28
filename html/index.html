@@ -646,7 +646,7 @@
                                                 <td>[{{ jar.group }}] <strong>{{ jar.type }}</strong></td>
                                                 <td>
                                                     <p>
-                                                        <button type="button" class="btn btn-mini btn-success" ng-click="host_command(jar.group + '_download', {profile: jar})" translate="DOWNLOAD"></button> <span ng-show="jar.downloaded" class="icone-ok">{{ 'DOWNLOADED' | translate }}</span>
+                                                        <button type="button" class="btn btn-mini btn-success" ng-click="host_command(jar.group + '_download', {profile: jar})" translate="DOWNLOAD"></button> <span ng-show="jar.progress.percent > 0 && jar.progress.percent < 100">{{ jar.progress.percent + '%' }}</span> <span ng-show="jar.downloaded" class="icone-ok">{{ 'DOWNLOADED' | translate }}</span>
                                                     </p>
                                                 </td>
                                             </tr>
