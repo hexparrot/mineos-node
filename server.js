@@ -66,8 +66,12 @@ server.backend = function(base_dir, socket_emitter) {
       })
       .on('remove', function(fp) {
         var server_name = path.basename(path.dirname(fp));
-        self.servers[server_name].cleanup();
-        delete self.servers[server_name];
+        try {
+          self.servers[server_name].cleanup();
+          delete self.servers[server_name];
+        } catch (e) {
+          //if server has already been deleted and this is running for reasons unknown, catch and ignore
+        }
         self.front_end.emit('untrack_server', server_name);
       })
   })();
@@ -450,7 +454,7 @@ server.backend = function(base_dir, socket_emitter) {
         function handle_reply(err, response, body) {
           var p = [];
 
-          if (!err && response.statusCode === 200)
+          if (!err && (response || {}).statusCode === 200)
             for (var index in body.versions) {
               var item = body.versions[index];
               item['group'] = 'mojang';
@@ -476,7 +480,7 @@ server.backend = function(base_dir, socket_emitter) {
         function handle_reply(err, response, body) {
           var p = [];
 
-          if (!err && response.statusCode === 200)
+          if (!err && (response || {}).statusCode === 200)
             xml_parser.parseString(body, function(inner_err, result) {
               var packs = result['modpacks']['modpack'];
 
@@ -523,7 +527,7 @@ server.backend = function(base_dir, socket_emitter) {
         function handle_reply(err, response, body) {
           var p = [];
 
-          if (!err && response.statusCode === 200)
+          if (!err && (response || {}).statusCode == 200)
             xml_parser.parseString(body, function(inner_err, result) {
               var packs = result['modpacks']['modpack'];
 
@@ -569,7 +573,7 @@ server.backend = function(base_dir, socket_emitter) {
 
         function handle_reply(err, retval) {
           for (var r in retval) 
-            if (retval[r].statusCode == 200) {
+            if ((retval[r] || {}).statusCode == 200) {
               var releases = JSON.parse(retval[r].body);
 
               var item = releases;
@@ -611,7 +615,7 @@ server.backend = function(base_dir, socket_emitter) {
         var p = [];
 
         function handle_reply(err, response, body) {
-          if (!err && response.statusCode == 200) {
+          if (!err && (response || {}).statusCode == 200) {
             var lines = body.split('\n');
             for (var i in lines) {
               var matching = lines[i].match(BUILD_REGEX);
