@@ -163,6 +163,9 @@ server.backend = function(base_dir, socket_emitter) {
 
   self.front_end.on('connection', function(socket) {
     var userid = require('userid');
+    var request = require('request');
+    var progress = require('request-progress');
+    var fs = require('fs-extra');
 
     var ip_address = socket.request.connection.remoteAddress;
     var username = socket.request.user.username;
@@ -212,10 +215,6 @@ server.backend = function(base_dir, socket_emitter) {
           })
           break;
         case 'mojang_download':
-          var request = require('request');
-          var progress = require('request-progress');
-          var fs = require('fs-extra');
-
           var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.profile.id);
           var filename = 'minecraft_server.{0}.jar'.format(args.profile.id);
           var dest_filepath = path.join(dest_dir, filename);
@@ -257,8 +256,6 @@ server.backend = function(base_dir, socket_emitter) {
           });
           break;
         case 'ftb_download':
-          var request = require('request');
-          var fs = require('fs-extra');
           var unzip = require('unzip');
 
           var dir_concat = '{0}-{1}'.format(args.profile.dir, args.profile.version);
@@ -272,7 +269,10 @@ server.backend = function(base_dir, socket_emitter) {
             if (err) {
               logging.error('[WEBUI] Error attempting download:', err);
             } else {
-              request(url)
+              progress(request(url), {
+                throttle: 1000,
+                delay: 100
+              })
                 .on('complete', function(response) {
                   if (response.statusCode == 200) {
                     logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
@@ -293,14 +293,16 @@ server.backend = function(base_dir, socket_emitter) {
                     args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
                     self.front_end.emit('file_download', args);
                   }
+                })
+                .on('progress', function(state) {
+                  args['progress'] = state;
+                  self.front_end.emit('file_progress', args);
                 })
                 .pipe(fs.createWriteStream(dest_filepath))
             }
           });
           break;
         case 'ftb_third_party_download':
-          var request = require('request');
-          var fs = require('fs-extra');
           var unzip = require('unzip');
 
           var dir_concat = '{0}-{1}'.format(args.profile.dir, args.profile.version);
@@ -314,7 +316,10 @@ server.backend = function(base_dir, socket_emitter) {
             if (err) {
               logging.error('[WEBUI] Error attempting download:', err);
             } else {
-              request(url)
+              progress(request(url), {
+                throttle: 1000,
+                delay: 100
+              })
                 .on('complete', function(response) {
                   if (response.statusCode == 200) {
                     logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
@@ -336,14 +341,15 @@ server.backend = function(base_dir, socket_emitter) {
                     self.front_end.emit('file_download', args);
                   }
                 })
+                .on('progress', function(state) {
+                  args['progress'] = state;
+                  self.front_end.emit('file_progress', args);
+                })
                 .pipe(fs.createWriteStream(dest_filepath))
             }
           });
           break;
         case 'pocketmine_download':
-          var request = require('request');
-          var fs = require('fs-extra');
-
           var dir_concat = args.profile.id;
           var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
           var filename = args.profile.filename;
@@ -363,7 +369,10 @@ server.backend = function(base_dir, socket_emitter) {
               else
                 url_to_use = URL_DEVELOPMENT.format(args.profile.build, args.profile.filename);
 
-              request(url_to_use)
+              progress(request(url_to_use), {
+                throttle: 1000,
+                delay: 100
+              })
                 .on('complete', function(response) {
                   if (response.statusCode == 200) {
                     logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
@@ -381,13 +390,15 @@ server.backend = function(base_dir, socket_emitter) {
                     self.front_end.emit('file_download', args);
                   }
                 })
+                .on('progress', function(state) {
+                  args['progress'] = state;
+                  self.front_end.emit('file_progress', args);
+                })
                 .pipe(fs.createWriteStream(dest_filepath))
             }
           });
           break;
         case 'php_download':
-          var request = require('request');
-          var fs = require('fs-extra');
           var tarball = require('tarball-extract')
 
           var dir_concat = args.profile.id;
@@ -401,7 +412,10 @@ server.backend = function(base_dir, socket_emitter) {
             if (err) {
               logging.error('[WEBUI] Error attempting download:', err);
             } else {
-              request(url)
+              progress(request(url), {
+                throttle: 1000,
+                delay: 100
+              })
                 .on('complete', function(response) {
                   if (response.statusCode == 200) {
                     logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
@@ -424,6 +438,10 @@ server.backend = function(base_dir, socket_emitter) {
                     args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
                     self.front_end.emit('file_download', args);
                   }
+                })
+                .on('progress', function(state) {
+                  args['progress'] = state;
+                  self.front_end.emit('file_progress', args);
                 })
                 .pipe(fs.createWriteStream(dest_filepath))
             }
