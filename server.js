@@ -17,7 +17,6 @@ server.backend = function(base_dir, socket_emitter) {
 
   self.servers = {};
   self.profiles = {};
-  self.watches = {};
   self.front_end = socket_emitter;
 
   fs.ensureDirSync(base_dir);
@@ -688,12 +687,11 @@ server.backend = function(base_dir, socket_emitter) {
 }
 
 function server_container(server_name, base_dir, socket_io) {
-  // when evoked, creates a permanent 'mc' instance, namespace, and place for file tails/watches. 
+  // when evoked, creates a permanent 'mc' instance, namespace, and place for file tails. 
   var self = this;
   var instance = new mineos.mc(server_name, base_dir),
       nsp = socket_io.of('/{0}'.format(server_name)),
       tails = {},
-      watches = {},
       notices = [],
       cron = {},
       heartbeat_interval = null,
@@ -787,9 +785,6 @@ function server_container(server_name, base_dir, socket_io) {
   self.cleanup = function () {
     for (var t in tails)
       tails[t].unwatch();
-
-    for (var w in watches)
-      watches[w].close();
 
     clearInterval(heartbeat_interval);
     nsp.removeAllListeners();
