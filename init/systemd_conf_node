@@ -1,0 +1,15 @@
+[Unit]
+Description=Start MineOS minecraft front-end
+After=network.target
+
+[Service]
+WorkingDirectory=/usr/games/minecraft
+Type=forking
+ExecStart=/usr/bin/node service.js start
+ExecStop=/usr/bin/node service.js stop
+ExecReload=/usr/bin/node service.js restart
+PIDFile=/var/run/mineos.pid
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
