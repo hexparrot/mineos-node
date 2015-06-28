@@ -236,6 +236,14 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     });
   })
 
+  socket.on('/', 'file_progress', function(data) {
+    for (var p in $scope.profiles)
+      if (data.profile.group == $scope.profiles[p].group &&
+          data.profile.id == $scope.profiles[p].id &&
+          data.profile.type == $scope.profiles[p].type)
+        $scope.profiles[p].progress = data.progress;
+  })
+
   $scope.loadavg = [];
   $scope.loadavg_options = {
       element: $("#load_averages"),
