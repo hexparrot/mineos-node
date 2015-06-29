@@ -546,7 +546,9 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
       me.latest_notice[data.command] = data;
       me.channel.emit(server_name, 'page_data', 'glance');
 
-      var suppress = ('suppress_popup' in data ? data.suppress_popup : false);
+      var suppress = false;
+      if ('suppress_popup' in data || data.success)
+        suppress = true;
 
       if (data.err == 'eula') 
         $('#modal_eula').modal('show');
