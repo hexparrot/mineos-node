@@ -20,7 +20,11 @@ server.backend = function(base_dir, socket_emitter) {
   self.front_end = socket_emitter;
 
   fs.ensureDirSync(base_dir);
+  fs.ensureDirSync(path.join(base_dir, mineos.DIRS['servers']));
+  fs.ensureDirSync(path.join(base_dir, mineos.DIRS['backup']));
+  fs.ensureDirSync(path.join(base_dir, mineos.DIRS['archive']));
   fs.ensureDirSync(path.join(base_dir, mineos.DIRS['import']));
+  fs.ensureDirSync(path.join(base_dir, mineos.DIRS['profiles']));
 
   (function() {
     //thanks to https://github.com/flareofghast/node-advertiser/blob/master/advert.js
