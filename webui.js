@@ -103,10 +103,19 @@ io.use(passportSocketIO.authorize({
 }));
 
 function tally(callback) {
+  var os = require('os');
+  var urllib = require('urllib');
+
+  var tally_info = {
+      sysname: os.type(), 
+      release: os.release(), 
+      nodename: os.hostname(),
+      version: '',
+      machine: process.arch
+    }
+
   try {
-    var uname = require('uname');
-    var urllib = require('urllib');
-    urllib.request('http://minecraft.codeemo.com/tally/tally-node.py', {data: uname.uname()}, function(){});
+    urllib.request('http://minecraft.codeemo.com/tally/tally-node.py', {data: tally_info}, function(){});
   } catch (e) {
     console.log('MineOS unable to load "uname" module; tally failed.')
   }
