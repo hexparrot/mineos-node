@@ -713,6 +713,29 @@ test.sp = function(test) {
   })
 }
 
+test.owner_unknown_ids = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(fs.chown, instance.env.cwd, 4141, 4141),
+    function(callback) {
+      instance.property('owner', function(err, owner_info) {
+        test.ifError(err);
+        test.ok('uid' in owner_info);
+        test.ok('gid' in owner_info);
+        test.equal(owner_info.username, '?');
+        test.equal(owner_info.groupname, '?');
+        callback(err);
+      })
+    }
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
 test.properties = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);

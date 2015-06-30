@@ -872,12 +872,21 @@ mineos.mc = function(server_name, base_dir) {
           if (err)
             callback(err, {});
           else {
-            callback(err, {
-              uid: stat_info['uid'],
-              gid: stat_info['gid'],
-              username: userid.username(stat_info['uid']),
-              groupname: userid.groupname(stat_info['gid'])
-            });
+            try {
+              callback(err, {
+                uid: stat_info['uid'],
+                gid: stat_info['gid'],
+                username: userid.username(stat_info['uid']),
+                groupname: userid.groupname(stat_info['gid'])
+              });
+            } catch (e) {
+              callback(err, {
+                uid: stat_info['uid'],
+                gid: stat_info['gid'],
+                username: '?',
+                groupname: '?'
+              });
+            }
           }
         })
         break;
