@@ -742,26 +742,34 @@ function server_container(server_name, base_dir, socket_io) {
     fw.add('**/eula.txt');
     fw.add('**/server-icon.png');
     
-    fw.on('add', function(fp) {
+    function handle_event(fp) {
+      var FS_DELAY = 250; 
+      // because it is unknown when fw triggers on add/change and
+      // further because if it catches DURING the write, it will find
+      // the file has 0 size, adding arbitrary delay.
+      // process.nexttick didnt work.
       var file_name = path.basename(fp);
       switch (file_name) {
         case 'server.properties':
-          broadcast_sp();
+          setTimeout(broadcast_sp, FS_DELAY);
           break;
         case 'server.config':
-          broadcast_sc();
+          setTimeout(broadcast_sc, FS_DELAY);
           break;
         case 'cron.config':
-          broadcast_cc();
+          setTimeout(broadcast_cc, FS_DELAY);
           break;
         case 'eula.txt':
-          emit_eula();
+          setTimeout(emit_eula, FS_DELAY);
           break;
         case 'server-icon.png':
-          broadcast_icon();
+          setTimeout(broadcast_icon, FS_DELAY);
           break;
       }
-    })
+    }
+    
+    fw.on('add', handle_event);
+    fw.on('change', handle_event);
   })();
 
   heartbeat_interval = setInterval(heartbeat, HEARTBEAT_INTERVAL_MS);
