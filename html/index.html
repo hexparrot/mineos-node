@@ -766,7 +766,7 @@
                                                                 profile_downloaded: 'only_downloaded' | 
                                                                 orderBy:'-releaseTime'" 
                                                                 ng-change="change_sc('minecraft', 'profile', myprofile.id)">
-                                                                <option value="" disabled selected translate="CHANGE_PROFILE_TO"></option>
+                                                                <option value="" selected translate="CHANGE_PROFILE_TO"></option>
                                                             </select>
                                                         </div>
                                                         <div class="controls">
@@ -794,7 +794,7 @@
                                                     <div class="control-group">
                                                         <div class="controls">
                                                             <select class="span6" ng-model="myjarfile" data-ng-options="j for j in servers[current].page_data.glance.server_files" ng-change="change_sc('java', 'jarfile', myjarfile)">
-                                                                <option value="" disabled selected translate="CHANGE_JARFILE_TO"></option>
+                                                                <option value="" selected translate="CHANGE_JARFILE_TO"></option>
                                                             </select>
                                                         </div>
                                                     </div><!--/ Select -->
