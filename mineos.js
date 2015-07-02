@@ -327,13 +327,13 @@ mineos.mc = function(server_name, base_dir) {
          
         unzipper.on('extract', function (log) {
           async.series([
+            async.apply(self.chown, owner.uid, owner.gid),
             async.apply(move_to_parent_dir, self.env.cwd),
             async.apply(self.sp),
             async.apply(self.sc),
             async.apply(self.crons),
             async.apply(fs.ensureDir, self.env.bwd),
-            async.apply(fs.ensureDir, self.env.awd),
-            async.apply(self.chown, owner.uid, owner.gid)
+            async.apply(fs.ensureDir, self.env.awd)
           ], callback)
         });
 
@@ -344,29 +344,22 @@ mineos.mc = function(server_name, base_dir) {
       case 'tar.gz':
       case 'tgz':
       case 'tar':
-        var tar = require('tar');
-        var zlib = require('zlib');
+        var binary = which.sync('tar');
+        var args = ['--force-local',
+                    '-xf', dest_filepath];
+        var params = { cwd: self.env.cwd,
+                       uid: owner.uid,
+                       gid: owner.gid };
 
         async.series([
           async.apply(self.create, owner),
           function(cb) {
-            var extractor = tar.Extract({
-              path: self.env.cwd
+            var proc = child_process.spawn(binary, args, params);
+            proc.on('error', function( err ){ console.log(err) })
+            proc.once('exit', function(code) {
+              cb(code);
             })
-              .on('error', function(err) {
-                cb(err);
-              })
-              .on('end', function() {
-                cb();
-              });
-
-            var gunzip = zlib.createGunzip();
-            fs.createReadStream(dest_filepath)
-              .pipe(gunzip)
-              .pipe(extractor);
-
-          },
-          async.apply(self.chown, owner.uid, owner.gid)
+          }
         ], callback)
         break;
     }
@@ -1240,6 +1233,7 @@ mineos.mc = function(server_name, base_dir) {
   self.chown = function(uid, gid, callback) {
     var passwd = require('passwd-user');
     var auth = require('./auth');
+    console.log(uid,gid)
     async.series([
       async.apply(auth.verify_ids, uid, gid),
       async.apply(self.verify, 'exists'),
