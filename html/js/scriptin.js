@@ -289,6 +289,8 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
   }
 
   $scope.change_sc = function(section, property, new_value) {
+    if (!new_value)
+      new_value = '';
     socket.emit($scope.current, 'command', { command: 'modify_sc',
                                              section: section, 
                                              property: property,
