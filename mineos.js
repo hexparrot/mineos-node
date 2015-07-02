@@ -355,7 +355,6 @@ mineos.mc = function(server_name, base_dir) {
           async.apply(self.create, owner),
           function(cb) {
             var proc = child_process.spawn(binary, args, params);
-            proc.on('error', function( err ){ console.log(err) })
             proc.once('exit', function(code) {
               cb(code);
             })
