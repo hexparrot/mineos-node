@@ -1001,13 +1001,25 @@ function server_container(server_name, base_dir, socket_io) {
         // a tail would only exist for a file the server itself has opened
         var fs = require('fs');
         var abs_filepath = path.join(instance.env['cwd'], rel_filepath);
+        var FILESIZE_LIMIT_THRESHOLD = 256000;
 
-        fs.readFile(abs_filepath, function (err, data) {
-          if (!err) {
+        async.waterfall([
+          async.apply(fs.stat, abs_filepath),
+          function(stat_data, cb) {
+            cb(stat_data.size > FILESIZE_LIMIT_THRESHOLD)
+          },
+          async.apply(fs.readFile, abs_filepath),
+          function(data, cb) {
             logging.info('[{0}] transmittting existing file contents: {1} ({2} bytes)'.format(server_name, rel_filepath, data.length));
             nsp.emit('file head', {filename: rel_filepath, payload: data.toString()});
+            cb();
           }
-        });
+        ], function(err) {
+          if (err) {
+            var msg = "File is too large (> {0} KB).  Only newly added lines will appear here.".format(FILESIZE_LIMIT_THRESHOLD/1000);
+            nsp.emit('file head', {filename: rel_filepath, payload: msg });
+          }
+        })
       }
     }
 
