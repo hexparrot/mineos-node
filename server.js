@@ -788,6 +788,51 @@ function server_container(server_name, base_dir, socket_io) {
     })
   }
 
+  (function() {
+    var CronJob = require('cron').CronJob;
+
+    function cron_dispatcher(args) {
+      var introspect = require('introspect');
+      var fn, required_args;
+      var arg_array = [];
+
+      fn = instance[args.command];
+      required_args = introspect(fn);
+
+      for (var i in required_args) {
+        // all callbacks expected to follow the pattern (success, payload).
+        if (required_args[i] == 'callback') 
+          arg_array.push(function(err, payload) {
+            args.success = !err;
+            args.err = err;
+            args.time_resolved = Date.now();
+            if (err)
+              logging.error('[{0}] command "{1}" errored out:'.format(server_name, args.command), args);
+          })
+        else if (required_args[i] in args) {
+          arg_array.push(args[required_args[i]])
+        }
+      }
+
+      fn.apply(instance, arg_array);
+    }
+
+    instance.crons(function(err, cron_dict) {
+      for (var cronhash in cron_dict) {
+        if (cron_dict[cronhash].enabled) {
+          cron[cronhash] = new CronJob({
+            cronTime: cron_dict[cronhash].source,
+            onTick: function() {
+              cron_dispatcher(this);
+            },
+            start: true,
+            context: cron_dict[cronhash]
+          });
+        }
+      }
+    })
+  })();
+
   self.broadcast_to_lan = function(callback) {
     async.waterfall([
       async.apply(instance.verify, 'exists'),
@@ -1073,18 +1118,17 @@ function server_container(server_name, base_dir, socket_io) {
         cron = {};
 
         instance.crons(function(err, cron_dict) {
-          for (var c in cron_dict) {
-            var cloned = JSON.parse(JSON.stringify(cron_dict[c])); //clones!
-            var enabled = cloned['enabled'];
-            delete cloned['enabled'];
-            var cronjob = new CronJob(cloned.source, function (){
-              server_dispatcher(cloned);
-            }, null, false);
-
-            if (enabled)
-              cronjob.start();
-
-            cron[hash(cloned)] = cronjob;
+          for (var cronhash in cron_dict) {
+            if (cron_dict[cronhash].enabled) {
+              cron[cronhash] = new CronJob({
+                cronTime: cron_dict[cronhash].source,
+                onTick: function() {
+                  server_dispatcher(this);
+                },
+                start: true,
+                context: cron_dict[cronhash]
+              });
+            }
           }
           callback();
         })
@@ -1127,12 +1171,7 @@ function server_container(server_name, base_dir, socket_io) {
           async.series([
             async.apply(instance.set_cron, opts.hash, true),
             async.apply(reload_cron)
-          ], function(err) {
-            if (!err) {
-              cron[opts.hash].start();
-              broadcast_cc();
-            }
-          })
+          ])
           break;
         case 'suspend':
           logging.log('[{0}] {1} suspending cron: {2}'.format(server_name, ip_address, opts.hash));
@@ -1140,12 +1179,7 @@ function server_container(server_name, base_dir, socket_io) {
           async.series([
             async.apply(instance.set_cron, opts.hash, false),
             async.apply(reload_cron)
-          ], function(err) {
-            if (!err) {
-              cron[opts.hash].stop();
-              broadcast_cc();
-            }
-          })
+          ])
           break;
         default:
           logging.warn('[{0}] {1} requested unexpected cron operation: {2}'.format(server_name, ip_address, operation), opts);
@@ -1182,5 +1216,5 @@ function server_container(server_name, base_dir, socket_io) {
       }
     })
 
-  })
+  }) //nsp on connect container ends
 }
