@@ -1077,14 +1077,18 @@ function server_container(server_name, base_dir, socket_io) {
             var cloned = JSON.parse(JSON.stringify(cron_dict[c])); //clones!
             var enabled = cloned['enabled'];
             delete cloned['enabled'];
-            var cronjob = new CronJob(cloned.source, function (){
-              server_dispatcher(cloned);
-            }, null, false);
 
-            if (enabled)
-              cronjob.start();
+            if (enabled) {
+              var job = new CronJob({
+                cronTime: cloned.source,
+                onTick: function() {
+                  server_dispatcher(cloned);
+                },
+                start: true,
+              });
 
-            cron[hash(cloned)] = cronjob;
+              cron[hash(cloned)] = job;
+            }
           }
           callback();
         })
@@ -1127,12 +1131,7 @@ function server_container(server_name, base_dir, socket_io) {
           async.series([
             async.apply(instance.set_cron, opts.hash, true),
             async.apply(reload_cron)
-          ], function(err) {
-            if (!err) {
-              cron[opts.hash].start();
-              broadcast_cc();
-            }
-          })
+          ])
           break;
         case 'suspend':
           logging.log('[{0}] {1} suspending cron: {2}'.format(server_name, ip_address, opts.hash));
@@ -1140,12 +1139,7 @@ function server_container(server_name, base_dir, socket_io) {
           async.series([
             async.apply(instance.set_cron, opts.hash, false),
             async.apply(reload_cron)
-          ], function(err) {
-            if (!err) {
-              cron[opts.hash].stop();
-              broadcast_cc();
-            }
-          })
+          ])
           break;
         default:
           logging.warn('[{0}] {1} requested unexpected cron operation: {2}'.format(server_name, ip_address, operation), opts);
