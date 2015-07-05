@@ -1073,21 +1073,16 @@ function server_container(server_name, base_dir, socket_io) {
         cron = {};
 
         instance.crons(function(err, cron_dict) {
-          for (var c in cron_dict) {
-            var cloned = JSON.parse(JSON.stringify(cron_dict[c])); //clones!
-            var enabled = cloned['enabled'];
-            delete cloned['enabled'];
-
-            if (enabled) {
-              var job = new CronJob({
-                cronTime: cloned.source,
+          for (var cronhash in cron_dict) {
+            if (cron_dict[cronhash].enabled) {
+              cron[cronhash] = new CronJob({
+                cronTime: cron_dict[cronhash].source,
                 onTick: function() {
-                  server_dispatcher(cloned);
+                  server_dispatcher(this);
                 },
                 start: true,
+                context: cron_dict[cronhash]
               });
-
-              cron[hash(cloned)] = job;
             }
           }
           callback();
