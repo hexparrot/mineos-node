@@ -1230,9 +1230,7 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.chown = function(uid, gid, callback) {
-    var passwd = require('passwd-user');
     var auth = require('./auth');
-    console.log(uid,gid)
     async.series([
       async.apply(auth.verify_ids, uid, gid),
       async.apply(self.verify, 'exists'),

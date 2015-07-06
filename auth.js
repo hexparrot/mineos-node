@@ -7,21 +7,21 @@ auth.authenticate_shadow = function(user, plaintext, callback) {
 
   function etc_shadow(inner_callback) {
     var passwd = require('etc-passwd');
-    async.waterfall([
-      async.apply(fs.stat, '/etc/shadow'),
-      async.apply(passwd.getShadow, {username: user}),
-      function(shadow_info, cb) {
-        try {
+    try {
+      passwd.getShadow({username: user}, function(err, shadow_info) {
+        if (!shadow_info)
+          inner_callback(false)
+        else {
           var password_parts = shadow_info['password'].split(/\$/);
           var salt = password_parts[2];
           var new_hash = hash.sha512crypt(plaintext, salt);
 
-          cb(null, new_hash == shadow_info['password']);
-        } catch (e) {
-          cb(true, null);
+          inner_callback((new_hash == shadow_info['password'] ? user : false));
         }
-      }
-    ], inner_callback)
+      })
+    } catch (e) {
+      inner_callback(false);
+    }
   }
 
   function posix(inner_callback) {
@@ -40,13 +40,7 @@ auth.authenticate_shadow = function(user, plaintext, callback) {
   }
 
   etc_shadow(function(err, result_one) {
-    if (err.errno == -2) { //if /etc/shadow ENOENT
-      posix(function(result_two) {
-        callback(result_two)
-      })
-    } else { //if /etc/shadow was found
-      callback(result_one);
-    }
+    callback(err, result_one);
   })
 }
 
