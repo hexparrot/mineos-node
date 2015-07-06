@@ -1045,7 +1045,13 @@ mineos.mc = function(server_name, base_dir) {
         break;
       case 'onreboot_start':
         self.sc(function(err, dict) {
-          callback(err, !!(dict['onreboot'] || {}).start);
+          var val = (dict['onreboot'] || {}).start;
+          try {
+            var boolean_ified = JSON.parse(val.toLowerCase());
+            callback(err, boolean_ified);
+          } catch (e) {
+            callback(err, false);
+          }
         })
         break;
       case 'eula':
