@@ -977,6 +977,7 @@ function server_container(server_name, base_dir, socket_io) {
   nsp.on('connection', function(socket) {
     var ip_address = socket.request.connection.remoteAddress;
     var username = socket.request.user.username;
+    var NOTICES_QUEUE_LENGTH = 10; // 0 < q <= 10
 
     function server_dispatcher(args) {
       var introspect = require('introspect');
@@ -994,6 +995,9 @@ function server_container(server_name, base_dir, socket_io) {
         args.time_resolved = Date.now();
         nsp.emit('server_fin', args);
         logging.error('server_fin', args);
+        
+        while (notices.length > NOTICES_QUEUE_LENGTH)
+          notices.shift();
         notices.push(args);
         return;
       }
@@ -1009,6 +1013,9 @@ function server_container(server_name, base_dir, socket_io) {
             if (err)
               logging.error('[{0}] command "{1}" errored out:'.format(server_name, args.command), args);
             logging.log('server_fin', args)
+
+            while (notices.length > NOTICES_QUEUE_LENGTH)
+              notices.shift();
 
             if (args.command != 'delete')
               notices.push(args);
