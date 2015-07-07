@@ -921,13 +921,9 @@
                                                     <!-- Select -->
                                                         <div class="control-group">
                                                             <div class="controls">
-                                                                {{ 'SERVER_OWNER' | translate }}: <select class="span4" 
-                                                                                                ng-model="servers[current].page_data.glance.owner.uid" 
-                                                                                                ng-change="change_owner()">
-                                                                    <option 
-                                                                        ng-repeat="user in users" 
-                                                                        value="{{ user.uid }}"
-                                                                        ng-selected="user.uid == servers[current].page_data.glance.owner.uid">{{ '{0} ({1})'.format(user.username, user.uid) }}</option>
+                                                                {{ 'SERVER_OWNER' | translate }}: {{ '{0} ({1})'.format(
+                                                                    servers[current].page_data.glance.owner.username, 
+                                                                    servers[current].page_data.glance.owner.uid) }}
                                                                 </select>
                                                             </div>
                                                         </div>
