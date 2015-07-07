@@ -1764,7 +1764,7 @@ test.create_server_from_awd = function(test) {
     },
     function(callback) {
       new_instance.create_from_archive(OWNER_CREDS, archive_filepath, function(err) {
-        callback();
+        callback(err);
       })
     },
     function(callback) {

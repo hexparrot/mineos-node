@@ -389,6 +389,7 @@ mineos.mc = function(server_name, base_dir) {
         async.series([
           async.apply(self.create, owner),
           function(cb) {
+            memoize_timestamps = {};
             var proc = child_process.spawn(binary, args, params);
             proc.once('exit', function(code) {
               cb(code);
