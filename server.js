@@ -1051,12 +1051,17 @@ function server_container(server_name, base_dir, socket_io) {
           async.waterfall([
             async.apply(instance.property, 'owner'),
             function(owner_data, cb) {
-              cb(!(owner_data.username == username)); // not equivalent, throw truthy 
+              if (owner_data.username != username)
+                cb('Only the current user owner may reassign server ownership.');
+              else if (owner_data.uid != args.uid)
+                cb('You may not change the user owner of the server.');
+              else
+                cb();
             }
           ], function(err) {
             if (err) {
               args.success = false;
-              args.err = 'Only the current user owner may reassign server ownership.';
+              args.err = err;
               args.time_resolved = Date.now();
               logging.error('[{0}] command "{1}" errored out:'.format(server_name, args.command), args);
               nsp.emit('server_fin', args);
