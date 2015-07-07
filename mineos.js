@@ -108,6 +108,8 @@ mineos.mc = function(server_name, base_dir) {
   var self = this;
   self.server_name = server_name;
 
+  process.umask(0002);
+
   self.env = {
     base_dir: base_dir,
     cwd: path.join(base_dir, mineos.DIRS['servers'], server_name),

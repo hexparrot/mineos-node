@@ -112,6 +112,10 @@ test.create_server = function(test) {
 
   test.equal(mineos.server_list(BASE_DIR).length, 0);
 
+  function oct2dec(octal_val) {
+    return parseInt(octal_val.toString(8).slice(-3));
+  }
+
   async.series([
     async.apply(instance.create, OWNER_CREDS),
     async.apply(fs.stat, instance.env.cwd),
@@ -134,6 +138,10 @@ test.create_server = function(test) {
       test.equal(fs.statSync(instance.env.sp).gid, OWNER_CREDS['gid']);
       test.equal(fs.statSync(instance.env.sc).gid, OWNER_CREDS['gid']);
       test.equal(fs.statSync(instance.env.cc).gid, OWNER_CREDS['gid']);
+
+      test.equal(oct2dec(fs.statSync(instance.env.sp).mode), 664);
+      test.equal(oct2dec(fs.statSync(instance.env.sc).mode), 664);
+      test.equal(oct2dec(fs.statSync(instance.env.cc).mode), 664);
 
       test.equal(mineos.server_list(BASE_DIR)[0], server_name);
       test.equal(mineos.server_list(BASE_DIR).length, 1);
