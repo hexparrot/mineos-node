@@ -416,31 +416,30 @@ mineos.mc = function(server_name, base_dir) {
   self.get_start_args = function(callback) {
 
     function type_jar(inner_callback) {
-      var server_config = async.memoize(self.sc);
       var java_binary = which.sync('java');
 
       async.series({
         'binary': function (cb) {
-          server_config(function (err, dict) {
+          self.sc(function (err, dict) {
             var value = (dict.java || {}).java_binary || java_binary;
             cb((value.length ? null : 'No java binary assigned for server.'), value);
           });
         },
         'xmx': function (cb) {
-          server_config(function (err, dict) {
+          self.sc(function (err, dict) {
             var value = parseInt((dict.java || {}).java_xmx) || 0;
             cb((value > 0 ? null : 'XMX heapsize must be positive integer'), value);
           });
         },
         'xms': function (cb) {
-          server_config(function (err, dict) {
+          self.sc(function (err, dict) {
             var xmx = parseInt((dict.java || {}).java_xmx) || 0;
             var xms = parseInt((dict.java || {}).java_xms) || xmx;
             cb((xmx >= xms && xms > 0 ? null : 'XMS heapsize must be positive integer where XMX >= XMS > 0'), xms);
           });
         },
         'jarfile': function (cb) {
-          server_config(function (err, dict) {
+          self.sc(function (err, dict) {
             var jarfile = (dict.java || {}).jarfile;
             if (!jarfile)
               cb('Server not assigned a runnable jar');
@@ -449,13 +448,13 @@ mineos.mc = function(server_name, base_dir) {
           });
         },
         'jar_args': function (cb) {
-          server_config(function (err, dict) {
+          self.sc(function (err, dict) {
             var value = (dict.java || {}).jar_args || 'nogui';
             cb(null, value);
           });
         },
         'java_tweaks': function (cb) {
-          server_config(function (err, dict) {
+          self.sc(function (err, dict) {
             var value = (dict.java || {}).java_tweaks || null;
             cb(null, value);
           });
