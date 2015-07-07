@@ -526,6 +526,7 @@ mineos.mc = function(server_name, base_dir) {
       });
 
       obj.set('--chown', '{0}:{1}'.format(username, groupname));
+      obj.set('--chmod' ,'ug=rwX');
 
       obj.execute(function(error, code, cmd) {
         callback_er(code);

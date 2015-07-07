@@ -15,6 +15,10 @@ var OWNER_CREDS = {
   gid: userid.gid(process.env.USER) || 1000
 }
 
+function oct2dec(octal_val) {
+  return parseInt(octal_val.toString(8).slice(-3));
+}
+
 function delete_everything(callback) {
   var server_list = new mineos.server_list(BASE_DIR);
 
@@ -111,10 +115,6 @@ test.create_server = function(test) {
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   test.equal(mineos.server_list(BASE_DIR).length, 0);
-
-  function oct2dec(octal_val) {
-    return parseInt(octal_val.toString(8).slice(-3));
-  }
 
   async.series([
     async.apply(instance.create, OWNER_CREDS),
@@ -1614,6 +1614,10 @@ test.copy_profile = function(test) {
         test.equal(err, 23); // [Error: rsync exited with code 23] (for source dir not existing)
         callback();
       })
+    },
+    function(callback) {
+      test.equal(oct2dec(fs.statSync(path.join(instance.env.cwd, 'minecraft_server.1.7.9.jar')).mode), 664);
+      callback();
     }
   ], function(err) {
     test.ifError(err);
