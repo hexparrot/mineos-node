@@ -1764,7 +1764,7 @@ test.create_server_from_awd = function(test) {
     },
     function(callback) {
       new_instance.create_from_archive(OWNER_CREDS, archive_filepath, function(err) {
-        callback();
+        callback(err);
       })
     },
     function(callback) {
@@ -1915,6 +1915,22 @@ test.onreboot = function(test) {
       instance.property('onreboot_start', function(err, val) {
         test.ifError(err);
         test.equal(val, true);
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'onreboot', 'start', true),
+    function(callback) {
+      instance.property('onreboot_start', function(err, val) {
+        test.ifError(err);
+        test.equal(val, true);
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'onreboot', 'start', false),
+    function(callback) {
+      instance.property('onreboot_start', function(err, val) {
+        test.ifError(err);
+        test.equal(val, false);
         callback(err);
       })
     }

@@ -119,6 +119,11 @@ mineos.mc = function(server_name, base_dir) {
     cc: path.join(base_dir, mineos.DIRS['servers'], server_name, 'cron.config')
   }
 
+  // ini related functions and vars
+
+  var memoized_files = {};
+  var memoize_timestamps = {};
+
   function read_ini(filepath, callback) {
     var ini = require('ini');
 
@@ -136,7 +141,22 @@ mineos.mc = function(server_name, base_dir) {
   // server properties functions
 
   self.sp = function(callback) {
-    read_ini(self.env.sp, callback);
+    var fn = 'server.properties';
+    async.waterfall([
+      async.apply(fs.stat, self.env.sp),
+      function(stat_data, cb) {
+        if (!(fn in memoize_timestamps)) { //hasn't yet been read
+          memoize_timestamps[fn] = stat_data.mtime;
+          memoized_files[fn] = async.memoize(read_ini);
+          memoized_files[fn](self.env.sp, cb);
+        } else if (memoize_timestamps[fn] - stat_data.mtime == 0) {
+          memoized_files[fn](self.env.sp, cb);
+        } else {
+          memoize_timestamps[fn] = stat_data.mtime;
+          read_ini(self.env.sp, cb);
+        }
+      }
+    ], callback);
   }
 
   self.modify_sp = function(property, new_value, callback) {
@@ -168,7 +188,22 @@ mineos.mc = function(server_name, base_dir) {
 
   // server config functions
   self.sc = function(callback) {
-    read_ini(self.env.sc, callback);
+    var fn = 'server.config';
+    async.waterfall([
+      async.apply(fs.stat, self.env.sc),
+      function(stat_data, cb) {
+        if (!(fn in memoize_timestamps)) { //hasn't yet been read
+          memoize_timestamps[fn] = stat_data.mtime;
+          memoized_files[fn] = async.memoize(read_ini);
+          memoized_files[fn](self.env.sc, cb);
+        } else if (memoize_timestamps[fn] - stat_data.mtime == 0) {
+          memoized_files[fn](self.env.sc, cb);
+        } else {
+          memoize_timestamps[fn] = stat_data.mtime;
+          read_ini(self.env.sc, cb);
+        }
+      }
+    ], callback);
   }
 
   self.modify_sc = function(section, property, new_value, callback) {
@@ -354,6 +389,7 @@ mineos.mc = function(server_name, base_dir) {
         async.series([
           async.apply(self.create, owner),
           function(cb) {
+            memoize_timestamps = {};
             var proc = child_process.spawn(binary, args, params);
             proc.once('exit', function(code) {
               cb(code);
@@ -1010,7 +1046,13 @@ mineos.mc = function(server_name, base_dir) {
         break;
       case 'onreboot_start':
         self.sc(function(err, dict) {
-          callback(err, !!(dict['onreboot'] || {}).start);
+          var val = (dict['onreboot'] || {}).start;
+          try {
+            var boolean_ified = (val === true) || JSON.parse(val.toLowerCase());
+            callback(err, boolean_ified);
+          } catch (e) {
+            callback(err, false);
+          }
         })
         break;
       case 'eula':
