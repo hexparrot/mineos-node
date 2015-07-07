@@ -145,15 +145,13 @@ mineos.mc = function(server_name, base_dir) {
     async.waterfall([
       async.apply(fs.stat, self.env.sp),
       function(stat_data, cb) {
-        if (!(fn in memoize_timestamps)) { //hasn't yet been read
-          memoize_timestamps[fn] = stat_data.mtime;
-          memoized_files[fn] = async.memoize(read_ini);
-          memoized_files[fn](self.env.sp, cb);
-        } else if (memoize_timestamps[fn] - stat_data.mtime == 0) {
+        if ( (fn in memoize_timestamps) &&
+             (memoize_timestamps[fn] - stat_data.mtime == 0) ) {
           memoized_files[fn](self.env.sp, cb);
         } else {
           memoize_timestamps[fn] = stat_data.mtime;
-          read_ini(self.env.sp, cb);
+          memoized_files[fn] = async.memoize(read_ini);
+          memoized_files[fn](self.env.sp, cb);
         }
       }
     ], callback);
@@ -169,6 +167,7 @@ mineos.mc = function(server_name, base_dir) {
         cb(null, sp_data);
       },
       function(sp_data, cb) {
+        memoize_timestamps['server.properties'] = 0;
         fs.writeFile(self.env.sp, ini.stringify(sp_data), cb);
       }
     ], callback)
@@ -182,6 +181,7 @@ mineos.mc = function(server_name, base_dir) {
         props[key] = dict[key];
 
       self._sp = props;
+      memoize_timestamps['server.properties'] = 0;
       fs.writeFile(self.env.sp, ini.stringify(self._sp), callback);
     })
   }
@@ -192,15 +192,13 @@ mineos.mc = function(server_name, base_dir) {
     async.waterfall([
       async.apply(fs.stat, self.env.sc),
       function(stat_data, cb) {
-        if (!(fn in memoize_timestamps)) { //hasn't yet been read
-          memoize_timestamps[fn] = stat_data.mtime;
-          memoized_files[fn] = async.memoize(read_ini);
-          memoized_files[fn](self.env.sc, cb);
-        } else if (memoize_timestamps[fn] - stat_data.mtime == 0) {
+        if ( (fn in memoize_timestamps) &&
+             (memoize_timestamps[fn] - stat_data.mtime == 0) ) {
           memoized_files[fn](self.env.sc, cb);
         } else {
           memoize_timestamps[fn] = stat_data.mtime;
-          read_ini(self.env.sc, cb);
+          memoized_files[fn] = async.memoize(read_ini);
+          memoized_files[fn](self.env.sc, cb);
         }
       }
     ], callback);
@@ -221,6 +219,7 @@ mineos.mc = function(server_name, base_dir) {
         cb(null, sc_data);
       },
       function(sc_data, cb) {
+        memoize_timestamps['server.config'] = 0;
         fs.writeFile(self.env.sc, ini.stringify(sc_data), cb);
       }
     ], callback)
