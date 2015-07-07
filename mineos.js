@@ -1048,7 +1048,7 @@ mineos.mc = function(server_name, base_dir) {
         self.sc(function(err, dict) {
           var val = (dict['onreboot'] || {}).start;
           try {
-            var boolean_ified = JSON.parse(val.toLowerCase());
+            var boolean_ified = (val === true) || JSON.parse(val.toLowerCase());
             callback(err, boolean_ified);
           } catch (e) {
             callback(err, false);
