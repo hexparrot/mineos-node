@@ -1044,8 +1044,32 @@ function server_container(server_name, base_dir, socket_io) {
       logging.info('[{0}] {1} issued command : "{2}"'.format(server_name, ip_address, args.command))
       args.uuid = uuid.v1();
       args.time_initiated = Date.now();
-      nsp.emit('server_ack', args)
-      server_dispatcher(args);
+      nsp.emit('server_ack', args);
+
+      switch (args.command) {
+        case 'chown':
+          async.waterfall([
+            async.apply(instance.property, 'owner'),
+            function(owner_data, cb) {
+              cb(!(owner_data.username == username)); // not equivalent, throw truthy 
+            }
+          ], function(err) {
+            if (err) {
+              args.success = false;
+              args.err = 'Only the current user owner may reassign server ownership.';
+              args.time_resolved = Date.now();
+              logging.error('[{0}] command "{1}" errored out:'.format(server_name, args.command), args);
+              nsp.emit('server_fin', args);
+            } else {
+              server_dispatcher(args);
+            }
+          })
+          break;
+        default:
+          server_dispatcher(args);
+          break;
+      }
+      
     }
 
     function get_file_contents(rel_filepath) {
