@@ -640,7 +640,7 @@ server.backend = function(base_dir, socket_emitter) {
             })
         })
         .on('end', function() {
-          self.front_end.emit('user_list', users);
+          socket.emit('user_list', users);
         })
 
       var gg = passwd.getGroups()
@@ -655,7 +655,7 @@ server.backend = function(base_dir, socket_emitter) {
           }
         })
         .on('end', function() {
-          self.front_end.emit('group_list', groups);
+          socket.emit('group_list', groups);
         })
     }
 
