@@ -28,6 +28,18 @@ mineos.SP_DEFAULTS = {
   'server-ip': '0.0.0.0',
 }
 
+var PROC_PATH = null;
+
+try {
+  fs.statSync('/proc/uptime');
+  PROC_PATH = '/proc';
+} catch (e) {
+  try {
+    fs.statSync('/usr/compat/linux/proc/uptime');
+    PROC_PATH = '/usr/compat/linux/proc';
+  } catch (e) {}
+}
+
 mineos.server_list = function(base_dir) {
   return fs.readdirSync(path.join(base_dir, mineos.DIRS['servers']));
 }
@@ -38,14 +50,14 @@ mineos.server_list_up = function() {
 
 mineos.server_pids_up = function() {
   var cmdline, environ, match;
-  var pids = fs.readdirSync('/proc').filter(function(e) { if (/^([0-9]+)$/.test(e)) {return e} });
+  var pids = fs.readdirSync(PROC_PATH).filter(function(e) { if (/^([0-9]+)$/.test(e)) {return e} });
   var SCREEN_REGEX = /screen[^S]+S mc-([^ ]+)/i;
   var JAVA_REGEX = /\.mc-([^ ]+)/i;
   var servers_found = {};
 
   for (var i=0; i < pids.length; i++) {
     try {
-      cmdline = fs.readFileSync('/proc/{0}/cmdline'.format(pids[i]))
+      cmdline = fs.readFileSync('{0}/{1}/cmdline'.format(PROC_PATH, pids[i]))
                               .toString('ascii')
                               .replace(/\u0000/g, ' ');
     } catch (e) {
@@ -61,7 +73,7 @@ mineos.server_pids_up = function() {
         servers_found[screen_match[1]] = {'screen': parseInt(pids[i])}
     } else {
       try {
-        environ = fs.readFileSync('/proc/{0}/environ'.format(pids[i]))
+        environ = fs.readFileSync('{0}/{1}/environ'.format(PROC_PATH, pids[i]))
                                 .toString('ascii')
                                 .replace(/\u0000/g, ' ');
       } catch (e) {
