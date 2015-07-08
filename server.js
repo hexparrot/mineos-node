@@ -100,36 +100,6 @@ server.backend = function(base_dir, socket_emitter) {
       })
   })();
 
-  self.send_importable_list = function() {
-    var importable_archives = path.join(base_dir, mineos.DIRS['import']);
-    var all_info = [];
-
-    fs.readdir(importable_archives, function(err, files) {
-      if (!err) {
-        var fullpath = files.map(function(value, index) {
-          return path.join(importable_archives, value);
-        });
-
-        var stat = fs.stat;
-        async.map(fullpath, stat, function(inner_err, results){
-          results.forEach(function(value, index) {
-            all_info.push({
-              time: value.mtime,
-              size: value.size,
-              filename: files[index]
-            })
-          })
-
-          all_info.sort(function(a, b) {
-            return a.time.getTime() - b.time.getTime();
-          });
-
-          self.front_end.emit('archive_list', all_info);
-        }); 
-      }
-    })
-  }
-
   function host_heartbeat() {
     self.front_end.emit('host_heartbeat', {
       'uptime': os.uptime(),
@@ -654,33 +624,6 @@ server.backend = function(base_dir, socket_emitter) {
       }
     }
 
-    function download_profile_list(callback) {
-      logging.info('[WEBUI] Downloading official profiles.');
-      async.auto({
-        'mojang': async.retry(2, self.check_profiles.mojang),
-        'ftb': async.retry(2, self.check_profiles.ftb),
-        'ftb_3rd': async.retry(2, self.check_profiles.ftb_third_party),
-        'pocketmine': async.retry(2, self.check_profiles.pocketmine),
-        'php': async.retry(2, self.check_profiles.php)
-      }, function(err, results) {
-        var merged = [];
-        for (var source in results)
-          merged = merged.concat.apply(merged, results[source]);
-
-        self.profiles = merged;
-        callback();
-      })
-    }
-
-    self.send_profile_list = function(force_redownload) {
-      if (force_redownload || !self.profiles.length)
-        download_profile_list(function() {
-          self.front_end.emit('profile_list', self.profiles);
-        })
-      else
-        self.front_end.emit('profile_list', self.profiles);
-    }
-
     self.send_user_list = function() {
       var passwd = require('etc-passwd');
       var users = [];
@@ -728,6 +671,63 @@ server.backend = function(base_dir, socket_emitter) {
     self.send_importable_list();
 
   })
+
+  self.send_importable_list = function() {
+    var importable_archives = path.join(base_dir, mineos.DIRS['import']);
+    var all_info = [];
+
+    fs.readdir(importable_archives, function(err, files) {
+      if (!err) {
+        var fullpath = files.map(function(value, index) {
+          return path.join(importable_archives, value);
+        });
+
+        var stat = fs.stat;
+        async.map(fullpath, stat, function(inner_err, results){
+          results.forEach(function(value, index) {
+            all_info.push({
+              time: value.mtime,
+              size: value.size,
+              filename: files[index]
+            })
+          })
+
+          all_info.sort(function(a, b) {
+            return a.time.getTime() - b.time.getTime();
+          });
+
+          self.front_end.emit('archive_list', all_info);
+        }); 
+      }
+    })
+  }
+
+  function download_profile_list(callback) {
+    logging.info('[WEBUI] Downloading official profiles.');
+    async.auto({
+      'mojang': async.retry(2, self.check_profiles.mojang),
+      'ftb': async.retry(2, self.check_profiles.ftb),
+      'ftb_3rd': async.retry(2, self.check_profiles.ftb_third_party),
+      'pocketmine': async.retry(2, self.check_profiles.pocketmine),
+      'php': async.retry(2, self.check_profiles.php)
+    }, function(err, results) {
+      var merged = [];
+      for (var source in results)
+        merged = merged.concat.apply(merged, results[source]);
+
+      self.profiles = merged;
+      callback();
+    })
+  }
+
+  self.send_profile_list = function(force_redownload) {
+    if (force_redownload || !self.profiles.length)
+      download_profile_list(function() {
+        self.front_end.emit('profile_list', self.profiles);
+      })
+    else
+      self.front_end.emit('profile_list', self.profiles);
+  }
 
   return self;
 }
