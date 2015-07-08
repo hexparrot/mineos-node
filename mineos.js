@@ -108,6 +108,8 @@ mineos.mc = function(server_name, base_dir) {
   var self = this;
   self.server_name = server_name;
 
+  process.umask(0002);
+
   self.env = {
     base_dir: base_dir,
     cwd: path.join(base_dir, mineos.DIRS['servers'], server_name),
@@ -118,6 +120,11 @@ mineos.mc = function(server_name, base_dir) {
     sc: path.join(base_dir, mineos.DIRS['servers'], server_name, 'server.config'),
     cc: path.join(base_dir, mineos.DIRS['servers'], server_name, 'cron.config')
   }
+
+  // ini related functions and vars
+
+  var memoized_files = {};
+  var memoize_timestamps = {};
 
   function read_ini(filepath, callback) {
     var ini = require('ini');
@@ -136,7 +143,20 @@ mineos.mc = function(server_name, base_dir) {
   // server properties functions
 
   self.sp = function(callback) {
-    read_ini(self.env.sp, callback);
+    var fn = 'server.properties';
+    async.waterfall([
+      async.apply(fs.stat, self.env.sp),
+      function(stat_data, cb) {
+        if ( (fn in memoize_timestamps) &&
+             (memoize_timestamps[fn] - stat_data.mtime == 0) ) {
+          memoized_files[fn](self.env.sp, cb);
+        } else {
+          memoize_timestamps[fn] = stat_data.mtime;
+          memoized_files[fn] = async.memoize(read_ini);
+          memoized_files[fn](self.env.sp, cb);
+        }
+      }
+    ], callback);
   }
 
   self.modify_sp = function(property, new_value, callback) {
@@ -149,6 +169,7 @@ mineos.mc = function(server_name, base_dir) {
         cb(null, sp_data);
       },
       function(sp_data, cb) {
+        memoize_timestamps['server.properties'] = 0;
         fs.writeFile(self.env.sp, ini.stringify(sp_data), cb);
       }
     ], callback)
@@ -162,13 +183,27 @@ mineos.mc = function(server_name, base_dir) {
         props[key] = dict[key];
 
       self._sp = props;
+      memoize_timestamps['server.properties'] = 0;
       fs.writeFile(self.env.sp, ini.stringify(self._sp), callback);
     })
   }
 
   // server config functions
   self.sc = function(callback) {
-    read_ini(self.env.sc, callback);
+    var fn = 'server.config';
+    async.waterfall([
+      async.apply(fs.stat, self.env.sc),
+      function(stat_data, cb) {
+        if ( (fn in memoize_timestamps) &&
+             (memoize_timestamps[fn] - stat_data.mtime == 0) ) {
+          memoized_files[fn](self.env.sc, cb);
+        } else {
+          memoize_timestamps[fn] = stat_data.mtime;
+          memoized_files[fn] = async.memoize(read_ini);
+          memoized_files[fn](self.env.sc, cb);
+        }
+      }
+    ], callback);
   }
 
   self.modify_sc = function(section, property, new_value, callback) {
@@ -186,6 +221,7 @@ mineos.mc = function(server_name, base_dir) {
         cb(null, sc_data);
       },
       function(sc_data, cb) {
+        memoize_timestamps['server.config'] = 0;
         fs.writeFile(self.env.sc, ini.stringify(sc_data), cb);
       }
     ], callback)
@@ -354,6 +390,7 @@ mineos.mc = function(server_name, base_dir) {
         async.series([
           async.apply(self.create, owner),
           function(cb) {
+            memoize_timestamps = {};
             var proc = child_process.spawn(binary, args, params);
             proc.once('exit', function(code) {
               cb(code);
@@ -381,31 +418,30 @@ mineos.mc = function(server_name, base_dir) {
   self.get_start_args = function(callback) {
 
     function type_jar(inner_callback) {
-      var server_config = async.memoize(self.sc);
       var java_binary = which.sync('java');
 
       async.series({
         'binary': function (cb) {
-          server_config(function (err, dict) {
+          self.sc(function (err, dict) {
             var value = (dict.java || {}).java_binary || java_binary;
             cb((value.length ? null : 'No java binary assigned for server.'), value);
           });
         },
         'xmx': function (cb) {
-          server_config(function (err, dict) {
+          self.sc(function (err, dict) {
             var value = parseInt((dict.java || {}).java_xmx) || 0;
             cb((value > 0 ? null : 'XMX heapsize must be positive integer'), value);
           });
         },
         'xms': function (cb) {
-          server_config(function (err, dict) {
+          self.sc(function (err, dict) {
             var xmx = parseInt((dict.java || {}).java_xmx) || 0;
             var xms = parseInt((dict.java || {}).java_xms) || xmx;
             cb((xmx >= xms && xms > 0 ? null : 'XMS heapsize must be positive integer where XMX >= XMS > 0'), xms);
           });
         },
         'jarfile': function (cb) {
-          server_config(function (err, dict) {
+          self.sc(function (err, dict) {
             var jarfile = (dict.java || {}).jarfile;
             if (!jarfile)
               cb('Server not assigned a runnable jar');
@@ -414,13 +450,13 @@ mineos.mc = function(server_name, base_dir) {
           });
         },
         'jar_args': function (cb) {
-          server_config(function (err, dict) {
+          self.sc(function (err, dict) {
             var value = (dict.java || {}).jar_args || 'nogui';
             cb(null, value);
           });
         },
         'java_tweaks': function (cb) {
-          server_config(function (err, dict) {
+          self.sc(function (err, dict) {
             var value = (dict.java || {}).java_tweaks || null;
             cb(null, value);
           });
@@ -490,6 +526,7 @@ mineos.mc = function(server_name, base_dir) {
       });
 
       obj.set('--chown', '{0}:{1}'.format(username, groupname));
+      obj.set('--chmod' ,'ug=rwX');
 
       obj.execute(function(error, code, cmd) {
         callback_er(code);
@@ -1010,7 +1047,13 @@ mineos.mc = function(server_name, base_dir) {
         break;
       case 'onreboot_start':
         self.sc(function(err, dict) {
-          callback(err, !!(dict['onreboot'] || {}).start);
+          var val = (dict['onreboot'] || {}).start;
+          try {
+            var boolean_ified = (val === true) || JSON.parse(val.toLowerCase());
+            callback(err, boolean_ified);
+          } catch (e) {
+            callback(err, false);
+          }
         })
         break;
       case 'eula':

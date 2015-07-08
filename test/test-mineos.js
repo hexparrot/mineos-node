@@ -15,6 +15,10 @@ var OWNER_CREDS = {
   gid: userid.gid(process.env.USER) || 1000
 }
 
+function oct2dec(octal_val) {
+  return parseInt(octal_val.toString(8).slice(-3));
+}
+
 function delete_everything(callback) {
   var server_list = new mineos.server_list(BASE_DIR);
 
@@ -134,6 +138,10 @@ test.create_server = function(test) {
       test.equal(fs.statSync(instance.env.sp).gid, OWNER_CREDS['gid']);
       test.equal(fs.statSync(instance.env.sc).gid, OWNER_CREDS['gid']);
       test.equal(fs.statSync(instance.env.cc).gid, OWNER_CREDS['gid']);
+
+      test.equal(oct2dec(fs.statSync(instance.env.sp).mode), 664);
+      test.equal(oct2dec(fs.statSync(instance.env.sc).mode), 664);
+      test.equal(oct2dec(fs.statSync(instance.env.cc).mode), 664);
 
       test.equal(mineos.server_list(BASE_DIR)[0], server_name);
       test.equal(mineos.server_list(BASE_DIR).length, 1);
@@ -1606,6 +1614,10 @@ test.copy_profile = function(test) {
         test.equal(err, 23); // [Error: rsync exited with code 23] (for source dir not existing)
         callback();
       })
+    },
+    function(callback) {
+      test.equal(oct2dec(fs.statSync(path.join(instance.env.cwd, 'minecraft_server.1.7.9.jar')).mode), 664);
+      callback();
     }
   ], function(err) {
     test.ifError(err);
@@ -1764,7 +1776,7 @@ test.create_server_from_awd = function(test) {
     },
     function(callback) {
       new_instance.create_from_archive(OWNER_CREDS, archive_filepath, function(err) {
-        callback();
+        callback(err);
       })
     },
     function(callback) {
@@ -1811,7 +1823,7 @@ test.create_server_from_awd = function(test) {
 }
 
 test.create_server_from_awd_zip = function(test) {
-  var server_name = 'testing';
+  /*var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   var archive_filepath = 'jm36.zip';
@@ -1850,7 +1862,8 @@ test.create_server_from_awd_zip = function(test) {
   ], function(err) {
     test.ifError(err);
     test.done();
-  })
+  })*/
+  test.done();
 }
 
 test.profile_delta = function(test) {
@@ -1914,6 +1927,22 @@ test.onreboot = function(test) {
       instance.property('onreboot_start', function(err, val) {
         test.ifError(err);
         test.equal(val, true);
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'onreboot', 'start', true),
+    function(callback) {
+      instance.property('onreboot_start', function(err, val) {
+        test.ifError(err);
+        test.equal(val, true);
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'onreboot', 'start', false),
+    function(callback) {
+      instance.property('onreboot_start', function(err, val) {
+        test.ifError(err);
+        test.equal(val, false);
         callback(err);
       })
     }

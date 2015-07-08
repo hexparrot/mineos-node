@@ -101,6 +101,7 @@
                         <div class="dropdown-menu" role="menu">
                             <footer>
                                 <a ng-click="refresh_server_list()" class="text"><span class="icon icone-globe"></span> {{ 'REFRESH_SERVER_LIST' | translate }}</a><br>
+                                <a ng-click="host_command('refresh_profile_list', {redownload: true})" class="text"><span class="icon icone-globe"></span> {{ 'REFRESH_PROFILE_LIST' | translate }}</a><br>
                                 <a href="/logout" class="text"><span class="icon icone-off"></span> {{ 'LOGOFF' | translate }}</a>
                             </footer>
                         </div>
@@ -921,13 +922,9 @@
                                                     <!-- Select -->
                                                         <div class="control-group">
                                                             <div class="controls">
-                                                                {{ 'SERVER_OWNER' | translate }}: <select class="span4" 
-                                                                                                ng-model="servers[current].page_data.glance.owner.uid" 
-                                                                                                ng-change="change_owner()">
-                                                                    <option 
-                                                                        ng-repeat="user in users" 
-                                                                        value="{{ user.uid }}"
-                                                                        ng-selected="user.uid == servers[current].page_data.glance.owner.uid">{{ '{0} ({1})'.format(user.username, user.uid) }}</option>
+                                                                {{ 'SERVER_OWNER' | translate }}: {{ '{0} ({1})'.format(
+                                                                    servers[current].page_data.glance.owner.username, 
+                                                                    servers[current].page_data.glance.owner.uid) }}
                                                                 </select>
                                                             </div>
                                                         </div>
