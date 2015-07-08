@@ -7,21 +7,25 @@ auth.authenticate_shadow = function(user, plaintext, callback) {
 
   function etc_shadow(inner_callback) {
     var passwd = require('etc-passwd');
-    try {
-      passwd.getShadow({username: user}, function(err, shadow_info) {
-        if (!shadow_info)
-          inner_callback(false)
-        else {
-          var password_parts = shadow_info['password'].split(/\$/);
-          var salt = password_parts[2];
-          var new_hash = hash.sha512crypt(plaintext, salt);
 
-          inner_callback((new_hash == shadow_info['password'] ? user : false));
-        }
-      })
-    } catch (e) {
-      inner_callback(false);
-    }
+    fs.stat('/etc/shadow', function(err, stat_info) {
+      if (err)
+        inner_callback(true)
+      else {
+        passwd.getShadow({username: user}, function(err, shadow_info) {
+          if (shadow_info) {
+            var password_parts = shadow_info['password'].split(/\$/);
+            var salt = password_parts[2];
+            var new_hash = hash.sha512crypt(plaintext, salt);
+
+            var passed = (new_hash == shadow_info['password'] ? user : false);
+            inner_callback(null, passed);
+          } else {
+            inner_callback(null, false);
+          }
+        })
+      }
+    })
   }
 
   function posix(inner_callback) {
@@ -39,8 +43,14 @@ auth.authenticate_shadow = function(user, plaintext, callback) {
     }
   }
 
-  etc_shadow(function(err, result_one) {
-    callback(err, result_one);
+  etc_shadow(function(err, result_passed) {
+    if (err) {
+      posix(function(result_passed) {
+        callback(result_passed);
+      });
+    } else {
+      callback(result_passed);
+    }
   })
 }
 
