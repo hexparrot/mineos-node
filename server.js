@@ -16,7 +16,7 @@ server.backend = function(base_dir, socket_emitter) {
   var self = this;
 
   self.servers = {};
-  self.profiles = {};
+  self.profiles = [];
   self.front_end = socket_emitter;
 
   fs.ensureDirSync(base_dir);
@@ -199,6 +199,9 @@ server.backend = function(base_dir, socket_emitter) {
         case 'refresh_server_list':
           for (var s in self.servers)
             self.front_end.emit('track_server', s);
+          break;
+        case 'refresh_profile_list':
+          self.send_profile_list(true);
           break;
         case 'create_from_archive':
           var instance = new mineos.mc(args.new_server_name, base_dir);
@@ -457,22 +460,6 @@ server.backend = function(base_dir, socket_emitter) {
       }
     }
 
-    self.send_profile_list = function() {
-      async.auto({
-        'mojang': async.retry(2, self.check_profiles.mojang),
-        'ftb': async.retry(2, self.check_profiles.ftb),
-        'ftb_3rd': async.retry(2, self.check_profiles.ftb_third_party),
-        'pocketmine': async.retry(2, self.check_profiles.pocketmine),
-        'php': async.retry(2, self.check_profiles.php)
-      }, function(err, results) {
-        var merged = [];
-        for (var source in results)
-          merged = merged.concat.apply(merged, results[source]);
-
-        self.front_end.emit('profile_list', merged);
-      })
-    }
-
     self.check_profiles = {
       mojang: function(callback) {
         var request = require('request');
@@ -667,6 +654,33 @@ server.backend = function(base_dir, socket_emitter) {
       }
     }
 
+    function download_profile_list(callback) {
+      logging.info('[WEBUI] Downloading official profiles.');
+      async.auto({
+        'mojang': async.retry(2, self.check_profiles.mojang),
+        'ftb': async.retry(2, self.check_profiles.ftb),
+        'ftb_3rd': async.retry(2, self.check_profiles.ftb_third_party),
+        'pocketmine': async.retry(2, self.check_profiles.pocketmine),
+        'php': async.retry(2, self.check_profiles.php)
+      }, function(err, results) {
+        var merged = [];
+        for (var source in results)
+          merged = merged.concat.apply(merged, results[source]);
+
+        self.profiles = merged;
+        callback();
+      })
+    }
+
+    self.send_profile_list = function(force_redownload) {
+      if (force_redownload || !self.profiles.length)
+        download_profile_list(function() {
+          self.front_end.emit('profile_list', self.profiles);
+        })
+      else
+        self.front_end.emit('profile_list', self.profiles);
+    }
+
     self.send_user_list = function() {
       var passwd = require('etc-passwd');
       var users = [];
@@ -709,9 +723,10 @@ server.backend = function(base_dir, socket_emitter) {
       socket.emit('track_server', server_name);
 
     socket.on('command', webui_dispatcher);
-    self.send_profile_list();
     self.send_user_list();
+    self.send_profile_list();
     self.send_importable_list();
+
   })
 
   return self;
