@@ -1225,15 +1225,15 @@ function download_profiles(args, front_end, callback) {
           })
             .on('complete', function(response) {
               if (response.statusCode == 200) {
-                logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url_to_use, dest_filepath));
                 args['dest_dir'] = dest_dir;
                 args['filename'] = filename;
                 args['success'] = true;
-                args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
+                args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url_to_use, dest_filepath);
                 front_end.emit('file_download', args);
                 inner_callback()
               } else {
-                logging.error('[WEBUI] Server was unable to download file:', url);
+                logging.error('[WEBUI] Server was unable to download file:', url_to_use);
                 logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
                 args['success'] = false;
                 args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
@@ -1249,7 +1249,7 @@ function download_profiles(args, front_end, callback) {
         }
       });
     },
-    php_download: function(inner_callback) {
+    php: function(inner_callback) {
       var tarball = require('tarball-extract')
 
       var dir_concat = args.profile.id;
