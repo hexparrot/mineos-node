@@ -180,7 +180,11 @@ server.backend = function(base_dir, socket_emitter) {
           })
           break;
         case 'download':
-          download_profiles(args, self.front_end, function(retval){
+          function progress_emitter(args) {
+            self.front_end.emit('file_progress', args);
+          }
+
+          download_profiles(args, progress_emitter, function(retval){
             self.front_end.emit('host_notice', retval);
             self.send_profile_list();
           });
@@ -1057,7 +1061,7 @@ function check_profiles(base_dir, callback) {
 
 } // end check_profiles
 
-function download_profiles(args, front_end, callback) {
+function download_profiles(args, progress_update_fn, callback) {
   var request = require('request');
   var progress = require('request-progress');
 
@@ -1098,7 +1102,7 @@ function download_profiles(args, front_end, callback) {
             })
             .on('progress', function(state) {
               args['progress'] = state;
-              front_end.emit('file_progress', args);
+              progress_update_fn(args);
             })
             .pipe(fs.createWriteStream(dest_filepath))
         }
@@ -1144,7 +1148,7 @@ function download_profiles(args, front_end, callback) {
             })
             .on('progress', function(state) {
               args['progress'] = state;
-              front_end.emit('file_progress', args);
+              progress_update_fn(args);
             })
             .pipe(fs.createWriteStream(dest_filepath))
         }
@@ -1190,7 +1194,7 @@ function download_profiles(args, front_end, callback) {
             })
             .on('progress', function(state) {
               args['progress'] = state;
-              front_end.emit('file_progress', args);
+              progress_update_fn(args);
             })
             .pipe(fs.createWriteStream(dest_filepath))
         }
@@ -1238,7 +1242,7 @@ function download_profiles(args, front_end, callback) {
             })
             .on('progress', function(state) {
               args['progress'] = state;
-              front_end.emit('file_progress', args);
+              progress_update_fn(args);
             })
             .pipe(fs.createWriteStream(dest_filepath))
         }
@@ -1291,7 +1295,7 @@ function download_profiles(args, front_end, callback) {
             })
             .on('progress', function(state) {
               args['progress'] = state;
-              front_end.emit('file_progress', args);
+              progress_update_fn(args);
             })
             .pipe(fs.createWriteStream(dest_filepath))
         }
