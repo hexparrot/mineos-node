@@ -152,8 +152,6 @@ server.backend = function(base_dir, socket_emitter) {
 
   self.front_end.on('connection', function(socket) {
     var userid = require('userid');
-    var request = require('request');
-    var progress = require('request-progress');
     var fs = require('fs-extra');
 
     var ip_address = socket.request.connection.remoteAddress;
@@ -181,6 +179,11 @@ server.backend = function(base_dir, socket_emitter) {
               logging.error(err);
           })
           break;
+        case 'download':
+          download_profiles(args, self.front_end, function(){
+            self.send_profile_list();
+          });
+          break;
         case 'refresh_server_list':
           for (var s in self.servers)
             self.front_end.emit('track_server', s);
@@ -205,239 +208,6 @@ server.backend = function(base_dir, socket_emitter) {
             else
               logging.error(err);
           })
-          break;
-        case 'mojang_download':
-          var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.profile.id);
-          var filename = 'minecraft_server.{0}.jar'.format(args.profile.id);
-          var dest_filepath = path.join(dest_dir, filename);
-
-          var url = 'https://s3.amazonaws.com/Minecraft.Download/versions/{0}/{1}'.format(args.profile.id, filename);
-
-          fs.ensureDir(dest_dir, function(err) {
-            if (err) {
-              logging.error('[WEBUI] Error attempting download:', err);
-            } else {
-              progress(request(url), {
-                throttle: 1000,
-                delay: 100
-              })
-                .on('complete', function(response) {
-                  if (response.statusCode == 200) {
-                    logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
-                    args['dest_dir'] = dest_dir;
-                    args['filename'] = filename;
-                    args['success'] = true;
-                    args['progress']['percent'] = 100;
-                    args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
-                    self.front_end.emit('file_download', args);
-                    self.send_profile_list();
-                  } else {
-                    logging.error('[WEBUI] Server was unable to download file:', url);
-                    logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
-                    args['success'] = false;
-                    args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
-                    self.front_end.emit('file_download', args);
-                  }
-                })
-                .on('progress', function(state) {
-                  args['progress'] = state;
-                  self.front_end.emit('file_progress', args);
-                })
-                .pipe(fs.createWriteStream(dest_filepath))
-            }
-          });
-          break;
-        case 'ftb_download':
-          var unzip = require('unzip');
-
-          var dir_concat = '{0}-{1}'.format(args.profile.dir, args.profile.version);
-          var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
-          var filename = args.profile.serverPack;
-          var dest_filepath = path.join(dest_dir, filename);
-
-          var url = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(args.profile.dir, args.profile.version.replace(/\./g, '_'), args.profile.serverPack);
-
-          fs.ensureDir(dest_dir, function(err) {
-            if (err) {
-              logging.error('[WEBUI] Error attempting download:', err);
-            } else {
-              progress(request(url), {
-                throttle: 1000,
-                delay: 100
-              })
-                .on('complete', function(response) {
-                  if (response.statusCode == 200) {
-                    logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
-                    args['dest_dir'] = dest_dir;
-                    args['filename'] = filename;
-                    args['success'] = true;
-                    args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
-
-                    fs.createReadStream(dest_filepath)
-                      .pipe(unzip.Extract({ path: dest_dir }).on('close', function() {
-                        self.front_end.emit('file_download', args);
-                        self.send_profile_list();
-                      }));
-                  } else {
-                    logging.error('[WEBUI] Server was unable to download file:', url);
-                    logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
-                    args['success'] = false;
-                    args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
-                    self.front_end.emit('file_download', args);
-                  }
-                })
-                .on('progress', function(state) {
-                  args['progress'] = state;
-                  self.front_end.emit('file_progress', args);
-                })
-                .pipe(fs.createWriteStream(dest_filepath))
-            }
-          });
-          break;
-        case 'ftb_third_party_download':
-          var unzip = require('unzip');
-
-          var dir_concat = '{0}-{1}'.format(args.profile.dir, args.profile.version);
-          var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
-          var filename = args.profile.serverPack;
-          var dest_filepath = path.join(dest_dir, filename);
-
-          var url = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(args.profile.dir, args.profile.version.replace(/\./g, '_'), args.profile.serverPack);
-
-          fs.ensureDir(dest_dir, function(err) {
-            if (err) {
-              logging.error('[WEBUI] Error attempting download:', err);
-            } else {
-              progress(request(url), {
-                throttle: 1000,
-                delay: 100
-              })
-                .on('complete', function(response) {
-                  if (response.statusCode == 200) {
-                    logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
-                    args['dest_dir'] = dest_dir;
-                    args['filename'] = filename;
-                    args['success'] = true;
-                    args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
-
-                    fs.createReadStream(dest_filepath)
-                      .pipe(unzip.Extract({ path: dest_dir }).on('close', function() {
-                        self.front_end.emit('file_download', args);
-                        self.send_profile_list();
-                      }));
-                  } else {
-                    logging.error('[WEBUI] Server was unable to download file:', url);
-                    logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
-                    args['success'] = false;
-                    args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
-                    self.front_end.emit('file_download', args);
-                  }
-                })
-                .on('progress', function(state) {
-                  args['progress'] = state;
-                  self.front_end.emit('file_progress', args);
-                })
-                .pipe(fs.createWriteStream(dest_filepath))
-            }
-          });
-          break;
-        case 'pocketmine_download':
-          var dir_concat = args.profile.id;
-          var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
-          var filename = args.profile.filename;
-          var dest_filepath = path.join(dest_dir, filename);
-
-          var URL_STABLE = 'https://github.com/PocketMine/PocketMine-MP/releases/download/{0}/{1}';
-          var URL_DEVELOPMENT = 'http://jenkins.pocketmine.net/job/PocketMine-MP/{0}/artifact/{1}';
-
-          fs.ensureDir(dest_dir, function(err) {
-            if (err) {
-              logging.error('[WEBUI] Error attempting download:', err);
-            } else {
-              var url_to_use = '';
-
-              if (args.profile.channel == 'stable')
-                url_to_use = URL_STABLE.format(args.profile.short_version, args.profile.filename);
-              else
-                url_to_use = URL_DEVELOPMENT.format(args.profile.build, args.profile.filename);
-
-              progress(request(url_to_use), {
-                throttle: 1000,
-                delay: 100
-              })
-                .on('complete', function(response) {
-                  if (response.statusCode == 200) {
-                    logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
-                    args['dest_dir'] = dest_dir;
-                    args['filename'] = filename;
-                    args['success'] = true;
-                    args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
-                    self.front_end.emit('file_download', args);
-                    self.send_profile_list();
-                  } else {
-                    logging.error('[WEBUI] Server was unable to download file:', url);
-                    logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
-                    args['success'] = false;
-                    args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
-                    self.front_end.emit('file_download', args);
-                  }
-                })
-                .on('progress', function(state) {
-                  args['progress'] = state;
-                  self.front_end.emit('file_progress', args);
-                })
-                .pipe(fs.createWriteStream(dest_filepath))
-            }
-          });
-          break;
-        case 'php_download':
-          var tarball = require('tarball-extract')
-
-          var dir_concat = args.profile.id;
-          var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
-          var filename = '{0}.tar.gz'.format(args.profile.id);
-          var dest_filepath = path.join(dest_dir, filename);
-
-          var url = 'https://dl.bintray.com/pocketmine/PocketMine/{0}'.format(filename);
-
-          fs.ensureDir(dest_dir, function(err) {
-            if (err) {
-              logging.error('[WEBUI] Error attempting download:', err);
-            } else {
-              progress(request(url), {
-                throttle: 1000,
-                delay: 100
-              })
-                .on('complete', function(response) {
-                  if (response.statusCode == 200) {
-                    logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
-                    args['dest_dir'] = dest_dir;
-                    args['filename'] = filename;
-                    args['success'] = true;
-                    args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
-
-                    async.series([
-                      async.apply(tarball.extractTarball, dest_filepath, dest_dir),
-                      function(cb) {
-                        self.front_end.emit('file_download', args);
-                        self.send_profile_list();
-                      }
-                    ])
-                  } else {
-                    logging.error('[WEBUI] Server was unable to download file:', url);
-                    logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
-                    args['success'] = false;
-                    args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
-                    self.front_end.emit('file_download', args);
-                  }
-                })
-                .on('progress', function(state) {
-                  args['progress'] = state;
-                  self.front_end.emit('file_progress', args);
-                })
-                .pipe(fs.createWriteStream(dest_filepath))
-            }
-          });
           break;
         default:
           logging.warning('Command ignored: no such command {0}'.format(args.command));
@@ -1285,3 +1055,252 @@ function check_profiles(base_dir, callback) {
   )
 
 } // end check_profiles
+
+function download_profiles(args, front_end, callback) {
+  var request = require('request');
+  var progress = require('request-progress');
+
+  var DOWNLOADS = {
+    mojang: function(inner_callback) {
+      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.profile.id);
+      var filename = 'minecraft_server.{0}.jar'.format(args.profile.id);
+      var dest_filepath = path.join(dest_dir, filename);
+
+      var url = 'https://s3.amazonaws.com/Minecraft.Download/versions/{0}/{1}'.format(args.profile.id, filename);
+
+      fs.ensureDir(dest_dir, function(err) {
+        if (err) {
+          logging.error('[WEBUI] Error attempting download:', err);
+        } else {
+          progress(request(url), {
+            throttle: 1000,
+            delay: 100
+          })
+            .on('complete', function(response) {
+              if (response.statusCode == 200) {
+                logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                args['dest_dir'] = dest_dir;
+                args['filename'] = filename;
+                args['success'] = true;
+                args['progress']['percent'] = 100;
+                args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
+                front_end.emit('file_download', args);
+                inner_callback();
+              } else {
+                logging.error('[WEBUI] Server was unable to download file:', url);
+                logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                args['success'] = false;
+                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                front_end.emit('file_download', args);
+                inner_callback();
+              }
+            })
+            .on('progress', function(state) {
+              args['progress'] = state;
+              front_end.emit('file_progress', args);
+            })
+            .pipe(fs.createWriteStream(dest_filepath))
+        }
+      });
+    },
+    ftb: function(inner_callback) {
+      var unzip = require('unzip');
+
+      var dir_concat = '{0}-{1}'.format(args.profile.dir, args.profile.version);
+      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
+      var filename = args.profile.serverPack;
+      var dest_filepath = path.join(dest_dir, filename);
+
+      var url = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(args.profile.dir, args.profile.version.replace(/\./g, '_'), args.profile.serverPack);
+
+      fs.ensureDir(dest_dir, function(err) {
+        if (err) {
+          logging.error('[WEBUI] Error attempting download:', err);
+        } else {
+          progress(request(url), {
+            throttle: 1000,
+            delay: 100
+          })
+            .on('complete', function(response) {
+              if (response.statusCode == 200) {
+                logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                args['dest_dir'] = dest_dir;
+                args['filename'] = filename;
+                args['success'] = true;
+                args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
+
+                fs.createReadStream(dest_filepath)
+                  .pipe(unzip.Extract({ path: dest_dir }).on('close', function() {
+                    front_end.emit('file_download', args);
+                    inner_callback()
+                  }));
+              } else {
+                logging.error('[WEBUI] Server was unable to download file:', url);
+                logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                args['success'] = false;
+                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                front_end.emit('file_download', args);
+                inner_callback();
+              }
+            })
+            .on('progress', function(state) {
+              args['progress'] = state;
+              front_end.emit('file_progress', args);
+            })
+            .pipe(fs.createWriteStream(dest_filepath))
+        }
+      });
+    },
+    ftb_third_party: function(inner_callback) {
+      var unzip = require('unzip');
+
+      var dir_concat = '{0}-{1}'.format(args.profile.dir, args.profile.version);
+      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
+      var filename = args.profile.serverPack;
+      var dest_filepath = path.join(dest_dir, filename);
+
+      var url = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(args.profile.dir, args.profile.version.replace(/\./g, '_'), args.profile.serverPack);
+
+      fs.ensureDir(dest_dir, function(err) {
+        if (err) {
+          logging.error('[WEBUI] Error attempting download:', err);
+        } else {
+          progress(request(url), {
+            throttle: 1000,
+            delay: 100
+          })
+            .on('complete', function(response) {
+              if (response.statusCode == 200) {
+                logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                args['dest_dir'] = dest_dir;
+                args['filename'] = filename;
+                args['success'] = true;
+                args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
+
+                fs.createReadStream(dest_filepath)
+                  .pipe(unzip.Extract({ path: dest_dir }).on('close', function() {
+                    front_end.emit('file_download', args);
+                    inner_callback()
+                  }));
+              } else {
+                logging.error('[WEBUI] Server was unable to download file:', url);
+                logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                args['success'] = false;
+                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                front_end.emit('file_download', args);
+                inner_callback();
+              }
+            })
+            .on('progress', function(state) {
+              args['progress'] = state;
+              front_end.emit('file_progress', args);
+            })
+            .pipe(fs.createWriteStream(dest_filepath))
+        }
+      });
+    },
+    pocketmine: function(inner_callback) {
+      var dir_concat = args.profile.id;
+      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
+      var filename = args.profile.filename;
+      var dest_filepath = path.join(dest_dir, filename);
+
+      var URL_STABLE = 'https://github.com/PocketMine/PocketMine-MP/releases/download/{0}/{1}';
+      var URL_DEVELOPMENT = 'http://jenkins.pocketmine.net/job/PocketMine-MP/{0}/artifact/{1}';
+
+      fs.ensureDir(dest_dir, function(err) {
+        if (err) {
+          logging.error('[WEBUI] Error attempting download:', err);
+        } else {
+          var url_to_use = '';
+
+          if (args.profile.channel == 'stable')
+            url_to_use = URL_STABLE.format(args.profile.short_version, args.profile.filename);
+          else
+            url_to_use = URL_DEVELOPMENT.format(args.profile.build, args.profile.filename);
+
+          progress(request(url_to_use), {
+            throttle: 1000,
+            delay: 100
+          })
+            .on('complete', function(response) {
+              if (response.statusCode == 200) {
+                logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                args['dest_dir'] = dest_dir;
+                args['filename'] = filename;
+                args['success'] = true;
+                args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
+                front_end.emit('file_download', args);
+                inner_callback()
+              } else {
+                logging.error('[WEBUI] Server was unable to download file:', url);
+                logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                args['success'] = false;
+                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                front_end.emit('file_download', args);
+                inner_callback();
+              }
+            })
+            .on('progress', function(state) {
+              args['progress'] = state;
+              front_end.emit('file_progress', args);
+            })
+            .pipe(fs.createWriteStream(dest_filepath))
+        }
+      });
+    },
+    php_download: function(inner_callback) {
+      var tarball = require('tarball-extract')
+
+      var dir_concat = args.profile.id;
+      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
+      var filename = '{0}.tar.gz'.format(args.profile.id);
+      var dest_filepath = path.join(dest_dir, filename);
+
+      var url = 'https://dl.bintray.com/pocketmine/PocketMine/{0}'.format(filename);
+
+      fs.ensureDir(dest_dir, function(err) {
+        if (err) {
+          logging.error('[WEBUI] Error attempting download:', err);
+        } else {
+          progress(request(url), {
+            throttle: 1000,
+            delay: 100
+          })
+            .on('complete', function(response) {
+              if (response.statusCode == 200) {
+                logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                args['dest_dir'] = dest_dir;
+                args['filename'] = filename;
+                args['success'] = true;
+                args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
+
+                async.series([
+                  async.apply(tarball.extractTarball, dest_filepath, dest_dir),
+                  function(cb) {
+                    front_end.emit('file_download', args);
+                    inner_callback();
+                  }
+                ])
+              } else {
+                logging.error('[WEBUI] Server was unable to download file:', url);
+                logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                args['success'] = false;
+                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                front_end.emit('file_download', args);
+                inner_callback();
+              }
+            })
+            .on('progress', function(state) {
+              args['progress'] = state;
+              front_end.emit('file_progress', args);
+            })
+            .pipe(fs.createWriteStream(dest_filepath))
+        }
+      });
+    }
+  } // end downloads {}
+
+  DOWNLOADS[args.profile.group](callback);
+
+} //end function
