@@ -309,10 +309,6 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
                                              gid: parseInt($scope.servers[$scope.current].page_data.glance.owner.gid)});
   }
 
-  $scope.refresh_server_list = function() {
-    socket.emit('/', 'command', { command: 'refresh_server_list' });
-  }
-
   $scope.create_server = function() {
     var serverform = $scope.serverform;
     var server_name = serverform['server_name'];
