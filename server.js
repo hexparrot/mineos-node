@@ -434,200 +434,6 @@ server.backend = function(base_dir, socket_emitter) {
       }
     }
 
-    self.check_profiles = {
-      mojang: function(callback) {
-        var request = require('request');
-        var fs = require('fs');
-
-        var MOJANG_VERSIONS_URL = 'http://s3.amazonaws.com/Minecraft.Download/versions/versions.json';
-        var path_prefix = path.join(base_dir, mineos.DIRS['profiles']);
-
-        function handle_reply(err, response, body) {
-          var p = [];
-
-          if (!err && (response || {}).statusCode === 200)
-            for (var index in body.versions) {
-              var item = body.versions[index];
-              item['group'] = 'mojang';
-              item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, 'minecraft_server.{0}.jar'.format(item.id)));
-              item['webui_desc'] = 'Official Mojang Jar';
-              item['weight'] = 0;
-
-              p.push(item);
-            }
-
-          callback(err, p);
-        }
-        request({ url: MOJANG_VERSIONS_URL, json: true }, handle_reply);
-      },
-      ftb: function(callback) {
-        var request = require('request');
-        var xml_parser = require('xml2js');
-        var fs = require('fs');
-
-        var FTB_VERSIONS_URL = 'http://ftb.cursecdn.com/FTB2/static/modpacks.xml';
-        var path_prefix = path.join(base_dir, mineos.DIRS['profiles']);
-
-        function handle_reply(err, response, body) {
-          var p = [];
-
-          if (!err && (response || {}).statusCode === 200)
-            xml_parser.parseString(body, function(inner_err, result) {
-              var packs = result['modpacks']['modpack'];
-
-              for (var index in packs) {
-                var item = packs[index]['$'];
-                var dir_concat = '{0}-{1}'.format(item['dir'], item['version']);
-                item['group'] = 'ftb';
-                item['type'] = 'release';
-                item['id'] = dir_concat;
-                item['webui_desc'] = '{0} {1}'.format(item['name'], item['version']);
-                item['weight'] = 5;
-                item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item['serverPack']));
-                p.push(item);
-
-                var old_versions = item['oldVersions'].split(';');
-                for (var idx in old_versions) {
-                  var new_item = JSON.parse(JSON.stringify(item)); //deep copy object
-                  var dir_concat = '{0}-{1}'.format(new_item['dir'], old_versions[idx]);
-
-                  if (old_versions[idx].length > 0 && old_versions[idx] != item['version']) {
-                    new_item['type'] = 'old_version';
-                    new_item['id'] = dir_concat;
-                    new_item['webui_desc'] = '{0} {1}'.format(new_item['name'], old_versions[idx]);
-                    new_item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, new_item['serverPack']));
-                    p.push(new_item);
-                  }
-                }
-              }
-              callback(err || inner_err, p);
-            })
-          else
-            callback(null, p);
-        }
-        request({ url: FTB_VERSIONS_URL, json: false }, handle_reply);
-      },
-      ftb_third_party: function(callback) {
-        var request = require('request');
-        var xml_parser = require('xml2js');
-        var fs = require('fs');
-
-        var FTB_VERSIONS_URL = 'http://ftb.cursecdn.com/FTB2/static/thirdparty.xml';
-        var path_prefix = path.join(base_dir, mineos.DIRS['profiles']);
-
-        function handle_reply(err, response, body) {
-          var p = [];
-
-          if (!err && (response || {}).statusCode == 200)
-            xml_parser.parseString(body, function(inner_err, result) {
-              var packs = result['modpacks']['modpack'];
-
-              for (var index in packs) {
-                var item = packs[index]['$'];
-                var dir_concat = '{0}-{1}'.format(item['dir'], item['version']);
-                item['group'] = 'ftb_third_party';
-                item['type'] = 'release';
-                item['id'] = dir_concat;
-                item['webui_desc'] = '{0} {1}'.format(item['name'], item['version']);
-                item['weight'] = 10;
-                item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item['serverPack']));
-                p.push(item);
-
-                var old_versions = item['oldVersions'].split(';');
-                for (var idx in old_versions) {
-                  var new_item = JSON.parse(JSON.stringify(item)); //deep copy object
-                  var dir_concat = '{0}-{1}'.format(new_item['dir'], old_versions[idx]);
-
-                  if (old_versions[idx].length > 0 && old_versions[idx] != item['version']) {
-                    new_item['type'] = 'old_version';
-                    new_item['id'] = dir_concat;
-                    new_item['webui_desc'] = '{0} {1}'.format(new_item['name'], old_versions[idx]);
-                    new_item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, new_item['serverPack']));
-                    p.push(new_item);
-                  }
-                }
-              }
-              callback(err || inner_err, p);
-            })
-          else
-            callback(null, p);
-        }
-        request({ url: FTB_VERSIONS_URL, json: false }, handle_reply);
-      },
-      pocketmine: function(callback) {
-        var request = require('request');
-
-        var URL_DEVELOPMENT = "http://www.pocketmine.net/api/?channel=development";
-        var URL_STABLE = "http://www.pocketmine.net/api/?channel=stable";
-
-        var p = [];
-
-        function handle_reply(err, retval) {
-          for (var r in retval) 
-            if ((retval[r] || {}).statusCode == 200) {
-              var releases = JSON.parse(retval[r].body);
-
-              var item = releases;
-              var version = releases.version;
-              var dir_concat = 'Pocketmine-{0}'.format(version);
-              item['channel'] = r;
-              item['filename'] = path.basename(item.download_url);
-              item['group'] = 'pocketmine';
-              item['id'] = dir_concat;
-              item['version'] = version;
-              switch (item.channel) {
-                case 'stable':
-                  item['short_version'] = path.basename(item.details_url);
-                  item['type'] = 'release';
-                  break;
-                case 'development':
-                  item['short_version'] = version;
-                  item['type'] = 'snapshot';
-                  break;
-              }
-              item['webui_desc'] = 'phar build {0}, api {1}'.format(item.build, item.api_version);
-              item['weight'] = 10;
-              item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item.filename));
-              p.push(item);
-
-            }
-          callback(null, p)
-        }
-
-        async.auto({
-          'stable': async.retry(2, async.apply(request, URL_STABLE)),
-          'development': async.retry(2, async.apply(request, URL_DEVELOPMENT)),
-        }, handle_reply)
-
-      },
-      php: function(callback) {
-        var request = require('request');
-        BUILD_REGEX = /^[\w]+BUILD="([^"]+)"/
-        var p = [];
-
-        function handle_reply(err, response, body) {
-          if (!err && (response || {}).statusCode == 200) {
-            var lines = body.split('\n');
-            for (var i in lines) {
-              var matching = lines[i].match(BUILD_REGEX);
-              if (matching) {
-                var item = {};
-                item['group'] = 'php';
-                item['type'] = 'release';
-                item['id'] = matching[1];
-                item['webui_desc'] = 'PHP binary for Pocketmine';
-                item['weight'] = 12;
-                item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], matching[1], '{0}.tar.gz'.format(matching[1])));
-                p.push(item);
-              }
-            }
-          }
-          callback(err, p);
-        }
-        request('http://get.pocketmine.net', handle_reply);
-      }
-    }
-
     self.send_user_list = function() {
       var passwd = require('etc-passwd');
       var users = [];
@@ -706,27 +512,10 @@ server.backend = function(base_dir, socket_emitter) {
     })
   }
 
-  function download_profile_list(callback) {
-    logging.info('[WEBUI] Downloading official profiles.');
-    async.auto({
-      'mojang': async.retry(2, self.check_profiles.mojang),
-      'ftb': async.retry(2, self.check_profiles.ftb),
-      'ftb_3rd': async.retry(2, self.check_profiles.ftb_third_party),
-      'pocketmine': async.retry(2, self.check_profiles.pocketmine),
-      'php': async.retry(2, self.check_profiles.php)
-    }, function(err, results) {
-      var merged = [];
-      for (var source in results)
-        merged = merged.concat.apply(merged, results[source]);
-
-      self.profiles = merged;
-      callback();
-    })
-  }
-
   self.send_profile_list = function(force_redownload) {
     if (force_redownload || !self.profiles.length)
-      download_profile_list(function() {
+      check_profiles(base_dir, function(all_profiles) {
+        self.profiles = all_profiles;
         self.front_end.emit('profile_list', self.profiles);
       })
     else
@@ -1273,3 +1062,213 @@ function server_container(server_name, base_dir, socket_io) {
 
   }) //nsp on connect container ends
 }
+
+
+
+function check_profiles(base_dir, callback) {
+  /**
+   * Returns list of all available profiles and denotes which are present on the system
+   * @param {String} base_dir, likely /var/games/minecraft
+   * @return {Array} all profile definitions
+   */
+  var request = require('request');
+  var fs = require('fs');
+
+  var SOURCES = {
+    mojang: function(callback) {
+      var MOJANG_VERSIONS_URL = 'http://s3.amazonaws.com/Minecraft.Download/versions/versions.json';
+      var path_prefix = path.join(base_dir, mineos.DIRS['profiles']);
+
+      function handle_reply(err, response, body) {
+        var p = [];
+
+        if (!err && (response || {}).statusCode === 200)
+          for (var index in body.versions) {
+            var item = body.versions[index];
+            item['group'] = 'mojang';
+            item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, 'minecraft_server.{0}.jar'.format(item.id)));
+            item['webui_desc'] = 'Official Mojang Jar';
+            item['weight'] = 0;
+
+            p.push(item);
+          }
+
+        callback(err, p);
+      }
+      request({ url: MOJANG_VERSIONS_URL, json: true }, handle_reply);
+    },
+    ftb: function(callback) {
+      var xml_parser = require('xml2js');
+
+      var FTB_VERSIONS_URL = 'http://ftb.cursecdn.com/FTB2/static/modpacks.xml';
+      var path_prefix = path.join(base_dir, mineos.DIRS['profiles']);
+
+      function handle_reply(err, response, body) {
+        var p = [];
+
+        if (!err && (response || {}).statusCode === 200)
+          xml_parser.parseString(body, function(inner_err, result) {
+            var packs = result['modpacks']['modpack'];
+
+            for (var index in packs) {
+              var item = packs[index]['$'];
+              var dir_concat = '{0}-{1}'.format(item['dir'], item['version']);
+              item['group'] = 'ftb';
+              item['type'] = 'release';
+              item['id'] = dir_concat;
+              item['webui_desc'] = '{0} {1}'.format(item['name'], item['version']);
+              item['weight'] = 5;
+              item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item['serverPack']));
+              p.push(item);
+
+              var old_versions = item['oldVersions'].split(';');
+              for (var idx in old_versions) {
+                var new_item = JSON.parse(JSON.stringify(item)); //deep copy object
+                var dir_concat = '{0}-{1}'.format(new_item['dir'], old_versions[idx]);
+
+                if (old_versions[idx].length > 0 && old_versions[idx] != item['version']) {
+                  new_item['type'] = 'old_version';
+                  new_item['id'] = dir_concat;
+                  new_item['webui_desc'] = '{0} {1}'.format(new_item['name'], old_versions[idx]);
+                  new_item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, new_item['serverPack']));
+                  p.push(new_item);
+                }
+              }
+            }
+            callback(err || inner_err, p);
+          })
+        else
+          callback(null, p);
+      }
+      request({ url: FTB_VERSIONS_URL, json: false }, handle_reply);
+    },
+    ftb_third_party: function(callback) {
+      var xml_parser = require('xml2js');
+
+      var FTB_VERSIONS_URL = 'http://ftb.cursecdn.com/FTB2/static/thirdparty.xml';
+      var path_prefix = path.join(base_dir, mineos.DIRS['profiles']);
+
+      function handle_reply(err, response, body) {
+        var p = [];
+
+        if (!err && (response || {}).statusCode == 200)
+          xml_parser.parseString(body, function(inner_err, result) {
+            var packs = result['modpacks']['modpack'];
+
+            for (var index in packs) {
+              var item = packs[index]['$'];
+              var dir_concat = '{0}-{1}'.format(item['dir'], item['version']);
+              item['group'] = 'ftb_third_party';
+              item['type'] = 'release';
+              item['id'] = dir_concat;
+              item['webui_desc'] = '{0} {1}'.format(item['name'], item['version']);
+              item['weight'] = 10;
+              item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item['serverPack']));
+              p.push(item);
+
+              var old_versions = item['oldVersions'].split(';');
+              for (var idx in old_versions) {
+                var new_item = JSON.parse(JSON.stringify(item)); //deep copy object
+                var dir_concat = '{0}-{1}'.format(new_item['dir'], old_versions[idx]);
+
+                if (old_versions[idx].length > 0 && old_versions[idx] != item['version']) {
+                  new_item['type'] = 'old_version';
+                  new_item['id'] = dir_concat;
+                  new_item['webui_desc'] = '{0} {1}'.format(new_item['name'], old_versions[idx]);
+                  new_item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, new_item['serverPack']));
+                  p.push(new_item);
+                }
+              }
+            }
+            callback(err || inner_err, p);
+          })
+        else
+          callback(null, p);
+      }
+      request({ url: FTB_VERSIONS_URL, json: false }, handle_reply);
+    },
+    pocketmine: function(callback) {
+      var URL_DEVELOPMENT = "http://www.pocketmine.net/api/?channel=development";
+      var URL_STABLE = "http://www.pocketmine.net/api/?channel=stable";
+
+      var p = [];
+
+      function handle_reply(err, retval) {
+        for (var r in retval) 
+          if ((retval[r] || {}).statusCode == 200) {
+            var releases = JSON.parse(retval[r].body);
+
+            var item = releases;
+            var version = releases.version;
+            var dir_concat = 'Pocketmine-{0}'.format(version);
+            item['channel'] = r;
+            item['filename'] = path.basename(item.download_url);
+            item['group'] = 'pocketmine';
+            item['id'] = dir_concat;
+            item['version'] = version;
+            switch (item.channel) {
+              case 'stable':
+                item['short_version'] = path.basename(item.details_url);
+                item['type'] = 'release';
+                break;
+              case 'development':
+                item['short_version'] = version;
+                item['type'] = 'snapshot';
+                break;
+            }
+            item['webui_desc'] = 'phar build {0}, api {1}'.format(item.build, item.api_version);
+            item['weight'] = 10;
+            item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item.filename));
+            p.push(item);
+
+          }
+        callback(null, p)
+      }
+
+      async.auto({
+        'stable': async.retry(2, async.apply(request, URL_STABLE)),
+        'development': async.retry(2, async.apply(request, URL_DEVELOPMENT)),
+      }, handle_reply)
+    },
+    php: function(callback) {
+      BUILD_REGEX = /^[\w]+BUILD="([^"]+)"/
+      var p = [];
+
+      function handle_reply(err, response, body) {
+        if (!err && (response || {}).statusCode == 200) {
+          var lines = body.split('\n');
+          for (var i in lines) {
+            var matching = lines[i].match(BUILD_REGEX);
+            if (matching) {
+              var item = {};
+              item['group'] = 'php';
+              item['type'] = 'release';
+              item['id'] = matching[1];
+              item['webui_desc'] = 'PHP binary for Pocketmine';
+              item['weight'] = 12;
+              item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], matching[1], '{0}.tar.gz'.format(matching[1])));
+              p.push(item);
+            }
+          }
+        }
+        callback(err, p);
+      }
+      request('http://get.pocketmine.net', handle_reply);
+    }
+  } //end sources
+
+  logging.info('[WEBUI] Downloading official profiles.');
+  async.auto({
+    'mojang': async.retry(2, SOURCES.mojang),
+    'ftb': async.retry(2, SOURCES.ftb),
+    'ftb_3rd': async.retry(2, SOURCES.ftb_third_party),
+    'pocketmine': async.retry(2, SOURCES.pocketmine),
+    'php': async.retry(2, SOURCES.php)
+  }, function(err, results) {
+    var merged = [];
+    for (var source in results)
+      merged = merged.concat.apply(merged, results[source]);
+
+    callback(merged);
+  })
+} // end check_profiles
