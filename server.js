@@ -180,7 +180,8 @@ server.backend = function(base_dir, socket_emitter) {
           })
           break;
         case 'download':
-          download_profiles(args, self.front_end, function(){
+          download_profiles(args, self.front_end, function(retval){
+            self.front_end.emit('host_notice', retval);
             self.send_profile_list();
           });
           break;
@@ -1084,15 +1085,15 @@ function download_profiles(args, front_end, callback) {
                 args['success'] = true;
                 args['progress']['percent'] = 100;
                 args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
-                front_end.emit('file_download', args);
-                inner_callback();
+                args['suppress_popup'] = false;
+                inner_callback(args);
               } else {
                 logging.error('[WEBUI] Server was unable to download file:', url);
                 logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
                 args['success'] = false;
                 args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
-                front_end.emit('file_download', args);
-                inner_callback();
+                args['suppress_popup'] = false;
+                inner_callback(args);
               }
             })
             .on('progress', function(state) {
@@ -1131,16 +1132,14 @@ function download_profiles(args, front_end, callback) {
 
                 fs.createReadStream(dest_filepath)
                   .pipe(unzip.Extract({ path: dest_dir }).on('close', function() {
-                    front_end.emit('file_download', args);
-                    inner_callback()
+                    inner_callback(args);
                   }));
               } else {
                 logging.error('[WEBUI] Server was unable to download file:', url);
                 logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
                 args['success'] = false;
                 args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
-                front_end.emit('file_download', args);
-                inner_callback();
+                inner_callback(args);
               }
             })
             .on('progress', function(state) {
@@ -1179,16 +1178,14 @@ function download_profiles(args, front_end, callback) {
 
                 fs.createReadStream(dest_filepath)
                   .pipe(unzip.Extract({ path: dest_dir }).on('close', function() {
-                    front_end.emit('file_download', args);
-                    inner_callback()
+                    inner_callback(args);
                   }));
               } else {
                 logging.error('[WEBUI] Server was unable to download file:', url);
                 logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
                 args['success'] = false;
                 args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
-                front_end.emit('file_download', args);
-                inner_callback();
+                inner_callback(args);
               }
             })
             .on('progress', function(state) {
@@ -1230,15 +1227,13 @@ function download_profiles(args, front_end, callback) {
                 args['filename'] = filename;
                 args['success'] = true;
                 args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url_to_use, dest_filepath);
-                front_end.emit('file_download', args);
-                inner_callback()
+                inner_callback(args);
               } else {
                 logging.error('[WEBUI] Server was unable to download file:', url_to_use);
                 logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
                 args['success'] = false;
                 args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
-                front_end.emit('file_download', args);
-                inner_callback();
+                inner_callback(args);
               }
             })
             .on('progress', function(state) {
@@ -1276,19 +1271,22 @@ function download_profiles(args, front_end, callback) {
                 args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
 
                 async.series([
-                  async.apply(tarball.extractTarball, dest_filepath, dest_dir),
-                  function(cb) {
-                    front_end.emit('file_download', args);
-                    inner_callback();
+                  async.apply(tarball.extractTarball, dest_filepath, dest_dir)
+                ], function(err) {
+                  if (err) {
+                    args['success'] = false;
+                    args['help_text'] = 'Successfully downloaded, but failed to extract {0}'.format(dest_filepath);
+                    inner_callback(args);
+                  } else {
+                    inner_callback(args);
                   }
-                ])
+                })
               } else {
                 logging.error('[WEBUI] Server was unable to download file:', url);
                 logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
                 args['success'] = false;
                 args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
-                front_end.emit('file_download', args);
-                inner_callback();
+                inner_callback(args);
               }
             })
             .on('progress', function(state) {
