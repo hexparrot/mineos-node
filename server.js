@@ -30,9 +30,9 @@ server.backend = function(base_dir, socket_emitter) {
     //thanks to https://github.com/flareofghast/node-advertiser/blob/master/advert.js
     var dgram = require('dgram');
     var udp_broadcaster = dgram.createSocket('udp4');
-    var udp_dest = '255.255.255.255';
-    var udp_port = 4445;
-    var broadcast_delay_ms = 2000;
+    var UDP_DEST = '255.255.255.255';
+    var UDP_PORT = 4445;
+    var BROADCAST_DELAY_MS = 4000;
 
     udp_broadcaster.bind();
     udp_broadcaster.on("listening", function () {
@@ -42,13 +42,27 @@ server.backend = function(base_dir, socket_emitter) {
           for (var s in self.servers) {
             self.servers[s].broadcast_to_lan(function(msg) {
               if (msg)
-                udp_broadcaster.send(msg, 0, msg.length, udp_port, udp_dest);
+                udp_broadcaster.send(msg, 0, msg.length, UDP_PORT, UDP_DEST);
             })
           }
-          setTimeout(next, broadcast_delay_ms);
+          setTimeout(next, BROADCAST_DELAY_MS);
         }
       )
     });
+  })();
+
+  (function() {
+    var HOST_HEARTBEAT_DELAY_MS = 1000;
+
+    function host_heartbeat() {
+      self.front_end.emit('host_heartbeat', {
+        'uptime': os.uptime(),
+        'freemem': os.freemem(),
+        'loadavg': os.loadavg()
+      })
+    }
+
+    setInterval(host_heartbeat, HOST_HEARTBEAT_DELAY_MS);
   })();
 
   (function() {
@@ -99,16 +113,6 @@ server.backend = function(base_dir, socket_emitter) {
         self.send_importable_list();
       })
   })();
-
-  function host_heartbeat() {
-    self.front_end.emit('host_heartbeat', {
-      'uptime': os.uptime(),
-      'freemem': os.freemem(),
-      'loadavg': os.loadavg()
-    })
-  }
-
-  setInterval(host_heartbeat, 1000);
 
   self.start_servers = function() {
     var MS_TO_PAUSE = 10000;
