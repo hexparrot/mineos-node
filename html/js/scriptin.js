@@ -228,7 +228,11 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     $scope.archive_list = archive_data;
   })
 
-  socket.on('/', 'file_download', function(data) {
+  socket.on('/', 'host_notice', function(data) {
+    var suppress = false;
+    if ('suppress_popup' in data || data.success)
+      suppress = true;
+
     $.gritter.add({
       title: "{0} {1}".format(data.command,
                               (data.success ? $filter('translate')('SUCCEEDED') : $filter('translate')('FAILED')) ),
@@ -307,10 +311,6 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     socket.emit($scope.current, 'command', { command: 'chown', 
                                              uid: parseInt($scope.servers[$scope.current].page_data.glance.owner.uid),
                                              gid: parseInt($scope.servers[$scope.current].page_data.glance.owner.gid)});
-  }
-
-  $scope.refresh_server_list = function() {
-    socket.emit('/', 'command', { command: 'refresh_server_list' });
   }
 
   $scope.create_server = function() {

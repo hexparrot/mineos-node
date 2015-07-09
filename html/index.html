@@ -100,7 +100,7 @@
                         <!-- START Dropdown Menu -->
                         <div class="dropdown-menu" role="menu">
                             <footer>
-                                <a ng-click="refresh_server_list()" class="text"><span class="icon icone-globe"></span> {{ 'REFRESH_SERVER_LIST' | translate }}</a><br>
+                                <a ng-click="host_command('refresh_server_list')" class="text"><span class="icon icone-globe"></span> {{ 'REFRESH_SERVER_LIST' | translate }}</a><br>
                                 <a ng-click="host_command('refresh_profile_list', {redownload: true})" class="text"><span class="icon icone-globe"></span> {{ 'REFRESH_PROFILE_LIST' | translate }}</a><br>
                                 <a href="/logout" class="text"><span class="icon icone-off"></span> {{ 'LOGOFF' | translate }}</a>
                             </footer>
@@ -645,7 +645,7 @@
                                                 <td>[{{ jar.group }}] <strong>{{ jar.type }}</strong></td>
                                                 <td>
                                                     <p>
-                                                        <button type="button" class="btn btn-mini btn-success" ng-click="host_command(jar.group + '_download', {profile: jar})" translate="DOWNLOAD"></button> <span ng-show="jar.progress.percent > 0 && jar.progress.percent < 100">{{ jar.progress.percent + '%' }}</span> <span ng-show="jar.downloaded" class="icone-ok">{{ 'DOWNLOADED' | translate }}</span>
+                                                        <button type="button" class="btn btn-mini btn-success" ng-click="host_command('download', {profile: jar})" translate="DOWNLOAD"></button> <span ng-show="jar.progress.percent > 0 && jar.progress.percent < 100">{{ jar.progress.percent + '%' }}</span> <span ng-show="jar.downloaded" class="icone-ok">{{ 'DOWNLOADED' | translate }}</span>
                                                     </p>
                                                 </td>
                                             </tr>
