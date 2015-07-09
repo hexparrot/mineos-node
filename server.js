@@ -139,6 +139,17 @@ server.backend = function(base_dir, socket_emitter) {
       self.servers[server_name].cleanup();
   }
 
+  self.send_profile_list = function(send_existing) {
+    if (send_existing && self.profiles.length) //if requesting to just send what you already have AND they are already present
+      self.front_end.emit('profile_list', self.profiles);
+    else
+      check_profiles(base_dir, function(err, all_profiles) {
+        if (!err)
+          self.profiles = all_profiles;
+        self.front_end.emit('profile_list', self.profiles);
+      })
+  }
+
   self.front_end.on('connection', function(socket) {
     var userid = require('userid');
     var request = require('request');
@@ -175,7 +186,7 @@ server.backend = function(base_dir, socket_emitter) {
             self.front_end.emit('track_server', s);
           break;
         case 'refresh_profile_list':
-          self.send_profile_list(true);
+          self.send_profile_list();
           break;
         case 'create_from_archive':
           var instance = new mineos.mc(args.new_server_name, base_dir);
@@ -477,7 +488,7 @@ server.backend = function(base_dir, socket_emitter) {
 
     socket.on('command', webui_dispatcher);
     self.send_user_list();
-    self.send_profile_list();
+    self.send_profile_list(true);
     self.send_importable_list();
 
   })
@@ -510,16 +521,6 @@ server.backend = function(base_dir, socket_emitter) {
         }); 
       }
     })
-  }
-
-  self.send_profile_list = function(force_redownload) {
-    if (force_redownload || !self.profiles.length)
-      check_profiles(base_dir, function(all_profiles) {
-        self.profiles = all_profiles;
-        self.front_end.emit('profile_list', self.profiles);
-      })
-    else
-      self.front_end.emit('profile_list', self.profiles);
   }
 
   return self;
@@ -1071,6 +1072,7 @@ function check_profiles(base_dir, callback) {
    * @param {String} base_dir, likely /var/games/minecraft
    * @return {Array} all profile definitions
    */
+  var self = this;
   var request = require('request');
   var fs = require('fs');
 
@@ -1258,17 +1260,28 @@ function check_profiles(base_dir, callback) {
   } //end sources
 
   logging.info('[WEBUI] Downloading official profiles.');
-  async.auto({
-    'mojang': async.retry(2, SOURCES.mojang),
-    'ftb': async.retry(2, SOURCES.ftb),
-    'ftb_3rd': async.retry(2, SOURCES.ftb_third_party),
-    'pocketmine': async.retry(2, SOURCES.pocketmine),
-    'php': async.retry(2, SOURCES.php)
-  }, function(err, results) {
-    var merged = [];
-    for (var source in results)
-      merged = merged.concat.apply(merged, results[source]);
 
-    callback(merged);
-  })
+  var LIMIT_SIMULTANEOUS_DOWNLOADS = 3;
+  var results = {};
+
+  async.forEachOfLimit(
+    SOURCES, 
+    LIMIT_SIMULTANEOUS_DOWNLOADS, 
+    function(dl_func, key, inner_callback) {
+      dl_func(function(err, profs) {
+        for (var source in profs)
+          results[key] = profs;
+
+        inner_callback();
+      })
+    }, 
+    function(err) {
+      var merged = [];
+      for (var source in results)
+        merged = merged.concat.apply(merged, results[source]);
+
+      callback(err, merged);
+    }
+  )
+
 } // end check_profiles
