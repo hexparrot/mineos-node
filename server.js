@@ -885,34 +885,38 @@ function check_profiles(base_dir, callback) {
 
         if (!err && (response || {}).statusCode === 200)
           xml_parser.parseString(body, function(inner_err, result) {
-            var packs = result['modpacks']['modpack'];
+            try {
+              var packs = result['modpacks']['modpack'];
 
-            for (var index in packs) {
-              var item = packs[index]['$'];
-              var dir_concat = '{0}-{1}'.format(item['dir'], item['version']);
-              item['group'] = 'ftb';
-              item['type'] = 'release';
-              item['id'] = dir_concat;
-              item['webui_desc'] = '{0} {1}'.format(item['name'], item['version']);
-              item['weight'] = 5;
-              item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item['serverPack']));
-              p.push(item);
+              for (var index in packs) {
+                var item = packs[index]['$'];
+                var dir_concat = '{0}-{1}'.format(item['dir'], item['version']);
+                item['group'] = 'ftb';
+                item['type'] = 'release';
+                item['id'] = dir_concat;
+                item['webui_desc'] = '{0} {1}'.format(item['name'], item['version']);
+                item['weight'] = 5;
+                item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item['serverPack']));
+                p.push(item);
 
-              var old_versions = item['oldVersions'].split(';');
-              for (var idx in old_versions) {
-                var new_item = JSON.parse(JSON.stringify(item)); //deep copy object
-                var dir_concat = '{0}-{1}'.format(new_item['dir'], old_versions[idx]);
+                var old_versions = item['oldVersions'].split(';');
+                for (var idx in old_versions) {
+                  var new_item = JSON.parse(JSON.stringify(item)); //deep copy object
+                  var dir_concat = '{0}-{1}'.format(new_item['dir'], old_versions[idx]);
 
-                if (old_versions[idx].length > 0 && old_versions[idx] != item['version']) {
-                  new_item['type'] = 'old_version';
-                  new_item['id'] = dir_concat;
-                  new_item['webui_desc'] = '{0} {1}'.format(new_item['name'], old_versions[idx]);
-                  new_item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, new_item['serverPack']));
-                  p.push(new_item);
+                  if (old_versions[idx].length > 0 && old_versions[idx] != item['version']) {
+                    new_item['type'] = 'old_version';
+                    new_item['id'] = dir_concat;
+                    new_item['webui_desc'] = '{0} {1}'.format(new_item['name'], old_versions[idx]);
+                    new_item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, new_item['serverPack']));
+                    p.push(new_item);
+                  }
                 }
               }
+              callback(err || inner_err, p);
+            } catch (e) {
+              callback(e, p)
             }
-            callback(err || inner_err, p);
           })
         else
           callback(null, p);
@@ -930,34 +934,38 @@ function check_profiles(base_dir, callback) {
 
         if (!err && (response || {}).statusCode == 200)
           xml_parser.parseString(body, function(inner_err, result) {
-            var packs = result['modpacks']['modpack'];
+            try {
+              var packs = result['modpacks']['modpack'];
 
-            for (var index in packs) {
-              var item = packs[index]['$'];
-              var dir_concat = '{0}-{1}'.format(item['dir'], item['version']);
-              item['group'] = 'ftb_third_party';
-              item['type'] = 'release';
-              item['id'] = dir_concat;
-              item['webui_desc'] = '{0} {1}'.format(item['name'], item['version']);
-              item['weight'] = 10;
-              item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item['serverPack']));
-              p.push(item);
+              for (var index in packs) {
+                var item = packs[index]['$'];
+                var dir_concat = '{0}-{1}'.format(item['dir'], item['version']);
+                item['group'] = 'ftb_third_party';
+                item['type'] = 'release';
+                item['id'] = dir_concat;
+                item['webui_desc'] = '{0} {1}'.format(item['name'], item['version']);
+                item['weight'] = 10;
+                item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item['serverPack']));
+                p.push(item);
 
-              var old_versions = item['oldVersions'].split(';');
-              for (var idx in old_versions) {
-                var new_item = JSON.parse(JSON.stringify(item)); //deep copy object
-                var dir_concat = '{0}-{1}'.format(new_item['dir'], old_versions[idx]);
+                var old_versions = item['oldVersions'].split(';');
+                for (var idx in old_versions) {
+                  var new_item = JSON.parse(JSON.stringify(item)); //deep copy object
+                  var dir_concat = '{0}-{1}'.format(new_item['dir'], old_versions[idx]);
 
-                if (old_versions[idx].length > 0 && old_versions[idx] != item['version']) {
-                  new_item['type'] = 'old_version';
-                  new_item['id'] = dir_concat;
-                  new_item['webui_desc'] = '{0} {1}'.format(new_item['name'], old_versions[idx]);
-                  new_item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, new_item['serverPack']));
-                  p.push(new_item);
+                  if (old_versions[idx].length > 0 && old_versions[idx] != item['version']) {
+                    new_item['type'] = 'old_version';
+                    new_item['id'] = dir_concat;
+                    new_item['webui_desc'] = '{0} {1}'.format(new_item['name'], old_versions[idx]);
+                    new_item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, new_item['serverPack']));
+                    p.push(new_item);
+                  }
                 }
               }
+              callback(err || inner_err, p);
+            } catch (e) {
+              callback(e);
             }
-            callback(err || inner_err, p);
           })
         else
           callback(null, p);
