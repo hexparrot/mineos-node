@@ -134,6 +134,8 @@ server.backend = function(base_dir, socket_emitter) {
     )
   }
 
+  setTimeout(self.start_servers, 5000);
+
   self.shutdown = function() {
     for (var server_name in self.servers)
       self.servers[server_name].cleanup();
