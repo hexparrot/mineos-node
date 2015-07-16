@@ -461,25 +461,18 @@ function server_container(server_name, base_dir, socket_io) {
   }
 
   function emit_eula() {
-    var ini = require('ini');
     var fs = require('fs-extra');
     var eula_path = path.join(instance.env.cwd, 'eula.txt');
 
     async.waterfall([
-      async.apply(fs.readFile, eula_path),
-      function(file_contents, cb) {
-        cb(null, ini.parse(file_contents.toString()));
-      },
-      function(parsed_ini, cb) {
-        var accepted = parsed_ini['eula'] == true; //minecraft accepts 'true' case-insensitive
-        if (!accepted)
-          accepted = parsed_ini['eula'] && parsed_ini['eula'].toString().toLowerCase() == 'true';
-
+      async.apply(instance.property, 'eula'),
+      function(accepted, cb) {
         logging.info('[{0}] eula.txt detected: {1} (eula={2})'.format(server_name,
                                                                      (accepted ? 'ACCEPTED' : 'NOT YET ACCEPTED'),
-                                                                     parsed_ini['eula']));
+                                                                     accepted));
         nsp.emit('eula', accepted);
-      }
+        cb();
+      },
     ])
   }
 
@@ -711,6 +704,7 @@ function server_container(server_name, base_dir, socket_io) {
             'du_cwd': async.apply(instance.property, 'du_cwd'),
             'owner': async.apply(instance.property, 'owner'),
             'server_files': async.apply(instance.property, 'server_files'),
+            'eula': async.apply(instance.property, 'eula'),
             'base_dir': function(cb) {
               cb(null, base_dir)
             }

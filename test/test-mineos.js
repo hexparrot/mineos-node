@@ -1382,6 +1382,76 @@ test.stuff = function(test) {
   })
 }
 
+test.check_eula = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.waterfall([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.property, 'eula'),
+    function(eula_value, cb) { //why does this fail when the eula.txt is entirely absent?
+      test.equal(eula_value, undefined);
+      cb();
+    }, 
+    async.apply(fs.outputFile, path.join(instance.env.cwd, 'eula.txt'), '//here is something\neula=false\n'),
+    async.apply(instance.property, 'eula'),
+    function(eula_value, cb) {
+      test.equal(eula_value, false);
+      cb();
+    },
+    async.apply(fs.outputFile, path.join(instance.env.cwd, 'eula.txt'), '//here is something\neula=true\n'),
+    async.apply(instance.property, 'eula'),
+    function(eula_value, cb) {
+      test.equal(eula_value, true);
+      cb();
+    },
+    async.apply(fs.outputFile, path.join(instance.env.cwd, 'eula.txt'), '//here is something\neula = false\n'),
+    async.apply(instance.property, 'eula'),
+    function(eula_value, cb) {
+      test.equal(eula_value, false);
+      cb();
+    },
+    async.apply(fs.outputFile, path.join(instance.env.cwd, 'eula.txt'), '//here is something\neula = true\n'),
+    async.apply(instance.property, 'eula'),
+    function(eula_value, cb) {
+      test.equal(eula_value, true);
+      cb();
+    },
+    async.apply(fs.outputFile, path.join(instance.env.cwd, 'eula.txt'), '//here is something\neula = FALSE\n'),
+    async.apply(instance.property, 'eula'),
+    function(eula_value, cb) {
+      test.equal(eula_value, false);
+      cb();
+    },
+    async.apply(fs.outputFile, path.join(instance.env.cwd, 'eula.txt'), '//here is something\neula = TRUE\n'),
+    async.apply(instance.property, 'eula'),
+    function(eula_value, cb) {
+      test.equal(eula_value, true);
+      cb();
+    },
+    async.apply(fs.outputFile, path.join(instance.env.cwd, 'eula.txt'), '//here is something\neula = fals\n'),
+    async.apply(instance.property, 'eula'),
+    function(eula_value, cb) {
+      test.equal(eula_value, false);
+      cb();
+    },
+    async.apply(fs.outputFile, path.join(instance.env.cwd, 'eula.txt'), '//here is something\neula = tru\n'),
+    async.apply(instance.property, 'eula'),
+    function(eula_value, cb) {
+      test.equal(eula_value, false);
+      cb();
+    },
+    async.apply(fs.outputFile, path.join(instance.env.cwd, 'eula.txt'), '//here is something\n//heres more irrelevant lines\n'),
+    async.apply(instance.property, 'eula'),
+    function(eula_value, cb) {
+      test.equal(eula_value, false);
+      cb();
+    }
+  ], function(err) {
+    test.done();
+  })
+}
+
 test.accept_eula = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -1389,14 +1459,18 @@ test.accept_eula = function(test) {
   async.waterfall([
     async.apply(instance.create, OWNER_CREDS),
     async.apply(fs.outputFile, path.join(instance.env.cwd, 'eula.txt'), 'eula=false'),
+    async.apply(instance.property, 'eula'),
+    function(eula_value, cb) {
+      test.equal(eula_value, false);
+      cb();
+    },
     async.apply(instance.accept_eula),
-    async.apply(fs.readFile, path.join(instance.env.cwd, 'eula.txt')),
-    function(eula_text, callback) {
-      test.equal(eula_text.toString(), 'eula=true');
-      callback(null);
+    async.apply(instance.property, 'eula'),
+    function(eula_value, cb) {
+      test.equal(eula_value, true);
+      cb();
     }
   ], function(err) {
-    test.expect(1);
     test.done();
   })
 }
