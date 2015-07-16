@@ -711,6 +711,7 @@ function server_container(server_name, base_dir, socket_io) {
             'du_cwd': async.apply(instance.property, 'du_cwd'),
             'owner': async.apply(instance.property, 'owner'),
             'server_files': async.apply(instance.property, 'server_files'),
+            'eula': async.apply(instance.property, 'eula'),
             'base_dir': function(cb) {
               cb(null, base_dir)
             }

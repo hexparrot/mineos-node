@@ -751,9 +751,12 @@
                                                                 <li><a href="#" ng-click="server_command('stop_and_backup')" translate="STOP_AND_BACKUP"></a></li>
                                                                 <li><a href="#" ng-click="server_command('restart')" translate="RESTART"></a></li>
                                                                 <li><a href="#" ng-click="server_command('kill')" translate="KILL" ng-disabled="!servers[current].heartbeat.up"></a></li>
-                                                                <li><a href="#" ng-click="modals.open_accept_eula()" translate="ACCEPT_EULA"></a></li>
                                                             </ul>
                                                         </div>
+                                                    </div>
+
+                                                    <div class="span2">
+                                                        <button type="button" class="btn btn-default span12" ng-click="modals.open_accept_eula()" translate="ACCEPT_EULA"></button>
                                                     </div>
 
                                                     <div class="clearfix"></div><div class="span12"></div>
