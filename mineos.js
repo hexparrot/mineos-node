@@ -604,7 +604,6 @@ mineos.mc = function(server_name, base_dir) {
     async.waterfall([
       async.apply(self.verify, 'exists'),
       async.apply(self.verify, '!up'),
-      async.apply(self.verify, 'eula'),
       async.apply(self.property, 'owner'),
       function(owner, cb) {
         params['uid'] = owner['uid'];

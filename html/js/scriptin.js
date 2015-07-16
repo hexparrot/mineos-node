@@ -570,8 +570,10 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
     })
 
     me.channel.on(server_name, 'eula', function(accepted) {
-      if (!accepted)
+      if (!accepted) {
+        me.page_data.glance.eula = accepted;
         $('#modal_eula').modal('show');
+      }
     })
 
     me.channel.emit(server_name, 'server-icon.png');
