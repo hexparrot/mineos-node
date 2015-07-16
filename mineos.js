@@ -1057,12 +1057,10 @@ mineos.mc = function(server_name, base_dir) {
         })
         break;
       case 'eula':
-        // returns false if and only if the file exists and finds 'eula=false'
-        // absent file and eula=true return true
         fs.readFile(path.join(self.env.cwd, 'eula.txt'), function(err, data) {
-          if (err)
-            callback(null, true);
-          else {
+          if (err) {
+            callback(null, undefined);
+          } else {
             var REGEX_EULA_TRUE = /eula\s*=\s*true/i
             var lines = data.toString().split('\n');
             var matches = false;
@@ -1070,7 +1068,7 @@ mineos.mc = function(server_name, base_dir) {
               if (lines[i].match(REGEX_EULA_TRUE))
                 matches = true;
             }
-            callback(err, matches);
+            callback(null, matches);
           }
         })
         break;

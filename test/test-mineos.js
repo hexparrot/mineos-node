@@ -1388,6 +1388,11 @@ test.check_eula = function(test) {
 
   async.waterfall([
     async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.property, 'eula'),
+    function(eula_value, cb) { //why does this fail when the eula.txt is entirely absent?
+      test.equal(eula_value, undefined);
+      cb();
+    }, 
     async.apply(fs.outputFile, path.join(instance.env.cwd, 'eula.txt'), '//here is something\neula=false\n'),
     async.apply(instance.property, 'eula'),
     function(eula_value, cb) {
