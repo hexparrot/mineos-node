@@ -643,6 +643,8 @@ mineos.mc = function(server_name, base_dir) {
 
   self.stop = function(callback) {
     var test_interval_ms = 200;
+    var iterations = 0;
+    var MAX_ITERATIONS_TO_QUIT = 100;
 
     async.series([
       async.apply(self.verify, 'exists'),
@@ -650,8 +652,16 @@ mineos.mc = function(server_name, base_dir) {
       async.apply(self.stuff, 'stop'),
       function(cb) {
         async.whilst(
-          function() { return (self.server_name in mineos.server_pids_up()) },
-          function(cc) { setTimeout(cc, test_interval_ms) },
+          function() { 
+            if (iterations > MAX_ITERATIONS_TO_QUIT)
+              return false;
+            else
+              return (self.server_name in mineos.server_pids_up()) 
+          },
+          function(cc) { 
+            iterations += 1;
+            setTimeout(cc, test_interval_ms) 
+          },
           function(ignored_err) {
             if (self.server_name in mineos.server_pids_up())
               cb(true); //error, stop did not succeed
