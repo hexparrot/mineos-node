@@ -999,6 +999,7 @@ mineos.mc = function(server_name, base_dir) {
         var pids = mineos.server_pids_up();
         if (self.server_name in pids) {
           var procfs = require('procfs-stats');
+          procfs.PROC = PROC_PATH; //procfs will default to /proc--this is determined more accurately by mineos.js!
           var ps = procfs(pids[self.server_name]['java']);
           ps.status(function(err, data){
             callback(err, data);
