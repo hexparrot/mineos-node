@@ -651,7 +651,11 @@ mineos.mc = function(server_name, base_dir) {
         var proc = child_process.spawn(binary, args, params);
         proc.once('close', cb);
       }
-    ], callback);
+    ], function(err, result) {
+      setTimeout(function() {
+        callback(err, result);
+      }, 100)
+    });
   }
 
   self.stop = function(callback) {
