@@ -616,7 +616,6 @@ mineos.mc = function(server_name, base_dir) {
     async.waterfall([
       async.apply(self.verify, 'exists'),
       async.apply(self.verify, '!up'),
-      async.apply(self.verify, 'eula'),
       async.apply(self.property, 'owner'),
       function(owner, cb) {
         params['uid'] = owner['uid'];
@@ -660,6 +659,8 @@ mineos.mc = function(server_name, base_dir) {
 
   self.stop = function(callback) {
     var test_interval_ms = 200;
+    var iterations = 0;
+    var MAX_ITERATIONS_TO_QUIT = 100;
 
     async.series([
       async.apply(self.verify, 'exists'),
@@ -667,8 +668,16 @@ mineos.mc = function(server_name, base_dir) {
       async.apply(self.stuff, 'stop'),
       function(cb) {
         async.whilst(
-          function() { return (self.server_name in mineos.server_pids_up()) },
-          function(cc) { setTimeout(cc, test_interval_ms) },
+          function() { 
+            if (iterations > MAX_ITERATIONS_TO_QUIT)
+              return false;
+            else
+              return (self.server_name in mineos.server_pids_up()) 
+          },
+          function(cc) { 
+            iterations += 1;
+            setTimeout(cc, test_interval_ms) 
+          },
           function(ignored_err) {
             if (self.server_name in mineos.server_pids_up())
               cb(true); //error, stop did not succeed
@@ -697,18 +706,24 @@ mineos.mc = function(server_name, base_dir) {
   self.kill = function(callback) {
     var pids = mineos.server_pids_up();
     var test_interval_ms = 200;
+    var MAX_ITERATIONS_TO_QUIT = 30;
 
     if (!(self.server_name in pids)) {
       callback(true);
     } else {
       process.kill(pids[self.server_name].java);
+      var iterations = 0;
 
       async.doWhilst(
         function(cb) {
+          iterations += 1;
           setTimeout(cb, test_interval_ms);
         },
         function() { 
-          return (self.server_name in mineos.server_pids_up())
+          if (iterations > MAX_ITERATIONS_TO_QUIT)
+            return false;
+          else
+            return (self.server_name in mineos.server_pids_up());
         },
         function(ignored_err) {
           if (self.server_name in mineos.server_pids_up())
@@ -1074,15 +1089,19 @@ mineos.mc = function(server_name, base_dir) {
         })
         break;
       case 'eula':
-        // returns false if and only if the file exists and finds 'eula=false'
-        // absent file and eula=true return true
-        var ini = require('ini');
-
         fs.readFile(path.join(self.env.cwd, 'eula.txt'), function(err, data) {
-          if (err)
-            callback(null, true);
-          else
-            callback(err, ini.parse(data.toString()).eula);
+          if (err) {
+            callback(null, undefined);
+          } else {
+            var REGEX_EULA_TRUE = /eula\s*=\s*true/i
+            var lines = data.toString().split('\n');
+            var matches = false;
+            for (var i in lines) {
+              if (lines[i].match(REGEX_EULA_TRUE))
+                matches = true;
+            }
+            callback(null, matches);
+          }
         })
         break;
       case 'server_files':

@@ -100,7 +100,7 @@
                         <!-- START Dropdown Menu -->
                         <div class="dropdown-menu" role="menu">
                             <footer>
-                                <a ng-click="refresh_server_list()" class="text"><span class="icon icone-globe"></span> {{ 'REFRESH_SERVER_LIST' | translate }}</a><br>
+                                <a ng-click="host_command('refresh_server_list')" class="text"><span class="icon icone-globe"></span> {{ 'REFRESH_SERVER_LIST' | translate }}</a><br>
                                 <a ng-click="host_command('refresh_profile_list', {redownload: true})" class="text"><span class="icon icone-globe"></span> {{ 'REFRESH_PROFILE_LIST' | translate }}</a><br>
                                 <a href="/logout" class="text"><span class="icon icone-off"></span> {{ 'LOGOFF' | translate }}</a>
                             </footer>
@@ -645,7 +645,7 @@
                                                 <td>[{{ jar.group }}] <strong>{{ jar.type }}</strong></td>
                                                 <td>
                                                     <p>
-                                                        <button type="button" class="btn btn-mini btn-success" ng-click="host_command(jar.group + '_download', {profile: jar})" translate="DOWNLOAD"></button> <span ng-show="jar.progress.percent > 0 && jar.progress.percent < 100">{{ jar.progress.percent + '%' }}</span> <span ng-show="jar.downloaded" class="icone-ok">{{ 'DOWNLOADED' | translate }}</span>
+                                                        <button type="button" class="btn btn-mini btn-success" ng-click="host_command('download', {profile: jar})" translate="DOWNLOAD"></button> <span ng-show="jar.progress.percent > 0 && jar.progress.percent < 100">{{ jar.progress.percent + '%' }}</span> <span ng-show="jar.downloaded" class="icone-ok">{{ 'DOWNLOADED' | translate }}</span>
                                                     </p>
                                                 </td>
                                             </tr>
@@ -751,9 +751,12 @@
                                                                 <li><a href="#" ng-click="server_command('stop_and_backup')" translate="STOP_AND_BACKUP"></a></li>
                                                                 <li><a href="#" ng-click="server_command('restart')" translate="RESTART"></a></li>
                                                                 <li><a href="#" ng-click="server_command('kill')" translate="KILL" ng-disabled="!servers[current].heartbeat.up"></a></li>
-                                                                <li><a href="#" ng-click="modals.open_accept_eula()" translate="ACCEPT_EULA"></a></li>
                                                             </ul>
                                                         </div>
+                                                    </div>
+
+                                                    <div class="span2">
+                                                        <button type="button" class="btn span12" ng-click="modals.open_accept_eula()" translate="ACCEPT_EULA" ng-class="{'btn-default': servers[current].page_data.glance.eula != false, 'btn-primary': servers[current].page_data.glance.eula == false}"></button>
                                                     </div>
 
                                                     <div class="clearfix"></div><div class="span12"></div>
@@ -1150,6 +1153,7 @@
                                                                 <select class="span12" ng-model="cron.action">
                                                                     <option translate="START" value="start"></option>
                                                                     <option translate="STOP" value="stop"></option>
+                                                                    <option translate="RESTART" value="restart"></option>
                                                                     <option translate="CREATE_NEW_RESTORE_POINT" value="backup"></option>
                                                                     <option translate="CREATE_NEW_ARCHIVE" value="archive"></option>
                                                                     <option translate="SEND_TO_CONSOLE" value="stuff"></option>
@@ -1391,7 +1395,7 @@
                     <p><a href="https://account.mojang.com/documents/minecraft_eula" translate="READ_THE_EULA"></a></p>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-success" aria-hidden="true" translate="ACCEPT_EULA" ng-click="server_command('accept_eula')"></button>
+                    <button class="btn" aria-hidden="true" translate="ACCEPT_EULA" ng-click="server_command('accept_eula')" ng-class="{'btn-default': servers[current].page_data.glance.eula != false, 'btn-primary': servers[current].page_data.glance.eula == false}"></button>
                     <button class="btn btn-warning" data-dismiss="modal" translate="KILL" ng-click="server_command('kill')" ng-show="servers[current].heartbeat.up"></button>
                     <button class="btn btn-warning" data-dismiss="modal" translate="RESTART" ng-click="modals.close_accept_eula_restart()" ng-show="servers[current].heartbeat.up"></button>
                     <button class="btn btn-warning" data-dismiss="modal" translate="START" ng-click="modals.close_accept_eula_start()" ng-show="!servers[current].heartbeat.up"></button>

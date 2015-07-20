@@ -30,9 +30,9 @@ server.backend = function(base_dir, socket_emitter) {
     //thanks to https://github.com/flareofghast/node-advertiser/blob/master/advert.js
     var dgram = require('dgram');
     var udp_broadcaster = dgram.createSocket('udp4');
-    var udp_dest = '255.255.255.255';
-    var udp_port = 4445;
-    var broadcast_delay_ms = 2000;
+    var UDP_DEST = '255.255.255.255';
+    var UDP_PORT = 4445;
+    var BROADCAST_DELAY_MS = 4000;
 
     udp_broadcaster.bind();
     udp_broadcaster.on("listening", function () {
@@ -42,13 +42,27 @@ server.backend = function(base_dir, socket_emitter) {
           for (var s in self.servers) {
             self.servers[s].broadcast_to_lan(function(msg) {
               if (msg)
-                udp_broadcaster.send(msg, 0, msg.length, udp_port, udp_dest);
+                udp_broadcaster.send(msg, 0, msg.length, UDP_PORT, UDP_DEST);
             })
           }
-          setTimeout(next, broadcast_delay_ms);
+          setTimeout(next, BROADCAST_DELAY_MS);
         }
       )
     });
+  })();
+
+  (function() {
+    var HOST_HEARTBEAT_DELAY_MS = 1000;
+
+    function host_heartbeat() {
+      self.front_end.emit('host_heartbeat', {
+        'uptime': os.uptime(),
+        'freemem': os.freemem(),
+        'loadavg': os.loadavg()
+      })
+    }
+
+    setInterval(host_heartbeat, HOST_HEARTBEAT_DELAY_MS);
   })();
 
   (function() {
@@ -100,16 +114,6 @@ server.backend = function(base_dir, socket_emitter) {
       })
   })();
 
-  function host_heartbeat() {
-    self.front_end.emit('host_heartbeat', {
-      'uptime': os.uptime(),
-      'freemem': os.freemem(),
-      'loadavg': os.loadavg()
-    })
-  }
-
-  setInterval(host_heartbeat, 1000);
-
   self.start_servers = function() {
     var MS_TO_PAUSE = 10000;
 
@@ -130,15 +134,26 @@ server.backend = function(base_dir, socket_emitter) {
     )
   }
 
+  setTimeout(self.start_servers, 5000);
+
   self.shutdown = function() {
     for (var server_name in self.servers)
       self.servers[server_name].cleanup();
   }
 
+  self.send_profile_list = function(send_existing) {
+    if (send_existing && self.profiles.length) //if requesting to just send what you already have AND they are already present
+      self.front_end.emit('profile_list', self.profiles);
+    else
+      check_profiles(base_dir, function(err, all_profiles) {
+        if (!err)
+          self.profiles = all_profiles;
+        self.front_end.emit('profile_list', self.profiles);
+      })
+  }
+
   self.front_end.on('connection', function(socket) {
     var userid = require('userid');
-    var request = require('request');
-    var progress = require('request-progress');
     var fs = require('fs-extra');
 
     var ip_address = socket.request.connection.remoteAddress;
@@ -166,12 +181,22 @@ server.backend = function(base_dir, socket_emitter) {
               logging.error(err);
           })
           break;
+        case 'download':
+          function progress_emitter(args) {
+            self.front_end.emit('file_progress', args);
+          }
+
+          download_profiles(args, progress_emitter, function(retval){
+            self.front_end.emit('host_notice', retval);
+            self.send_profile_list();
+          });
+          break;
         case 'refresh_server_list':
           for (var s in self.servers)
             self.front_end.emit('track_server', s);
           break;
         case 'refresh_profile_list':
-          self.send_profile_list(true);
+          self.send_profile_list();
           break;
         case 'create_from_archive':
           var instance = new mineos.mc(args.new_server_name, base_dir);
@@ -191,436 +216,9 @@ server.backend = function(base_dir, socket_emitter) {
               logging.error(err);
           })
           break;
-        case 'mojang_download':
-          var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.profile.id);
-          var filename = 'minecraft_server.{0}.jar'.format(args.profile.id);
-          var dest_filepath = path.join(dest_dir, filename);
-
-          var url = 'https://s3.amazonaws.com/Minecraft.Download/versions/{0}/{1}'.format(args.profile.id, filename);
-
-          fs.ensureDir(dest_dir, function(err) {
-            if (err) {
-              logging.error('[WEBUI] Error attempting download:', err);
-            } else {
-              progress(request(url), {
-                throttle: 1000,
-                delay: 100
-              })
-                .on('complete', function(response) {
-                  if (response.statusCode == 200) {
-                    logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
-                    args['dest_dir'] = dest_dir;
-                    args['filename'] = filename;
-                    args['success'] = true;
-                    args['progress']['percent'] = 100;
-                    args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
-                    self.front_end.emit('file_download', args);
-                    self.send_profile_list();
-                  } else {
-                    logging.error('[WEBUI] Server was unable to download file:', url);
-                    logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
-                    args['success'] = false;
-                    args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
-                    self.front_end.emit('file_download', args);
-                  }
-                })
-                .on('progress', function(state) {
-                  args['progress'] = state;
-                  self.front_end.emit('file_progress', args);
-                })
-                .pipe(fs.createWriteStream(dest_filepath))
-            }
-          });
-          break;
-        case 'ftb_download':
-          var unzip = require('unzip');
-
-          var dir_concat = '{0}-{1}'.format(args.profile.dir, args.profile.version);
-          var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
-          var filename = args.profile.serverPack;
-          var dest_filepath = path.join(dest_dir, filename);
-
-          var url = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(args.profile.dir, args.profile.version.replace(/\./g, '_'), args.profile.serverPack);
-
-          fs.ensureDir(dest_dir, function(err) {
-            if (err) {
-              logging.error('[WEBUI] Error attempting download:', err);
-            } else {
-              progress(request(url), {
-                throttle: 1000,
-                delay: 100
-              })
-                .on('complete', function(response) {
-                  if (response.statusCode == 200) {
-                    logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
-                    args['dest_dir'] = dest_dir;
-                    args['filename'] = filename;
-                    args['success'] = true;
-                    args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
-
-                    fs.createReadStream(dest_filepath)
-                      .pipe(unzip.Extract({ path: dest_dir }).on('close', function() {
-                        self.front_end.emit('file_download', args);
-                        self.send_profile_list();
-                      }));
-                  } else {
-                    logging.error('[WEBUI] Server was unable to download file:', url);
-                    logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
-                    args['success'] = false;
-                    args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
-                    self.front_end.emit('file_download', args);
-                  }
-                })
-                .on('progress', function(state) {
-                  args['progress'] = state;
-                  self.front_end.emit('file_progress', args);
-                })
-                .pipe(fs.createWriteStream(dest_filepath))
-            }
-          });
-          break;
-        case 'ftb_third_party_download':
-          var unzip = require('unzip');
-
-          var dir_concat = '{0}-{1}'.format(args.profile.dir, args.profile.version);
-          var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
-          var filename = args.profile.serverPack;
-          var dest_filepath = path.join(dest_dir, filename);
-
-          var url = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(args.profile.dir, args.profile.version.replace(/\./g, '_'), args.profile.serverPack);
-
-          fs.ensureDir(dest_dir, function(err) {
-            if (err) {
-              logging.error('[WEBUI] Error attempting download:', err);
-            } else {
-              progress(request(url), {
-                throttle: 1000,
-                delay: 100
-              })
-                .on('complete', function(response) {
-                  if (response.statusCode == 200) {
-                    logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
-                    args['dest_dir'] = dest_dir;
-                    args['filename'] = filename;
-                    args['success'] = true;
-                    args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
-
-                    fs.createReadStream(dest_filepath)
-                      .pipe(unzip.Extract({ path: dest_dir }).on('close', function() {
-                        self.front_end.emit('file_download', args);
-                        self.send_profile_list();
-                      }));
-                  } else {
-                    logging.error('[WEBUI] Server was unable to download file:', url);
-                    logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
-                    args['success'] = false;
-                    args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
-                    self.front_end.emit('file_download', args);
-                  }
-                })
-                .on('progress', function(state) {
-                  args['progress'] = state;
-                  self.front_end.emit('file_progress', args);
-                })
-                .pipe(fs.createWriteStream(dest_filepath))
-            }
-          });
-          break;
-        case 'pocketmine_download':
-          var dir_concat = args.profile.id;
-          var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
-          var filename = args.profile.filename;
-          var dest_filepath = path.join(dest_dir, filename);
-
-          var URL_STABLE = 'https://github.com/PocketMine/PocketMine-MP/releases/download/{0}/{1}';
-          var URL_DEVELOPMENT = 'http://jenkins.pocketmine.net/job/PocketMine-MP/{0}/artifact/{1}';
-
-          fs.ensureDir(dest_dir, function(err) {
-            if (err) {
-              logging.error('[WEBUI] Error attempting download:', err);
-            } else {
-              var url_to_use = '';
-
-              if (args.profile.channel == 'stable')
-                url_to_use = URL_STABLE.format(args.profile.short_version, args.profile.filename);
-              else
-                url_to_use = URL_DEVELOPMENT.format(args.profile.build, args.profile.filename);
-
-              progress(request(url_to_use), {
-                throttle: 1000,
-                delay: 100
-              })
-                .on('complete', function(response) {
-                  if (response.statusCode == 200) {
-                    logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
-                    args['dest_dir'] = dest_dir;
-                    args['filename'] = filename;
-                    args['success'] = true;
-                    args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
-                    self.front_end.emit('file_download', args);
-                    self.send_profile_list();
-                  } else {
-                    logging.error('[WEBUI] Server was unable to download file:', url);
-                    logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
-                    args['success'] = false;
-                    args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
-                    self.front_end.emit('file_download', args);
-                  }
-                })
-                .on('progress', function(state) {
-                  args['progress'] = state;
-                  self.front_end.emit('file_progress', args);
-                })
-                .pipe(fs.createWriteStream(dest_filepath))
-            }
-          });
-          break;
-        case 'php_download':
-          var tarball = require('tarball-extract')
-
-          var dir_concat = args.profile.id;
-          var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
-          var filename = '{0}.tar.gz'.format(args.profile.id);
-          var dest_filepath = path.join(dest_dir, filename);
-
-          var url = 'https://dl.bintray.com/pocketmine/PocketMine/{0}'.format(filename);
-
-          fs.ensureDir(dest_dir, function(err) {
-            if (err) {
-              logging.error('[WEBUI] Error attempting download:', err);
-            } else {
-              progress(request(url), {
-                throttle: 1000,
-                delay: 100
-              })
-                .on('complete', function(response) {
-                  if (response.statusCode == 200) {
-                    logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
-                    args['dest_dir'] = dest_dir;
-                    args['filename'] = filename;
-                    args['success'] = true;
-                    args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
-
-                    async.series([
-                      async.apply(tarball.extractTarball, dest_filepath, dest_dir),
-                      function(cb) {
-                        self.front_end.emit('file_download', args);
-                        self.send_profile_list();
-                      }
-                    ])
-                  } else {
-                    logging.error('[WEBUI] Server was unable to download file:', url);
-                    logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
-                    args['success'] = false;
-                    args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
-                    self.front_end.emit('file_download', args);
-                  }
-                })
-                .on('progress', function(state) {
-                  args['progress'] = state;
-                  self.front_end.emit('file_progress', args);
-                })
-                .pipe(fs.createWriteStream(dest_filepath))
-            }
-          });
-          break;
         default:
           logging.warning('Command ignored: no such command {0}'.format(args.command));
           break;
-      }
-    }
-
-    self.check_profiles = {
-      mojang: function(callback) {
-        var request = require('request');
-        var fs = require('fs');
-
-        var MOJANG_VERSIONS_URL = 'http://s3.amazonaws.com/Minecraft.Download/versions/versions.json';
-        var path_prefix = path.join(base_dir, mineos.DIRS['profiles']);
-
-        function handle_reply(err, response, body) {
-          var p = [];
-
-          if (!err && (response || {}).statusCode === 200)
-            for (var index in body.versions) {
-              var item = body.versions[index];
-              item['group'] = 'mojang';
-              item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, 'minecraft_server.{0}.jar'.format(item.id)));
-              item['webui_desc'] = 'Official Mojang Jar';
-              item['weight'] = 0;
-
-              p.push(item);
-            }
-
-          callback(err, p);
-        }
-        request({ url: MOJANG_VERSIONS_URL, json: true }, handle_reply);
-      },
-      ftb: function(callback) {
-        var request = require('request');
-        var xml_parser = require('xml2js');
-        var fs = require('fs');
-
-        var FTB_VERSIONS_URL = 'http://ftb.cursecdn.com/FTB2/static/modpacks.xml';
-        var path_prefix = path.join(base_dir, mineos.DIRS['profiles']);
-
-        function handle_reply(err, response, body) {
-          var p = [];
-
-          if (!err && (response || {}).statusCode === 200)
-            xml_parser.parseString(body, function(inner_err, result) {
-              var packs = result['modpacks']['modpack'];
-
-              for (var index in packs) {
-                var item = packs[index]['$'];
-                var dir_concat = '{0}-{1}'.format(item['dir'], item['version']);
-                item['group'] = 'ftb';
-                item['type'] = 'release';
-                item['id'] = dir_concat;
-                item['webui_desc'] = '{0} {1}'.format(item['name'], item['version']);
-                item['weight'] = 5;
-                item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item['serverPack']));
-                p.push(item);
-
-                var old_versions = item['oldVersions'].split(';');
-                for (var idx in old_versions) {
-                  var new_item = JSON.parse(JSON.stringify(item)); //deep copy object
-                  var dir_concat = '{0}-{1}'.format(new_item['dir'], old_versions[idx]);
-
-                  if (old_versions[idx].length > 0 && old_versions[idx] != item['version']) {
-                    new_item['type'] = 'old_version';
-                    new_item['id'] = dir_concat;
-                    new_item['webui_desc'] = '{0} {1}'.format(new_item['name'], old_versions[idx]);
-                    new_item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, new_item['serverPack']));
-                    p.push(new_item);
-                  }
-                }
-              }
-              callback(err || inner_err, p);
-            })
-          else
-            callback(null, p);
-        }
-        request({ url: FTB_VERSIONS_URL, json: false }, handle_reply);
-      },
-      ftb_third_party: function(callback) {
-        var request = require('request');
-        var xml_parser = require('xml2js');
-        var fs = require('fs');
-
-        var FTB_VERSIONS_URL = 'http://ftb.cursecdn.com/FTB2/static/thirdparty.xml';
-        var path_prefix = path.join(base_dir, mineos.DIRS['profiles']);
-
-        function handle_reply(err, response, body) {
-          var p = [];
-
-          if (!err && (response || {}).statusCode == 200)
-            xml_parser.parseString(body, function(inner_err, result) {
-              var packs = result['modpacks']['modpack'];
-
-              for (var index in packs) {
-                var item = packs[index]['$'];
-                var dir_concat = '{0}-{1}'.format(item['dir'], item['version']);
-                item['group'] = 'ftb_third_party';
-                item['type'] = 'release';
-                item['id'] = dir_concat;
-                item['webui_desc'] = '{0} {1}'.format(item['name'], item['version']);
-                item['weight'] = 10;
-                item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item['serverPack']));
-                p.push(item);
-
-                var old_versions = item['oldVersions'].split(';');
-                for (var idx in old_versions) {
-                  var new_item = JSON.parse(JSON.stringify(item)); //deep copy object
-                  var dir_concat = '{0}-{1}'.format(new_item['dir'], old_versions[idx]);
-
-                  if (old_versions[idx].length > 0 && old_versions[idx] != item['version']) {
-                    new_item['type'] = 'old_version';
-                    new_item['id'] = dir_concat;
-                    new_item['webui_desc'] = '{0} {1}'.format(new_item['name'], old_versions[idx]);
-                    new_item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, new_item['serverPack']));
-                    p.push(new_item);
-                  }
-                }
-              }
-              callback(err || inner_err, p);
-            })
-          else
-            callback(null, p);
-        }
-        request({ url: FTB_VERSIONS_URL, json: false }, handle_reply);
-      },
-      pocketmine: function(callback) {
-        var request = require('request');
-
-        var URL_DEVELOPMENT = "http://www.pocketmine.net/api/?channel=development";
-        var URL_STABLE = "http://www.pocketmine.net/api/?channel=stable";
-
-        var p = [];
-
-        function handle_reply(err, retval) {
-          for (var r in retval) 
-            if ((retval[r] || {}).statusCode == 200) {
-              var releases = JSON.parse(retval[r].body);
-
-              var item = releases;
-              var version = releases.version;
-              var dir_concat = 'Pocketmine-{0}'.format(version);
-              item['channel'] = r;
-              item['filename'] = path.basename(item.download_url);
-              item['group'] = 'pocketmine';
-              item['id'] = dir_concat;
-              item['version'] = version;
-              switch (item.channel) {
-                case 'stable':
-                  item['short_version'] = path.basename(item.details_url);
-                  item['type'] = 'release';
-                  break;
-                case 'development':
-                  item['short_version'] = version;
-                  item['type'] = 'snapshot';
-                  break;
-              }
-              item['webui_desc'] = 'phar build {0}, api {1}'.format(item.build, item.api_version);
-              item['weight'] = 10;
-              item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item.filename));
-              p.push(item);
-
-            }
-          callback(null, p)
-        }
-
-        async.auto({
-          'stable': async.retry(2, async.apply(request, URL_STABLE)),
-          'development': async.retry(2, async.apply(request, URL_DEVELOPMENT)),
-        }, handle_reply)
-
-      },
-      php: function(callback) {
-        var request = require('request');
-        BUILD_REGEX = /^[\w]+BUILD="([^"]+)"/
-        var p = [];
-
-        function handle_reply(err, response, body) {
-          if (!err && (response || {}).statusCode == 200) {
-            var lines = body.split('\n');
-            for (var i in lines) {
-              var matching = lines[i].match(BUILD_REGEX);
-              if (matching) {
-                var item = {};
-                item['group'] = 'php';
-                item['type'] = 'release';
-                item['id'] = matching[1];
-                item['webui_desc'] = 'PHP binary for Pocketmine';
-                item['weight'] = 12;
-                item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], matching[1], '{0}.tar.gz'.format(matching[1])));
-                p.push(item);
-              }
-            }
-          }
-          callback(err, p);
-        }
-        request('http://get.pocketmine.net', handle_reply);
       }
     }
 
@@ -667,7 +265,7 @@ server.backend = function(base_dir, socket_emitter) {
 
     socket.on('command', webui_dispatcher);
     self.send_user_list();
-    self.send_profile_list();
+    self.send_profile_list(true);
     self.send_importable_list();
 
   })
@@ -700,33 +298,6 @@ server.backend = function(base_dir, socket_emitter) {
         }); 
       }
     })
-  }
-
-  function download_profile_list(callback) {
-    logging.info('[WEBUI] Downloading official profiles.');
-    async.auto({
-      'mojang': async.retry(2, self.check_profiles.mojang),
-      'ftb': async.retry(2, self.check_profiles.ftb),
-      'ftb_3rd': async.retry(2, self.check_profiles.ftb_third_party),
-      'pocketmine': async.retry(2, self.check_profiles.pocketmine),
-      'php': async.retry(2, self.check_profiles.php)
-    }, function(err, results) {
-      var merged = [];
-      for (var source in results)
-        merged = merged.concat.apply(merged, results[source]);
-
-      self.profiles = merged;
-      callback();
-    })
-  }
-
-  self.send_profile_list = function(force_redownload) {
-    if (force_redownload || !self.profiles.length)
-      download_profile_list(function() {
-        self.front_end.emit('profile_list', self.profiles);
-      })
-    else
-      self.front_end.emit('profile_list', self.profiles);
   }
 
   return self;
@@ -890,25 +461,18 @@ function server_container(server_name, base_dir, socket_io) {
   }
 
   function emit_eula() {
-    var ini = require('ini');
     var fs = require('fs-extra');
     var eula_path = path.join(instance.env.cwd, 'eula.txt');
 
     async.waterfall([
-      async.apply(fs.readFile, eula_path),
-      function(file_contents, cb) {
-        cb(null, ini.parse(file_contents.toString()));
-      },
-      function(parsed_ini, cb) {
-        var accepted = parsed_ini['eula'] == true; //minecraft accepts 'true' case-insensitive
-        if (!accepted)
-          accepted = parsed_ini['eula'] && parsed_ini['eula'].toString().toLowerCase() == 'true';
-
+      async.apply(instance.property, 'eula'),
+      function(accepted, cb) {
         logging.info('[{0}] eula.txt detected: {1} (eula={2})'.format(server_name,
                                                                      (accepted ? 'ACCEPTED' : 'NOT YET ACCEPTED'),
-                                                                     parsed_ini['eula']));
+                                                                     accepted));
         nsp.emit('eula', accepted);
-      }
+        cb();
+      },
     ])
   }
 
@@ -1140,6 +704,7 @@ function server_container(server_name, base_dir, socket_io) {
             'du_cwd': async.apply(instance.property, 'du_cwd'),
             'owner': async.apply(instance.property, 'owner'),
             'server_files': async.apply(instance.property, 'server_files'),
+            'eula': async.apply(instance.property, 'eula'),
             'base_dir': function(cb) {
               cb(null, base_dir)
             }
@@ -1269,3 +834,479 @@ function server_container(server_name, base_dir, socket_io) {
 
   }) //nsp on connect container ends
 }
+
+
+
+function check_profiles(base_dir, callback) {
+  /**
+   * Returns list of all available profiles and denotes which are present on the system
+   * @param {String} base_dir, likely /var/games/minecraft
+   * @return {Array} all profile definitions
+   */
+  var self = this;
+  var request = require('request');
+  var fs = require('fs');
+
+  var SOURCES = {
+    mojang: function(callback) {
+      var MOJANG_VERSIONS_URL = 'http://s3.amazonaws.com/Minecraft.Download/versions/versions.json';
+      var path_prefix = path.join(base_dir, mineos.DIRS['profiles']);
+
+      function handle_reply(err, response, body) {
+        var p = [];
+
+        if (!err && (response || {}).statusCode === 200)
+          for (var index in body.versions) {
+            var item = body.versions[index];
+            item['group'] = 'mojang';
+            item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, 'minecraft_server.{0}.jar'.format(item.id)));
+            item['webui_desc'] = 'Official Mojang Jar';
+            item['weight'] = 0;
+
+            p.push(item);
+          }
+
+        callback(err, p);
+      }
+      request({ url: MOJANG_VERSIONS_URL, json: true }, handle_reply);
+    },
+    ftb: function(callback) {
+      var xml_parser = require('xml2js');
+
+      var FTB_VERSIONS_URL = 'http://ftb.cursecdn.com/FTB2/static/modpacks.xml';
+      var path_prefix = path.join(base_dir, mineos.DIRS['profiles']);
+
+      function handle_reply(err, response, body) {
+        var p = [];
+
+        if (!err && (response || {}).statusCode === 200)
+          xml_parser.parseString(body, function(inner_err, result) {
+            try {
+              var packs = result['modpacks']['modpack'];
+
+              for (var index in packs) {
+                var item = packs[index]['$'];
+                var dir_concat = '{0}-{1}'.format(item['dir'], item['version']);
+                item['group'] = 'ftb';
+                item['type'] = 'release';
+                item['id'] = dir_concat;
+                item['webui_desc'] = '{0} {1}'.format(item['name'], item['version']);
+                item['weight'] = 5;
+                item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item['serverPack']));
+                p.push(item);
+
+                var old_versions = item['oldVersions'].split(';');
+                for (var idx in old_versions) {
+                  var new_item = JSON.parse(JSON.stringify(item)); //deep copy object
+                  var dir_concat = '{0}-{1}'.format(new_item['dir'], old_versions[idx]);
+
+                  if (old_versions[idx].length > 0 && old_versions[idx] != item['version']) {
+                    new_item['type'] = 'old_version';
+                    new_item['id'] = dir_concat;
+                    new_item['webui_desc'] = '{0} {1}'.format(new_item['name'], old_versions[idx]);
+                    new_item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, new_item['serverPack']));
+                    p.push(new_item);
+                  }
+                }
+              }
+              callback(err || inner_err, p);
+            } catch (e) {
+              callback(e, p)
+            }
+          })
+        else
+          callback(null, p);
+      }
+      request({ url: FTB_VERSIONS_URL, json: false }, handle_reply);
+    },
+    ftb_third_party: function(callback) {
+      var xml_parser = require('xml2js');
+
+      var FTB_VERSIONS_URL = 'http://ftb.cursecdn.com/FTB2/static/thirdparty.xml';
+      var path_prefix = path.join(base_dir, mineos.DIRS['profiles']);
+
+      function handle_reply(err, response, body) {
+        var p = [];
+
+        if (!err && (response || {}).statusCode == 200)
+          xml_parser.parseString(body, function(inner_err, result) {
+            try {
+              var packs = result['modpacks']['modpack'];
+
+              for (var index in packs) {
+                var item = packs[index]['$'];
+                var dir_concat = '{0}-{1}'.format(item['dir'], item['version']);
+                item['group'] = 'ftb_third_party';
+                item['type'] = 'release';
+                item['id'] = dir_concat;
+                item['webui_desc'] = '{0} {1}'.format(item['name'], item['version']);
+                item['weight'] = 10;
+                item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item['serverPack']));
+                p.push(item);
+
+                var old_versions = item['oldVersions'].split(';');
+                for (var idx in old_versions) {
+                  var new_item = JSON.parse(JSON.stringify(item)); //deep copy object
+                  var dir_concat = '{0}-{1}'.format(new_item['dir'], old_versions[idx]);
+
+                  if (old_versions[idx].length > 0 && old_versions[idx] != item['version']) {
+                    new_item['type'] = 'old_version';
+                    new_item['id'] = dir_concat;
+                    new_item['webui_desc'] = '{0} {1}'.format(new_item['name'], old_versions[idx]);
+                    new_item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, new_item['serverPack']));
+                    p.push(new_item);
+                  }
+                }
+              }
+              callback(err || inner_err, p);
+            } catch (e) {
+              callback(e);
+            }
+          })
+        else
+          callback(null, p);
+      }
+      request({ url: FTB_VERSIONS_URL, json: false }, handle_reply);
+    },
+    pocketmine: function(callback) {
+      var URL_DEVELOPMENT = "http://www.pocketmine.net/api/?channel=development";
+      var URL_STABLE = "http://www.pocketmine.net/api/?channel=stable";
+
+      var p = [];
+
+      function handle_reply(err, retval) {
+        for (var r in retval) 
+          if ((retval[r] || {}).statusCode == 200) {
+            var releases = JSON.parse(retval[r].body);
+
+            var item = releases;
+            var version = releases.version;
+            var dir_concat = 'Pocketmine-{0}'.format(version);
+            item['channel'] = r;
+            item['filename'] = path.basename(item.download_url);
+            item['group'] = 'pocketmine';
+            item['id'] = dir_concat;
+            item['version'] = version;
+            switch (item.channel) {
+              case 'stable':
+                item['short_version'] = path.basename(item.details_url);
+                item['type'] = 'release';
+                break;
+              case 'development':
+                item['short_version'] = version;
+                item['type'] = 'snapshot';
+                break;
+            }
+            item['webui_desc'] = 'phar build {0}, api {1}'.format(item.build, item.api_version);
+            item['weight'] = 10;
+            item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item.filename));
+            p.push(item);
+
+          }
+        callback(null, p)
+      }
+
+      async.auto({
+        'stable': async.retry(2, async.apply(request, URL_STABLE)),
+        'development': async.retry(2, async.apply(request, URL_DEVELOPMENT)),
+      }, handle_reply)
+    },
+    php: function(callback) {
+      BUILD_REGEX = /^[\w]+BUILD="([^"]+)"/
+      var p = [];
+
+      function handle_reply(err, response, body) {
+        if (!err && (response || {}).statusCode == 200) {
+          var lines = body.split('\n');
+          for (var i in lines) {
+            var matching = lines[i].match(BUILD_REGEX);
+            if (matching) {
+              var item = {};
+              item['group'] = 'php';
+              item['type'] = 'release';
+              item['id'] = matching[1];
+              item['webui_desc'] = 'PHP binary for Pocketmine';
+              item['weight'] = 12;
+              item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], matching[1], '{0}.tar.gz'.format(matching[1])));
+              p.push(item);
+            }
+          }
+        }
+        callback(err, p);
+      }
+      request('http://get.pocketmine.net', handle_reply);
+    }
+  } //end sources
+
+  logging.info('[WEBUI] Downloading official profiles.');
+
+  var LIMIT_SIMULTANEOUS_DOWNLOADS = 3;
+  var results = {};
+
+  async.forEachOfLimit(
+    SOURCES, 
+    LIMIT_SIMULTANEOUS_DOWNLOADS, 
+    function(dl_func, key, inner_callback) {
+      dl_func(function(err, profs) {
+        for (var source in profs)
+          results[key] = profs;
+
+        inner_callback();
+      })
+    }, 
+    function(err) {
+      var merged = [];
+      for (var source in results)
+        merged = merged.concat.apply(merged, results[source]);
+
+      callback(err, merged);
+    }
+  )
+
+} // end check_profiles
+
+function download_profiles(args, progress_update_fn, callback) {
+  var request = require('request');
+  var progress = require('request-progress');
+
+  var DOWNLOADS = {
+    mojang: function(inner_callback) {
+      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.profile.id);
+      var filename = 'minecraft_server.{0}.jar'.format(args.profile.id);
+      var dest_filepath = path.join(dest_dir, filename);
+
+      var url = 'https://s3.amazonaws.com/Minecraft.Download/versions/{0}/{1}'.format(args.profile.id, filename);
+
+      fs.ensureDir(dest_dir, function(err) {
+        if (err) {
+          logging.error('[WEBUI] Error attempting download:', err);
+        } else {
+          progress(request(url), {
+            throttle: 1000,
+            delay: 100
+          })
+            .on('complete', function(response) {
+              if (response.statusCode == 200) {
+                logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                args['dest_dir'] = dest_dir;
+                args['filename'] = filename;
+                args['success'] = true;
+                args['progress']['percent'] = 100;
+                args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
+                args['suppress_popup'] = false;
+                inner_callback(args);
+              } else {
+                logging.error('[WEBUI] Server was unable to download file:', url);
+                logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                args['success'] = false;
+                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                args['suppress_popup'] = false;
+                inner_callback(args);
+              }
+            })
+            .on('progress', function(state) {
+              args['progress'] = state;
+              progress_update_fn(args);
+            })
+            .pipe(fs.createWriteStream(dest_filepath))
+        }
+      });
+    },
+    ftb: function(inner_callback) {
+      var unzip = require('unzip');
+
+      var dir_concat = '{0}-{1}'.format(args.profile.dir, args.profile.version);
+      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
+      var filename = args.profile.serverPack;
+      var dest_filepath = path.join(dest_dir, filename);
+
+      var url = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(args.profile.dir, args.profile.version.replace(/\./g, '_'), args.profile.serverPack);
+
+      fs.ensureDir(dest_dir, function(err) {
+        if (err) {
+          logging.error('[WEBUI] Error attempting download:', err);
+        } else {
+          progress(request(url), {
+            throttle: 1000,
+            delay: 100
+          })
+            .on('complete', function(response) {
+              if (response.statusCode == 200) {
+                logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                args['dest_dir'] = dest_dir;
+                args['filename'] = filename;
+                args['success'] = true;
+                args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
+
+                fs.createReadStream(dest_filepath)
+                  .pipe(unzip.Extract({ path: dest_dir }).on('close', function() {
+                    inner_callback(args);
+                  }));
+              } else {
+                logging.error('[WEBUI] Server was unable to download file:', url);
+                logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                args['success'] = false;
+                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                inner_callback(args);
+              }
+            })
+            .on('progress', function(state) {
+              args['progress'] = state;
+              progress_update_fn(args);
+            })
+            .pipe(fs.createWriteStream(dest_filepath))
+        }
+      });
+    },
+    ftb_third_party: function(inner_callback) {
+      var unzip = require('unzip');
+
+      var dir_concat = '{0}-{1}'.format(args.profile.dir, args.profile.version);
+      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
+      var filename = args.profile.serverPack;
+      var dest_filepath = path.join(dest_dir, filename);
+
+      var url = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(args.profile.dir, args.profile.version.replace(/\./g, '_'), args.profile.serverPack);
+
+      fs.ensureDir(dest_dir, function(err) {
+        if (err) {
+          logging.error('[WEBUI] Error attempting download:', err);
+        } else {
+          progress(request(url), {
+            throttle: 1000,
+            delay: 100
+          })
+            .on('complete', function(response) {
+              if (response.statusCode == 200) {
+                logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                args['dest_dir'] = dest_dir;
+                args['filename'] = filename;
+                args['success'] = true;
+                args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
+
+                fs.createReadStream(dest_filepath)
+                  .pipe(unzip.Extract({ path: dest_dir }).on('close', function() {
+                    inner_callback(args);
+                  }));
+              } else {
+                logging.error('[WEBUI] Server was unable to download file:', url);
+                logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                args['success'] = false;
+                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                inner_callback(args);
+              }
+            })
+            .on('progress', function(state) {
+              args['progress'] = state;
+              progress_update_fn(args);
+            })
+            .pipe(fs.createWriteStream(dest_filepath))
+        }
+      });
+    },
+    pocketmine: function(inner_callback) {
+      var dir_concat = args.profile.id;
+      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
+      var filename = args.profile.filename;
+      var dest_filepath = path.join(dest_dir, filename);
+
+      var URL_STABLE = 'https://github.com/PocketMine/PocketMine-MP/releases/download/{0}/{1}';
+      var URL_DEVELOPMENT = 'http://jenkins.pocketmine.net/job/PocketMine-MP/{0}/artifact/{1}';
+
+      fs.ensureDir(dest_dir, function(err) {
+        if (err) {
+          logging.error('[WEBUI] Error attempting download:', err);
+        } else {
+          var url_to_use = '';
+
+          if (args.profile.channel == 'stable')
+            url_to_use = URL_STABLE.format(args.profile.short_version, args.profile.filename);
+          else
+            url_to_use = URL_DEVELOPMENT.format(args.profile.build, args.profile.filename);
+
+          progress(request(url_to_use), {
+            throttle: 1000,
+            delay: 100
+          })
+            .on('complete', function(response) {
+              if (response.statusCode == 200) {
+                logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url_to_use, dest_filepath));
+                args['dest_dir'] = dest_dir;
+                args['filename'] = filename;
+                args['success'] = true;
+                args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url_to_use, dest_filepath);
+                inner_callback(args);
+              } else {
+                logging.error('[WEBUI] Server was unable to download file:', url_to_use);
+                logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                args['success'] = false;
+                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                inner_callback(args);
+              }
+            })
+            .on('progress', function(state) {
+              args['progress'] = state;
+              progress_update_fn(args);
+            })
+            .pipe(fs.createWriteStream(dest_filepath))
+        }
+      });
+    },
+    php: function(inner_callback) {
+      var tarball = require('tarball-extract')
+
+      var dir_concat = args.profile.id;
+      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
+      var filename = '{0}.tar.gz'.format(args.profile.id);
+      var dest_filepath = path.join(dest_dir, filename);
+
+      var url = 'https://dl.bintray.com/pocketmine/PocketMine/{0}'.format(filename);
+
+      fs.ensureDir(dest_dir, function(err) {
+        if (err) {
+          logging.error('[WEBUI] Error attempting download:', err);
+        } else {
+          progress(request(url), {
+            throttle: 1000,
+            delay: 100
+          })
+            .on('complete', function(response) {
+              if (response.statusCode == 200) {
+                logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                args['dest_dir'] = dest_dir;
+                args['filename'] = filename;
+                args['success'] = true;
+                args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
+
+                async.series([
+                  async.apply(tarball.extractTarball, dest_filepath, dest_dir)
+                ], function(err) {
+                  if (err) {
+                    args['success'] = false;
+                    args['help_text'] = 'Successfully downloaded, but failed to extract {0}'.format(dest_filepath);
+                    inner_callback(args);
+                  } else {
+                    inner_callback(args);
+                  }
+                })
+              } else {
+                logging.error('[WEBUI] Server was unable to download file:', url);
+                logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                args['success'] = false;
+                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                inner_callback(args);
+              }
+            })
+            .on('progress', function(state) {
+              args['progress'] = state;
+              progress_update_fn(args);
+            })
+            .pipe(fs.createWriteStream(dest_filepath))
+        }
+      });
+    }
+  } // end downloads {}
+
+  DOWNLOADS[args.profile.group](callback);
+
+} //end function
