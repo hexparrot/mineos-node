@@ -680,18 +680,24 @@ mineos.mc = function(server_name, base_dir) {
   self.kill = function(callback) {
     var pids = mineos.server_pids_up();
     var test_interval_ms = 200;
+    var MAX_ITERATIONS_TO_QUIT = 30;
 
     if (!(self.server_name in pids)) {
       callback(true);
     } else {
       process.kill(pids[self.server_name].java);
+      var iterations = 0;
 
       async.doWhilst(
         function(cb) {
+          iterations += 1;
           setTimeout(cb, test_interval_ms);
         },
         function() { 
-          return (self.server_name in mineos.server_pids_up())
+          if (iterations > MAX_ITERATIONS_TO_QUIT)
+            return false;
+          else
+            return (self.server_name in mineos.server_pids_up());
         },
         function(ignored_err) {
           if (self.server_name in mineos.server_pids_up())
