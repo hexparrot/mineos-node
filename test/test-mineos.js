@@ -960,7 +960,9 @@ test.verify = function(test) {
         callback(!err);
       })
     },
+    async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
     async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
+    async.apply(instance.copy_profile),
     async.apply(instance.start),
     function(callback) {
       instance.verify('!exists', function(err) {
