@@ -660,7 +660,7 @@ mineos.mc = function(server_name, base_dir) {
   self.stop = function(callback) {
     var test_interval_ms = 200;
     var iterations = 0;
-    var MAX_ITERATIONS_TO_QUIT = 100;
+    var MAX_ITERATIONS_TO_QUIT = 150;
 
     async.series([
       async.apply(self.verify, 'exists'),

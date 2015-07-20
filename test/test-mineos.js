@@ -1008,7 +1008,7 @@ test.ping = function(test) {
           test.equal(pingback.players_max, 20);
           callback(err);
         })
-      }, 15000)
+      }, 22000)
     },
     async.apply(instance.kill)
   ], function(err) {
