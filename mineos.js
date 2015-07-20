@@ -51,13 +51,13 @@ mineos.server_list_up = function() {
 mineos.server_pids_up = function() {
   var cmdline, environ, match;
   var pids = fs.readdirSync(PROC_PATH).filter(function(e) { if (/^([0-9]+)$/.test(e)) {return e} });
-  var SCREEN_REGEX = /screen[^S]+S mc-([^ ]+)/i;
-  var JAVA_REGEX = /\.mc-([^ ]+)/i;
+  var SCREEN_REGEX = /screen[^S]+S mc-([^\s]+)/i;
+  var JAVA_REGEX = /\.mc-([^\s]+)/i;
   var servers_found = {};
 
   for (var i=0; i < pids.length; i++) {
     try {
-      cmdline = fs.readFileSync('{0}/{1}/cmdline'.format(PROC_PATH, pids[i]))
+      cmdline = fs.readFileSync(path.join(PROC_PATH, pids[i].toString(), 'cmdline'))
                               .toString('ascii')
                               .replace(/\u0000/g, ' ');
     } catch (e) {
@@ -73,7 +73,7 @@ mineos.server_pids_up = function() {
         servers_found[screen_match[1]] = {'screen': parseInt(pids[i])}
     } else {
       try {
-        environ = fs.readFileSync('{0}/{1}/environ'.format(PROC_PATH, pids[i]))
+        environ = fs.readFileSync(path.join(PROC_PATH, pids[i].toString(), 'environ'))
                                 .toString('ascii')
                                 .replace(/\u0000/g, ' ');
       } catch (e) {
