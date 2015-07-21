@@ -1711,7 +1711,7 @@ test.eula_false = function(test) {
     function(callback) {
       instance.property('eula', function(err, eula_value) {
         test.ifError(err);
-        test.ok(eula_value);
+        test.equal(eula_value, undefined);
         callback(err);
       })
     },
