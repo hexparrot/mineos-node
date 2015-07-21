@@ -1367,7 +1367,7 @@ test.stuff = function(test) {
     async.apply(instance.copy_profile),
     async.apply(instance.start),
     function(callback) {
-      setTimeout(callback, 10000);
+      setTimeout(callback, 20000);
     },
     async.apply(instance.stuff, 'op hexparrot'),
     async.apply(instance.kill)

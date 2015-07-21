@@ -706,7 +706,7 @@ mineos.mc = function(server_name, base_dir) {
   self.kill = function(callback) {
     var pids = mineos.server_pids_up();
     var test_interval_ms = 200;
-    var MAX_ITERATIONS_TO_QUIT = 30;
+    var MAX_ITERATIONS_TO_QUIT = 150;
 
     if (!(self.server_name in pids)) {
       callback(true);
