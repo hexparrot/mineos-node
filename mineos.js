@@ -28,6 +28,18 @@ mineos.SP_DEFAULTS = {
   'server-ip': '0.0.0.0',
 }
 
+var PROC_PATH = null;
+
+try {
+  fs.statSync('/proc/uptime');
+  PROC_PATH = '/proc';
+} catch (e) {
+  try {
+    fs.statSync('/usr/compat/linux/proc/uptime');
+    PROC_PATH = '/usr/compat/linux/proc';
+  } catch (e) {}
+}
+
 mineos.server_list = function(base_dir) {
   return fs.readdirSync(path.join(base_dir, mineos.DIRS['servers']));
 }
@@ -38,14 +50,14 @@ mineos.server_list_up = function() {
 
 mineos.server_pids_up = function() {
   var cmdline, environ, match;
-  var pids = fs.readdirSync('/proc').filter(function(e) { if (/^([0-9]+)$/.test(e)) {return e} });
-  var SCREEN_REGEX = /screen[^S]+S mc-([^ ]+)/i;
-  var JAVA_REGEX = /\.mc-([^ ]+)/i;
+  var pids = fs.readdirSync(PROC_PATH).filter(function(e) { if (/^([0-9]+)$/.test(e)) {return e} });
+  var SCREEN_REGEX = /screen[^S]+S mc-([^\s]+)/i;
+  var JAVA_REGEX = /\.mc-([^\s]+)/i;
   var servers_found = {};
 
   for (var i=0; i < pids.length; i++) {
     try {
-      cmdline = fs.readFileSync('/proc/{0}/cmdline'.format(pids[i]))
+      cmdline = fs.readFileSync(path.join(PROC_PATH, pids[i].toString(), 'cmdline'))
                               .toString('ascii')
                               .replace(/\u0000/g, ' ');
     } catch (e) {
@@ -61,7 +73,7 @@ mineos.server_pids_up = function() {
         servers_found[screen_match[1]] = {'screen': parseInt(pids[i])}
     } else {
       try {
-        environ = fs.readFileSync('/proc/{0}/environ'.format(pids[i]))
+        environ = fs.readFileSync(path.join(PROC_PATH, pids[i].toString(), 'environ'))
                                 .toString('ascii')
                                 .replace(/\u0000/g, ' ');
       } catch (e) {
@@ -638,13 +650,17 @@ mineos.mc = function(server_name, base_dir) {
         var proc = child_process.spawn(binary, args, params);
         proc.once('close', cb);
       }
-    ], callback);
+    ], function(err, result) {
+      setTimeout(function() {
+        callback(err, result);
+      }, 100)
+    });
   }
 
   self.stop = function(callback) {
     var test_interval_ms = 200;
     var iterations = 0;
-    var MAX_ITERATIONS_TO_QUIT = 100;
+    var MAX_ITERATIONS_TO_QUIT = 150;
 
     async.series([
       async.apply(self.verify, 'exists'),
@@ -690,7 +706,7 @@ mineos.mc = function(server_name, base_dir) {
   self.kill = function(callback) {
     var pids = mineos.server_pids_up();
     var test_interval_ms = 200;
-    var MAX_ITERATIONS_TO_QUIT = 30;
+    var MAX_ITERATIONS_TO_QUIT = 150;
 
     if (!(self.server_name in pids)) {
       callback(true);
@@ -998,6 +1014,7 @@ mineos.mc = function(server_name, base_dir) {
         var pids = mineos.server_pids_up();
         if (self.server_name in pids) {
           var procfs = require('procfs-stats');
+          procfs.PROC = PROC_PATH; //procfs will default to /proc--this is determined more accurately by mineos.js!
           var ps = procfs(pids[self.server_name]['java']);
           ps.status(function(err, data){
             callback(err, data);

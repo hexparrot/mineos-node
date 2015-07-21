@@ -94,7 +94,6 @@ test.verify_ids = function(test) {
       })
     }
   ], function(err, results) {
-    console.lo
     test.ifError(err);
     test.done();
   })

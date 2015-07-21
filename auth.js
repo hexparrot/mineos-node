@@ -2,27 +2,55 @@ var async = require('async');
 var auth = exports;
 
 auth.authenticate_shadow = function(user, plaintext, callback) {
-  var passwd = require('etc-passwd');
   var hash = require('sha512crypt-node');
+  var fs = require('fs-extra');
 
-  async.waterfall([
-    async.apply(passwd.getShadow, {username: user}),
-    function(shadow_info, cb) {
-      try {
-        var password_parts = shadow_info['password'].split(/\$/);
-        var salt = password_parts[2];
-        var new_hash = hash.sha512crypt(plaintext, salt);
+  function etc_shadow(inner_callback) {
+    var passwd = require('etc-passwd');
 
-        cb(null, new_hash == shadow_info['password']);
-      } catch (e) {
-        cb(true, null);
+    fs.stat('/etc/shadow', function(err, stat_info) {
+      if (err)
+        inner_callback(true)
+      else {
+        passwd.getShadow({username: user}, function(err, shadow_info) {
+          if (shadow_info) {
+            var password_parts = shadow_info['password'].split(/\$/);
+            var salt = password_parts[2];
+            var new_hash = hash.sha512crypt(plaintext, salt);
+
+            var passed = (new_hash == shadow_info['password'] ? user : false);
+            inner_callback(null, passed);
+          } else {
+            inner_callback(null, false);
+          }
+        })
       }
+    })
+  }
+
+  function posix(inner_callback) {
+    var crypt = require('crypt3');
+    var posix = require('posix');
+
+    try {
+      var user_data = posix.getpwnam(user);
+      if (crypt(plaintext, user_data.passwd) == user_data.passwd)
+        inner_callback(user);
+      else
+        inner_callback(false);
+    } catch (e) {
+      inner_callback(false);
     }
-  ], function(err, retval) {
-    if (retval)
-      callback(user);
-    else
-      callback(false);
+  }
+
+  etc_shadow(function(err, result_passed) {
+    if (err) {
+      posix(function(result_passed) {
+        callback(result_passed);
+      });
+    } else {
+      callback(result_passed);
+    }
   })
 }
 

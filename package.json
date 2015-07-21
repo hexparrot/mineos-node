@@ -66,7 +66,9 @@
     "tar": "2.1.x",
     "decompress-zip": "0.2.x",
     "fireworm": "0.6.x",
-    "request-progress": "0.3.x"
+    "request-progress": "0.3.x",
+    "posix": "2.0.x",
+    "crypt3": "0.1.x"
   },
   "devDependencies": {
     "nodeunit": "0.9.x"
