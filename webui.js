@@ -54,15 +54,13 @@ passport.use('local-signin', new LocalStrategy(
     localAuth(username, password)
     .then(function (user) {
       if (user) {
-        req.session.success = 'You are successfully logged in ' + user.username + '!';
-        done(null, user);
-      } else {
-        req.session.error = 'Could not log user in. Please try again.'; //inform user could not log them in
+        console.log('Successful login attempt for username:', username);
         done(null, user);
       }
     })
-    .fail(function (err){
-      console.log(err.body);
+    .fail(function (err) {
+      console.log('Unsuccessful login attempt for username:', username);
+      done(null);
     });
   }
 ));
