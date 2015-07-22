@@ -166,6 +166,13 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     }
   )
 
+  $scope.$watch(function(scope) { return scope.current },
+    function() {
+      if (!($scope.current in Servers))
+        $scope.change_page('dashboard');
+    }
+  );
+
   /* computed variables */
 
   $scope.servers_up = function() {
@@ -205,11 +212,6 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
   socket.on('/', 'host_heartbeat', function(data) {
     $scope.host_heartbeat = data;
     $scope.update_loadavg(data.loadavg);
-  })
-
-  socket.on('/', 'untrack_server', function(server_name) {
-    if (server_name == $scope.current)
-      $scope.change_page('dashboard');
   })
 
   socket.on('/', 'profile_list', function(profile_data) {
