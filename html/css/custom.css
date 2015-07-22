@@ -5,3 +5,11 @@
  * @author URL : your url
  *
  */
+
+table tbody tr a {
+    cursor: pointer;
+}
+
+.widget p a {
+    cursor: help;
+}
