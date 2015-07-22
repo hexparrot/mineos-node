@@ -7,6 +7,7 @@ app.run(['$rootScope', '$translate', function($rootScope, $translate) {
 }]);
 
 app.config(function ($translateProvider) {
+  $translateProvider.useSanitizeValueStrategy('escape');
   $translateProvider.useStaticFilesLoader({
     prefix: 'locales/locale-',
     suffix: '.json'
