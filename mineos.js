@@ -1131,6 +1131,11 @@ mineos.mc = function(server_name, base_dir) {
           }
         })
         break;
+      case 'unconventional':
+        self.sc(function(err, dict) {
+          callback(err, !!(dict['minecraft'] || {}).unconventional);
+        })
+        break;
       case 'eula':
         fs.readFile(path.join(self.env.cwd, 'eula.txt'), function(err, data) {
           if (err) {

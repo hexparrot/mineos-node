@@ -971,6 +971,13 @@ test.properties = function(test) {
       })
     },
     function(callback) {
+      instance.property('unconventional', function(err, retval) {
+        test.ifError(err);
+        test.equal(retval, false);
+        callback(err);
+      })
+    },
+    function(callback) {
       setTimeout(function() {
         instance.kill(function(err) {
           test.ifError(err);
@@ -980,7 +987,6 @@ test.properties = function(test) {
     }
   ], function(err) {
     test.ifError(err);
-    test.expect(48);
     test.done();
   })
 }
