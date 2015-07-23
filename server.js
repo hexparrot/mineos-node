@@ -1035,6 +1035,42 @@ function check_profiles(base_dir, callback) {
         callback(err, p);
       }
       request('http://get.pocketmine.net', handle_reply);
+    },
+    bungeecord: function(callback) {
+      var xml_parser = require('xml2js');
+
+      var BUNGEE_VERSIONS_URL = 'http://ci.md-5.net/job/BungeeCord/rssAll';
+      var path_prefix = path.join(base_dir, mineos.DIRS['profiles']);
+
+      function handle_reply(err, response, body) {
+        var p = [];
+
+        if (!err && (response || {}).statusCode === 200)
+          xml_parser.parseString(body, function(inner_err, result) {
+            try {
+              var packs = result['feed']['entry'];
+
+              for (var index in packs) {
+                var item = packs[index];
+                item['version'] = result['feed']['entry'][index]['id'][0].split(':').slice(-1)[0];
+                var dir_concat = 'bungeecord-{1}'.format(item['dir'], item['version']);
+                item['group'] = 'bungeecord';
+                item['type'] = 'release';
+                item['id'] = dir_concat;
+                item['webui_desc'] = result['feed']['entry'][index]['title'][0];
+                item['weight'] = 5;
+                item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, 'BungeeCord.jar'));
+                p.push(item);
+              }
+              callback(err || inner_err, p);
+            } catch (e) {
+              callback(e, p)
+            }
+          })
+        else
+          callback(null, p);
+      }
+      request({ url: BUNGEE_VERSIONS_URL, json: false }, handle_reply);
     }
   } //end sources
 
