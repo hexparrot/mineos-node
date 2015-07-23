@@ -1059,7 +1059,7 @@ function check_profiles(base_dir, callback) {
                 item['id'] = dir_concat;
                 item['webui_desc'] = result['feed']['entry'][index]['title'][0];
                 item['weight'] = 5;
-                item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, 'BungeeCord.jar'));
+                item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, 'BungeeCord-{0}.jar'.format(item.version)));
                 p.push(item);
               }
               callback(err || inner_err, p);
@@ -1330,6 +1330,48 @@ function download_profiles(args, progress_update_fn, callback) {
                 logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
                 args['success'] = false;
                 args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                inner_callback(args);
+              }
+            })
+            .on('progress', function(state) {
+              args['progress'] = state;
+              progress_update_fn(args);
+            })
+            .pipe(fs.createWriteStream(dest_filepath))
+        }
+      });
+    },
+    bungeecord: function(inner_callback) {
+      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.profile.id);
+      var filename = 'BungeeCord-{0}.jar'.format(args.profile.version);
+      var dest_filepath = path.join(dest_dir, filename);
+
+      var url = 'http://ci.md-5.net/job/BungeeCord/{0}/artifact/bootstrap/target/BungeeCord.jar'.format(args.profile.version);
+
+      fs.ensureDir(dest_dir, function(err) {
+        if (err) {
+          logging.error('[WEBUI] Error attempting download:', err);
+        } else {
+          progress(request(url), {
+            throttle: 1000,
+            delay: 100
+          })
+            .on('complete', function(response) {
+              if (response.statusCode == 200) {
+                logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                args['dest_dir'] = dest_dir;
+                args['filename'] = filename;
+                args['success'] = true;
+                args['progress']['percent'] = 100;
+                args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
+                args['suppress_popup'] = false;
+                inner_callback(args);
+              } else {
+                logging.error('[WEBUI] Server was unable to download file:', url);
+                logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                args['success'] = false;
+                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                args['suppress_popup'] = false;
                 inner_callback(args);
               }
             })
