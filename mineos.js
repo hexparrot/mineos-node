@@ -312,6 +312,26 @@ mineos.mc = function(server_name, base_dir) {
     ], callback)
   }
 
+  self.create_non_server = function(owner, callback) {
+    async.series([
+      async.apply(self.verify, '!exists'),
+      async.apply(self.verify, '!up'),
+      async.apply(fs.ensureDir, self.env.cwd),
+      async.apply(fs.chown, self.env.cwd, owner['uid'], owner['gid']),
+      async.apply(fs.ensureDir, self.env.bwd),
+      async.apply(fs.chown, self.env.bwd, owner['uid'], owner['gid']),
+      async.apply(fs.ensureDir, self.env.awd),
+      async.apply(fs.chown, self.env.awd, owner['uid'], owner['gid']),
+      async.apply(fs.ensureFile, self.env.sp),
+      async.apply(fs.chown, self.env.sp, owner['uid'], owner['gid']),
+      async.apply(fs.ensureFile, self.env.sc),
+      async.apply(fs.chown, self.env.sc, owner['uid'], owner['gid']),
+      async.apply(fs.ensureFile, self.env.cc),
+      async.apply(fs.chown, self.env.cc, owner['uid'], owner['gid']),
+      async.apply(self.modify_sc, 'minecraft', 'non_server', true),
+    ], callback)
+  }
+
   self.create_from_archive = function(owner, filepath, callback) {
 
     function move_to_parent_dir(source_dir, inner_callback) {
