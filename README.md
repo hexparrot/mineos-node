@@ -7,8 +7,7 @@ by leveraging the event-triggering, asyncronous model of Node.JS and websockets.
 
 This allows the front-end to provide system health, disk and memory usage, and logging in real-time.
 
-The ultimate goal will be for this to work on all Linux and BSD distros, but so
-far testing and development has only occurred on Debian-based Linux distributions.
+This has been tested on Debian, Ubuntu, ArchLinux, and FreeBSD and should work on all variants, Linux or BSD.
 
 Installation
 ------------
@@ -49,11 +48,11 @@ For hosts using 'systemd':
 
 To use the webui as a background daemon:
 
-    nodejs service.js [start|stop|restart|status]
+    node service.js [start|stop|restart|status]
 
 To start the webui in the foreground:
 
-    nodejs webui.js
+    node webui.js
 
 Developing and Contributing
 ------

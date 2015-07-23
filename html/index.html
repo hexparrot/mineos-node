@@ -232,7 +232,7 @@
                                     <!--/ END Menu Divider -->
 
                                     <!-- START Menu -->
-                                    <li class="accordion-group" ng-show="current">
+                                    <li class="accordion-group" ng-show="current && servers[current].live_logs['logs/latest.log'].length">
                                         <a ng-click="change_page('console')">
                                             <span class="icon icone-desktop"></span>
                                             <span class="text">logs/latest.log</span>
@@ -241,7 +241,7 @@
                                     <!--/ END Menu -->                                    
 
                                     <!-- START Menu -->
-                                    <li class="accordion-group" ng-show="current">
+                                    <li class="accordion-group" ng-show="current && servers[current].live_logs['server.log'].length">
                                         <a ng-click="change_page('console2')">
                                             <span class="icon icone-desktop"></span>
                                             <span class="text">server.log</span>
