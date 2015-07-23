@@ -167,6 +167,12 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     }
   )
 
+  $scope.$watch(function(scope) { return scope.unconventional },
+    function(new_value, previous_value) {
+      $scope.change_sc('minecraft', 'unconventional', new_value);
+    }
+  )
+
   $scope.$watch(function(scope) { return scope.current },
     function() {
       if (!($scope.current in Servers))
@@ -540,6 +546,10 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
       else
         $('#onrebootstart').iCheck('uncheck');
 
+      if ((data.minecraft || {}).unconventional)
+        $('#unconventional').iCheck('check');
+      else
+        $('#unconventional').iCheck('uncheck');
     })
 
     me.channel.on(server_name, 'cron.config', function(data) {

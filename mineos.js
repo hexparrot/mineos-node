@@ -312,7 +312,7 @@ mineos.mc = function(server_name, base_dir) {
     ], callback)
   }
 
-  self.create_non_server = function(owner, callback) {
+  self.create_unconventional_server = function(owner, callback) {
     async.series([
       async.apply(self.verify, '!exists'),
       async.apply(self.verify, '!up'),
@@ -328,7 +328,7 @@ mineos.mc = function(server_name, base_dir) {
       async.apply(fs.chown, self.env.sc, owner['uid'], owner['gid']),
       async.apply(fs.ensureFile, self.env.cc),
       async.apply(fs.chown, self.env.cc, owner['uid'], owner['gid']),
-      async.apply(self.modify_sc, 'minecraft', 'non_server', true),
+      async.apply(self.modify_sc, 'minecraft', 'unconventional', true),
     ], callback)
   }
 

@@ -74,6 +74,7 @@
   "KILL": "Kill",
   "BROADCAST_TO_LAN": "Broadcast to LAN",
   "START_ON_BOOT": "Start server on boot",
+  "UNCONVENTIONAL_SERVER": "This is not a conventional Minecraft server",
   "COPY_PROFILE": "Copy profile to live server files",
 
   "JAVA_SETTINGS": "Java Settings",

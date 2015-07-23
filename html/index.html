@@ -188,7 +188,7 @@
                                     <!--/ END Menu -->
 
                                     <!-- START Menu -->
-                                    <li class="accordion-group" ng-show="current">
+                                    <li class="accordion-group" ng-show="current && !servers[current].sc.minecraft.unconventional">
                                         <a ng-click="change_page('server_properties')">
                                             <span class="icon iconm-pencil-5"></span>
                                             <span class="text" translate="SERVER.PROPERTIES"></span>
@@ -792,6 +792,9 @@
                                                     </label>
                                                     <label class="checkbox">
                                                         <input icheck id="onrebootstart" class="icheck" type="checkbox" ng-model="onrebootstart"> {{ 'START_ON_BOOT' | translate }}
+                                                    </label>
+                                                    <label class="checkbox">
+                                                        <input icheck id="unconventional" class="icheck" type="checkbox" ng-model="unconventional"> {{ 'UNCONVENTIONAL_SERVER' | translate }}
                                                     </label>
 
                                                 </div>

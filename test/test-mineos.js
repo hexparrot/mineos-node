@@ -2077,14 +2077,14 @@ test.list_increments = function(test) {
   })  
 }
 
-test.create_non_server = function(test) {
+test.create_unconventional_server = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   test.equal(mineos.server_list(BASE_DIR).length, 0);
 
   async.series([
-    async.apply(instance.create_non_server, OWNER_CREDS),
+    async.apply(instance.create_unconventional_server, OWNER_CREDS),
     async.apply(fs.stat, instance.env.cwd),
     async.apply(fs.stat, instance.env.bwd),
     async.apply(fs.stat, instance.env.awd),
@@ -2115,7 +2115,7 @@ test.create_non_server = function(test) {
 
       instance.sc(function(err, dict) {
         test.equal(Object.keys(dict).length, 1);
-        test.equal(dict.minecraft.non_server, true);
+        test.equal(dict.minecraft.unconventional, true);
       })
 
       instance.sp(function(err, dict) {
@@ -2125,7 +2125,7 @@ test.create_non_server = function(test) {
       callback();
     },
     function(callback) {
-      instance.create_non_server(OWNER_CREDS, function(err){
+      instance.create_unconventional_server(OWNER_CREDS, function(err){
         test.ifError(!err);
         callback(!err);
       })
