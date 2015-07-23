@@ -698,7 +698,7 @@
                                                     </figure><!--/ END Summary -->
 
                                                     <!-- START Circular -->
-                                                    <figure class="stats summary stacked circular">
+                                                    <figure class="stats summary stacked circular" ng-hide="servers[current].sc.minecraft.unconventional">
                                                         <div id="capacity_gauge" class="gauge gauge-red" data-percent="0">
                                                             <span class="icon icone-exchange"></span>
                                                         </div>
@@ -716,7 +716,7 @@
                                                     </figure><!--/ END Summary -->
 
                                                     <!-- START Summary -->
-                                                    <figure class="stats summary stacked">
+                                                    <figure class="stats summary stacked" ng-hide="servers[current].sc.minecraft.unconventional">
                                                         <div class="icon circle blue"><span class="icone-cogs"></span></div>
                                                         <figcaption>
                                                             <h4>{{ servers[current].heartbeat.ping.server_version }}&nbsp;<small translate="REPORTED_VERSION"></small></h4>
@@ -754,19 +754,34 @@
 
                                                     <div class="span6">
                                                         <div class="btn-group btn-block">
-                                                            <button class="btn btn-danger span4" ng-disabled="!servers[current].heartbeat.up" ng-click="server_command('stop')" translate="STOP"></button>
-                                                            <button class="btn btn-danger dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
-                                                            <ul class="dropdown-menu">
-                                                                <li><a href="#" ng-click="server_command('stop')" translate="STOP" ng-disabled="!servers[current].heartbeat.up"></a></li>
-                                                                <li><a href="#" ng-click="server_command('stop_and_backup')" translate="STOP_AND_BACKUP"></a></li>
-                                                                <li><a href="#" ng-click="server_command('restart')" translate="RESTART"></a></li>
-                                                                <li><a href="#" ng-click="server_command('kill')" translate="KILL" ng-disabled="!servers[current].heartbeat.up"></a></li>
+                                                            <button class="btn btn-danger span4" translate="STOP"
+                                                                    ng-disabled="!servers[current].heartbeat.up" 
+                                                                    ng-click="server_command('stop')"
+                                                                    ng-hide="servers[current].sc.minecraft.unconventional"
+                                                                    ></button>
+                                                            <button class="btn btn-danger span4" translate="KILL"
+                                                                    ng-disabled="!servers[current].heartbeat.up" 
+                                                                    ng-click="server_command('kill')" 
+                                                                    ng-hide="!servers[current].sc.minecraft.unconventional"
+                                                                    ></button>
+                                                            <button class="btn btn-danger dropdown-toggle" data-toggle="dropdown" ng-hide="servers[current].sc.minecraft.unconventional"><span class="caret"></span></button>
+                                                            <ul class="dropdown-menu" ng-hide="servers[current].sc.minecraft.unconventional">
+                                                                <li><a href="#" translate="STOP"
+                                                                       ng-click="server_command('stop')" 
+                                                                       ng-disabled="!servers[current].heartbeat.up"></a></li>
+                                                                <li><a href="#" translate="STOP_AND_BACKUP"
+                                                                       ng-click="server_command('stop_and_backup')"></a></li>
+                                                                <li><a href="#" translate="RESTART"
+                                                                       ng-click="server_command('restart')"></a></li>
+                                                                <li><a href="#" translate="KILL" 
+                                                                       ng-click="server_command('kill')"
+                                                                       ng-disabled="!servers[current].heartbeat.up"></a></li>
                                                             </ul>
                                                         </div>
                                                     </div>
 
                                                     <div class="span2">
-                                                        <button type="button" class="btn span12" ng-click="modals.open_accept_eula()" translate="ACCEPT_EULA" ng-class="{'btn-default': servers[current].page_data.glance.eula != false, 'btn-primary': servers[current].page_data.glance.eula == false}"></button>
+                                                        <button type="button" class="btn span12" ng-click="modals.open_accept_eula()" translate="ACCEPT_EULA" ng-class="{'btn-default': servers[current].page_data.glance.eula != false, 'btn-primary': servers[current].page_data.glance.eula == false}" ng-hide="servers[current].sc.minecraft.unconventional"></button>
                                                     </div>
 
                                                     <div class="clearfix"></div><div class="span12"></div>
