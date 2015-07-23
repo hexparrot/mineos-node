@@ -461,15 +461,28 @@ mineos.mc = function(server_name, base_dir) {
         },
         'xmx': function (cb) {
           self.sc(function (err, dict) {
+            var unconventional = (dict.minecraft || {}).unconventional;
             var value = parseInt((dict.java || {}).java_xmx) || 0;
-            cb((value > 0 ? null : 'XMX heapsize must be positive integer'), value);
+            
+            if (unconventional)
+              cb((value >= 0 ? null : 'XMX heapsize must be positive integer >= 0'), value);
+            else
+              cb((value > 0 ? null : 'XMX heapsize must be positive integer > 0'), value);
           });
         },
         'xms': function (cb) {
           self.sc(function (err, dict) {
-            var xmx = parseInt((dict.java || {}).java_xmx) || 0;
-            var xms = parseInt((dict.java || {}).java_xms) || xmx;
-            cb((xmx >= xms && xms > 0 ? null : 'XMS heapsize must be positive integer where XMX >= XMS > 0'), xms);
+            var unconventional = (dict.minecraft || {}).unconventional;
+
+            if (unconventional) {
+              var xmx = parseInt((dict.java || {}).java_xmx) || 0;
+              var xms = parseInt((dict.java || {}).java_xms) || 0;
+              cb((xmx >= xms && xms >= 0 ? null : 'XMS heapsize must be positive integer where XMX >= XMS >= 0'), xms);
+            } else {
+              var xmx = parseInt((dict.java || {}).java_xmx) || 0;
+              var xms = parseInt((dict.java || {}).java_xms) || xmx;
+              cb((xmx >= xms && xms > 0 ? null : 'XMS heapsize must be positive integer where XMX >= XMS > 0'), xms);
+            }
           });
         },
         'jarfile': function (cb) {
@@ -498,7 +511,17 @@ mineos.mc = function(server_name, base_dir) {
           inner_callback(err, {});
         } else {
           var args = ['-dmS', 'mc-{0}'.format(self.server_name)];
-          args.push.apply(args, [results.binary, '-server', '-Xmx{0}M'.format(results.xmx), '-Xms{0}M'.format(results.xms)]);
+          args.push.apply(args, [results.binary, '-server']);
+
+          if (results.xmx == 0 || results.xms == 0) { //only passes previous test if unconventional
+            if (results.xmx > 0)
+              args.push('-Xmx{0}M'.format(results.xmx));
+            if (results.xms > 0)
+              args.push('-Xms{0}M'.format(results.xms));
+          } else {
+            args.push.apply(args, ['-Xmx{0}M'.format(results.xmx), '-Xms{0}M'.format(results.xms)]);
+          }
+          
           if (results.java_tweaks)
             args.push(results.java_tweaks);
           args.push.apply(args, ['-jar', results.jarfile, results.jar_args]);

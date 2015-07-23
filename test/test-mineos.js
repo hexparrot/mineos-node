@@ -441,6 +441,69 @@ test.get_start_args_phar = function(test) {
   })
 }
 
+test.get_start_args_unconventional = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create_unconventional_server, OWNER_CREDS),
+    async.apply(instance.modify_sc, 'minecraft', 'unconventional', true),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(!err); //expected error
+        test.equal(err, 'Cannot start server without a designated jar/phar.');
+        test.equal(args, null);
+        callback(!err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'BungeeCord-1078.jar'),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2].slice(-4), 'java');
+        test.equal(args[3], '-server');
+        test.equal(args[4], '-jar');
+        test.equal(args[5], 'BungeeCord-1078.jar');
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'java_xmx', 256),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2].slice(-4), 'java');
+        test.equal(args[3], '-server');
+        test.equal(args[4], '-Xmx256M');
+        test.equal(args[5], '-jar');
+        test.equal(args[6], 'BungeeCord-1078.jar');
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'java_xms', 128),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2].slice(-4), 'java');
+        test.equal(args[3], '-server');
+        test.equal(args[4], '-Xmx256M');
+        test.equal(args[5], '-Xms128M');
+        test.equal(args[6], '-jar');
+        test.equal(args[7], 'BungeeCord-1078.jar');
+        callback(err);
+      })
+    }
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
 test.start = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
