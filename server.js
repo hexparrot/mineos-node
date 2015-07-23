@@ -317,6 +317,7 @@ function server_container(server_name, base_dir, socket_io) {
   logging.info('[{0}] Discovered server'.format(server_name));
   make_tail('logs/latest.log');
   make_tail('server.log');
+  make_tail('proxy.log.0');
 
   (function() {
     var fireworm = require('fireworm');

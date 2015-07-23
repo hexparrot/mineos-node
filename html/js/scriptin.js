@@ -580,6 +580,7 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
 
     me.channel.emit(server_name, 'server-icon.png');
     me.channel.emit(server_name, 'page_data', 'glance');
+    me.channel.emit(server_name, 'get_file_contents', 'proxy.log.0');
     me.channel.emit(server_name, 'get_file_contents', 'logs/latest.log');
     me.channel.emit(server_name, 'get_file_contents', 'server.log');
     me.channel.emit(server_name, 'req_server_activity');
