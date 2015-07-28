@@ -365,7 +365,14 @@ function server_container(server_name, base_dir, socket_io) {
     async.series({
       'up': function(cb) { instance.property('up', function(err, is_up) { cb(null, is_up) }) },
       'memory': function(cb) { instance.property('memory', function(err, mem) { cb(null, err ? {} : mem) }) },
-      'ping': function(cb) { instance.property('ping', function(err, ping) { cb(null, err ? {} : ping) }) }
+      'ping': function(cb) {
+        instance.property('unconventional', function(err, is_unconventional) {
+          if (is_unconventional)
+            cb(null, {}); //ignore ping--wouldn't respond in any meaningful way
+          else
+            instance.property('ping', function(err, ping) { cb(null, err ? {} : ping) }) 
+        })
+      }
     }, function(err, retval) {
       nsp.emit('heartbeat', {
         'server_name': server_name,
