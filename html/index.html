@@ -459,8 +459,18 @@
                                     </div>
                                 </div><!--/ Help Text -->
 
+                                <!-- Default Checkbox -->
+                                    <div class="control-group">
+                                    <label class="control-label"></label>
+                                    <div class="controls">
+                                        <label class="checkbox">
+                                            <input type="checkbox" class="nostyle" value="true" ng-model="unconventional"> {{ 'UNCONVENTIONAL_SERVER_TYPE' | translate}}
+                                        </label>
+                                    </div>
+                                </div><!--/ Default Checkbox -->
+
                                 <!-- Input Text Placeholder -->
-                                <div class="control-group">
+                                <div class="control-group" ng-hide="unconventional">
                                     <label class="control-label">server-port</label>
                                     <div class="controls">
                                         <input type="text" placeholder="25565" class="span2" ng-model="serverform.server_port">
@@ -468,7 +478,7 @@
                                 </div><!--/ Input Text Placeholder -->
 
                                 <!-- Input Text Placeholder -->
-                                <div class="control-group">
+                                <div class="control-group" ng-hide="unconventional">
                                     <label class="control-label">server-ip</label>
                                     <div class="controls">
                                         <input type="text" placeholder="0.0.0.0" class="span2" ng-model="serverform.server_ip">
@@ -476,7 +486,7 @@
                                 </div><!--/ Input Text Placeholder -->
 
                                 <!-- Input Text Placeholder -->
-                                <div class="control-group">
+                                <div class="control-group" ng-hide="unconventional">
                                     <label class="control-label">max-players</label>
                                     <div class="controls">
                                         <input type="text" placeholder="20" class="span2" ng-model="serverform.max_players">
@@ -484,7 +494,7 @@
                                 </div><!--/ Input Text Placeholder -->
 
                                 <!-- Input Text Placeholder -->
-                                <div class="control-group">
+                                <div class="control-group" ng-hide="unconventional">
                                     <label class="control-label">level-name</label>
                                     <div class="controls">
                                         <input type="text" placeholder="world" class="span2" ng-model="serverform.level_name">
@@ -492,7 +502,7 @@
                                 </div><!--/ Input Text Placeholder -->
 
                                 <!-- Input Text Placeholder -->
-                                <div class="control-group">
+                                <div class="control-group" ng-hide="unconventional">
                                     <label class="control-label">level-seed</label>
                                     <div class="controls">
                                         <input type="text" placeholder="" class="span2" ng-model="serverform.level_seed">
@@ -500,7 +510,7 @@
                                 </div><!--/ Input Text Placeholder -->
 
                                 <!-- Select -->
-                                <div class="control-group">
+                                <div class="control-group" ng-hide="unconventional">
                                     <label class="control-label">difficulty</label>
                                     <div class="controls">
                                         <select class="span2" ng-model="serverform.difficulty">
@@ -513,7 +523,7 @@
                                 </div><!--/ Select -->
 
                                 <!-- Select -->
-                                <div class="control-group">
+                                <div class="control-group" ng-hide="unconventional">
                                     <label class="control-label">gamemode</label>
                                     <div class="controls">
                                         <select class="span2" ng-model="serverform.gamemode">
@@ -525,7 +535,7 @@
                                 </div><!--/ Select -->
 
                                 <!-- Select -->
-                                <div class="control-group">
+                                <div class="control-group" ng-hide="unconventional">
                                     <label class="control-label">level-type</label>
                                     <div class="controls">
                                         <input type="text" placeholder="DEFAULT" class="span2" ng-model="serverform.level_type">
@@ -533,7 +543,7 @@
                                 </div><!--/ Select -->
 
                                 <!-- Default Checkbox -->
-                                    <div class="control-group">
+                                    <div class="control-group" ng-hide="unconventional">
                                     <label class="control-label">generate-structures</label>
                                     <div class="controls">
                                         <label class="checkbox">

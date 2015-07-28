@@ -45,6 +45,7 @@
 
   "SERVER_NAME": "Server Name",
   "CREATE_HELP": "Only letters, numbers and underscores.",
+  "UNCONVENTIONAL_SERVER_TYPE": "This is an unconventional server, such as a proxy/load balancing server.", 
 
   "OFFICIAL_MOJANG_SERVER_JARS": "Official Mojang Server Jars",
   "AVAILABLE_SERVER_JARS": "Available Server Jars/Packs",
