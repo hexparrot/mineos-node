@@ -181,6 +181,19 @@ server.backend = function(base_dir, socket_emitter) {
               logging.error(err);
           })
           break;
+        case 'create_unconventional_server':
+          var instance = new mineos.mc(args.server_name, base_dir);
+
+          async.series([
+            async.apply(instance.verify, '!exists'),
+            async.apply(instance.create_unconventional_server, OWNER_CREDS),
+          ], function(err, results) {
+            if (!err)
+              logging.info('[{0}] Server (unconventional) created in filesystem.'.format(args.server_name));
+            else
+              logging.error(err);
+          })
+          break;
         case 'download':
           function progress_emitter(args) {
             self.front_end.emit('file_progress', args);

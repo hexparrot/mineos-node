@@ -327,17 +327,26 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     var server_name = serverform['server_name'];
     var hyphenated = {};
 
-    delete serverform['server_name'];
+    if ($scope.unconventional) {
+      socket.emit('/', 'command', {
+        'command': 'create_unconventional_server',
+        'server_name': server_name,
+        'properties': hyphenated
+      });
+    } else {
+      delete serverform['server_name'];
 
-    for (var prop in serverform) 
-      if (serverform.hasOwnProperty(prop)) 
-        hyphenated[prop.split("_").join("-")] = serverform[prop]; //replace _ with -
+      for (var prop in serverform) 
+        if (serverform.hasOwnProperty(prop)) 
+          hyphenated[prop.split("_").join("-")] = serverform[prop]; //replace _ with -
 
-    socket.emit('/', 'command', {
-      'command': 'create',
-      'server_name': server_name,
-      'properties': hyphenated
-    });
+      socket.emit('/', 'command', {
+        'command': 'create',
+        'server_name': server_name,
+        'properties': hyphenated
+      });
+    }
+  
 
     $scope.change_page('dashboard', server_name);
   }
