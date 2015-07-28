@@ -328,6 +328,7 @@ function server_container(server_name, base_dir, socket_io) {
     fw.add('**/cron.config');
     fw.add('**/eula.txt');
     fw.add('**/server-icon.png');
+    fw.add('**/config.yml');
     
     function handle_event(fp) {
       var FS_DELAY = 250; 
@@ -351,6 +352,9 @@ function server_container(server_name, base_dir, socket_io) {
           break;
         case 'server-icon.png':
           setTimeout(broadcast_icon, FS_DELAY);
+          break;
+        case 'config.yml':
+          setTimeout(broadcast_cy, FS_DELAY);
           break;
       }
     }
@@ -492,6 +496,16 @@ function server_container(server_name, base_dir, socket_io) {
     fs.readFile(filepath, function(err, data) {
       if (!err && data.toString('hex',0,4) == '89504e47') //magic number for png first 4B
         nsp.emit('server-icon.png', new Buffer(data).toString('base64'));
+    });
+  }
+
+  function broadcast_cy() {
+    // function to broadcast raw config.yml from bungeecord
+    var fs = require('fs');
+    var filepath = path.join(instance.env.cwd, 'config.yml');
+    fs.readFile(filepath, function(err, data) {
+      if (!err)
+        nsp.emit('config.yml', new Buffer(data).toString());
     });
   }
 
@@ -836,6 +850,7 @@ function server_container(server_name, base_dir, socket_io) {
         socket.on('server.config', broadcast_sc);
         socket.on('cron.config', broadcast_cc);
         socket.on('server-icon.png', broadcast_icon);
+        socket.on('config.yml', broadcast_cy);
         socket.on('req_server_activity', broadcast_notices);
       }
     })

@@ -191,7 +191,16 @@
                                     <li class="accordion-group" ng-show="current && !servers[current].sc.minecraft.unconventional">
                                         <a ng-click="change_page('server_properties')">
                                             <span class="icon iconm-pencil-5"></span>
-                                            <span class="text" translate="SERVER.PROPERTIES"></span>
+                                            <span class="text">server.properties</span>
+                                        </a>
+                                    </li>
+                                    <!--/ END Menu -->
+
+                                    <!-- START Menu -->
+                                    <li class="accordion-group" ng-show="current && servers[current].cy">
+                                        <a ng-click="change_page('config_yml')">
+                                            <span class="icon iconm-pencil-5"></span>
+                                            <span class="text">config.yml</span>
                                         </a>
                                     </li>
                                     <!--/ END Menu -->
@@ -1272,6 +1281,29 @@
                                                 ng-model-options="{ updateOn: 'default blur', debounce: {'default': 1500, 'blur': 0} }">
                                         </div>
                                     </div><!--/ Read Only -->
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Default Widget -->
+                    </div>
+                    <!--/ END Row -->
+
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content - CONFIG_YML -->
+                <div class="container-fluid" ng-show="page == 'config_yml'">
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Default Widget -->
+                        <div class="span12 widget">
+                            <header>
+                                <h4 class="title"><span class="icon icone-edit"></span> config.yml</h4>
+                            </header>
+                            <section class="body">
+                                <div class="body-inner">
+                                    <textarea class="span10 monospace" rows="20" ng-model="servers[current].cy" readonly></textarea>
                                 </div>
                             </section>
                         </div>

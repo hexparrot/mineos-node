@@ -13,3 +13,7 @@ table tbody tr a {
 .widget p a {
     cursor: help;
 }
+
+.monospace {
+	font-family:monospace;
+}
