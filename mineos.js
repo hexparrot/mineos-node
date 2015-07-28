@@ -449,7 +449,7 @@ mineos.mc = function(server_name, base_dir) {
 
   self.get_start_args = function(callback) {
 
-    function type_jar(inner_callback) {
+    function type_jar_unconventional (inner_callback) {
       var java_binary = which.sync('java');
 
       async.series({
@@ -461,28 +461,17 @@ mineos.mc = function(server_name, base_dir) {
         },
         'xmx': function (cb) {
           self.sc(function (err, dict) {
-            var unconventional = (dict.minecraft || {}).unconventional;
             var value = parseInt((dict.java || {}).java_xmx) || 0;
             
-            if (unconventional)
-              cb((value >= 0 ? null : 'XMX heapsize must be positive integer >= 0'), value);
-            else
-              cb((value > 0 ? null : 'XMX heapsize must be positive integer > 0'), value);
+            cb((value >= 0 ? null : 'XMX heapsize must be positive integer >= 0'), value);
           });
         },
         'xms': function (cb) {
           self.sc(function (err, dict) {
-            var unconventional = (dict.minecraft || {}).unconventional;
+            var xmx = parseInt((dict.java || {}).java_xmx) || 0;
+            var xms = parseInt((dict.java || {}).java_xms) || 0;
 
-            if (unconventional) {
-              var xmx = parseInt((dict.java || {}).java_xmx) || 0;
-              var xms = parseInt((dict.java || {}).java_xms) || 0;
-              cb((xmx >= xms && xms >= 0 ? null : 'XMS heapsize must be positive integer where XMX >= XMS >= 0'), xms);
-            } else {
-              var xmx = parseInt((dict.java || {}).java_xmx) || 0;
-              var xms = parseInt((dict.java || {}).java_xms) || xmx;
-              cb((xmx >= xms && xms > 0 ? null : 'XMS heapsize must be positive integer where XMX >= XMS > 0'), xms);
-            }
+            cb((xmx >= xms && xms >= 0 ? null : 'XMS heapsize must be positive integer where XMX >= XMS >= 0'), xms);
           });
         },
         'jarfile': function (cb) {
@@ -513,15 +502,72 @@ mineos.mc = function(server_name, base_dir) {
           var args = ['-dmS', 'mc-{0}'.format(self.server_name)];
           args.push.apply(args, [results.binary, '-server']);
 
-          if (results.xmx == 0 || results.xms == 0) { //only passes previous test if unconventional
-            if (results.xmx > 0)
-              args.push('-Xmx{0}M'.format(results.xmx));
-            if (results.xms > 0)
-              args.push('-Xms{0}M'.format(results.xms));
-          } else {
-            args.push.apply(args, ['-Xmx{0}M'.format(results.xmx), '-Xms{0}M'.format(results.xms)]);
-          }
+          if (results.xmx > 0)
+            args.push('-Xmx{0}M'.format(results.xmx));
+          if (results.xms > 0)
+            args.push('-Xms{0}M'.format(results.xms));
           
+          if (results.java_tweaks)
+            args.push(results.java_tweaks);
+          args.push.apply(args, ['-jar', results.jarfile, results.jar_args]);
+
+          inner_callback(null, args);
+        }
+      })
+    }
+
+    function type_jar(inner_callback) {
+      var java_binary = which.sync('java');
+
+      async.series({
+        'binary': function (cb) {
+          self.sc(function (err, dict) {
+            var value = (dict.java || {}).java_binary || java_binary;
+            cb((value.length ? null : 'No java binary assigned for server.'), value);
+          });
+        },
+        'xmx': function (cb) {
+          self.sc(function (err, dict) {
+            var value = parseInt((dict.java || {}).java_xmx) || 0;
+
+            cb((value > 0 ? null : 'XMX heapsize must be positive integer > 0'), value);
+          });
+        },
+        'xms': function (cb) {
+          self.sc(function (err, dict) {
+            var xmx = parseInt((dict.java || {}).java_xmx) || 0;
+            var xms = parseInt((dict.java || {}).java_xms) || xmx;
+            cb((xmx >= xms && xms > 0 ? null : 'XMS heapsize must be positive integer where XMX >= XMS > 0'), xms);
+          });
+        },
+        'jarfile': function (cb) {
+          self.sc(function (err, dict) {
+            var jarfile = (dict.java || {}).jarfile;
+            if (!jarfile)
+              cb('Server not assigned a runnable jar');
+            else
+              cb(null, jarfile);
+          });
+        },
+        'jar_args': function (cb) {
+          self.sc(function (err, dict) {
+            var value = (dict.java || {}).jar_args || 'nogui';
+            cb(null, value);
+          });
+        },
+        'java_tweaks': function (cb) {
+          self.sc(function (err, dict) {
+            var value = (dict.java || {}).java_tweaks || null;
+            cb(null, value);
+          });
+        }
+      }, function(err, results) {
+        if (err) {
+          inner_callback(err, {});
+        } else {
+          var args = ['-dmS', 'mc-{0}'.format(self.server_name)];
+          args.push.apply(args, [results.binary, '-server', '-Xmx{0}M'.format(results.xmx), '-Xms{0}M'.format(results.xms)]);
+
           if (results.java_tweaks)
             args.push(results.java_tweaks);
           args.push.apply(args, ['-jar', results.jarfile, results.jar_args]);
@@ -559,11 +605,16 @@ mineos.mc = function(server_name, base_dir) {
       async.apply(self.sc),
       function(sc_data, cb) {
         var jarfile = (sc_data.java || {}).jarfile;
+        var unconventional = (sc_data.minecraft || {}).unconventional;
+
         if (!jarfile)
           cb('Cannot start server without a designated jar/phar.', null);
-        else if (jarfile.slice(-4).toLowerCase() == '.jar')
-          type_jar(cb);
-        else if (jarfile.slice(-5).toLowerCase() == '.phar')
+        else if (jarfile.slice(-4).toLowerCase() == '.jar') {
+          if (unconventional)
+            type_jar_unconventional(cb);
+          else
+            type_jar(cb);
+        } else if (jarfile.slice(-5).toLowerCase() == '.phar')
           type_phar(cb);
       }
     ], callback)
