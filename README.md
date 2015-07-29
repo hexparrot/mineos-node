@@ -86,13 +86,14 @@ The Angular.JS-based web user interface capable of:
 * delete previous archives and restore poitns to free up space
 * restore server from previous restore point
 * see filesystem usage of live server files, archives, and restore points
-* easy selection of server packs from FTB or Mojang official jars
 * authentication via shadow passwords (/etc/shadow) of underlying Linux system
 * logs all user actions to file
 * cronjobs saved to portable format cron.config
 * server can be daemonized to background
 * upstart/supervisord restart process on unhandled exceptions
+* easy selection of server packs from FTB or Mojang official jars
 * PHAR support for Pocketmine servers
+* Support for BungeeCord servers
 
 TODO
 -------
