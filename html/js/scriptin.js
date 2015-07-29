@@ -127,20 +127,7 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
 
   $scope.$watch(function(scope) { return scope.current },
     function() {
-      if ($scope.current && 'sc' in $scope.servers[$scope.current]) {
-        var sc = $scope.servers[$scope.current].sc || {};
-        $scope.broadcast_to_lan = (sc.minecraft || {}).broadcast;
-        $scope.onrebootstart = (sc.onreboot || {}).start;
-        $scope.unconventional_server = (sc.minecraft || {}).unconventional;
-
-        $('#broadcast').prop('checked', $scope.broadcast_to_lan );
-        $('#onrebootstart').prop('checked', $scope.onrebootstart );
-        $('#unconventional').prop('checked', $scope.unconventional_server );
-      }
-
-      $scope.delete_archive = false;
-      $scope.delete_backup = false;
-      $scope.delete_servers = false;
+      $scope.refresh_checkboxes();
         
       if (!($scope.current in Servers))
         $scope.change_page('dashboard');
@@ -424,6 +411,27 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
       } catch (e) {}
     }
     $('#calendar').fullCalendar('destroy').fullCalendar({events: events });
+  }
+
+  $scope.refresh_checkboxes = function() {
+    try {
+      var sc = $scope.servers[$scope.current].sc;
+      $scope.broadcast_to_lan = (sc.minecraft || {}).broadcast;
+      $scope.onrebootstart = (sc.onreboot || {}).start;
+      $scope.unconventional_server = (sc.minecraft || {}).unconventional;
+    } catch (e) {
+      $scope.broadcast_to_lan = false;
+      $scope.onrebootstart = false;
+      $scope.unconventional_server = false;
+    }
+      
+    $('#broadcast').prop('checked', $scope.broadcast_to_lan );
+    $('#onrebootstart').prop('checked', $scope.onrebootstart );
+    $('#unconventional').prop('checked', $scope.unconventional_server );
+
+    $scope.delete_archive = false;
+    $scope.delete_backup = false;
+    $scope.delete_servers = false;
   }
 
   $scope.change_page = function(page, server_name) {
