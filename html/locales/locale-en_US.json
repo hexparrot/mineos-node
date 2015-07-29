@@ -45,6 +45,7 @@
 
   "SERVER_NAME": "Server Name",
   "CREATE_HELP": "Only letters, numbers and underscores.",
+  "UNCONVENTIONAL_SERVER_TYPE": "This is an unconventional server, such as a proxy/load balancing server.", 
 
   "OFFICIAL_MOJANG_SERVER_JARS": "Official Mojang Server Jars",
   "AVAILABLE_SERVER_JARS": "Available Server Jars/Packs",
@@ -74,6 +75,7 @@
   "KILL": "Kill",
   "BROADCAST_TO_LAN": "Broadcast to LAN",
   "START_ON_BOOT": "Start server on boot",
+  "UNCONVENTIONAL_SERVER": "This is not a conventional Minecraft server",
   "COPY_PROFILE": "Copy profile to live server files",
 
   "JAVA_SETTINGS": "Java Settings",

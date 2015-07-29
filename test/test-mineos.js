@@ -441,6 +441,69 @@ test.get_start_args_phar = function(test) {
   })
 }
 
+test.get_start_args_unconventional = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create_unconventional_server, OWNER_CREDS),
+    async.apply(instance.modify_sc, 'minecraft', 'unconventional', true),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(!err); //expected error
+        test.equal(err, 'Cannot start server without a designated jar/phar.');
+        test.equal(args, null);
+        callback(!err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'BungeeCord-1078.jar'),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2].slice(-4), 'java');
+        test.equal(args[3], '-server');
+        test.equal(args[4], '-jar');
+        test.equal(args[5], 'BungeeCord-1078.jar');
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'java_xmx', 256),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2].slice(-4), 'java');
+        test.equal(args[3], '-server');
+        test.equal(args[4], '-Xmx256M');
+        test.equal(args[5], '-jar');
+        test.equal(args[6], 'BungeeCord-1078.jar');
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'java_xms', 128),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2].slice(-4), 'java');
+        test.equal(args[3], '-server');
+        test.equal(args[4], '-Xmx256M');
+        test.equal(args[5], '-Xms128M');
+        test.equal(args[6], '-jar');
+        test.equal(args[7], 'BungeeCord-1078.jar');
+        callback(err);
+      })
+    }
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
 test.start = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
@@ -908,6 +971,13 @@ test.properties = function(test) {
       })
     },
     function(callback) {
+      instance.property('unconventional', function(err, retval) {
+        test.ifError(err);
+        test.equal(retval, false);
+        callback(err);
+      })
+    },
+    function(callback) {
       setTimeout(function() {
         instance.kill(function(err) {
           test.ifError(err);
@@ -917,7 +987,6 @@ test.properties = function(test) {
     }
   ], function(err) {
     test.ifError(err);
-    test.expect(48);
     test.done();
   })
 }
@@ -2075,4 +2144,63 @@ test.list_increments = function(test) {
     test.expect(13);
     test.done();
   })  
+}
+
+test.create_unconventional_server = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  test.equal(mineos.server_list(BASE_DIR).length, 0);
+
+  async.series([
+    async.apply(instance.create_unconventional_server, OWNER_CREDS),
+    async.apply(fs.stat, instance.env.cwd),
+    async.apply(fs.stat, instance.env.bwd),
+    async.apply(fs.stat, instance.env.awd),
+    async.apply(fs.stat, instance.env.sp),
+    async.apply(fs.stat, instance.env.sc),
+    async.apply(fs.stat, instance.env.cc),
+    function(callback) {
+      test.equal(fs.statSync(instance.env.cwd).uid, OWNER_CREDS['uid']);
+      test.equal(fs.statSync(instance.env.bwd).uid, OWNER_CREDS['uid']);
+      test.equal(fs.statSync(instance.env.awd).uid, OWNER_CREDS['uid']);
+      test.equal(fs.statSync(instance.env.sp).uid, OWNER_CREDS['uid']);
+      test.equal(fs.statSync(instance.env.sc).uid, OWNER_CREDS['uid']);
+      test.equal(fs.statSync(instance.env.cc).uid, OWNER_CREDS['uid']);
+
+      test.equal(fs.statSync(instance.env.cwd).gid, OWNER_CREDS['gid']);
+      test.equal(fs.statSync(instance.env.bwd).gid, OWNER_CREDS['gid']);
+      test.equal(fs.statSync(instance.env.awd).gid, OWNER_CREDS['gid']);
+      test.equal(fs.statSync(instance.env.sp).gid, OWNER_CREDS['gid']);
+      test.equal(fs.statSync(instance.env.sc).gid, OWNER_CREDS['gid']);
+      test.equal(fs.statSync(instance.env.cc).gid, OWNER_CREDS['gid']);
+
+      test.equal(oct2dec(fs.statSync(instance.env.sp).mode), 664);
+      test.equal(oct2dec(fs.statSync(instance.env.sc).mode), 664);
+      test.equal(oct2dec(fs.statSync(instance.env.cc).mode), 664);
+
+      test.equal(mineos.server_list(BASE_DIR)[0], server_name);
+      test.equal(mineos.server_list(BASE_DIR).length, 1);
+
+      instance.sc(function(err, dict) {
+        test.equal(Object.keys(dict).length, 1);
+        test.equal(dict.minecraft.unconventional, true);
+      })
+
+      instance.sp(function(err, dict) {
+        test.equal(Object.keys(dict).length, 0);
+      })
+
+      callback();
+    },
+    function(callback) {
+      instance.create_unconventional_server(OWNER_CREDS, function(err){
+        test.ifError(!err);
+        callback(!err);
+      })
+    }
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
 }

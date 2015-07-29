@@ -28,7 +28,6 @@
 
     <!-- Stylesheet(Plugins) -->
     <link rel="stylesheet" href="assets/jui/css/jquery-ui-1.10.3.min.css">
-    <link rel="stylesheet" href="assets/icheck/css/jquery.icheck.min.css">
     <link rel="stylesheet" href="assets/select2/css/select2.min.css">
     <link rel="stylesheet" href="assets/formvalidation/validationengine/css/jquery.validationEngine.min.css">
     <link rel="stylesheet" href="assets/fullcalendar/css/fullcalendar.min.css">
@@ -188,10 +187,19 @@
                                     <!--/ END Menu -->
 
                                     <!-- START Menu -->
-                                    <li class="accordion-group" ng-show="current">
+                                    <li class="accordion-group" ng-show="current && !servers[current].sc.minecraft.unconventional">
                                         <a ng-click="change_page('server_properties')">
                                             <span class="icon iconm-pencil-5"></span>
-                                            <span class="text" translate="SERVER.PROPERTIES"></span>
+                                            <span class="text">server.properties</span>
+                                        </a>
+                                    </li>
+                                    <!--/ END Menu -->
+
+                                    <!-- START Menu -->
+                                    <li class="accordion-group" ng-show="current && servers[current].cy">
+                                        <a ng-click="change_page('config_yml')">
+                                            <span class="icon iconm-pencil-5"></span>
+                                            <span class="text">config.yml</span>
                                         </a>
                                     </li>
                                     <!--/ END Menu -->
@@ -247,7 +255,16 @@
                                             <span class="text">server.log</span>
                                         </a>
                                     </li>
-                                    <!--/ END Menu -->  
+                                    <!--/ END Menu -->
+
+                                    <!-- START Menu -->
+                                    <li class="accordion-group" ng-show="current && servers[current].live_logs['proxy.log.0'].length">
+                                        <a ng-click="change_page('console3')">
+                                            <span class="icon icone-desktop"></span>
+                                            <span class="text">proxy.log.0</span>
+                                        </a>
+                                    </li>
+                                    <!--/ END Menu -->
                                 </ul>
                             </nav>
                             <!--/ END Sidebar Menu -->
@@ -403,7 +420,7 @@
                                                     <a ng-click="$parent.change_page('server_status', server_name)">{{ server_name }}</a>
                                                 </td>
                                                 <td><a ng-attr-title="{{ 'MC Protocol: ' + instance.heartbeat.ping.protocol }}">{{ instance.sc.minecraft.profile }}</a></td>
-                                                <td class="hidden-phone">{{ instance.sp['server-port'] }}</td>
+                                                <td class="hidden-phone">{{ (instance.sc.minecraft.unconventional ? '-----' : instance.sp['server-port']) }}</td>
                                                 <td><span class="label" ng-show="instance.heartbeat" ng-class="{'label-success': instance.heartbeat.up, 'label-important': !instance.heartbeat.up}">{{ instance.heartbeat.up ? 'up' : 'down' }}</span></td>
                                                 <td>{{ instance.heartbeat.memory.VmRSS }}</td>
                                             </tr>
@@ -441,8 +458,18 @@
                                     </div>
                                 </div><!--/ Help Text -->
 
+                                <!-- Default Checkbox -->
+                                    <div class="control-group">
+                                    <label class="control-label"></label>
+                                    <div class="controls">
+                                        <label class="checkbox">
+                                            <input type="checkbox" class="nostyle" value="true" ng-model="unconventional"> {{ 'UNCONVENTIONAL_SERVER_TYPE' | translate}}
+                                        </label>
+                                    </div>
+                                </div><!--/ Default Checkbox -->
+
                                 <!-- Input Text Placeholder -->
-                                <div class="control-group">
+                                <div class="control-group" ng-hide="unconventional">
                                     <label class="control-label">server-port</label>
                                     <div class="controls">
                                         <input type="text" placeholder="25565" class="span2" ng-model="serverform.server_port">
@@ -450,7 +477,7 @@
                                 </div><!--/ Input Text Placeholder -->
 
                                 <!-- Input Text Placeholder -->
-                                <div class="control-group">
+                                <div class="control-group" ng-hide="unconventional">
                                     <label class="control-label">server-ip</label>
                                     <div class="controls">
                                         <input type="text" placeholder="0.0.0.0" class="span2" ng-model="serverform.server_ip">
@@ -458,7 +485,7 @@
                                 </div><!--/ Input Text Placeholder -->
 
                                 <!-- Input Text Placeholder -->
-                                <div class="control-group">
+                                <div class="control-group" ng-hide="unconventional">
                                     <label class="control-label">max-players</label>
                                     <div class="controls">
                                         <input type="text" placeholder="20" class="span2" ng-model="serverform.max_players">
@@ -466,7 +493,7 @@
                                 </div><!--/ Input Text Placeholder -->
 
                                 <!-- Input Text Placeholder -->
-                                <div class="control-group">
+                                <div class="control-group" ng-hide="unconventional">
                                     <label class="control-label">level-name</label>
                                     <div class="controls">
                                         <input type="text" placeholder="world" class="span2" ng-model="serverform.level_name">
@@ -474,7 +501,7 @@
                                 </div><!--/ Input Text Placeholder -->
 
                                 <!-- Input Text Placeholder -->
-                                <div class="control-group">
+                                <div class="control-group" ng-hide="unconventional">
                                     <label class="control-label">level-seed</label>
                                     <div class="controls">
                                         <input type="text" placeholder="" class="span2" ng-model="serverform.level_seed">
@@ -482,7 +509,7 @@
                                 </div><!--/ Input Text Placeholder -->
 
                                 <!-- Select -->
-                                <div class="control-group">
+                                <div class="control-group" ng-hide="unconventional">
                                     <label class="control-label">difficulty</label>
                                     <div class="controls">
                                         <select class="span2" ng-model="serverform.difficulty">
@@ -495,7 +522,7 @@
                                 </div><!--/ Select -->
 
                                 <!-- Select -->
-                                <div class="control-group">
+                                <div class="control-group" ng-hide="unconventional">
                                     <label class="control-label">gamemode</label>
                                     <div class="controls">
                                         <select class="span2" ng-model="serverform.gamemode">
@@ -507,7 +534,7 @@
                                 </div><!--/ Select -->
 
                                 <!-- Select -->
-                                <div class="control-group">
+                                <div class="control-group" ng-hide="unconventional">
                                     <label class="control-label">level-type</label>
                                     <div class="controls">
                                         <input type="text" placeholder="DEFAULT" class="span2" ng-model="serverform.level_type">
@@ -515,7 +542,7 @@
                                 </div><!--/ Select -->
 
                                 <!-- Default Checkbox -->
-                                    <div class="control-group">
+                                    <div class="control-group" ng-hide="unconventional">
                                     <label class="control-label">generate-structures</label>
                                     <div class="controls">
                                         <label class="checkbox">
@@ -614,6 +641,7 @@
                                                         <option value="ftb_third_party">FTB-3rd Party</option>
                                                         <option value="pocketmine">Pocketmine</option>
                                                         <option value="php">Pocketmine-php</option>
+                                                        <option value="bungeecord">BungeeCord</option>
                                                         <option value="all">Show All</option>
                                                     </select>
                                                 </td>
@@ -688,7 +716,7 @@
                                                     </figure><!--/ END Summary -->
 
                                                     <!-- START Circular -->
-                                                    <figure class="stats summary stacked circular">
+                                                    <figure class="stats summary stacked circular" ng-hide="servers[current].sc.minecraft.unconventional">
                                                         <div id="capacity_gauge" class="gauge gauge-red" data-percent="0">
                                                             <span class="icon icone-exchange"></span>
                                                         </div>
@@ -706,7 +734,7 @@
                                                     </figure><!--/ END Summary -->
 
                                                     <!-- START Summary -->
-                                                    <figure class="stats summary stacked">
+                                                    <figure class="stats summary stacked" ng-hide="servers[current].sc.minecraft.unconventional">
                                                         <div class="icon circle blue"><span class="icone-cogs"></span></div>
                                                         <figcaption>
                                                             <h4>{{ servers[current].heartbeat.ping.server_version }}&nbsp;<small translate="REPORTED_VERSION"></small></h4>
@@ -744,19 +772,34 @@
 
                                                     <div class="span6">
                                                         <div class="btn-group btn-block">
-                                                            <button class="btn btn-danger span4" ng-disabled="!servers[current].heartbeat.up" ng-click="server_command('stop')" translate="STOP"></button>
-                                                            <button class="btn btn-danger dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
-                                                            <ul class="dropdown-menu">
-                                                                <li><a href="#" ng-click="server_command('stop')" translate="STOP" ng-disabled="!servers[current].heartbeat.up"></a></li>
-                                                                <li><a href="#" ng-click="server_command('stop_and_backup')" translate="STOP_AND_BACKUP"></a></li>
-                                                                <li><a href="#" ng-click="server_command('restart')" translate="RESTART"></a></li>
-                                                                <li><a href="#" ng-click="server_command('kill')" translate="KILL" ng-disabled="!servers[current].heartbeat.up"></a></li>
+                                                            <button class="btn btn-danger span4" translate="STOP"
+                                                                    ng-disabled="!servers[current].heartbeat.up" 
+                                                                    ng-click="server_command('stop')"
+                                                                    ng-hide="servers[current].sc.minecraft.unconventional"
+                                                                    ></button>
+                                                            <button class="btn btn-danger span4" translate="KILL"
+                                                                    ng-disabled="!servers[current].heartbeat.up" 
+                                                                    ng-click="server_command('kill')" 
+                                                                    ng-hide="!servers[current].sc.minecraft.unconventional"
+                                                                    ></button>
+                                                            <button class="btn btn-danger dropdown-toggle" data-toggle="dropdown" ng-hide="servers[current].sc.minecraft.unconventional"><span class="caret"></span></button>
+                                                            <ul class="dropdown-menu" ng-hide="servers[current].sc.minecraft.unconventional">
+                                                                <li><a href="#" translate="STOP"
+                                                                       ng-click="server_command('stop')" 
+                                                                       ng-disabled="!servers[current].heartbeat.up"></a></li>
+                                                                <li><a href="#" translate="STOP_AND_BACKUP"
+                                                                       ng-click="server_command('stop_and_backup')"></a></li>
+                                                                <li><a href="#" translate="RESTART"
+                                                                       ng-click="server_command('restart')"></a></li>
+                                                                <li><a href="#" translate="KILL" 
+                                                                       ng-click="server_command('kill')"
+                                                                       ng-disabled="!servers[current].heartbeat.up"></a></li>
                                                             </ul>
                                                         </div>
                                                     </div>
 
                                                     <div class="span2">
-                                                        <button type="button" class="btn span12" ng-click="modals.open_accept_eula()" translate="ACCEPT_EULA" ng-class="{'btn-default': servers[current].page_data.glance.eula != false, 'btn-primary': servers[current].page_data.glance.eula == false}"></button>
+                                                        <button type="button" class="btn span12" ng-click="modals.open_accept_eula()" translate="ACCEPT_EULA" ng-class="{'btn-default': servers[current].page_data.glance.eula != false, 'btn-primary': servers[current].page_data.glance.eula == false}" ng-hide="servers[current].sc.minecraft.unconventional"></button>
                                                     </div>
 
                                                     <div class="clearfix"></div><div class="span12"></div>
@@ -778,10 +821,13 @@
                                                         </div>
                                                     </div><!--/ Select -->
                                                     <label class="checkbox">
-                                                        <input icheck id="broadcast" class="icheck" type="checkbox" ng-model="broadcast_to_lan"> {{ 'BROADCAST_TO_LAN' | translate }}
+                                                        <input id="broadcast" type="checkbox" ng-model="broadcast_to_lan" ng-change="change_sc('minecraft', 'broadcast', broadcast_to_lan || 'false')"> {{ 'BROADCAST_TO_LAN' | translate }}
                                                     </label>
                                                     <label class="checkbox">
-                                                        <input icheck id="onrebootstart" class="icheck" type="checkbox" ng-model="onrebootstart"> {{ 'START_ON_BOOT' | translate }}
+                                                        <input id="onrebootstart" type="checkbox" ng-model="onrebootstart" ng-change="change_sc('onreboot', 'start', onrebootstart || 'false')"> {{ 'START_ON_BOOT' | translate }}
+                                                    </label>
+                                                    <label class="checkbox">
+                                                        <input id="unconventional"  type="checkbox" ng-model="unconventional_server" ng-change="change_sc('minecraft', 'unconventional', unconventional_server || 'false')"> {{ 'UNCONVENTIONAL_SERVER' | translate }}
                                                     </label>
 
                                                 </div>
@@ -963,13 +1009,13 @@
                                                     <div class="control-group">
                                                         <div class="controls">
                                                             <label class="checkbox">
-                                                                <input icheck class="icheck" type="checkbox" ng-model="delete_archive"> {{ 'DELETE_ARCHIVES' | translate }} {{ '{0}/{1}/{2}'.format(servers[current].page_data.glance.base_dir, 'archive', current) }}
+                                                                <input type="checkbox" ng-model="delete_archive"> {{ 'DELETE_ARCHIVES' | translate }} {{ '{0}/{1}/{2}'.format(servers[current].page_data.glance.base_dir, 'archive', current) }}
                                                             </label>
                                                             <label class="checkbox">
-                                                                <input icheck class="icheck" type="checkbox" ng-model="delete_backup"> {{ 'DELETE_RESTORE_POINTS' | translate }} {{ '{0}/{1}/{2}'.format(servers[current].page_data.glance.base_dir, 'backup', current) }}
+                                                                <input type="checkbox" ng-model="delete_backup"> {{ 'DELETE_RESTORE_POINTS' | translate }} {{ '{0}/{1}/{2}'.format(servers[current].page_data.glance.base_dir, 'backup', current) }}
                                                             </label>
                                                             <label class="checkbox">
-                                                                <input icheck class="icheck" type="checkbox" ng-model="delete_servers"> {{ 'DELETE_LIVE_FILES' | translate }} {{ '{0}/{1}/{2}'.format(servers[current].page_data.glance.base_dir, 'servers', current) }}
+                                                                <input type="checkbox" ng-model="delete_servers"> {{ 'DELETE_LIVE_FILES' | translate }} {{ '{0}/{1}/{2}'.format(servers[current].page_data.glance.base_dir, 'servers', current) }}
                                                             </label>
                                                         </div>
                                                         <button type="button" class="btn btn-mini btn-danger" ng-disabled="!(delete_servers && delete_backup && delete_archive && !servers[current].heartbeat.up)" ng-click="server_command('delete')"><span class="icone-warning-sign"></span> {{ 'DELETE' | translate }}</button>
@@ -1254,6 +1300,29 @@
                 </div>
                 <!--/ END Content -->
 
+                <!-- START Content - CONFIG_YML -->
+                <div class="container-fluid" ng-show="page == 'config_yml'">
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Default Widget -->
+                        <div class="span12 widget">
+                            <header>
+                                <h4 class="title"><span class="icon icone-edit"></span> config.yml</h4>
+                            </header>
+                            <section class="body">
+                                <div class="body-inner">
+                                    <textarea class="span10 monospace" rows="20" ng-model="servers[current].cy" readonly></textarea>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Default Widget -->
+                    </div>
+                    <!--/ END Row -->
+
+                </div>
+                <!--/ END Content -->
+
                 <!-- START Content - CONSOLE -->
                 <div class="container-fluid" ng-show="page == 'console'">
 
@@ -1337,6 +1406,61 @@
                                     <table class="table">
                                         <tbody>
                                             <tr ng-repeat="line in servers[current].live_logs['server.log'] track by $index">
+                                                <td>{{ line }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Basic Table -->
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <div class="body-inner">
+                            <div class="control-group">
+                                <div class="controls">
+                                    <input type="text" class="span12" ng-model="user_input" ng-enter="console_input()">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!--/ END Row -->
+
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content - CONSOLE3 -->
+                <div class="container-fluid" ng-show="page == 'console3'">
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <div class="body-inner">
+                            <div class="control-group">
+                                <div class="controls">
+                                    <input type="text" class="span12" ng-model="user_input" ng-enter="console_input()">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!--/ END Row -->
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Basic Table -->
+                        <div class="span12 widget dark stacked">
+                            <header>
+                                <h4 class="title">proxy.log.0</h4>
+                            </header>
+                            <section class="body">
+                                <div class="body-inner no-padding">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr ng-repeat="line in servers[current].live_logs['proxy.log.0'] track by $index">
                                                 <td>{{ line }}</td>
                                             </tr>
                                         </tbody>
@@ -1499,7 +1623,6 @@
     <script src="assets/easypiechart/js/jquery.easypiechart.min.js"></script>
     <script src="assets/formwizard/js/jquery.formwizard.min.js"></script>
     <script src="assets/fullcalendar/js/fullcalendar.min.js"></script>
-    <script src="assets/icheck/js/jquery.icheck.min.js"></script>
     <script src="assets/ie-placeholder/js/jquery.placeholder.min.js"></script>
     <script src="assets/inputmask/js/jquery.inputmask.min.js"></script>
     <script src="assets/select2/js/select2.min.js"></script>

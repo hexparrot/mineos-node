@@ -32,36 +32,6 @@ app.directive('ngEnter', function () {
   };
 });
 
-app.directive('icheck', function($timeout, $parse) {
-  //http://stackoverflow.com/q/19346523/1191579
-  return {
-    link: function($scope, element, $attrs) {
-      return $timeout(function() {
-        var ngModelGetter, value;
-        ngModelGetter = $parse($attrs['ngModel']);
-        value = $parse($attrs['ngValue'])($scope);
-        return $(element).iCheck({
-          checkboxClass: 'icheckbox_minimal',
-          radioClass: 'iradio_minimal-grey',
-          checkboxClass: 'icheckbox_minimal-grey',
-          increaseArea: '20%'
-        }).on('ifChanged', function(event) {
-          if ($(element).attr('type') === 'checkbox' && $attrs['ngModel']) {
-            $scope.$apply(function() {
-                return ngModelGetter.assign($scope, event.target.checked);
-            });
-          }
-          if ($(element).attr('type') === 'radio' && $attrs['ngModel']) {
-            return $scope.$apply(function() {
-                return ngModelGetter.assign($scope, value);
-            });
-          }
-        });
-      });
-    }
-  };
-});  
-
 /* filters */
 
 app.filter('membership', function() {
@@ -155,20 +125,19 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     }
   );
 
-  $scope.$watch(function(scope) { return scope.broadcast_to_lan },
-    function(new_value, previous_value) {
-      $scope.change_sc('minecraft', 'broadcast', new_value);
-    }
-  )
-
-  $scope.$watch(function(scope) { return scope.onrebootstart },
-    function(new_value, previous_value) {
-      $scope.change_sc('onreboot', 'start', new_value);
-    }
-  )
-
   $scope.$watch(function(scope) { return scope.current },
     function() {
+      if ($scope.current && 'sc' in $scope.servers[$scope.current]) {
+        var sc = $scope.servers[$scope.current].sc || {};
+        $scope.broadcast_to_lan = (sc.minecraft || {}).broadcast;
+        $scope.onrebootstart = (sc.onreboot || {}).start;
+        $scope.unconventional_server = (sc.minecraft || {}).unconventional;
+
+        $('#broadcast').prop('checked', $scope.broadcast_to_lan );
+        $('#onrebootstart').prop('checked', $scope.onrebootstart );
+        $('#unconventional').prop('checked', $scope.unconventional_server );
+      }
+        
       if (!($scope.current in Servers))
         $scope.change_page('dashboard');
     }
@@ -321,17 +290,26 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     var server_name = serverform['server_name'];
     var hyphenated = {};
 
-    delete serverform['server_name'];
+    if ($scope.unconventional) {
+      socket.emit('/', 'command', {
+        'command': 'create_unconventional_server',
+        'server_name': server_name,
+        'properties': hyphenated
+      });
+    } else {
+      delete serverform['server_name'];
 
-    for (var prop in serverform) 
-      if (serverform.hasOwnProperty(prop)) 
-        hyphenated[prop.split("_").join("-")] = serverform[prop]; //replace _ with -
+      for (var prop in serverform) 
+        if (serverform.hasOwnProperty(prop)) 
+          hyphenated[prop.split("_").join("-")] = serverform[prop]; //replace _ with -
 
-    socket.emit('/', 'command', {
-      'command': 'create',
-      'server_name': server_name,
-      'properties': hyphenated
-    });
+      socket.emit('/', 'command', {
+        'command': 'create',
+        'server_name': server_name,
+        'properties': hyphenated
+      });
+    }
+  
 
     $scope.change_page('dashboard', server_name);
   }
@@ -530,16 +508,10 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
 
     me.channel.on(server_name, 'server.config', function(data) {
       me['sc'] = data;
-      if ((data.minecraft || {}).broadcast)
-        $('#broadcast').iCheck('check');
-      else
-        $('#broadcast').iCheck('uncheck');
+    })
 
-      if ((data.onreboot || {}).start)
-        $('#onrebootstart').iCheck('check');
-      else
-        $('#onrebootstart').iCheck('uncheck');
-
+    me.channel.on(server_name, 'config.yml', function(data) {
+      me['cy'] = data;
     })
 
     me.channel.on(server_name, 'cron.config', function(data) {
@@ -580,9 +552,11 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
 
     me.channel.emit(server_name, 'server-icon.png');
     me.channel.emit(server_name, 'page_data', 'glance');
+    me.channel.emit(server_name, 'get_file_contents', 'proxy.log.0');
     me.channel.emit(server_name, 'get_file_contents', 'logs/latest.log');
     me.channel.emit(server_name, 'get_file_contents', 'server.log');
     me.channel.emit(server_name, 'req_server_activity');
+    me.channel.emit(server_name, 'config.yml');
     me.channel.emit(server_name, 'cron.config');
     me.channel.emit(server_name, 'server.config');
     me.channel.emit(server_name, 'server.properties');

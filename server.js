@@ -181,6 +181,19 @@ server.backend = function(base_dir, socket_emitter) {
               logging.error(err);
           })
           break;
+        case 'create_unconventional_server':
+          var instance = new mineos.mc(args.server_name, base_dir);
+
+          async.series([
+            async.apply(instance.verify, '!exists'),
+            async.apply(instance.create_unconventional_server, OWNER_CREDS),
+          ], function(err, results) {
+            if (!err)
+              logging.info('[{0}] Server (unconventional) created in filesystem.'.format(args.server_name));
+            else
+              logging.error(err);
+          })
+          break;
         case 'download':
           function progress_emitter(args) {
             self.front_end.emit('file_progress', args);
@@ -317,6 +330,7 @@ function server_container(server_name, base_dir, socket_io) {
   logging.info('[{0}] Discovered server'.format(server_name));
   make_tail('logs/latest.log');
   make_tail('server.log');
+  make_tail('proxy.log.0');
 
   (function() {
     var fireworm = require('fireworm');
@@ -327,6 +341,7 @@ function server_container(server_name, base_dir, socket_io) {
     fw.add('**/cron.config');
     fw.add('**/eula.txt');
     fw.add('**/server-icon.png');
+    fw.add('**/config.yml');
     
     function handle_event(fp) {
       var FS_DELAY = 250; 
@@ -351,6 +366,9 @@ function server_container(server_name, base_dir, socket_io) {
         case 'server-icon.png':
           setTimeout(broadcast_icon, FS_DELAY);
           break;
+        case 'config.yml':
+          setTimeout(broadcast_cy, FS_DELAY);
+          break;
       }
     }
     
@@ -364,7 +382,14 @@ function server_container(server_name, base_dir, socket_io) {
     async.series({
       'up': function(cb) { instance.property('up', function(err, is_up) { cb(null, is_up) }) },
       'memory': function(cb) { instance.property('memory', function(err, mem) { cb(null, err ? {} : mem) }) },
-      'ping': function(cb) { instance.property('ping', function(err, ping) { cb(null, err ? {} : ping) }) }
+      'ping': function(cb) {
+        instance.property('unconventional', function(err, is_unconventional) {
+          if (is_unconventional)
+            cb(null, {}); //ignore ping--wouldn't respond in any meaningful way
+          else
+            instance.property('ping', function(err, ping) { cb(null, err ? {} : ping) }) 
+        })
+      }
     }, function(err, retval) {
       nsp.emit('heartbeat', {
         'server_name': server_name,
@@ -484,6 +509,16 @@ function server_container(server_name, base_dir, socket_io) {
     fs.readFile(filepath, function(err, data) {
       if (!err && data.toString('hex',0,4) == '89504e47') //magic number for png first 4B
         nsp.emit('server-icon.png', new Buffer(data).toString('base64'));
+    });
+  }
+
+  function broadcast_cy() {
+    // function to broadcast raw config.yml from bungeecord
+    var fs = require('fs');
+    var filepath = path.join(instance.env.cwd, 'config.yml');
+    fs.readFile(filepath, function(err, data) {
+      if (!err)
+        nsp.emit('config.yml', new Buffer(data).toString());
     });
   }
 
@@ -828,6 +863,7 @@ function server_container(server_name, base_dir, socket_io) {
         socket.on('server.config', broadcast_sc);
         socket.on('cron.config', broadcast_cc);
         socket.on('server-icon.png', broadcast_icon);
+        socket.on('config.yml', broadcast_cy);
         socket.on('req_server_activity', broadcast_notices);
       }
     })
@@ -1035,6 +1071,42 @@ function check_profiles(base_dir, callback) {
         callback(err, p);
       }
       request('http://get.pocketmine.net', handle_reply);
+    },
+    bungeecord: function(callback) {
+      var xml_parser = require('xml2js');
+
+      var BUNGEE_VERSIONS_URL = 'http://ci.md-5.net/job/BungeeCord/rssAll';
+      var path_prefix = path.join(base_dir, mineos.DIRS['profiles']);
+
+      function handle_reply(err, response, body) {
+        var p = [];
+
+        if (!err && (response || {}).statusCode === 200)
+          xml_parser.parseString(body, function(inner_err, result) {
+            try {
+              var packs = result['feed']['entry'];
+
+              for (var index in packs) {
+                var item = packs[index];
+                item['version'] = result['feed']['entry'][index]['id'][0].split(':').slice(-1)[0];
+                var dir_concat = 'bungeecord-{1}'.format(item['dir'], item['version']);
+                item['group'] = 'bungeecord';
+                item['type'] = 'release';
+                item['id'] = dir_concat;
+                item['webui_desc'] = result['feed']['entry'][index]['title'][0];
+                item['weight'] = 5;
+                item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, 'BungeeCord-{0}.jar'.format(item.version)));
+                p.push(item);
+              }
+              callback(err || inner_err, p);
+            } catch (e) {
+              callback(e, p)
+            }
+          })
+        else
+          callback(null, p);
+      }
+      request({ url: BUNGEE_VERSIONS_URL, json: false }, handle_reply);
     }
   } //end sources
 
@@ -1294,6 +1366,48 @@ function download_profiles(args, progress_update_fn, callback) {
                 logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
                 args['success'] = false;
                 args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                inner_callback(args);
+              }
+            })
+            .on('progress', function(state) {
+              args['progress'] = state;
+              progress_update_fn(args);
+            })
+            .pipe(fs.createWriteStream(dest_filepath))
+        }
+      });
+    },
+    bungeecord: function(inner_callback) {
+      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.profile.id);
+      var filename = 'BungeeCord-{0}.jar'.format(args.profile.version);
+      var dest_filepath = path.join(dest_dir, filename);
+
+      var url = 'http://ci.md-5.net/job/BungeeCord/{0}/artifact/bootstrap/target/BungeeCord.jar'.format(args.profile.version);
+
+      fs.ensureDir(dest_dir, function(err) {
+        if (err) {
+          logging.error('[WEBUI] Error attempting download:', err);
+        } else {
+          progress(request(url), {
+            throttle: 1000,
+            delay: 100
+          })
+            .on('complete', function(response) {
+              if (response.statusCode == 200) {
+                logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                args['dest_dir'] = dest_dir;
+                args['filename'] = filename;
+                args['success'] = true;
+                args['progress']['percent'] = 100;
+                args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
+                args['suppress_popup'] = false;
+                inner_callback(args);
+              } else {
+                logging.error('[WEBUI] Server was unable to download file:', url);
+                logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                args['success'] = false;
+                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                args['suppress_popup'] = false;
                 inner_callback(args);
               }
             })
