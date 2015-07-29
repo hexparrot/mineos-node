@@ -137,6 +137,10 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
         $('#onrebootstart').prop('checked', $scope.onrebootstart );
         $('#unconventional').prop('checked', $scope.unconventional_server );
       }
+
+      $scope.delete_archive = false;
+      $scope.delete_backup = false;
+      $scope.delete_servers = false;
         
       if (!($scope.current in Servers))
         $scope.change_page('dashboard');
