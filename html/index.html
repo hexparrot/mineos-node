@@ -28,7 +28,6 @@
 
     <!-- Stylesheet(Plugins) -->
     <link rel="stylesheet" href="assets/jui/css/jquery-ui-1.10.3.min.css">
-    <link rel="stylesheet" href="assets/icheck/css/jquery.icheck.min.css">
     <link rel="stylesheet" href="assets/select2/css/select2.min.css">
     <link rel="stylesheet" href="assets/formvalidation/validationengine/css/jquery.validationEngine.min.css">
     <link rel="stylesheet" href="assets/fullcalendar/css/fullcalendar.min.css">
@@ -822,13 +821,13 @@
                                                         </div>
                                                     </div><!--/ Select -->
                                                     <label class="checkbox">
-                                                        <input icheck id="broadcast" class="icheck" type="checkbox" ng-model="broadcast_to_lan"> {{ 'BROADCAST_TO_LAN' | translate }}
+                                                        <input id="broadcast" type="checkbox" ng-model="broadcast_to_lan" ng-change="change_sc('minecraft', 'broadcast', broadcast_to_lan || 'false')"> {{ 'BROADCAST_TO_LAN' | translate }}
                                                     </label>
                                                     <label class="checkbox">
-                                                        <input icheck id="onrebootstart" class="icheck" type="checkbox" ng-model="onrebootstart"> {{ 'START_ON_BOOT' | translate }}
+                                                        <input id="onrebootstart" type="checkbox" ng-model="onrebootstart" ng-change="change_sc('onreboot', 'start', onrebootstart || 'false')"> {{ 'START_ON_BOOT' | translate }}
                                                     </label>
                                                     <label class="checkbox">
-                                                        <input icheck id="unconventional" class="icheck" type="checkbox" ng-model="unconventional"> {{ 'UNCONVENTIONAL_SERVER' | translate }}
+                                                        <input id="unconventional"  type="checkbox" ng-model="unconventional_server" ng-change="change_sc('minecraft', 'unconventional', unconventional_server || 'false')"> {{ 'UNCONVENTIONAL_SERVER' | translate }}
                                                     </label>
 
                                                 </div>
@@ -1010,13 +1009,13 @@
                                                     <div class="control-group">
                                                         <div class="controls">
                                                             <label class="checkbox">
-                                                                <input icheck class="icheck" type="checkbox" ng-model="delete_archive"> {{ 'DELETE_ARCHIVES' | translate }} {{ '{0}/{1}/{2}'.format(servers[current].page_data.glance.base_dir, 'archive', current) }}
+                                                                <input type="checkbox" ng-model="delete_archive"> {{ 'DELETE_ARCHIVES' | translate }} {{ '{0}/{1}/{2}'.format(servers[current].page_data.glance.base_dir, 'archive', current) }}
                                                             </label>
                                                             <label class="checkbox">
-                                                                <input icheck class="icheck" type="checkbox" ng-model="delete_backup"> {{ 'DELETE_RESTORE_POINTS' | translate }} {{ '{0}/{1}/{2}'.format(servers[current].page_data.glance.base_dir, 'backup', current) }}
+                                                                <input type="checkbox" ng-model="delete_backup"> {{ 'DELETE_RESTORE_POINTS' | translate }} {{ '{0}/{1}/{2}'.format(servers[current].page_data.glance.base_dir, 'backup', current) }}
                                                             </label>
                                                             <label class="checkbox">
-                                                                <input icheck class="icheck" type="checkbox" ng-model="delete_servers"> {{ 'DELETE_LIVE_FILES' | translate }} {{ '{0}/{1}/{2}'.format(servers[current].page_data.glance.base_dir, 'servers', current) }}
+                                                                <input type="checkbox" ng-model="delete_servers"> {{ 'DELETE_LIVE_FILES' | translate }} {{ '{0}/{1}/{2}'.format(servers[current].page_data.glance.base_dir, 'servers', current) }}
                                                             </label>
                                                         </div>
                                                         <button type="button" class="btn btn-mini btn-danger" ng-disabled="!(delete_servers && delete_backup && delete_archive && !servers[current].heartbeat.up)" ng-click="server_command('delete')"><span class="icone-warning-sign"></span> {{ 'DELETE' | translate }}</button>
@@ -1624,7 +1623,6 @@
     <script src="assets/easypiechart/js/jquery.easypiechart.min.js"></script>
     <script src="assets/formwizard/js/jquery.formwizard.min.js"></script>
     <script src="assets/fullcalendar/js/fullcalendar.min.js"></script>
-    <script src="assets/icheck/js/jquery.icheck.min.js"></script>
     <script src="assets/ie-placeholder/js/jquery.placeholder.min.js"></script>
     <script src="assets/inputmask/js/jquery.inputmask.min.js"></script>
     <script src="assets/select2/js/select2.min.js"></script>
