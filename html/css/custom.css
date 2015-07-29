@@ -17,3 +17,7 @@ table tbody tr a {
 .monospace {
 	font-family:monospace;
 }
+
+#sidebar #nav > ul > li > a {
+	cursor: pointer;
+}
