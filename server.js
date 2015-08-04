@@ -199,10 +199,15 @@ server.backend = function(base_dir, socket_emitter) {
             self.front_end.emit('file_progress', args);
           }
 
-          download_profiles(args, progress_emitter, function(retval){
-            self.front_end.emit('host_notice', retval);
-            self.send_profile_list();
-          });
+          for (var idx in self.profiles)
+            if (self.profiles[idx].id == args.profile.id) {
+              download_profiles(args, progress_emitter, function(retval){
+                self.front_end.emit('host_notice', retval);
+                self.send_profile_list();
+              });
+              break;
+            }
+              
           break;
         case 'refresh_server_list':
           for (var s in self.servers)
@@ -883,6 +888,21 @@ function check_profiles(base_dir, callback) {
   var request = require('request');
   var fs = require('fs');
 
+  function profile_template() {
+    return  {
+      id: null,
+      time: null,
+      releaseTime: null,
+      type: null, // release, snapshot, old_version
+      group: null, //mojang, ftb, ftb_third_party, pocketmine, etc.
+      webui_desc: null, 
+      weight: 0,
+      downloaded: false,
+      filename: null, // minecraft_server.1.8.8.jar
+      version: null // 1.8.8,
+    }
+  }
+
   var SOURCES = {
     mojang: function(callback) {
       var MOJANG_VERSIONS_URL = 'http://s3.amazonaws.com/Minecraft.Download/versions/versions.json';
@@ -893,11 +913,21 @@ function check_profiles(base_dir, callback) {
 
         if (!err && (response || {}).statusCode === 200)
           for (var index in body.versions) {
-            var item = body.versions[index];
+            var item = new profile_template();
+            var ref_obj = body.versions[index];
+
+            item['id'] = ref_obj['id'];
+            item['time'] = ref_obj['time'];
+            item['releaseTime'] = ref_obj['releaseTime'];
+            item['type'] = ref_obj['type'];
             item['group'] = 'mojang';
-            item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, 'minecraft_server.{0}.jar'.format(item.id)));
             item['webui_desc'] = 'Official Mojang Jar';
             item['weight'] = 0;
+            item['filename'] = 'minecraft_server.{0}.jar'.format(ref_obj['id']);
+            item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, item.filename));
+            item['version'] = ref_obj['id'];
+            item['release_version'] = ref_obj['id'];
+            item['url'] = 'https://s3.amazonaws.com/Minecraft.Download/versions/{0}/minecraft_server.{0}.jar'.format(item.version);
 
             p.push(item);
           }
@@ -921,28 +951,42 @@ function check_profiles(base_dir, callback) {
               var packs = result['modpacks']['modpack'];
 
               for (var index in packs) {
-                var item = packs[index]['$'];
-                var dir_concat = '{0}-{1}'.format(item['dir'], item['version']);
-                item['group'] = 'ftb';
+                var item = new profile_template();
+                var ref_obj = packs[index]['$'];
+
+                item['id'] = '{0}-{1}'.format(ref_obj['dir'], ref_obj['version']);
+                //item['time'] = ref_obj['time'];
+                //item['releaseTime'] = ref_obj['releaseTime'];
                 item['type'] = 'release';
-                item['id'] = dir_concat;
-                item['webui_desc'] = '{0} {1}'.format(item['name'], item['version']);
-                item['weight'] = 5;
-                item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item['serverPack']));
+                item['group'] = 'ftb';
+                item['webui_desc'] = '{0} (mc: {1})'.format(ref_obj['name'], ref_obj['mcVersion']);
+                item['weight'] = 3;
+                item['filename'] = ref_obj['serverPack'];
+                item['url'] = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(ref_obj.dir, ref_obj.version.replace(/\./g, '_'), ref_obj.serverPack);
+                item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, item.filename));
+                item['version'] = ref_obj['mcVersion'];
+                item['release_version'] = ref_obj['version'];
                 p.push(item);
 
-                var old_versions = item['oldVersions'].split(';');
+                var old_versions = ref_obj['oldVersions'].split(';');
                 for (var idx in old_versions) {
-                  var new_item = JSON.parse(JSON.stringify(item)); //deep copy object
-                  var dir_concat = '{0}-{1}'.format(new_item['dir'], old_versions[idx]);
+                  var new_item = new profile_template();
 
-                  if (old_versions[idx].length > 0 && old_versions[idx] != item['version']) {
-                    new_item['type'] = 'old_version';
-                    new_item['id'] = dir_concat;
-                    new_item['webui_desc'] = '{0} {1}'.format(new_item['name'], old_versions[idx]);
-                    new_item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, new_item['serverPack']));
-                    p.push(new_item);
-                  }
+                  new_item['id'] = '{0}-{1}'.format(ref_obj['dir'], old_versions[idx]);
+                  //new_item['time'] = ref_obj['time'];
+                  //new_item['releaseTime'] = ref_obj['releaseTime'];
+                  new_item['type'] = 'old_version';
+                  new_item['group'] = 'ftb';
+                  new_item['webui_desc'] = ref_obj['name'];
+                  new_item['weight'] = 3;
+                  new_item['filename'] = ref_obj['serverPack'];
+                  new_item['url'] = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(ref_obj.dir, ref_obj.version.replace(/\./g, '_'), ref_obj.serverPack);
+                  new_item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], new_item.id, new_item.filename));
+                  new_item['version'] = ref_obj['mcVersion'];
+                  new_item['release_version'] = old_versions[idx];
+
+                  if (old_versions[idx].length > 0 && old_versions[idx] != ref_obj['version'])
+                    p.push(new_item);                  
                 }
               }
               callback(err || inner_err, p);
@@ -964,39 +1008,53 @@ function check_profiles(base_dir, callback) {
       function handle_reply(err, response, body) {
         var p = [];
 
-        if (!err && (response || {}).statusCode == 200)
+        if (!err && (response || {}).statusCode === 200)
           xml_parser.parseString(body, function(inner_err, result) {
             try {
               var packs = result['modpacks']['modpack'];
 
               for (var index in packs) {
-                var item = packs[index]['$'];
-                var dir_concat = '{0}-{1}'.format(item['dir'], item['version']);
-                item['group'] = 'ftb_third_party';
+                var item = new profile_template();
+                var ref_obj = packs[index]['$'];
+
+                item['id'] = '{0}-{1}'.format(ref_obj['dir'], ref_obj['version']);
+                //item['time'] = ref_obj['time'];
+                //item['releaseTime'] = ref_obj['releaseTime'];
                 item['type'] = 'release';
-                item['id'] = dir_concat;
-                item['webui_desc'] = '{0} {1}'.format(item['name'], item['version']);
-                item['weight'] = 10;
-                item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item['serverPack']));
+                item['group'] = 'ftb_third_party';
+                item['webui_desc'] = '{0} (mc: {1})'.format(ref_obj['name'], ref_obj['mcVersion']);
+                item['weight'] = 3;
+                item['filename'] = ref_obj['serverPack'];
+                item['url'] = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(ref_obj.dir, ref_obj.version.replace(/\./g, '_'), ref_obj.serverPack);
+                item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, item.filename));
+                item['version'] = ref_obj['mcVersion'];
+                item['release_version'] = ref_obj['version'];
                 p.push(item);
 
-                var old_versions = item['oldVersions'].split(';');
+                var old_versions = ref_obj['oldVersions'].split(';');
                 for (var idx in old_versions) {
-                  var new_item = JSON.parse(JSON.stringify(item)); //deep copy object
-                  var dir_concat = '{0}-{1}'.format(new_item['dir'], old_versions[idx]);
+                  var new_item = new profile_template();
 
-                  if (old_versions[idx].length > 0 && old_versions[idx] != item['version']) {
-                    new_item['type'] = 'old_version';
-                    new_item['id'] = dir_concat;
-                    new_item['webui_desc'] = '{0} {1}'.format(new_item['name'], old_versions[idx]);
-                    new_item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, new_item['serverPack']));
-                    p.push(new_item);
-                  }
+                  new_item['id'] = '{0}-{1}'.format(ref_obj['dir'], old_versions[idx]);
+                  //new_item['time'] = ref_obj['time'];
+                  //new_item['releaseTime'] = ref_obj['releaseTime'];
+                  new_item['type'] = 'old_version';
+                  new_item['group'] = 'ftb';
+                  new_item['webui_desc'] = ref_obj['name'];
+                  new_item['weight'] = 3;
+                  new_item['filename'] = ref_obj['serverPack'];
+                  new_item['url'] = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(ref_obj.dir, ref_obj.version.replace(/\./g, '_'), ref_obj.serverPack);
+                  new_item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], new_item.id, new_item.filename));
+                  new_item['version'] = ref_obj['mcVersion'];
+                  new_item['release_version'] = old_versions[idx];
+
+                  if (old_versions[idx].length > 0 && old_versions[idx] != ref_obj['version'])
+                    p.push(new_item);                  
                 }
               }
               callback(err || inner_err, p);
             } catch (e) {
-              callback(e);
+              callback(e, p)
             }
           })
         else
@@ -1013,31 +1071,33 @@ function check_profiles(base_dir, callback) {
       function handle_reply(err, retval) {
         for (var r in retval) 
           if ((retval[r] || {}).statusCode == 200) {
-            var releases = JSON.parse(retval[r].body);
+            var item = new profile_template();
+            var ref_obj = JSON.parse(retval[r].body);
 
-            var item = releases;
-            var version = releases.version;
-            var dir_concat = 'Pocketmine-{0}'.format(version);
-            item['channel'] = r;
-            item['filename'] = path.basename(item.download_url);
+            item['id'] = 'PocketMine-{0}'.format(ref_obj['build']);
+            item['time'] = ref_obj['date'];
+            item['releaseTime'] = ref_obj['date'];
+            //item['type'] = 'release';
             item['group'] = 'pocketmine';
-            item['id'] = dir_concat;
-            item['version'] = version;
-            switch (item.channel) {
+            item['webui_desc'] = '{0} (api: {1})'.format(ref_obj['version'], ref_obj['api_version']);
+            item['weight'] = 10;
+            item['channel'] = r;
+            item['filename'] = path.basename(ref_obj['download_url']);
+            item['url'] = ref_obj['download_url'];
+            item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, item.filename));
+            item['version'] = null;
+            item['release_version'] = ref_obj['build'];
+
+            switch (r) {
               case 'stable':
-                item['short_version'] = path.basename(item.details_url);
                 item['type'] = 'release';
                 break;
               case 'development':
-                item['short_version'] = version;
                 item['type'] = 'snapshot';
                 break;
             }
-            item['webui_desc'] = 'phar build {0}, api {1}'.format(item.build, item.api_version);
-            item['weight'] = 10;
-            item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, item.filename));
-            p.push(item);
 
+            p.push(item);
           }
         callback(null, p)
       }
@@ -1057,13 +1117,15 @@ function check_profiles(base_dir, callback) {
           for (var i in lines) {
             var matching = lines[i].match(BUILD_REGEX);
             if (matching) {
-              var item = {};
+              var item = new profile_template();
               item['group'] = 'php';
               item['type'] = 'release';
               item['id'] = matching[1];
               item['webui_desc'] = 'PHP binary for Pocketmine';
               item['weight'] = 12;
               item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], matching[1], '{0}.tar.gz'.format(matching[1])));
+              item['filename'] = '{0}.tar.gz'.format(matching[1]);
+              item['url'] = 'https://dl.bintray.com/pocketmine/PocketMine/{0}'.format(item.filename);
               p.push(item);
             }
           }
@@ -1087,15 +1149,18 @@ function check_profiles(base_dir, callback) {
               var packs = result['feed']['entry'];
 
               for (var index in packs) {
-                var item = packs[index];
-                item['version'] = result['feed']['entry'][index]['id'][0].split(':').slice(-1)[0];
-                var dir_concat = 'bungeecord-{1}'.format(item['dir'], item['version']);
+                var item = new profile_template();
+                var ref_obj = packs[index];
+
+                item['version'] = packs[index]['id'][0].split(':').slice(-1)[0];
                 item['group'] = 'bungeecord';
                 item['type'] = 'release';
-                item['id'] = dir_concat;
-                item['webui_desc'] = result['feed']['entry'][index]['title'][0];
+                item['id'] = 'BungeeCord-{0}'.format(item.version);
+                item['webui_desc'] = packs[index]['title'][0];
                 item['weight'] = 5;
-                item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], dir_concat, 'BungeeCord-{0}.jar'.format(item.version)));
+                item['filename'] = 'BungeeCord-{0}.jar'.format(item.version);
+                item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, item.filename));
+                item['url'] = 'http://ci.md-5.net/job/BungeeCord/{0}/artifact/bootstrap/target/BungeeCord.jar'.format(item.version);
                 p.push(item);
               }
               callback(err || inner_err, p);
@@ -1147,7 +1212,7 @@ function download_profiles(args, progress_update_fn, callback) {
       var filename = 'minecraft_server.{0}.jar'.format(args.profile.id);
       var dest_filepath = path.join(dest_dir, filename);
 
-      var url = 'https://s3.amazonaws.com/Minecraft.Download/versions/{0}/{1}'.format(args.profile.id, filename);
+      var url = args.profile.url;
 
       fs.ensureDir(dest_dir, function(err) {
         if (err) {
@@ -1187,12 +1252,11 @@ function download_profiles(args, progress_update_fn, callback) {
     ftb: function(inner_callback) {
       var unzip = require('unzip');
 
-      var dir_concat = '{0}-{1}'.format(args.profile.dir, args.profile.version);
-      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
-      var filename = args.profile.serverPack;
+      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.profile.id);
+      var filename = args.profile.filename;
       var dest_filepath = path.join(dest_dir, filename);
 
-      var url = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(args.profile.dir, args.profile.version.replace(/\./g, '_'), args.profile.serverPack);
+      var url = args.profile.url;
 
       fs.ensureDir(dest_dir, function(err) {
         if (err) {
@@ -1233,12 +1297,11 @@ function download_profiles(args, progress_update_fn, callback) {
     ftb_third_party: function(inner_callback) {
       var unzip = require('unzip');
 
-      var dir_concat = '{0}-{1}'.format(args.profile.dir, args.profile.version);
-      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
-      var filename = args.profile.serverPack;
+      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.profile.id);
+      var filename = args.profile.filename;
       var dest_filepath = path.join(dest_dir, filename);
 
-      var url = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(args.profile.dir, args.profile.version.replace(/\./g, '_'), args.profile.serverPack);
+      var url = args.profile.url;
 
       fs.ensureDir(dest_dir, function(err) {
         if (err) {
@@ -1277,39 +1340,30 @@ function download_profiles(args, progress_update_fn, callback) {
       });
     },
     pocketmine: function(inner_callback) {
-      var dir_concat = args.profile.id;
-      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
+      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.profile.id);
       var filename = args.profile.filename;
       var dest_filepath = path.join(dest_dir, filename);
 
-      var URL_STABLE = 'https://github.com/PocketMine/PocketMine-MP/releases/download/{0}/{1}';
-      var URL_DEVELOPMENT = 'http://jenkins.pocketmine.net/job/PocketMine-MP/{0}/artifact/{1}';
+      var url = args.profile.url;
 
       fs.ensureDir(dest_dir, function(err) {
         if (err) {
           logging.error('[WEBUI] Error attempting download:', err);
         } else {
-          var url_to_use = '';
-
-          if (args.profile.channel == 'stable')
-            url_to_use = URL_STABLE.format(args.profile.short_version, args.profile.filename);
-          else
-            url_to_use = URL_DEVELOPMENT.format(args.profile.build, args.profile.filename);
-
-          progress(request(url_to_use), {
+          progress(request(url), {
             throttle: 1000,
             delay: 100
           })
             .on('complete', function(response) {
               if (response.statusCode == 200) {
-                logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url_to_use, dest_filepath));
+                logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
                 args['dest_dir'] = dest_dir;
                 args['filename'] = filename;
                 args['success'] = true;
-                args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url_to_use, dest_filepath);
+                args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
                 inner_callback(args);
               } else {
-                logging.error('[WEBUI] Server was unable to download file:', url_to_use);
+                logging.error('[WEBUI] Server was unable to download file:', url);
                 logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
                 args['success'] = false;
                 args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
@@ -1327,12 +1381,11 @@ function download_profiles(args, progress_update_fn, callback) {
     php: function(inner_callback) {
       var tarball = require('tarball-extract')
 
-      var dir_concat = args.profile.id;
-      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(dir_concat);
+      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.profile.id);
       var filename = '{0}.tar.gz'.format(args.profile.id);
       var dest_filepath = path.join(dest_dir, filename);
 
-      var url = 'https://dl.bintray.com/pocketmine/PocketMine/{0}'.format(filename);
+      var url = args.profile.url
 
       fs.ensureDir(dest_dir, function(err) {
         if (err) {
@@ -1379,10 +1432,10 @@ function download_profiles(args, progress_update_fn, callback) {
     },
     bungeecord: function(inner_callback) {
       var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.profile.id);
-      var filename = 'BungeeCord-{0}.jar'.format(args.profile.version);
+      var filename = args.profile.filename;
       var dest_filepath = path.join(dest_dir, filename);
 
-      var url = 'http://ci.md-5.net/job/BungeeCord/{0}/artifact/bootstrap/target/BungeeCord.jar'.format(args.profile.version);
+      var url = args.profile.url;
 
       fs.ensureDir(dest_dir, function(err) {
         if (err) {
