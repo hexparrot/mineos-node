@@ -1206,11 +1206,12 @@ function download_profiles(args, progress_update_fn, callback) {
   var request = require('request');
   var progress = require('request-progress');
 
+  args['command'] = 'Download';
+
   var DOWNLOADS = {
     mojang: function(inner_callback) {
       var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.id);
-      var filename = 'minecraft_server.{0}.jar'.format(args.id);
-      var dest_filepath = path.join(dest_dir, filename);
+      var dest_filepath = path.join(dest_dir, args.filename);
 
       var url = args.url;
 
@@ -1226,7 +1227,6 @@ function download_profiles(args, progress_update_fn, callback) {
               if (response.statusCode == 200) {
                 logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
                 args['dest_dir'] = dest_dir;
-                args['filename'] = filename;
                 args['success'] = true;
                 args['progress']['percent'] = 100;
                 args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
@@ -1253,8 +1253,7 @@ function download_profiles(args, progress_update_fn, callback) {
       var unzip = require('unzip');
 
       var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.id);
-      var filename = args.filename;
-      var dest_filepath = path.join(dest_dir, filename);
+      var dest_filepath = path.join(dest_dir, args.filename);
 
       var url = args.url;
 
@@ -1270,7 +1269,6 @@ function download_profiles(args, progress_update_fn, callback) {
               if (response.statusCode == 200) {
                 logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
                 args['dest_dir'] = dest_dir;
-                args['filename'] = filename;
                 args['success'] = true;
                 args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
 
@@ -1282,7 +1280,7 @@ function download_profiles(args, progress_update_fn, callback) {
                 logging.error('[WEBUI] Server was unable to download file:', url);
                 logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
                 args['success'] = false;
-                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(args.filename, response.statusCode);
                 inner_callback(args);
               }
             })
@@ -1298,8 +1296,7 @@ function download_profiles(args, progress_update_fn, callback) {
       var unzip = require('unzip');
 
       var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.id);
-      var filename = args.filename;
-      var dest_filepath = path.join(dest_dir, filename);
+      var dest_filepath = path.join(dest_dir, args.filename);
 
       var url = args.url;
 
@@ -1315,7 +1312,6 @@ function download_profiles(args, progress_update_fn, callback) {
               if (response.statusCode == 200) {
                 logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
                 args['dest_dir'] = dest_dir;
-                args['filename'] = filename;
                 args['success'] = true;
                 args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
 
@@ -1327,7 +1323,7 @@ function download_profiles(args, progress_update_fn, callback) {
                 logging.error('[WEBUI] Server was unable to download file:', url);
                 logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
                 args['success'] = false;
-                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(args.filename, response.statusCode);
                 inner_callback(args);
               }
             })
@@ -1341,8 +1337,7 @@ function download_profiles(args, progress_update_fn, callback) {
     },
     pocketmine: function(inner_callback) {
       var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.id);
-      var filename = args.filename;
-      var dest_filepath = path.join(dest_dir, filename);
+      var dest_filepath = path.join(dest_dir, args.filename);
 
       var url = args.url;
 
@@ -1358,7 +1353,6 @@ function download_profiles(args, progress_update_fn, callback) {
               if (response.statusCode == 200) {
                 logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
                 args['dest_dir'] = dest_dir;
-                args['filename'] = filename;
                 args['success'] = true;
                 args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
                 inner_callback(args);
@@ -1366,7 +1360,7 @@ function download_profiles(args, progress_update_fn, callback) {
                 logging.error('[WEBUI] Server was unable to download file:', url);
                 logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
                 args['success'] = false;
-                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(args.filename, response.statusCode);
                 inner_callback(args);
               }
             })
@@ -1382,8 +1376,7 @@ function download_profiles(args, progress_update_fn, callback) {
       var tarball = require('tarball-extract')
 
       var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.id);
-      var filename = '{0}.tar.gz'.format(args.id);
-      var dest_filepath = path.join(dest_dir, filename);
+      var dest_filepath = path.join(dest_dir, args.filename);
 
       var url = args.url;
 
@@ -1399,7 +1392,6 @@ function download_profiles(args, progress_update_fn, callback) {
               if (response.statusCode == 200) {
                 logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
                 args['dest_dir'] = dest_dir;
-                args['filename'] = filename;
                 args['success'] = true;
                 args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
 
@@ -1418,7 +1410,7 @@ function download_profiles(args, progress_update_fn, callback) {
                 logging.error('[WEBUI] Server was unable to download file:', url);
                 logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
                 args['success'] = false;
-                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(args.filename, response.statusCode);
                 inner_callback(args);
               }
             })
@@ -1432,8 +1424,7 @@ function download_profiles(args, progress_update_fn, callback) {
     },
     bungeecord: function(inner_callback) {
       var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.id);
-      var filename = args.filename;
-      var dest_filepath = path.join(dest_dir, filename);
+      var dest_filepath = path.join(dest_dir, args.filename);
 
       var url = args.url;
 
@@ -1449,7 +1440,6 @@ function download_profiles(args, progress_update_fn, callback) {
               if (response.statusCode == 200) {
                 logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
                 args['dest_dir'] = dest_dir;
-                args['filename'] = filename;
                 args['success'] = true;
                 args['progress']['percent'] = 100;
                 args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
@@ -1459,7 +1449,7 @@ function download_profiles(args, progress_update_fn, callback) {
                 logging.error('[WEBUI] Server was unable to download file:', url);
                 logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
                 args['success'] = false;
-                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(args.filename, response.statusCode);
                 args['suppress_popup'] = false;
                 inner_callback(args);
               }
