@@ -199,10 +199,15 @@ server.backend = function(base_dir, socket_emitter) {
             self.front_end.emit('file_progress', args);
           }
 
-          download_profiles(args, progress_emitter, function(retval){
-            self.front_end.emit('host_notice', retval);
-            self.send_profile_list();
-          });
+          for (var idx in self.profiles)
+            if (self.profiles[idx].id == args.profile.id) {
+              download_profiles(args, progress_emitter, function(retval){
+                self.front_end.emit('host_notice', retval);
+                self.send_profile_list();
+              });
+              break;
+            }
+              
           break;
         case 'refresh_server_list':
           for (var s in self.servers)
