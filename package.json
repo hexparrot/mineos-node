@@ -68,7 +68,8 @@
     "fireworm": "0.6.x",
     "request-progress": "0.3.x",
     "posix": "2.0.x",
-    "crypt3": "0.1.x"
+    "crypt3": "0.1.x",
+    "node-getopt": "0.2.x"
   },
   "devDependencies": {
     "nodeunit": "0.9.x"
