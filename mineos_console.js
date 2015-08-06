@@ -16,15 +16,35 @@ var opt = getopt.create([
 .bindHelp()     // bind option 'help' to default action
 .parseSystem(); // parse command line
 
-if ('version' in opt.options) {
+function return_git_commit_hash(callback) {
   var gitproc = child_process.spawn('git', 'log -n 1 --pretty=format:"%H"'.split(' '));
+  var commit_value = '';
 
   gitproc.stdout.on('data', function(data) {
     var buffer = new Buffer(data, 'ascii');
-    var lines = buffer.toString('ascii');
-
-    console.log(lines);
+    commit_value = buffer.toString('ascii');
   });
+
+  gitproc.on('error', function(code) {
+    // branch if path does not exist
+    if (code != 0)
+      callback(true, undefined);
+  });
+
+  gitproc.on('exit', function(code) {
+    if (code == 0) // branch if all is well
+      callback(code, commit_value);
+    else 
+      callback(true, undefined);
+  });
+}
+
+if ('version' in opt.options) {
+  return_git_commit_hash(function(code, hash) {
+    if (!code)
+      console.log(hash);
+    process.exit(code);
+  })
 } else if ('server_name' in opt.options) {
   var base_dir = opt.options.d || '/var/games/minecraft';
   var instance = new mineos.mc(opt.options.server_name, base_dir);
