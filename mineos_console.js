@@ -3,19 +3,29 @@
 var getopt = require('node-getopt');
 var async = require('async');
 var introspect = require('introspect');
+var child_process = require('child_process');
 var mineos = require('./mineos');
 
 var opt = getopt.create([
   ['s' , 'server_name=SERVER_NAME'  , 'server name'],
   ['d' , 'base_dir=BASE_DIR'        , 'defaults to /var/games/minecraft'],
   ['D' , 'debug'                    , 'show debug output'],
-  ['v' , 'version'                  , 'show version'],
+  ['V' , 'version'                  , 'show version'],
   ['h' , 'help'                     , 'display this help']
 ])              // create Getopt instance
 .bindHelp()     // bind option 'help' to default action
 .parseSystem(); // parse command line
 
-if ('server_name' in opt.options) {
+if ('version' in opt.options) {
+  var gitproc = child_process.spawn('git', 'log -n 1 --pretty=format:"%H"'.split(' '));
+
+  gitproc.stdout.on('data', function(data) {
+    var buffer = new Buffer(data, 'ascii');
+    var lines = buffer.toString('ascii');
+
+    console.log(lines);
+  });
+} else if ('server_name' in opt.options) {
   var base_dir = opt.options.d || '/var/games/minecraft';
   var instance = new mineos.mc(opt.options.server_name, base_dir);
 
