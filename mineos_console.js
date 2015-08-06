@@ -80,8 +80,8 @@ function handle_server(args, callback) {
             gid: parseInt(owner_pair[1])
           })
         } catch (e) {
-          console.log('Provide owner attribute as uid:gid pair, e.g., 1000:1000');
-          process.exit(9);
+          callback(1, ['Provide owner attribute as uid:gid pair, e.g., 1000:1000']);
+          return;
         } 
         break;
       default:
