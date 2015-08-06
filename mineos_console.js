@@ -72,10 +72,9 @@ if ('server_name' in opt.options) {
     var arg_array = [property];
 
     arg_array.push(function(err, payload) {
-      if (!err) {
+      if (!err && payload !== undefined) {
         console.log('[{0}] Queried property: "{1}"'.format(opt.options.server_name, property));
-        if (payload)
-          console.log(payload)
+        console.log(payload);
         process.exit(0);
       } else {
         console.log('[{0}] Error querying property "{1}"'.format(

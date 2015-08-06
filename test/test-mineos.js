@@ -978,6 +978,13 @@ test.properties = function(test) {
       })
     },
     function(callback) {
+      instance.property('madeup', function(err, retval) {
+        test.ok(err);  //testing positive error
+        test.equal(retval, undefined);
+        callback(!err);
+      })
+    },
+    function(callback) {
       setTimeout(function() {
         instance.kill(function(err) {
           test.ifError(err);

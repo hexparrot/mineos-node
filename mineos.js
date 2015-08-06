@@ -1243,6 +1243,9 @@ mineos.mc = function(server_name, base_dir) {
           callback(err, server_files);
         })
         break;
+      default:
+        callback(true, undefined);
+        break;
     }
   }
 
