@@ -53,6 +53,19 @@ To use the webui as a background daemon:
 To start the webui in the foreground:
 
     node webui.js
+    
+Things to watch out for
+------
+
+On FreeBSD, you will need to mount a Linux-compatible /proc filesystem, i.e., linprocfs,
+at /usr/compat/linux/proc in order for the web-ui to work.
+
+On ArchLinux and OSX, installing the npm package "uname" fails.  The webui can operate
+without this module, however, so it is possible to continue despite this issue.
+
+Mineos-node requires rsync 3.1.x or later, 3.0.x does not have the ability to chown
+on copy, which is essential for profiles. Depending on your distribution, you may need
+to build it from source.
 
 Developing and Contributing
 ------
