@@ -590,10 +590,19 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
 app.factory('socket', function ($rootScope) {
   //http://briantford.com/blog/angular-socket-io
   var sockets = {};
-  if (window.location.protocol == "https:")
-    var connect_string = ':8443/';
-  else
-    var connect_string = ':8080/';
+
+  var port = window.location.port || null;
+  if (port === null) {
+    //this path should pretty much never occur
+    //but permits users to not have to use default port assignment
+    //i.e., any user-specified port will be honored.
+    if (window.location.protocol == "https:")
+      var port = '443';
+    else
+      var port = '80';
+  }
+
+  var connect_string = ':{0}/'.format(port);
 
   return {
     on: function (server_name, eventName, callback) {
