@@ -172,19 +172,19 @@ mineos.dependencies(function(err, binaries) {
 
     var fs = require('fs');
     var mineos_config = read_ini('/etc/mineos.conf');
-    var HOSTING_PORT = null;
+    var SOCKET_PORT = null;
     var USE_HTTPS = true;
 
     if ('use_https' in mineos_config)
       USE_HTTPS = mineos_config['use_https'];
 
-    if ('hosting_port' in mineos_config)
-      HOSTING_PORT = mineos_config['hosting_port'];
+    if ('socket_port' in mineos_config)
+      SOCKET_PORT = mineos_config['socket_port'];
     else
       if (USE_HTTPS)
-        HOSTING_PORT = 8443;
+        SOCKET_PORT = 8443;
       else
-        HOSTING_PORT = 8080;
+        SOCKET_PORT = 8080;
 
     if (USE_HTTPS)
       async.parallel({
@@ -197,15 +197,15 @@ mineos.dependencies(function(err, binaries) {
         } else {
           var https = require('https');
 
-          var https_server = https.createServer(ssl, app).listen(HOSTING_PORT);
+          var https_server = https.createServer(ssl, app).listen(SOCKET_PORT);
           io.attach(https_server);
-          console.log("MineOS webui listening on *:" + HOSTING_PORT);
+          console.log("MineOS webui listening on *:" + SOCKET_PORT);
         }
       })
     else {
       console.error('mineos.conf set to host insecurely: starting HTTP server.');
-      http.listen(HOSTING_PORT, function(){
-        console.log('MineOS webui listening on *:' + HOSTING_PORT);
+      http.listen(SOCKET_PORT, function(){
+        console.log('MineOS webui listening on *:' + SOCKET_PORT);
       });
     }
 
