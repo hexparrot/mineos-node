@@ -112,6 +112,16 @@ function tally(callback) {
   }
 }
 
+function read_ini(filepath) {
+  var ini = require('ini');
+  try {
+    var data = fs.readFileSync(filepath);
+    return ini.parse(data.toString());
+  } catch (e) {
+    return {};
+  }
+}
+
 mineos.dependencies(function(err, binaries) {
 	if (err) {
 		console.log('MineOS is missing dependencies:', err);
@@ -160,10 +170,11 @@ mineos.dependencies(function(err, binaries) {
 		});
 
     var fs = require('fs');
+    var mineos_config = read_ini('/etc/mineos.conf');
 
     async.parallel({
-      key: async.apply(fs.readFile, '/etc/ssl/certs/mineos.key'),
-      cert: async.apply(fs.readFile, '/etc/ssl/certs/mineos.crt')
+      key: async.apply(fs.readFile, mineos_config['ssl_private_key'] || '/etc/ssl/certs/mineos.key'),
+      cert: async.apply(fs.readFile, mineos_config['ssl_certificate'] || '/etc/ssl/certs/mineos.crt')
     }, function(err, ssl) {
       if (err) {
         var HOSTING_PORT = 8080;
