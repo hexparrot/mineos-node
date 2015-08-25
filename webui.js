@@ -201,8 +201,13 @@ mineos.dependencies(function(err, binaries) {
         } else {
           var https = require('https');
 
+          if ('ssl_cert_chain' in mineos_config) {
+            var cert_chain_data = fs.readFileSync(mineos_config['ssl_cert_chain']);
+            if (cert_chain_data.length)
+              ssl['ca'] = cert_chain_data;
+          }
+
           var https_server = https.createServer(ssl, app).listen(SOCKET_PORT, SOCKET_HOST, function() {
-            console.log(arguments)
             io.attach(https_server);
             console.log('MineOS webui listening on HTTPS://' + SOCKET_HOST + ':' + SOCKET_PORT);
           });
