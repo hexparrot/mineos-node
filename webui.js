@@ -114,6 +114,7 @@ function tally(callback) {
 
 function read_ini(filepath) {
   var ini = require('ini');
+  var fs = require('fs');
   try {
     var data = fs.readFileSync(filepath);
     return ini.parse(data.toString());
@@ -171,26 +172,42 @@ mineos.dependencies(function(err, binaries) {
 
     var fs = require('fs');
     var mineos_config = read_ini('/etc/mineos.conf');
+    var HOSTING_PORT = null;
+    var USE_HTTPS = true;
 
-    async.parallel({
-      key: async.apply(fs.readFile, mineos_config['ssl_private_key'] || '/etc/ssl/certs/mineos.key'),
-      cert: async.apply(fs.readFile, mineos_config['ssl_certificate'] || '/etc/ssl/certs/mineos.crt')
-    }, function(err, ssl) {
-      if (err) {
-        var HOSTING_PORT = 8080;
-        console.error('Could not locate required SSL files /etc/ssl/certs/mineos.{key,crt}, starting HTTP server');
-        http.listen(HOSTING_PORT, function(){
-          console.log('MineOS webui listening on *:' + HOSTING_PORT);
-        });
-      } else {
-        var https = require('https');
+    if ('use_https' in mineos_config)
+      USE_HTTPS = mineos_config['use_https'];
 
-        var HOSTING_PORT = 8443;
-        var https_server = https.createServer(ssl, app).listen(HOSTING_PORT);
-        io.attach(https_server);
-        console.log("MineOS webui listening on *:" + HOSTING_PORT);
-      }
-    })
+    if ('hosting_port' in mineos_config)
+      HOSTING_PORT = mineos_config['hosting_port'];
+    else
+      if (USE_HTTPS)
+        HOSTING_PORT = 8443;
+      else
+        HOSTING_PORT = 8080;
+
+    if (USE_HTTPS)
+      async.parallel({
+        key: async.apply(fs.readFile, mineos_config['ssl_private_key'] || '/etc/ssl/certs/mineos.key'),
+        cert: async.apply(fs.readFile, mineos_config['ssl_certificate'] || '/etc/ssl/certs/mineos.crt')
+      }, function(err, ssl) {
+        if (err) {
+          console.error('Could not locate required SSL files /etc/ssl/certs/mineos.{key,crt}, aborting server start.');
+          process.exit(1);
+        } else {
+          var https = require('https');
+
+          var https_server = https.createServer(ssl, app).listen(HOSTING_PORT);
+          io.attach(https_server);
+          console.log("MineOS webui listening on *:" + HOSTING_PORT);
+        }
+      })
+    else {
+      console.error('mineos.conf set to host insecurely: starting HTTP server.');
+      http.listen(HOSTING_PORT, function(){
+        console.log('MineOS webui listening on *:' + HOSTING_PORT);
+      });
+    }
 
     setInterval(session_cleanup, 3600000); //check for expired sessions every hour
   }
