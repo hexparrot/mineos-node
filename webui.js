@@ -117,7 +117,7 @@ function tally(callback) {
   try {
     urllib.request('http://minecraft.codeemo.com/tally/tally-node.py', {data: tally_info}, function(){});
   } catch (e) {
-    console.log('MineOS unable to load "uname" module; tally failed.')
+    console.error('Tally failed for various reason--continuing startup without tally.')
   }
 }
 
