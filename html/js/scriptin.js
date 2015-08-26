@@ -277,32 +277,40 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
   }
 
   $scope.create_server = function() {
+    var regex_valid_server_name = /^(?!\.)[a-zA-Z0-9_\.]+$/;
+
     var serverform = $scope.serverform;
     var server_name = serverform['server_name'];
     var hyphenated = {};
 
-    if ($scope.unconventional) {
-      socket.emit('/', 'command', {
-        'command': 'create_unconventional_server',
-        'server_name': server_name,
-        'properties': hyphenated
-      });
+    if (!regex_valid_server_name.test(server_name)) {
+      $.gritter.add({
+        title: "Invalid server name",
+        text: "Alphanumerics and underscores only (no spaces)."
+      })
     } else {
-      delete serverform['server_name'];
+      // if server name is valid, continue here
+      if ($scope.unconventional) {
+        socket.emit('/', 'command', {
+          'command': 'create_unconventional_server',
+          'server_name': server_name,
+          'properties': hyphenated
+        });
+      } else {
+        delete serverform['server_name'];
 
-      for (var prop in serverform) 
-        if (serverform.hasOwnProperty(prop)) 
-          hyphenated[prop.split("_").join("-")] = serverform[prop]; //replace _ with -
+        for (var prop in serverform) 
+          if (serverform.hasOwnProperty(prop)) 
+            hyphenated[prop.split("_").join("-")] = serverform[prop]; //replace _ with -
 
-      socket.emit('/', 'command', {
-        'command': 'create',
-        'server_name': server_name,
-        'properties': hyphenated
-      });
+        socket.emit('/', 'command', {
+          'command': 'create',
+          'server_name': server_name,
+          'properties': hyphenated
+        });
+      }
+      $scope.change_page('dashboard', server_name);
     }
-  
-
-    $scope.change_page('dashboard', server_name);
   }
 
   $scope.modals = {
