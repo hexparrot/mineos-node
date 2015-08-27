@@ -128,7 +128,7 @@ function read_ini(filepath) {
     var data = fs.readFileSync(filepath);
     return ini.parse(data.toString());
   } catch (e) {
-    return {};
+    return null;
   }
 }
 
@@ -141,7 +141,7 @@ mineos.dependencies(function(err, binaries) {
 
   var fs = require('fs-extra');
 
-  var mineos_config = read_ini('/etc/mineos.conf');
+  var mineos_config = read_ini('/etc/mineos.conf') || read_ini('/usr/local/etc/mineos.conf') || {};
   var base_directory = '/var/games/minecraft';
 
   if ('base_directory' in mineos_config) {
@@ -157,9 +157,9 @@ mineos.dependencies(function(err, binaries) {
       process.exit(2); 
     }
 
-    console.info('base_directory found in /etc/mineos.conf, using:', base_directory);
+    console.info('base_directory found in mineos.conf, using:', base_directory);
   } else {
-    console.info('base_directory not specified in /etc/mineos.conf, using default:', base_directory);
+    console.info('base_directory not specified in mineos.conf, using default:', base_directory);
   }
 
   var be = new server.backend(base_directory, io);
