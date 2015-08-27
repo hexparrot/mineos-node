@@ -133,11 +133,34 @@ function read_ini(filepath) {
 }
 
 mineos.dependencies(function(err, binaries) {
-	if (err) {
-		console.log('MineOS is missing dependencies:', err);
-		console.log(binaries);
-	} else {
-		var be = new server.backend(BASE_DIR, io);
+  if (err) {
+    console.log('MineOS is missing dependencies:', err);
+    console.log(binaries);
+  } else {
+    var fs = require('fs-extra');
+
+    var mineos_config = read_ini('/etc/mineos.conf');
+    var base_directory = '/var/games/minecraft';
+
+    if ('base_directory' in mineos_config) {
+      try {
+        if (mineos_config['base_directory'].length < 2)
+          throw new error('Invalid base_directory length.');
+
+        base_directory = mineos_config['base_directory'];
+        fs.ensureDirSync(base_directory);
+
+      } catch (e) {
+        console.error(e.message, 'Aborting startup.');
+        process.exit(2); 
+      }
+
+      console.info('base_directory found in /etc/mineos.conf, using:', base_directory);
+    } else {
+      console.info('base_directory not specified in /etc/mineos.conf, using default: /var/games/minecraft');
+    }
+
+    var be = new server.backend(base_directory, io);
 
     tally();
     setInterval(tally, 7200000); //7200000 == 120min
@@ -179,8 +202,6 @@ mineos.dependencies(function(err, binaries) {
 			process.exit();
 		});
 
-    var fs = require('fs');
-    var mineos_config = read_ini('/etc/mineos.conf');
     var SOCKET_PORT = null;
     var SOCKET_HOST = '0.0.0.0';
     var USE_HTTPS = true;
