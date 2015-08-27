@@ -105,20 +105,21 @@ io.use(passportSocketIO.authorize({
 function tally(callback) {
   var os = require('os');
   var urllib = require('urllib');
+  var child_process = require('child_process');
 
   var tally_info = {
-      sysname: os.type(), 
-      release: os.release(), 
-      nodename: os.hostname(),
-      version: '',
-      machine: process.arch
-    }
-
-  try {
-    urllib.request('http://minecraft.codeemo.com/tally/tally-node.py', {data: tally_info}, function(){});
-  } catch (e) {
-    console.error('Tally failed for various reason--continuing startup without tally.')
+    sysname: os.type(), 
+    release: os.release(), 
+    nodename: os.hostname(),
+    version: '',
+    machine: process.arch
   }
+
+  child_process.execFile('uname', ['-v'], function(err, output) {
+    if (!err)
+      tally_info['version'] = output.replace(/\n/,'');
+    urllib.request('http://minecraft.codeemo.com/tally/tally-node.py', {data: tally_info}, function(){});
+  })
 }
 
 function read_ini(filepath) {
