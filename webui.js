@@ -136,7 +136,7 @@ mineos.dependencies(function(err, binaries) {
   if (err) {
     console.error('MineOS is missing dependencies:', err);
     console.log(binaries);
-    process.exit(2);
+    process.exit(1);
   } 
 
   var fs = require('fs-extra');
@@ -154,7 +154,7 @@ mineos.dependencies(function(err, binaries) {
 
     } catch (e) {
       console.error(e.message, 'Aborting startup.');
-      process.exit(3); 
+      process.exit(2); 
     }
 
     console.info('base_directory found in /etc/mineos.conf, using:', base_directory);
@@ -229,7 +229,7 @@ mineos.dependencies(function(err, binaries) {
     }, function(err, ssl) {
       if (err) {
         console.error('Could not locate required SSL files /etc/ssl/certs/mineos.{key,crt}, aborting server start.');
-        process.exit(1);
+        process.exit(3);
       } else {
         var https = require('https');
 
@@ -248,7 +248,7 @@ mineos.dependencies(function(err, binaries) {
       }
     })
   else {
-    console.error('mineos.conf set to host insecurely: starting HTTP server.');
+    console.warn('mineos.conf set to host insecurely: starting HTTP server.');
     http.listen(SOCKET_PORT, SOCKET_HOST, function(){
       console.log('MineOS webui listening on HTTP://' + SOCKET_HOST + ':' + SOCKET_PORT);
     });
