@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/sh
 # Generate SSL certificate
 # Note: daemons using certificate need to be restarted for changes to take effect
 
@@ -69,6 +69,9 @@ openssl req -x509 \
     -passout pass:$KEYPASS \
     -days $DAYS \
     -multivalue-rdn -subj "$RDN"
+
+# create needed directories
+mkdir -p ${CERTFILE%/*} ${CRTFILE%/*} ${KEYFILE%/*}
 
 # remove password protection from key if not set by user
 if [ "$KEYPASS" == "<blank>" ]; then
