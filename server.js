@@ -447,8 +447,8 @@ function server_container(server_name, base_dir, socket_io) {
             });
           } catch (e) {
             // catches invalid cron expressions
-            logging.warn('[{0}] invalid cron expression:'.format(server_name), cron_hash, cron_dict[cronhash]);
-            instance.set_cron(opts.hash, false, function(){});
+            logging.warn('[{0}] invalid cron expression:'.format(server_name), cronhash, cron_dict[cronhash]);
+            instance.set_cron(cronhash, false, function(){});
           }
         }
       }
