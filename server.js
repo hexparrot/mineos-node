@@ -776,14 +776,27 @@ function server_container(server_name, base_dir, socket_io) {
         instance.crons(function(err, cron_dict) {
           for (var cronhash in cron_dict) {
             if (cron_dict[cronhash].enabled) {
-              cron[cronhash] = new CronJob({
-                cronTime: cron_dict[cronhash].source,
-                onTick: function() {
-                  server_dispatcher(this);
-                },
-                start: true,
-                context: cron_dict[cronhash]
-              });
+              try {
+                cron[cronhash] = new CronJob({
+                  cronTime: cron_dict[cronhash].source,
+                  onTick: function() {
+                    server_dispatcher(this);
+                  },
+                  start: true,
+                  context: cron_dict[cronhash]
+                });
+              } catch (e) {
+                //catches invalid cron pattern, disables cron
+                logging.warn('[{0}] {1} invalid cron expression:'.format(server_name, ip_address), cron_hash, opts);
+                instance.set_cron(opts.hash, false, function(){
+                  self.front_end.emit('host_notice', {
+                    'server_name': server_name,
+                    'command': 'crontab',
+                    'success': false,
+                    'help_text': 'Cron disabled due to invalid cron expression: {0}'.format(opts.source)
+                  });
+                });
+              }
             }
           }
           callback();
