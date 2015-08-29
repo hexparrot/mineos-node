@@ -436,14 +436,20 @@ function server_container(server_name, base_dir, socket_io) {
     instance.crons(function(err, cron_dict) {
       for (var cronhash in cron_dict) {
         if (cron_dict[cronhash].enabled) {
-          cron[cronhash] = new CronJob({
-            cronTime: cron_dict[cronhash].source,
-            onTick: function() {
-              cron_dispatcher(this);
-            },
-            start: true,
-            context: cron_dict[cronhash]
-          });
+          try {
+            cron[cronhash] = new CronJob({
+              cronTime: cron_dict[cronhash].source,
+              onTick: function() {
+                cron_dispatcher(this);
+              },
+              start: true,
+              context: cron_dict[cronhash]
+            });
+          } catch (e) {
+            // catches invalid cron expressions
+            logging.warn('[{0}] invalid cron expression:'.format(server_name), cron_hash, cron_dict[cronhash]);
+            instance.set_cron(opts.hash, false, function(){});
+          }
         }
       }
     })
