@@ -793,15 +793,8 @@ function server_container(server_name, base_dir, socket_io) {
                 });
               } catch (e) {
                 //catches invalid cron pattern, disables cron
-                logging.warn('[{0}] {1} invalid cron expression:'.format(server_name, ip_address), cron_hash, opts);
-                instance.set_cron(opts.hash, false, function(){
-                  self.front_end.emit('host_notice', {
-                    'server_name': server_name,
-                    'command': 'crontab',
-                    'success': false,
-                    'help_text': 'Cron disabled due to invalid cron expression: {0}'.format(opts.source)
-                  });
-                });
+                logging.warn('[{0}] {1} invalid cron expression submitted:'.format(server_name, ip_address), cron_dict[cronhash].source);
+                instance.set_cron(opts.hash, false, function(){});
               }
             }
           }
