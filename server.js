@@ -28,6 +28,8 @@ server.backend = function(base_dir, socket_emitter) {
   fs.ensureDirSync(path.join(base_dir, mineos.DIRS['import']));
   fs.ensureDirSync(path.join(base_dir, mineos.DIRS['profiles']));
 
+  fs.chmod(path.join(base_dir, mineos.DIRS['import']), 0777);
+
   (function() {
     //thanks to https://github.com/flareofghast/node-advertiser/blob/master/advert.js
     var dgram = require('dgram');
