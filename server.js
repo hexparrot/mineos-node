@@ -19,6 +19,8 @@ server.backend = function(base_dir, socket_emitter) {
   self.profiles = [];
   self.front_end = socket_emitter;
 
+  process.umask(0002);
+
   fs.ensureDirSync(base_dir);
   fs.ensureDirSync(path.join(base_dir, mineos.DIRS['servers']));
   fs.ensureDirSync(path.join(base_dir, mineos.DIRS['backup']));
@@ -201,7 +203,7 @@ server.backend = function(base_dir, socket_emitter) {
 
           for (var idx in self.profiles)
             if (self.profiles[idx].id == args.profile.id) {
-              download_profiles(self.profiles[idx], progress_emitter, function(retval){
+              download_profiles(base_dir, self.profiles[idx], progress_emitter, function(retval){
                 self.front_end.emit('host_notice', retval);
                 self.send_profile_list();
               });
@@ -1214,7 +1216,7 @@ function check_profiles(base_dir, callback) {
 
 } // end check_profiles
 
-function download_profiles(args, progress_update_fn, callback) {
+function download_profiles(base_dir, args, progress_update_fn, callback) {
   var request = require('request');
   var progress = require('request-progress');
 
@@ -1222,7 +1224,7 @@ function download_profiles(args, progress_update_fn, callback) {
 
   var DOWNLOADS = {
     mojang: function(inner_callback) {
-      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.id);
+      var dest_dir = path.join(base_dir, 'profiles', args.id);
       var dest_filepath = path.join(dest_dir, args.filename);
 
       var url = args.url;
@@ -1264,7 +1266,7 @@ function download_profiles(args, progress_update_fn, callback) {
     ftb: function(inner_callback) {
       var unzip = require('unzip');
 
-      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.id);
+      var dest_dir = path.join(base_dir, 'profiles', args.id);
       var dest_filepath = path.join(dest_dir, args.filename);
 
       var url = args.url;
@@ -1307,7 +1309,7 @@ function download_profiles(args, progress_update_fn, callback) {
     ftb_third_party: function(inner_callback) {
       var unzip = require('unzip');
 
-      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.id);
+      var dest_dir = path.join(base_dir, 'profiles', args.id);
       var dest_filepath = path.join(dest_dir, args.filename);
 
       var url = args.url;
@@ -1348,7 +1350,7 @@ function download_profiles(args, progress_update_fn, callback) {
       });
     },
     pocketmine: function(inner_callback) {
-      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.id);
+      var dest_dir = path.join(base_dir, 'profiles', args.id);
       var dest_filepath = path.join(dest_dir, args.filename);
 
       var url = args.url;
@@ -1387,7 +1389,7 @@ function download_profiles(args, progress_update_fn, callback) {
     php: function(inner_callback) {
       var tarball = require('tarball-extract')
 
-      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.id);
+      var dest_dir = path.join(base_dir, 'profiles', args.id);
       var dest_filepath = path.join(dest_dir, args.filename);
 
       var url = args.url;
@@ -1435,7 +1437,7 @@ function download_profiles(args, progress_update_fn, callback) {
       });
     },
     bungeecord: function(inner_callback) {
-      var dest_dir = '/var/games/minecraft/profiles/{0}'.format(args.id);
+      var dest_dir = path.join(base_dir, 'profiles', args.id);
       var dest_filepath = path.join(dest_dir, args.filename);
 
       var url = args.url;

@@ -17,7 +17,6 @@ var sessionStore = new expressSession.MemoryStore();
 var app = express();
 var http = require('http').Server(app);
 
-var BASE_DIR = '/var/games/minecraft';
 var response_options = {root: __dirname};
 
 // Authorization
