@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Generate SSL certificate
 # Note: daemons using certificate need to be restarted for changes to take effect
 
@@ -74,7 +74,7 @@ openssl req -x509 \
 mkdir -p ${CERTFILE%/*} ${CRTFILE%/*} ${KEYFILE%/*}
 
 # remove password protection from key if not set by user
-if [ "$KEYPASS" == "<blank>" ]; then
+if [ "$KEYPASS" = "<blank>" ]; then
     openssl rsa -passin pass:$KEYPASS < $TMPKEY > $KEYFILE
     cp $KEYFILE $CERTFILE
 else
