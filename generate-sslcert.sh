@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Generate SSL certificate
 # Note: daemons using certificate need to be restarted for changes to take effect
 
