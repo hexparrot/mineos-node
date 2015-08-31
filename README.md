@@ -25,7 +25,7 @@ Do not install this atop an existing MineOS system, since the installation locat
     git clone https://github.com/hexparrot/mineos-node.git minecraft
     cd minecraft
     chmod +x generate-sslcert.sh
-    ./generate-sslcert.sh
+    /bin/bash generate-sslcert.sh
     npm install --all
     
 For hosts using 'upstart':
@@ -107,6 +107,7 @@ The Angular.JS-based web user interface capable of:
 * easy selection of server packs from FTB or Mojang official jars
 * PHAR support for Pocketmine servers
 * Support for BungeeCord servers
+* command-line interface for scripting
 
 TODO
 -------
@@ -118,5 +119,4 @@ EVENTUALLY
 -------
 
 * implement previous_versions: functionality to roll back or view particular files' previous state
-* command-line interface for scripting
 * identify java versions in web-ui, allow choice of utilized jvm
