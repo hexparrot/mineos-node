@@ -1,16 +1,21 @@
 {
   "WEBSITE_TITLE": "MineOS Web-Oberfläche",
   "NOTIFICATIONS": "Benachrichtigungen",
+  "REFRESH_SERVER_LIST": "Refresh Server List",
+  "REFRESH_PROFILE_LIST": "Refresh Profile List",
+  "LOG_OFF": "Log Off",
 
   "HOST_SETTINGS": "MineOS-Einstellungen",
   "DASHBOARD": "Übersicht",
   "CREATE_NEW_SERVER": "Neuen Server erstellen",
+  "IMPORT_SERVER": "Import a Server",
   "PROFILES": "Profile",
   "CALENDAR": "Kalender",
 
   "SERVER_SETTINGS": "Server-Einstellungen",
   "SERVER_STATUS": "Server Status",
   "BACKUPS_AND_RESTORES": "Backup und Wiederherstellung",
+  "SERVER.PROPERTIES": "server.properties",
   "RESTORE_POINT": "Wiederherstellungspunkt",
   "RESTORE_POINTS": "Wiederherstellung",
   "ARCHIVES": "Archive",
@@ -40,20 +45,24 @@
 
   "SERVER_NAME": "Server Name",
   "CREATE_HELP": "Erlaubt sind Buchstaben, Ziffern und _ (Unterstriche).",
+  "UNCONVENTIONAL_SERVER_TYPE": "This is an unconventional server, such as a proxy/load balancing server.",
 
   "OFFICIAL_MOJANG_SERVER_JARS": "Offizielle Mojang Serverprofile",
-  "MOJANG_ID": "Mojang ID",
+  "AVAILABLE_SERVER_JARS": "Available Server Jars/Packs",
+  "IDENTIFIER": "ID",
   "RELEASE_TIMESTAMP": "Release vom",
   "RELEASE_TYPE": "Release Typ",
   "RELEASE": "Release",
+  "OLD_VERSION": "Old Version",
   "SNAPSHOT": "Snapshot",
   "SHOW_ALL_RELEASES": "Alle anzeigen",
   "DOWNLOADED_PROFILES": "Heruntergeladene Profile",
   "CURRENTLY_USING_PROFILE": "Derzeit verwendetes Profil:",
-  "CHANGE_PROFILE_TO": "Profil ändern:",
   "PROFILE": "Profil",
+  "PROFILE_DESC": "Profile Description",
+  "DOWNLOADED": "Downloaded",
 
-  "GLANCE": "Server-Details", 
+  "GLANCE": "Server-Details",
   "VERSION": "Version",
   "REPORTED_VERSION": "Interne Version",
   "MEMORY_FOOTPRINT": "Speicherverbrauch (RAM)",
@@ -65,6 +74,9 @@
   "STOP_AND_BACKUP": "Stop mit Backup",
   "KILL": "Kill",
   "BROADCAST_TO_LAN": "Im LAN veröffentlichen",
+  "START_ON_BOOT": "Start server on boot",
+  "UNCONVENTIONAL_SERVER": "This is not a conventional Minecraft server",
+  "COPY_PROFILE": "Copy profile to live server files",
 
   "JAVA_SETTINGS": "Java Settings",
   "MEMORY_ALLOCATION": "RAM Einstellungen (Heapsize)",
@@ -72,6 +84,9 @@
   "JAVA_XMS": "-Xms",
   "MB_ABBREVIATION": "MB",
   "SELECT_SERVER_PROFILE": "Serverprofil auswählen",
+  "CHANGE_PROFILE_TO": "Change profile to:",
+  "CHANGE_JARFILE_TO": "Change runnable jar to:",
+  "ADDITIONAL_JAVA_ARGS": "Additional Java arguments:",
 
   "MOST_RECENT_RESTORE_POINT": "Jüngster Wiederherstellungspunkt",
   "OLDEST_RESTORE_POINT": "Ältester Wiederherstellungspunkt",
@@ -98,6 +113,9 @@
   "DELETE": "Löschen",
   "EDIT": "Bearbeiten",
   "SETTINGS": "Einstellungen",
+  "DELETE_ARCHIVES": "Delete Archives:",
+  "DELETE_RESTORE_POINTS": "Delete Restore Points:",
+  "DELETE_LIVE_FILES": "Delete Live Server Files:",
 
   "AVAILABLE_RESTORE_POINTS": "Verfügbare Wiederherstellungspunkte",
   "STEP": "ID",
@@ -105,6 +123,7 @@
   "SIZE": "Größe",
   "CUMULATIVE_SIZE": "Größe kumulativ",
   "RESTORE": "Wiederherstellen",
+  "PRUNE": "Prune older than this",
 
   "AVAILABLE_ARCHIVES": "Verfügbare Archive",
   "FILENAME": "Dateiname",
@@ -122,19 +141,28 @@
 
   "CREDITS": "MineOS - erstellt und gewartet von William Dizon und Mitwirkenden",
 
+  "CHANGE_LOCALE": "Change Localization",
+
   "EULA_DETECTED": "Minecraft EULA",
   "EULA_MUST_BE_ACCEPTED": "Mojang erwartet von Server-Admins, dass diese die Minecraft EULA akzeptieren, bevor ein Server gestartet werden kann. Dies erfolgt, indem in der Datei 'eula.txt' im Hauptverzeichnis des Servers der Wert 'eula=false' in 'eula=true' geändert wird.",
   "ACCEPT_EULA": "Minecraft EULA akzeptieren",
   "READ_THE_EULA": "Minecraft EULA lesen",
 
+  "STARTING_A_NEW_SERVER": "Starting a new server",
+  "NEW_SERVER_OVERVIEW": "Starting a new server requires at least the following initial configuration: a runnable server JAR and the Java maximum heap size. Select a profile to expand additional JAR files.",
+
   "CREATE_SERVER_FROM_ARCHIVE": "Neuen Server aus einem bestehenden Archiv erstellen",
   "SERVER_FROM_ARCHIVE_DESC": "Bitte den Namen des neuen Servers eingeben",
+
+  "ADD_SP_ATTRIBUTE": "Add new attribute",
+  "SP_DESCRIPTION": "Add a new attribute/value pair to server.properties.",
+  "SP_ADD": "Add",
 
   "SUCCEEDED": "erfolgreich",
   "FAILED": "fehlgeschlagen",
   "!up": "Für diese Aktion darf der Server nicht online sein.",
   "up": "Server muss für diese Aktion online sein.",
   "!exists": "Server darf bei dieser Aktion noch nicht existieren.",
-  "exists": "Server nicht gefunden. Dieser muss existieren, um das gewählte Kommando darauf auszuführen."
+  "exists": "Server nicht gefunden. Dieser muss existieren, um das gewählte Kommando darauf auszuführen.",
+  "eula": "The Mojang End-User Licesnce Agreement must be accepted to start this server."
 }
-

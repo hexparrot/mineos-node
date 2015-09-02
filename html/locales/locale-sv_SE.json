@@ -45,7 +45,7 @@
 
   "SERVER_NAME": "Server Namn",
   "CREATE_HELP": "Endast bokstäver, nummer och streck.",
-  "UNCONVENTIONAL_SERVER_TYPE": "Detta är en okonventionell server, såsom en proxy/lastbalanserande server.", 
+  "UNCONVENTIONAL_SERVER_TYPE": "Detta är en okonventionell server, såsom en proxy/lastbalanserande server.",
 
   "OFFICIAL_MOJANG_SERVER_JARS": "Officiella Mojang Server Jars",
   "AVAILABLE_SERVER_JARS": "Tillgängliga Server Jars/Paket",
@@ -62,7 +62,7 @@
   "PROFILE_DESC": "Profil beskrivning",
   "DOWNLOADED": "Nerladdad",
 
-  "GLANCE": "Server Överblick", 
+  "GLANCE": "Server Överblick",
   "VERSION": "Version",
   "REPORTED_VERSION": "Ping Version",
   "MEMORY_FOOTPRINT": "Minnes Fotavtryck",
@@ -140,6 +140,8 @@
   "SUSPEND": "Suspendera",
 
   "CREDITS": "MineOS skapad och underhålls av William Dizon",
+
+  "CHANGE_LOCALE": "Change Localization",
 
   "EULA_DETECTED": "Minecraft EULA",
   "EULA_MUST_BE_ACCEPTED": "Mojang kräver att Minecraft server administratörer accepterar Licensavtalet för slutanvändaren innan man hostar en Minecraft server. Detta utförs genom att ändra 'eula=false' till 'eula=true' i eula.txt i server mappen.",
