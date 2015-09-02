@@ -1,11 +1,5 @@
 var app = angular.module("mineos", ['angularMoment', 'pascalprecht.translate']);
 
-app.run(['$rootScope', '$translate', function($rootScope, $translate) {
-  $rootScope.change_locale = function (locale) {
-    $translate.use(locale);
-  }
-}]);
-
 app.config(function ($translateProvider) {
   $translateProvider.useSanitizeValueStrategy('escape');
   $translateProvider.useStaticFilesLoader({
@@ -107,7 +101,7 @@ app.filter('profile_downloaded', function() {
 
 /* controllers */
 
-app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($scope, socket, Servers, $filter) {
+app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate', function($scope, socket, Servers, $filter, $translate) {
   $scope.page = 'dashboard';
   $scope.servers = Servers;
   $scope.current = null;
@@ -125,10 +119,16 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     }
   );
 
+  $scope.$watch(function(scope) { return scope.preferred_locale },
+    function(new_value, previous_value) {
+      $scope.change_locale(new_value);
+    }
+  );
+
   $scope.$watch(function(scope) { return scope.current },
     function() {
       $scope.refresh_checkboxes();
-        
+
       if (!($scope.current in Servers))
         $scope.change_page('dashboard');
     }
@@ -228,6 +228,10 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     };
 
   /* other functions */
+  
+  $scope.change_locale = function(locale) {
+    $translate.use(locale);
+  }
 
   $scope.server_command = function(cmd, args) {
     if (args) {
@@ -337,11 +341,14 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     },
     close_add_sp: function() {
       $('#modal_sp').modal('hide');
-      socket.emit($scope.current, 'command', { 
+      socket.emit($scope.current, 'command', {
         'command': 'modify_sp',
         'property': $scope.sp.new_attribute,
         'new_value': $scope.sp.new_value
       });
+    },
+    open_locales: function() {
+      $('#modal_locales').modal('show');
     }
   }
 
