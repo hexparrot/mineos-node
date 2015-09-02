@@ -101,6 +101,7 @@
                             <footer>
                                 <a ng-click="host_command('refresh_server_list')" class="text"><span class="icon icone-globe"></span> {{ 'REFRESH_SERVER_LIST' | translate }}</a><br>
                                 <a ng-click="host_command('refresh_profile_list', {redownload: true})" class="text"><span class="icon icone-globe"></span> {{ 'REFRESH_PROFILE_LIST' | translate }}</a><br>
+                                <a ng-click="modals.open_locales()" class="text"><span class="icon icone-globe"></span> {{ 'CHANGE_LOCALE' | translate }}</a><br>
                                 <a href="/logout" class="text"><span class="icon icone-off"></span> {{ 'LOGOFF' | translate }}</a>
                             </footer>
                         </div>
@@ -1494,6 +1495,26 @@
 
                 </div>
                 <!--/ END Content -->
+
+            <!-- Modal With Animation -->
+            <div id="modal_locales" class="modal hide fade">
+                <div class="modal-header">
+                    <h4 translate="CHANGE_LOCALE"></h4>
+                </div>
+                <div class="modal-body">
+                  <!-- Select -->
+                  <div class="control-group">
+                      <div class="controls">
+                          <select class="span2" ng-model="preferred_locale">
+                              <option value="en_US">en_US</option>
+                              <option value="de_DE">de_DE</option>
+                              <option value="sv_SE">sv_SE</option>
+                          </select>
+                      </div>
+                  </div>
+                  <!--/ Select -->
+                </div>
+            </div><!--/ Modal With Animation -->
 
             <!-- Modal With Animation -->
             <div id="modal_sp" class="modal hide fade">

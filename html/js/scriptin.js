@@ -119,10 +119,16 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     }
   );
 
+  $scope.$watch(function(scope) { return scope.preferred_locale },
+    function(new_value, previous_value) {
+      $scope.change_locale(new_value);
+    }
+  );
+
   $scope.$watch(function(scope) { return scope.current },
     function() {
       $scope.refresh_checkboxes();
-        
+
       if (!($scope.current in Servers))
         $scope.change_page('dashboard');
     }
@@ -335,11 +341,14 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     },
     close_add_sp: function() {
       $('#modal_sp').modal('hide');
-      socket.emit($scope.current, 'command', { 
+      socket.emit($scope.current, 'command', {
         'command': 'modify_sp',
         'property': $scope.sp.new_attribute,
         'new_value': $scope.sp.new_value
       });
+    },
+    open_locales: function() {
+      $('#modal_locales').modal('show');
     }
   }
 
