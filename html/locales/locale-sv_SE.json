@@ -17,7 +17,7 @@
   "BACKUPS_AND_RESTORES": "Säkerhetskopior och Återställningspunkter",
   "SERVER.PROPERTIES": "server.properties",
   "RESTORE_POINT": "Återställ punkt",
-  "RESTORE_POINTS": "Återställ punkter",
+  "RESTORE_POINTS": "Återställningspunkter",
   "ARCHIVES": "Arkiv",
   "SCHEDULING": "Schemaläggning",
   "CONFIGURATION": "Konfiguration",
@@ -29,7 +29,7 @@
 
   "CURRENTLY_SELECTED_SERVER": "Vald Server",
   "SERVER_OVERVIEW": "Server Översikt",
-  "SERVERS_RUNNING": "Servers Running",
+  "SERVERS_RUNNING": "Antal startade servrar",
   "PLAYERS_ONLINE": "Spelare Online",
   "UPTIME": "Uptid",
   "RAM_FREE": "Ledigt RAM-minne",
@@ -65,7 +65,7 @@
   "GLANCE": "Server Överblick",
   "VERSION": "Version",
   "REPORTED_VERSION": "Ping Version",
-  "MEMORY_FOOTPRINT": "Minnes Fotavtryck",
+  "MEMORY_FOOTPRINT": "Minnes Användning",
 
   "SERVER_ACTIONS": "Server Handlingar",
   "START": "Starta",
@@ -123,7 +123,7 @@
   "SIZE": "Storlek",
   "CUMULATIVE_SIZE": "Ackumulerad Storlek",
   "RESTORE": "Återställ",
-  "PRUNE": "Beskär äldre än den här",
+  "PRUNE": "Ta bort äldre än den här",
 
   "AVAILABLE_ARCHIVES": "Tillgängliga Arkiv",
   "FILENAME": "Filnamn",
@@ -141,7 +141,7 @@
 
   "CREDITS": "MineOS skapad och underhålls av William Dizon",
 
-  "CHANGE_LOCALE": "Change Localization",
+  "CHANGE_LOCALE": "Ändra språk",
 
   "EULA_DETECTED": "Minecraft EULA",
   "EULA_MUST_BE_ACCEPTED": "Mojang kräver att Minecraft server administratörer accepterar Licensavtalet för slutanvändaren innan man hostar en Minecraft server. Detta utförs genom att ändra 'eula=false' till 'eula=true' i eula.txt i server mappen.",
