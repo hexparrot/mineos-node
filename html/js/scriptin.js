@@ -1,11 +1,5 @@
 var app = angular.module("mineos", ['angularMoment', 'pascalprecht.translate']);
 
-app.run(['$rootScope', '$translate', function($rootScope, $translate) {
-  $rootScope.change_locale = function (locale) {
-    $translate.use(locale);
-  }
-}]);
-
 app.config(function ($translateProvider) {
   $translateProvider.useSanitizeValueStrategy('escape');
   $translateProvider.useStaticFilesLoader({
@@ -107,7 +101,7 @@ app.filter('profile_downloaded', function() {
 
 /* controllers */
 
-app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($scope, socket, Servers, $filter) {
+app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate', function($scope, socket, Servers, $filter, $translate) {
   $scope.page = 'dashboard';
   $scope.servers = Servers;
   $scope.current = null;
@@ -228,6 +222,10 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', function($sco
     };
 
   /* other functions */
+  
+  $scope.change_locale = function(locale) {
+    $translate.use(locale);
+  }
 
   $scope.server_command = function(cmd, args) {
     if (args) {
