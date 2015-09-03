@@ -1,0 +1,7 @@
+[program:mineos]
+command=/usr/local/bin/node webui.js
+directory=/usr/local/games/minecraft
+autostart=true
+autorestart=true
+redirect_stderr=true
+environment=PATH="/usr/local/bin:%(ENV_PATH)s"
