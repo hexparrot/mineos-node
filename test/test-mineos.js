@@ -1606,6 +1606,65 @@ test.chown = function(test) {
   })
 }
 
+test.chown_recursive = function(test) {
+  var userid = require('userid');
+
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  var NEW_OWNER_CREDS = {
+    uid: 1001,
+    gid: 1001
+  }
+
+  if (userid.uid(process.env.USER) != 0) {
+    NEW_OWNER_CREDS = {
+      uid: userid.uid(process.env.USER),
+      gid: userid.uid(process.env.USER)
+    }
+  }
+
+  var newfile = path.join(instance.env.cwd, 'newfile');
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(fs.open, newfile, 'w'),
+    async.apply(fs.chown, newfile, OWNER_CREDS.uid, OWNER_CREDS.gid),
+    function(callback) {
+      fs.readdir(instance.env.cwd, function(err, files) {
+        for (var i=0; i<files.length; i++) {
+          var fp = path.join(instance.env.cwd, files[i]);
+
+          test.equal(fs.statSync(fp).uid, OWNER_CREDS.uid);
+          test.equal(fs.statSync(fp).gid, OWNER_CREDS.gid);
+        }
+        callback();
+      });
+    },
+    function(callback) {
+      instance.chown(NEW_OWNER_CREDS.uid, NEW_OWNER_CREDS.gid, function(err) {
+        test.ifError(err);
+        callback(err);
+      })
+    },
+    function(callback) {
+
+      fs.readdir(instance.env.cwd, function(err, files) {
+        for (var i=0; i<files.length; i++) {
+          var fp = path.join(instance.env.cwd, files[i]);
+
+          test.equal(fs.statSync(fp).uid, NEW_OWNER_CREDS.uid);
+          test.equal(fs.statSync(fp).gid, NEW_OWNER_CREDS.gid);
+        }
+        callback();
+      });
+    }
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
 test.broadcast_property = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);

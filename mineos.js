@@ -1424,12 +1424,14 @@ mineos.mc = function(server_name, base_dir) {
 
   self.chown = function(uid, gid, callback) {
     var auth = require('./auth');
+    var chownr = require('chownr');
+
     async.series([
       async.apply(auth.verify_ids, uid, gid),
       async.apply(self.verify, 'exists'),
-      async.apply(fs.chown, self.env.cwd, uid, gid),
-      async.apply(fs.chown, self.env.bwd, uid, gid),
-      async.apply(fs.chown, self.env.awd, uid, gid)
+      async.apply(chownr, self.env.cwd, uid, gid),
+      async.apply(chownr, self.env.bwd, uid, gid),
+      async.apply(chownr, self.env.awd, uid, gid)
     ], callback)
   }
 
