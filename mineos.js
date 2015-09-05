@@ -336,6 +336,8 @@ mineos.mc = function(server_name, base_dir) {
 
     function move_to_parent_dir(source_dir, inner_callback) {
       var remainder = null;
+      var attempted_move = false;
+
       async.waterfall([
         async.apply(fs.readdir, source_dir),
         function(files, cb) {
@@ -346,6 +348,7 @@ mineos.mc = function(server_name, base_dir) {
             cb(true);
         },
         function(cb) {
+          var attempted_move = true;
           var inside_dir = path.join(source_dir, remainder);
           fs.lstat(inside_dir, function(err, stat) {
             if (stat.isDirectory)
@@ -369,7 +372,12 @@ mineos.mc = function(server_name, base_dir) {
               cb(err);
           })
         }
-      ], inner_callback);
+      ], function(err) {
+        if (attempted_move)
+          inner_callback(err);
+        else
+          inner_callback(null); //not really an error if it cancelled because no parent dir
+      });
     }
 
     if (filepath.match(/\//))  //if it has a '/', its hopefully an absolute path
@@ -387,34 +395,31 @@ mineos.mc = function(server_name, base_dir) {
     switch (extension) {
       case 'zip':
         var DecompressZip = require('decompress-zip');
-        var unzipper = new DecompressZip(dest_filepath);
 
-        self.create(owner, function(err) {
-          if (err)
-            callback(err)
-          else {
-            unzipper.on('error', function (err) {
-              callback(err);
-            });
-           
-            unzipper.on('extract', function (log) {
-              async.series([
-                async.apply(self.chown, owner.uid, owner.gid),
-                async.apply(move_to_parent_dir, self.env.cwd),
-                async.apply(self.sp),
-                async.apply(self.sc),
-                async.apply(self.crons),
-                async.apply(fs.ensureDir, self.env.bwd),
-                async.apply(fs.ensureDir, self.env.awd)
-              ], callback)
-            });
+        function unzipper_it(cb) {
+          var unzipper = new DecompressZip(dest_filepath);
 
-            unzipper.extract({
-              path: self.env.cwd
-            });
-          }
-  
-        })
+          unzipper.on('error', function (err) {
+            cb(err);
+          });
+         
+          unzipper.on('extract', function (log) {
+            async.series([
+              async.apply(move_to_parent_dir, self.env.cwd),
+              async.apply(fs.chown, self.env.cwd, owner.uid, owner.gid)
+            ], cb)
+          });
+
+          unzipper.extract({
+            path: self.env.cwd
+          });
+        }
+
+        async.series([
+          async.apply(self.create, owner),
+          async.apply(unzipper_it)
+        ], callback)
+
         break;
       case 'tar.gz':
       case 'tgz':
