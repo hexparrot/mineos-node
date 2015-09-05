@@ -404,10 +404,7 @@ mineos.mc = function(server_name, base_dir) {
           });
          
           unzipper.on('extract', function (log) {
-            async.series([
-              async.apply(move_to_parent_dir, self.env.cwd),
-              async.apply(fs.chown, self.env.cwd, owner.uid, owner.gid)
-            ], cb)
+            move_to_parent_dir(self.env.cwd, cb);
           });
 
           unzipper.extract({
@@ -417,7 +414,8 @@ mineos.mc = function(server_name, base_dir) {
 
         async.series([
           async.apply(self.create, owner),
-          async.apply(unzipper_it)
+          async.apply(unzipper_it),
+          async.apply(self.chown, owner['uid'], owner['gid'])
         ], callback)
 
         break;
