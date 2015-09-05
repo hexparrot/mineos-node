@@ -137,7 +137,7 @@
   "SEND_TO_CONSOLE": "Envoyer à consoler",
   "ADDITIONAL_ARGUMENT": "Argument supplémentaire",
   "SUBMIT_CRONJOB": "Submit cronjob",
-  "SUSPEND": "suspendre",
+  "SUSPEND": "Suspendre",
 
   "CREDITS": "MineOS créé et maintenu par William Dizon",
 
@@ -160,9 +160,9 @@
 
   "SUCCEEDED": "Réussi",
   "FAILED": "Echoué",
-  "!up": "Server may not be up when performing this action.",
-  "up": "Server must be up when performing this action.",
-  "!exists": "Server may not exist when performing this action.",
+  "!up": "Le doit ètre etein pour faire cette action.",
+  "up": "Le doit ètre alummer pour faire cette action.",
+  "!exists": "Le serveur n'exists pas pour faire cette action.",
   "exists": "Le serveur n'est pas trouvable",
   "eula": "Le Contrat de Licence Utilisateur Final Mojang doit être accepté pour démarrer ce serveur."
 }
