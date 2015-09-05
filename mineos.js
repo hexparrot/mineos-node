@@ -389,25 +389,32 @@ mineos.mc = function(server_name, base_dir) {
         var DecompressZip = require('decompress-zip');
         var unzipper = new DecompressZip(dest_filepath);
 
-        unzipper.on('error', function (err) {
-          callback(err);
-        });
-         
-        unzipper.on('extract', function (log) {
-          async.series([
-            async.apply(self.chown, owner.uid, owner.gid),
-            async.apply(move_to_parent_dir, self.env.cwd),
-            async.apply(self.sp),
-            async.apply(self.sc),
-            async.apply(self.crons),
-            async.apply(fs.ensureDir, self.env.bwd),
-            async.apply(fs.ensureDir, self.env.awd)
-          ], callback)
-        });
+        self.create(owner, function(err) {
+          if (err)
+            callback(err)
+          else {
+            unzipper.on('error', function (err) {
+              callback(err);
+            });
+           
+            unzipper.on('extract', function (log) {
+              async.series([
+                async.apply(self.chown, owner.uid, owner.gid),
+                async.apply(move_to_parent_dir, self.env.cwd),
+                async.apply(self.sp),
+                async.apply(self.sc),
+                async.apply(self.crons),
+                async.apply(fs.ensureDir, self.env.bwd),
+                async.apply(fs.ensureDir, self.env.awd)
+              ], callback)
+            });
 
-        unzipper.extract({
-          path: self.env.cwd
-        });
+            unzipper.extract({
+              path: self.env.cwd
+            });
+          }
+  
+        })
         break;
       case 'tar.gz':
       case 'tgz':
