@@ -144,7 +144,7 @@
   "CRONTAB_SCHEDULE": "Crontab Schedule",
   "CRON_EXPRESSION": "Cron Expression",
   "COMMAND_TO_RUN": "Commande à exécuter",
-  "SEND_TO_CONSOLE": "Envoyer à consoler",
+  "SEND_TO_CONSOLE": "Envoyer à la console",
   "ADDITIONAL_ARGUMENT": "Argument supplémentaire",
   "SUBMIT_CRONJOB": "Submit cronjob",
   "SUSPEND": "Suspendre",
