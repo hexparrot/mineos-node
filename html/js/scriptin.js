@@ -55,6 +55,21 @@ app.filter('bytes_to_mb', function() {
   };
 })
 
+app.filter('kb_string_to_mb', function() {
+  return function(kbyte_str) {
+    var k = 1024;
+    var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    var kbytes = parseInt(kbyte_str) * k;
+
+    if (kbytes) {
+      var i = Math.floor(Math.log(kbytes) / Math.log(k));
+      return (kbytes / Math.pow(k, i)).toPrecision(3) + sizes[i];
+    } else {
+      return '';
+    }
+  };
+})
+
 app.filter('seconds_to_time', function() {
   return function(seconds) {
     return moment.duration(seconds, "seconds").format();
