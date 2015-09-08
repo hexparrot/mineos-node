@@ -405,10 +405,11 @@ test.get_start_args_java = function(test) {
         test.equal(args[3], '-server');
         test.equal(args[4], '-Xmx256M');
         test.equal(args[5], '-Xms128M');
-        test.equal(args[6], '-Xmx2G -XX:MaxPermSize=256M');
-        test.equal(args[7], '-jar');
-        test.equal(args[8], 'minecraft_server.1.7.9.jar');
-        test.equal(args[9], 'nogui');
+        test.equal(args[6], '-Xmx2G');
+        test.equal(args[7], '-XX:MaxPermSize=256M');
+        test.equal(args[8], '-jar');
+        test.equal(args[9], 'minecraft_server.1.7.9.jar');
+        test.equal(args[10], 'nogui');
         callback(err);
       })
     }

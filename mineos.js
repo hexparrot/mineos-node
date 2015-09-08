@@ -517,8 +517,12 @@ mineos.mc = function(server_name, base_dir) {
           if (results.xms > 0)
             args.push('-Xms{0}M'.format(results.xms));
           
-          if (results.java_tweaks)
-            args.push(results.java_tweaks);
+          if (results.java_tweaks) {
+            var splits = results.java_tweaks.split(/ /);
+            for (var i in splits)
+              args.push(splits[i]);
+          }
+
           args.push.apply(args, ['-jar', results.jarfile, results.jar_args]);
 
           inner_callback(null, args);
@@ -578,8 +582,12 @@ mineos.mc = function(server_name, base_dir) {
           var args = ['-dmS', 'mc-{0}'.format(self.server_name)];
           args.push.apply(args, [results.binary, '-server', '-Xmx{0}M'.format(results.xmx), '-Xms{0}M'.format(results.xms)]);
 
-          if (results.java_tweaks)
-            args.push(results.java_tweaks);
+          if (results.java_tweaks) {
+            var splits = results.java_tweaks.split(/ /);
+            for (var i in splits)
+              args.push(splits[i]);
+          }
+
           args.push.apply(args, ['-jar', results.jarfile, results.jar_args]);
 
           inner_callback(null, args);
