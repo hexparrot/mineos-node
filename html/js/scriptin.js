@@ -403,16 +403,25 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
       return res;
     }
 
+    function get_max_y(arr) {
+      var max_y = 1;
+      for (var i=0; i<arr.length; i++)
+        if (arr[i][1] > max_y)
+          max_y = arr[i][1];
+      return max_y;
+    }
+
     var dataset = [
       { label: "fifteen", data: get_enumerated_values(2), color: "#0077FF" },
       { label: "five", data: get_enumerated_values(1), color: "#ED7B00" },
       { label: "one", data: get_enumerated_values(0), color: "#E8E800" }
     ];
 
-    $scope.loadavg_options.yaxis.max = Math.max(
-      Math.max.apply(Math,dataset[0].data),
-      Math.max.apply(Math,dataset[1].data),
-      Math.max.apply(Math,dataset[2].data)) || $scope.loadavg_options.fallback_xaxis_max;
+    $scope.loadavg_options.yaxis.max = Math.max.apply(Math, [
+      get_max_y(dataset[0].data),
+      get_max_y(dataset[1].data),
+      get_max_y(dataset[2].data)
+    ]);
 
     $.plot($scope.loadavg_options.element, dataset, $scope.loadavg_options).draw();
   }
