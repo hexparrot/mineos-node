@@ -423,7 +423,7 @@
                                                 <td><a ng-attr-title="{{ 'MC Protocol: ' + instance.heartbeat.ping.protocol }}">{{ instance.sc.minecraft.profile }}</a></td>
                                                 <td class="hidden-phone">{{ (instance.sc.minecraft.unconventional ? '-----' : instance.sp['server-port']) }}</td>
                                                 <td><span class="label" ng-show="instance.heartbeat" ng-class="{'label-success': instance.heartbeat.up, 'label-important': !instance.heartbeat.up}">{{ instance.heartbeat.up ? 'up' : 'down' }}</span></td>
-                                                <td>{{ instance.heartbeat.memory.VmRSS }}</td>
+                                                <td>{{ instance.heartbeat.memory.VmRSS | kb_string_to_mb }}</td>
                                             </tr>
                                         </tbody>
                                     </table>
