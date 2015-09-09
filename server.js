@@ -50,26 +50,32 @@ server.backend = function(base_dir, socket_emitter) {
   (function() {
     //thanks to https://github.com/flareofghast/node-advertiser/blob/master/advert.js
     var dgram = require('dgram');
-    var udp_broadcaster = dgram.createSocket('udp4');
+    var udp_broadcaster = {};
     var UDP_DEST = '255.255.255.255';
     var UDP_PORT = 4445;
     var BROADCAST_DELAY_MS = 4000;
 
-    udp_broadcaster.bind();
-    udp_broadcaster.on("listening", function () {
-      udp_broadcaster.setBroadcast(true);
-      async.forever(
-        function(next) {
-          for (var s in self.servers) {
-            self.servers[s].broadcast_to_lan(function(msg) {
-              if (msg)
-                udp_broadcaster.send(msg, 0, msg.length, UDP_PORT, UDP_DEST);
-            })
-          }
-          setTimeout(next, BROADCAST_DELAY_MS);
+    async.forever(
+      function(next) {
+        for (var s in self.servers) {
+          var server_ip = '0.0.0.0'; // I cannot for the life of me figure out how to get the MC server IP
+          self.servers[s].broadcast_to_lan(function(msg) {
+            if (msg) {
+              if (udp_broadcaster[server_ip]) {
+                udp_broadcaster[server_ip].send(msg, 0, msg.length, UDP_PORT, UDP_DEST);
+              } else {
+                udp_broadcaster[server_ip] = dgram.createSocket('udp4');
+                udp_broadcaster[server_ip].bind(UDP_PORT, server_ip, function () {
+                  udp_broadcaster[server_ip].setBroadcast(true);
+                  udp_broadcaster[server_ip].send(msg, 0, msg.length, UDP_PORT, UDP_DEST);
+                });
+              }
+            }
+          })
         }
-      )
-    });
+        setTimeout(next, BROADCAST_DELAY_MS);
+      }
+    )
   })();
 
   (function() {
