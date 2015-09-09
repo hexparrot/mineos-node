@@ -58,8 +58,7 @@ server.backend = function(base_dir, socket_emitter) {
     async.forever(
       function(next) {
         for (var s in self.servers) {
-          var server_ip = '0.0.0.0'; // I cannot for the life of me figure out how to get the MC server IP
-          self.servers[s].broadcast_to_lan(function(msg) {
+          self.servers[s].broadcast_to_lan(function(msg, server_ip) {
             if (msg) {
               if (udp_broadcaster[server_ip]) {
                 udp_broadcaster[server_ip].send(msg, 0, msg.length, UDP_PORT, UDP_DEST);
@@ -498,7 +497,8 @@ function server_container(server_name, base_dir, socket_io) {
         callback(null);
       else {
         var msg = new Buffer("[MOTD]" + sp_data.motd + "[/MOTD][AD]" + sp_data['server-port'] + "[/AD]");
-        callback(msg);
+        var server_ip = sp_data['server-ip'];
+        callback(msg, server_ip);
       }
     })
   }
