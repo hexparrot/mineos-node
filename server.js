@@ -1115,7 +1115,7 @@ function check_profiles(base_dir, callback) {
             item['group'] = 'forge';
             item['webui_desc'] = 'Forge Jar (build {0})'.format(ref_obj['build']);
             item['weight'] = 0;
-            item['filename'] = 'forge-{0}-{1}-universal.jar'.format(ref_obj['mcversion'], ref_obj['version']);
+            item['filename'] = 'forge-{0}-{1}-installer.jar'.format(ref_obj['mcversion'], ref_obj['version']);
             item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, item.filename));
             item['version'] = ref_obj['mcversion'];
             item['release_version'] = ref_obj['version'];
