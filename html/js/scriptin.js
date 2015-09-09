@@ -185,6 +185,12 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     $scope.username = username;
   })
 
+  socket.on('/', 'commit_msg', function(commit_msg) {
+    console.log(commit_msg)
+    $scope.commit_msg = commit_msg;
+    $scope.git_commit = commit_msg.split(' ')[0];
+  })
+
   socket.on('/', 'host_heartbeat', function(data) {
     $scope.host_heartbeat = data;
     $scope.update_loadavg(data.loadavg);

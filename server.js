@@ -18,6 +18,7 @@ server.backend = function(base_dir, socket_emitter) {
   self.servers = {};
   self.profiles = [];
   self.front_end = socket_emitter;
+  self.commit_msg = '';
 
   process.umask(0002);
 
@@ -29,6 +30,22 @@ server.backend = function(base_dir, socket_emitter) {
   fs.ensureDirSync(path.join(base_dir, mineos.DIRS['profiles']));
 
   fs.chmod(path.join(base_dir, mineos.DIRS['import']), 0777);
+
+  (function() {
+    var which = require('which');
+
+    async.waterfall([
+      async.apply(which, 'git'),
+      function(path, cb) {
+        var child = require('child_process');
+        child.execFile(path, [ 'show', '--oneline', '-s' ], cb);
+      },
+      function(stdout, stderr, cb) {
+        self.commit_msg = (stdout ? stdout : '');
+        cb();
+      }
+    ])
+  })();
 
   (function() {
     //thanks to https://github.com/flareofghast/node-advertiser/blob/master/advert.js
@@ -281,6 +298,7 @@ server.backend = function(base_dir, socket_emitter) {
 
     logging.info('[WEBUI] {0} connected from {1}'.format(username, ip_address));
     socket.emit('whoami', username);
+    socket.emit('commit_msg', self.commit_msg);
 
     for (var server_name in self.servers)
       socket.emit('track_server', server_name);
