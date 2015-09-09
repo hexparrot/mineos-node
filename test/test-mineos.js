@@ -410,6 +410,65 @@ test.get_start_args_java = function(test) {
         test.equal(args[8], '-jar');
         test.equal(args[9], 'minecraft_server.1.7.9.jar');
         test.equal(args[10], 'nogui');
+        test.equal(args.length, 11);
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'jar_args', ''),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2].slice(-4), 'java');
+        test.equal(args[3], '-server');
+        test.equal(args[4], '-Xmx256M');
+        test.equal(args[5], '-Xms128M');
+        test.equal(args[6], '-Xmx2G');
+        test.equal(args[7], '-XX:MaxPermSize=256M');
+        test.equal(args[8], '-jar');
+        test.equal(args[9], 'minecraft_server.1.7.9.jar');
+        test.equal(args[10], 'nogui');
+        test.equal(args.length, 11);
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'jar_args', '--installServer'),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2].slice(-4), 'java');
+        test.equal(args[3], '-server');
+        test.equal(args[4], '-Xmx256M');
+        test.equal(args[5], '-Xms128M');
+        test.equal(args[6], '-Xmx2G');
+        test.equal(args[7], '-XX:MaxPermSize=256M');
+        test.equal(args[8], '-jar');
+        test.equal(args[9], 'minecraft_server.1.7.9.jar');
+        test.equal(args[10], '--installServer');
+        test.equal(args.length, 11);
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'jar_args', 'nogui --installServer'),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2].slice(-4), 'java');
+        test.equal(args[3], '-server');
+        test.equal(args[4], '-Xmx256M');
+        test.equal(args[5], '-Xms128M');
+        test.equal(args[6], '-Xmx2G');
+        test.equal(args[7], '-XX:MaxPermSize=256M');
+        test.equal(args[8], '-jar');
+        test.equal(args[9], 'minecraft_server.1.7.9.jar');
+        test.equal(args[10], 'nogui');
+        test.equal(args[11], '--installServer');
+        test.equal(args.length, 12);
         callback(err);
       })
     }
@@ -496,6 +555,57 @@ test.get_start_args_unconventional = function(test) {
         test.equal(args[5], '-Xms128M');
         test.equal(args[6], '-jar');
         test.equal(args[7], 'BungeeCord-1078.jar');
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'jar_args', ''),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2].slice(-4), 'java');
+        test.equal(args[3], '-server');
+        test.equal(args[4], '-Xmx256M');
+        test.equal(args[5], '-Xms128M');
+        test.equal(args[6], '-jar');
+        test.equal(args[7], 'BungeeCord-1078.jar');
+        test.equal(args.length, 8);
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'jar_args', 'nogui'),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2].slice(-4), 'java');
+        test.equal(args[3], '-server');
+        test.equal(args[4], '-Xmx256M');
+        test.equal(args[5], '-Xms128M');
+        test.equal(args[6], '-jar');
+        test.equal(args[7], 'BungeeCord-1078.jar');
+        test.equal(args[8], 'nogui');
+        test.equal(args.length, 9);
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'jar_args', 'nogui --installServer'),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2].slice(-4), 'java');
+        test.equal(args[3], '-server');
+        test.equal(args[4], '-Xmx256M');
+        test.equal(args[5], '-Xms128M');
+        test.equal(args[6], '-jar');
+        test.equal(args[7], 'BungeeCord-1078.jar');
+        test.equal(args[8], 'nogui');
+        test.equal(args[9], '--installServer');
+        test.equal(args.length, 10);
         callback(err);
       })
     }
