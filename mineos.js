@@ -602,6 +602,10 @@ mineos.mc = function(server_name, base_dir) {
               args.push(splits[i]);
           }
 
+          if (results.jarfile.toLowerCase().indexOf('forge') == 0)
+            if (results.jarfile.slice(-13).toLowerCase() == 'installer.jar')
+              args.push('--installServer');
+
           inner_callback(null, args);
         }
       })
