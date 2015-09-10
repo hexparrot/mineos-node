@@ -1121,7 +1121,8 @@ function check_profiles(base_dir, callback) {
             item['release_version'] = ref_obj['version'];
             item['url'] = 'http://files.minecraftforge.net/maven/net/minecraftforge/forge/{0}-{1}/{2}'.format(ref_obj['mcversion'], ref_obj['version'], item['filename']);
 
-            p.push(item);
+            if (parseFloat(ref_obj['mcversion']) > 1.6)
+              p.push(item);
           }
 
         callback(err, p);
