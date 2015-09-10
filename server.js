@@ -64,9 +64,13 @@ server.backend = function(base_dir, socket_emitter) {
                 udp_broadcaster[server_ip].send(msg, 0, msg.length, UDP_PORT, UDP_DEST);
               } else {
                 udp_broadcaster[server_ip] = dgram.createSocket('udp4');
-                udp_broadcaster[server_ip].bind(UDP_PORT, server_ip, function () {
+                udp_broadcaster[server_ip].bind(UDP_PORT, server_ip);
+                udp_broadcaster[server_ip].on("listening", function () {
                   udp_broadcaster[server_ip].setBroadcast(true);
                   udp_broadcaster[server_ip].send(msg, 0, msg.length, UDP_PORT, UDP_DEST);
+                });
+                udp_broadcaster[server_ip].on("error", function (err) {
+                  logging.error("Cannot bind broadcaster to ip " + server_ip);
                 });
               }
             }
