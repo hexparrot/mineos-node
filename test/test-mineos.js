@@ -478,6 +478,51 @@ test.get_start_args_java = function(test) {
   })
 }
 
+test.get_start_args_forge = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'forge-1.7.10-10.13.4.1492-installer.jar'),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2].slice(-4), 'java');
+        test.equal(args[3], '-server');
+        test.equal(args[4], '-Xmx256M');
+        test.equal(args[5], '-Xms256M');
+        test.equal(args[6], '-jar');
+        test.equal(args[7], 'forge-1.7.10-10.13.4.1492-installer.jar');
+        test.equal(args[8], 'nogui');
+        test.equal(args[9], '--installServer');
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'forge-1.7.10-10.13.4.1492-universal.jar'),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2].slice(-4), 'java');
+        test.equal(args[3], '-server');
+        test.equal(args[4], '-Xmx256M');
+        test.equal(args[5], '-Xms256M');
+        test.equal(args[6], '-jar');
+        test.equal(args[7], 'forge-1.7.10-10.13.4.1492-universal.jar');
+        test.equal(args[8], 'nogui');
+        callback(err);
+      })
+    },
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
 test.get_start_args_phar = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
