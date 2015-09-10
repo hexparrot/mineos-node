@@ -87,6 +87,7 @@
   "CHANGE_PROFILE_TO": "Changer le profil:",
   "CHANGE_JARFILE_TO": "Changer le jar éxécuter:",
   "ADDITIONAL_JAVA_ARGS": "D'autres arguments Java:",
+  "ADDITIONAL_JAR_ARGS": "Additional Jar arguments:",
 
   "MOST_RECENT_RESTORE_POINT": "Point de restauration le plus récent",
   "OLDEST_RESTORE_POINT": "Point de restauration le plus ancien ",

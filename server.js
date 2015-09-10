@@ -1302,7 +1302,7 @@ function download_profiles(base_dir, args, progress_update_fn, callback) {
                 logging.error('[WEBUI] Server was unable to download file:', url);
                 logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
                 args['success'] = false;
-                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(filename, response.statusCode);
+                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(args.filename, response.statusCode);
                 args['suppress_popup'] = false;
                 inner_callback(args);
               }

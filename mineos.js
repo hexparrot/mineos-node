@@ -495,7 +495,7 @@ mineos.mc = function(server_name, base_dir) {
         },
         'jar_args': function (cb) {
           self.sc(function (err, dict) {
-            var value = (dict.java || {}).jar_args || 'nogui';
+            var value = (dict.java || {}).jar_args || '';
             cb(null, value);
           });
         },
@@ -523,7 +523,13 @@ mineos.mc = function(server_name, base_dir) {
               args.push(splits[i]);
           }
 
-          args.push.apply(args, ['-jar', results.jarfile, results.jar_args]);
+          args.push.apply(args, ['-jar', results.jarfile]);
+
+          if (results.jar_args) {
+            var splits = results.jar_args.split(/ /);
+            for (var i in splits)
+              args.push(splits[i]);
+          }
 
           inner_callback(null, args);
         }
@@ -588,7 +594,13 @@ mineos.mc = function(server_name, base_dir) {
               args.push(splits[i]);
           }
 
-          args.push.apply(args, ['-jar', results.jarfile, results.jar_args]);
+          args.push.apply(args, ['-jar', results.jarfile]);
+
+          if (results.jar_args) {
+            var splits = results.jar_args.split(/ /);
+            for (var i in splits)
+              args.push(splits[i]);
+          }
 
           inner_callback(null, args);
         }

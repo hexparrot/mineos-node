@@ -883,6 +883,15 @@
                                                             ng-change="change_sc('java', 'java_tweaks', servers[current].sc.java.java_tweaks)" 
                                                             ng-model-options="{ updateOn: 'default blur', debounce: {'default': 1500, 'blur': 0} }">
                                                     </div>
+                                                    <div class="controls">
+                                                        <label class="control-label" translate="ADDITIONAL_JAR_ARGS"></label>
+                                                        <input type="text" 
+                                                            class="span6"
+                                                            placeholder="nogui"
+                                                            ng-model="servers[current].sc.java.jar_args" 
+                                                            ng-change="change_sc('java', 'jar_args', servers[current].sc.java.jar_args)" 
+                                                            ng-model-options="{ updateOn: 'default blur', debounce: {'default': 1500, 'blur': 0} }">
+                                                    </div>
                                                 </div>
                                             </section>
                                         </div>

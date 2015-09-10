@@ -87,6 +87,7 @@
   "CHANGE_PROFILE_TO": "Byt profil till:",
   "CHANGE_JARFILE_TO": "Byt körbar Jar till:",
   "ADDITIONAL_JAVA_ARGS": "Ytterligare Java argument:",
+  "ADDITIONAL_JAR_ARGS": "Additional Jar arguments:",
 
   "MOST_RECENT_RESTORE_POINT": "Senaste återställningspunkt",
   "OLDEST_RESTORE_POINT": "Äldsta återställningspunkt",
