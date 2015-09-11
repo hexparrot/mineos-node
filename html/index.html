@@ -772,14 +772,14 @@
                                                         <button type="button" class="btn btn-success span12" ng-disabled="servers[current].heartbeat.up" ng-click="modals.open_new_server()" translate="START" ng-show="!(servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
                                                     </div>
 
-                                                    <div class="span6">
+                                                    <div class="span4">
                                                         <div class="btn-group btn-block">
-                                                            <button class="btn btn-danger span4" translate="STOP"
+                                                            <button class="btn btn-danger span6" translate="STOP"
                                                                     ng-disabled="!servers[current].heartbeat.up" 
                                                                     ng-click="server_command('stop')"
                                                                     ng-hide="servers[current].sc.minecraft.unconventional"
                                                                     ></button>
-                                                            <button class="btn btn-danger span4" translate="KILL"
+                                                            <button class="btn btn-danger span6" translate="KILL"
                                                                     ng-disabled="!servers[current].heartbeat.up" 
                                                                     ng-click="server_command('kill')" 
                                                                     ng-hide="!servers[current].sc.minecraft.unconventional"
@@ -800,8 +800,8 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="span2">
-                                                        <button type="button" class="btn span12" ng-click="modals.open_accept_eula()" translate="ACCEPT_EULA" ng-class="{'btn-default': servers[current].page_data.glance.eula != false, 'btn-primary': servers[current].page_data.glance.eula == false}" ng-hide="servers[current].sc.minecraft.unconventional"></button>
+                                                    <div class="span4">
+                                                        <button type="button" class="btn pull-right" ng-click="modals.open_accept_eula()" translate="ACCEPT_EULA" ng-class="{'btn-default': servers[current].page_data.glance.eula != false, 'btn-primary': servers[current].page_data.glance.eula == false}" ng-hide="servers[current].sc.minecraft.unconventional"></button>
                                                     </div>
 
                                                     <div class="clearfix"></div><div class="span12"></div>
