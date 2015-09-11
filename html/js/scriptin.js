@@ -529,11 +529,13 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
       var previous_state = me.heartbeat;
       me.heartbeat = data.payload;
 
-      if ((previous_state || {}).up == true && me.heartbeat.up == false)
+      if ((previous_state || {}).up == true && me.heartbeat.up == false) {
+        me.channel.emit(server_name, 'page_data', 'glance');
         $.gritter.add({
           title: "[{0}] {1}".format(me.server_name, $filter('translate')('DOWN') ),
           text: ''
         });
+      }
     })
 
     me.channel.on(server_name, 'page_data', function(data) {
