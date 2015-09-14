@@ -10,6 +10,7 @@
   "CREATE_NEW_SERVER": "Créer un nouveau serveur",
   "IMPORT_SERVER": "Importer un serveur",
   "PROFILES": "Profils",
+  "BUILDTOOLS": "BuildTools",
   "CALENDAR": "Calendrier",
 
   "SERVER_SETTINGS": "Paramètres du serveur",
