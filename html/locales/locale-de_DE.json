@@ -62,6 +62,7 @@
   "PROFILE": "Profil",
   "PROFILE_DESC": "Profile Description",
   "DOWNLOADED": "Downloaded",
+  "BUILD_JAR": "Build Jarfile",
 
   "GLANCE": "Server-Details",
   "VERSION": "Version",

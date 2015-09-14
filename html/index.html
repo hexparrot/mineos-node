@@ -713,7 +713,27 @@
                             </header>
                             <section class="body">
                                 <div class="body-inner no-padding">
-                                    
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th translate="IDENTIFIER"></th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="jar in profiles | 
+                                                           profile_filter: {field: 'group', value: 'mojang'} | 
+                                                           profile_filter: {field: 'type', value: 'release'} | 
+                                                           orderBy:['+weight', '-releaseTime', 'id']">
+                                                <td>{{ jar.id }}</td>
+                                                <td>
+                                                    <p>
+                                                        <button type="button" class="btn btn-mini btn-success" ng-click="" translate="BUILD_JAR"></button>
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </section>
                         </div>
