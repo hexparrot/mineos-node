@@ -1139,7 +1139,7 @@ function check_profiles(base_dir, callback) {
       }
       request({ url: FORGE_VERSIONS_URL, json: true }, handle_reply);
     },
-    spigot: function(callback) {
+    spigot_buildtools: function(callback) {
       var xml_parser = require('xml2js');
 
       var SPIGOT_VERSIONS_URL = 'https://hub.spigotmc.org/jenkins/job/BuildTools/rssAll';
@@ -1160,7 +1160,7 @@ function check_profiles(base_dir, callback) {
               item['time'] = new Date(ref_obj.updated[0]).getTime();
               item['releaseTime'] = new Date(ref_obj.published[0]).getTime();
               item['type'] = 'release';
-              item['group'] = 'spigot';
+              item['group'] = 'spigot_buildtools';
               item['webui_desc'] = ref_obj.title[0];
               item['weight'] = 0;
               item['filename'] = 'BuildTools-{0}.jar'.format(num);
@@ -1492,7 +1492,7 @@ function download_profiles(base_dir, args, progress_update_fn, callback) {
         }
       });
     },
-    spigot: function(inner_callback) {
+    spigot_buildtools: function(inner_callback) {
       var dest_dir = path.join(base_dir, 'profiles', args.id);
       var dest_filepath = path.join(dest_dir, args.filename);
 
