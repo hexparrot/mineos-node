@@ -50,26 +50,35 @@ server.backend = function(base_dir, socket_emitter) {
   (function() {
     //thanks to https://github.com/flareofghast/node-advertiser/blob/master/advert.js
     var dgram = require('dgram');
-    var udp_broadcaster = dgram.createSocket('udp4');
+    var udp_broadcaster = {};
     var UDP_DEST = '255.255.255.255';
     var UDP_PORT = 4445;
     var BROADCAST_DELAY_MS = 4000;
 
-    udp_broadcaster.bind();
-    udp_broadcaster.on("listening", function () {
-      udp_broadcaster.setBroadcast(true);
-      async.forever(
-        function(next) {
-          for (var s in self.servers) {
-            self.servers[s].broadcast_to_lan(function(msg) {
-              if (msg)
-                udp_broadcaster.send(msg, 0, msg.length, UDP_PORT, UDP_DEST);
-            })
-          }
-          setTimeout(next, BROADCAST_DELAY_MS);
+    async.forever(
+      function(next) {
+        for (var s in self.servers) {
+          self.servers[s].broadcast_to_lan(function(msg, server_ip) {
+            if (msg) {
+              if (udp_broadcaster[server_ip]) {
+                udp_broadcaster[server_ip].send(msg, 0, msg.length, UDP_PORT, UDP_DEST);
+              } else {
+                udp_broadcaster[server_ip] = dgram.createSocket('udp4');
+                udp_broadcaster[server_ip].bind(UDP_PORT, server_ip);
+                udp_broadcaster[server_ip].on("listening", function () {
+                  udp_broadcaster[server_ip].setBroadcast(true);
+                  udp_broadcaster[server_ip].send(msg, 0, msg.length, UDP_PORT, UDP_DEST);
+                });
+                udp_broadcaster[server_ip].on("error", function (err) {
+                  logging.error("Cannot bind broadcaster to ip " + server_ip);
+                });
+              }
+            }
+          })
         }
-      )
-    });
+        setTimeout(next, BROADCAST_DELAY_MS);
+      }
+    )
   })();
 
   (function() {
@@ -492,7 +501,8 @@ function server_container(server_name, base_dir, socket_io) {
         callback(null);
       else {
         var msg = new Buffer("[MOTD]" + sp_data.motd + "[/MOTD][AD]" + sp_data['server-port'] + "[/AD]");
-        callback(msg);
+        var server_ip = sp_data['server-ip'];
+        callback(msg, server_ip);
       }
     })
   }
