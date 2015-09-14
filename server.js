@@ -243,28 +243,56 @@ server.backend = function(base_dir, socket_emitter) {
           var which = require('which');
           var child_process = require('child_process');
 
-          var profile_path = path.join(base_dir, mineos.DIRS['profiles']);
-          var working_dir = path.join(profile_path, 'workdir_{0}'.format(args.version));
-          var bt_path = path.join(profile_path, args.builder.id, args.builder.filename);
-          var params = { cwd: working_dir };
+          try {
+            var profile_path = path.join(base_dir, mineos.DIRS['profiles']);
+            var working_dir = path.join(profile_path, 'workdir_{0}'.format(args.version));
+            var bt_path = path.join(profile_path, args.builder.id, args.builder.filename);
+            var dest_path = path.join(working_dir, args.builder.filename);
+            var params = { cwd: working_dir };
+          } catch (e) {
+            logging.error('[WEBUI] Could not build jar; insufficient/incorrect arguments provided:', args);
+            logging.error(e);
+            return;
+          }
 
           async.series([
-            async.apply(fs.ensureDir, working_dir),
+            async.apply(fs.mkdir, working_dir),
+            async.apply(fs.copy, bt_path, dest_path),
             function(cb) {
               var binary = which.sync('java');
-              var proc = child_process.spawn(binary, ['-jar', bt_path], params);
-              proc.once('close', cb);
-            },
-            function(cb) {
-              logging.info('[WEBUI] BuildTools jar compilation succeeded in {0}'.format(working_dir));
-              logging.info('[WEBUI] Buildtools used: {0}'.format(bt_path));
-              self.front_end.emit('host_notice', {
-                'command': 'BuildTools jar compilation',
-                'success': true,
-                'help_text': 'You may now copy the completed jars to a server folder.'
+              var proc = child_process.spawn(binary, ['-jar', dest_path, '--rev', args.version], params);
+
+              /*proc.stdout.on('data', function (data) {
+                logging.log('stdout: ' + data);
+              });*/
+
+              logging.info('[WEBUI] BuildTools starting with arguments:', args)
+
+              proc.stderr.on('data', function (data) {
+                logging.error('stderr: ' + data);
+              });
+
+              proc.on('close', function (code) {
+                cb(code);
               });
             }
-          ])
+          ], function(err, results) {
+            logging.info('[WEBUI] BuildTools jar compilation finished {0} in {1}'.format( (err ? 'unsuccessfully' : 'successfully'), working_dir));
+            logging.info('[WEBUI] Buildtools used: {0}'.format(dest_path));
+
+            var retval = {
+              'command': 'BuildTools jar compilation',
+              'success': true,
+              'help_text': ''
+            }
+
+            if (err) {
+              retval['success'] = false;
+              retval['help_text'] = "Error {0} ({1}): {2}".format(err.errno, err.code, err.path);
+            }
+
+            self.front_end.emit('host_notice', retval);
+          })
           break;
         case 'refresh_server_list':
           for (var s in self.servers)
@@ -1190,7 +1218,7 @@ function check_profiles(base_dir, callback) {
               item['group'] = 'spigot_buildtools';
               item['webui_desc'] = ref_obj.title[0];
               item['weight'] = 0;
-              item['filename'] = 'BuildTools-{0}.jar'.format(num);
+              item['filename'] = 'BuildTools.jar';
               item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, item.filename));
               item['version'] = num;
               item['release_version'] = '';
