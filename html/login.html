@@ -168,12 +168,12 @@
     <script type="text/javascript">
       $(document).ready(function () {
         try {
-          $('input[name=password]').attr('type', 'textbox');
+          $('input[name=password]').attr('type', 'text');
           $('input[name=hide]').on('change', function () {
             if ($(this).is(':checked'))
               $('input[name=password]').attr('type', 'password');
             else
-              $('input[name=password]').attr('type', 'textbox');
+              $('input[name=password]').attr('type', 'text');
           })
         } catch (e) {
           $('input[name=password]').attr('type', 'password');
