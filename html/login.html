@@ -169,7 +169,7 @@
       $(document).ready(function () {
         try {
           $('input[name=password]').attr('type', 'textbox');
-          $('input[name=hide]').on('ifChanged', function () {
+          $('input[name=hide]').on('change', function () {
             if ($(this).is(':checked'))
               $('input[name=password]').attr('type', 'password');
             else
