@@ -239,6 +239,33 @@ server.backend = function(base_dir, socket_emitter) {
             }
               
           break;
+        case 'build_jar':
+          var which = require('which');
+          var child_process = require('child_process');
+
+          var profile_path = path.join(base_dir, mineos.DIRS['profiles']);
+          var working_dir = path.join(profile_path, 'workdir_{0}'.format(args.version));
+          var bt_path = path.join(profile_path, args.builder.id, args.builder.filename);
+          var params = { cwd: working_dir };
+
+          async.series([
+            async.apply(fs.ensureDir, working_dir),
+            function(cb) {
+              var binary = which.sync('java');
+              var proc = child_process.spawn(binary, ['-jar', bt_path], params);
+              proc.once('close', cb);
+            },
+            function(cb) {
+              logging.info('[WEBUI] BuildTools jar compilation succeeded in {0}'.format(working_dir));
+              logging.info('[WEBUI] Buildtools used: {0}'.format(bt_path));
+              self.front_end.emit('host_notice', {
+                'command': 'BuildTools jar compilation',
+                'success': true,
+                'help_text': 'You may now copy the completed jars to a server folder.'
+              });
+            }
+          ])
+          break;
         case 'refresh_server_list':
           for (var s in self.servers)
             self.front_end.emit('track_server', s);

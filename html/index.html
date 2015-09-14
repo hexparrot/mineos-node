@@ -739,7 +739,7 @@
                                                 <td>{{ jar.id }}</td>
                                                 <td>
                                                     <p>
-                                                        <button type="button" class="btn btn-mini btn-success" ng-click="" translate="BUILD_JAR"></button>
+                                                        <button type="button" class="btn btn-mini btn-success" ng-click="host_command('build_jar', {builder: btprofile, version: jar.id})" translate="BUILD_JAR"></button>
                                                     </p>
                                                 </td>
                                             </tr>
