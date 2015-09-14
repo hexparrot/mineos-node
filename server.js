@@ -245,7 +245,7 @@ server.backend = function(base_dir, socket_emitter) {
 
           try {
             var profile_path = path.join(base_dir, mineos.DIRS['profiles']);
-            var working_dir = path.join(profile_path, 'workdir_{0}'.format(args.version));
+            var working_dir = path.join(profile_path, 'spigot_{0}'.format(args.version));
             var bt_path = path.join(profile_path, args.builder.id, args.builder.filename);
             var dest_path = path.join(working_dir, args.builder.filename);
             var params = { cwd: working_dir };
