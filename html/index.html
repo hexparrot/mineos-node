@@ -751,6 +751,28 @@
                         <!--/ END Basic Table -->
                     </div>
                     <!--/ END Row -->
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Basic Table -->
+                        <div class="span12 widget dark stacked">
+                            <header>
+                                <h4 class="title" translate="OUTPUT_FROM_BUILDTOOLS"></h4>
+                            </header>
+                            <section class="body">
+                                <div class="body-inner no-padding">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr ng-repeat="line in build_jar_log track by $index">
+                                                <td>{{ line }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Basic Table -->
+                    </div>
+                    <!--/ END Row -->
 
                 </div>
                 <!--/ END Content -->

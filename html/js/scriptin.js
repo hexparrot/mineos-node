@@ -120,6 +120,7 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
   $scope.page = 'dashboard';
   $scope.servers = Servers;
   $scope.current = null;
+  $scope.build_jar_log = [];
 
   $scope.serverprofiles = {
     group: 'mojang',
@@ -210,6 +211,12 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
 
   socket.on('/', 'archive_list', function(archive_data) {
     $scope.archive_list = archive_data;
+  })
+
+  socket.on('/', 'build_jar_output', function(data) {
+    while ($scope.build_jar_log.length > 25)
+      $scope.build_jar_log.splice(0,1);
+    $scope.build_jar_log.push(data);
   })
 
   socket.on('/', 'host_notice', function(data) {

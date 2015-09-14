@@ -262,13 +262,15 @@ server.backend = function(base_dir, socket_emitter) {
               var binary = which.sync('java');
               var proc = child_process.spawn(binary, ['-jar', dest_path, '--rev', args.version], params);
 
-              /*proc.stdout.on('data', function (data) {
-                logging.log('stdout: ' + data);
-              });*/
+              proc.stdout.on('data', function (data) {
+                self.front_end.emit('build_jar_output', data.toString());
+                //logging.log('stdout: ' + data);
+              });
 
               logging.info('[WEBUI] BuildTools starting with arguments:', args)
 
               proc.stderr.on('data', function (data) {
+                self.front_end.emit('build_jar_output', data.toString());
                 logging.error('stderr: ' + data);
               });
 

@@ -62,7 +62,9 @@
   "PROFILE": "Profile",
   "PROFILE_DESC": "Profile Description",
   "DOWNLOADED": "Downloaded",
+
   "BUILD_JAR": "Build Jarfile",
+  "OUTPUT_FROM_BUILDTOOLS": "Output from BuildTools.jar",
 
   "GLANCE": "Server at a Glance", 
   "VERSION": "Version",
