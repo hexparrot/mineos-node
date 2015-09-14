@@ -182,6 +182,28 @@ server.backend = function(base_dir, socket_emitter) {
       })
   }
 
+  self.send_spigot_list = function() {
+    var profiles_dir = path.join(base_dir, mineos.DIRS['profiles']);
+    var spigot_profiles = {};
+
+    async.waterfall([
+      async.apply(fs.readdir, profiles_dir),
+      function(listing, cb) {
+        for (var i in listing) {
+          var match = listing[i].match(/spigot_([\d\.]+)/);
+          if (match)
+            spigot_profiles[match[1]] = {
+              'directory': match[0],
+              'jarfiles': fs.readdirSync(path.join(profiles_dir, match[0])).filter(function(a) { return a.match(/.+\.jar/i) })
+            }
+        }
+        cb();
+      }
+    ], function(err) {
+      self.front_end.emit('spigot_list', spigot_profiles);
+    })
+  }
+
   self.front_end.on('connection', function(socket) {
     var userid = require('userid');
     var fs = require('fs-extra');
@@ -294,6 +316,7 @@ server.backend = function(base_dir, socket_emitter) {
             }
 
             self.front_end.emit('host_notice', retval);
+            self.send_spigot_list();
           })
           break;
         case 'refresh_server_list':
@@ -302,6 +325,9 @@ server.backend = function(base_dir, socket_emitter) {
           break;
         case 'refresh_profile_list':
           self.send_profile_list();
+          break;
+        case 'refresh_spigot_list':
+          self.send_spigot_list();
           break;
         case 'create_from_archive':
           var instance = new mineos.mc(args.new_server_name, base_dir);
@@ -372,6 +398,7 @@ server.backend = function(base_dir, socket_emitter) {
     socket.on('command', webui_dispatcher);
     self.send_user_list();
     self.send_profile_list(true);
+    self.send_spigot_list();
     self.send_importable_list();
 
   })

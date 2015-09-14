@@ -213,6 +213,11 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     $scope.archive_list = archive_data;
   })
 
+  socket.on('/', 'spigot_list', function(spigot_list) {
+    console.log(spigot_list)
+    $scope.spigot_list = spigot_list;
+  })
+
   socket.on('/', 'build_jar_output', function(data) {
     while ($scope.build_jar_log.length > 25)
       $scope.build_jar_log.splice(0,1);
