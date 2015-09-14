@@ -717,8 +717,19 @@
                                         <thead>
                                             <tr>
                                                 <th translate="IDENTIFIER"></th>
-                                                <th></th>
+                                                <th>
+                                                <!-- Select -->
+                                                    <select class="" 
+                                                        ng-model="btprofile" 
+                                                        data-ng-options="p as p.id group by p.group for p in profiles | 
+                                                        profile_filter: {field: 'group', value: 'spigot_buildtools'} | 
+                                                        profile_downloaded: 'only_downloaded' | 
+                                                        orderBy:'-releaseTime'">
+                                                    </select>
+                                                    <!--/ Select -->
+                                                </th>
                                             </tr>
+
                                         </thead>
                                         <tbody>
                                             <tr ng-repeat="jar in profiles | 
