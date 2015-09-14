@@ -713,21 +713,22 @@
                             </header>
                             <section class="body">
                                 <div class="body-inner no-padding">
+                                    <!-- Select -->
+                                    <select class="" 
+                                        ng-model="btprofile" 
+                                        data-ng-options="p as p.id group by p.group for p in profiles | 
+                                        profile_filter: {field: 'group', value: 'spigot_buildtools'} | 
+                                        profile_downloaded: 'only_downloaded' | 
+                                        orderBy:'-releaseTime'">
+                                        <option value="" selected translate="SELECT_BUILDTOOLS"></option>
+                                    </select>
+                                    <!--/ Select -->
                                     <table class="table">
                                         <thead>
                                             <tr>
                                                 <th translate="IDENTIFIER"></th>
-                                                <th>
-                                                <!-- Select -->
-                                                    <select class="" 
-                                                        ng-model="btprofile" 
-                                                        data-ng-options="p as p.id group by p.group for p in profiles | 
-                                                        profile_filter: {field: 'group', value: 'spigot_buildtools'} | 
-                                                        profile_downloaded: 'only_downloaded' | 
-                                                        orderBy:'-releaseTime'">
-                                                    </select>
-                                                    <!--/ Select -->
-                                                </th>
+                                                <th translate="JARS_IN_DIRECTORY"></th>
+                                                <th></th>
                                             </tr>
 
                                         </thead>
@@ -737,9 +738,10 @@
                                                            profile_filter: {field: 'type', value: 'release'} | 
                                                            orderBy:['+weight', '-releaseTime', 'id']">
                                                 <td>{{ jar.id }}</td>
+                                                <td>{{ spigot_list[jar.id].jarfiles.join(', ') }}</td>
                                                 <td>
                                                     <p>
-                                                        <button type="button" class="btn btn-mini btn-success" ng-click="host_command('build_jar', {builder: btprofile, version: jar.id})" ng-disabled="!btprofile" translate="BUILD_JAR"></button>
+                                                        <button type="button" class="btn btn-mini btn-success" ng-click="host_command('build_jar', {builder: btprofile, version: jar.id})" ng-disabled="!btprofile" translate="BUILD_JAR"></button> 
                                                     </p>
                                                 </td>
                                             </tr>

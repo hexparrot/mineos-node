@@ -64,7 +64,9 @@
   "DOWNLOADED": "Téléchargé",
 
   "BUILD_JAR": "Build Jarfile",
+  "SELECT_BUILDTOOLS": "Select BuildTools.jar version",
   "OUTPUT_FROM_BUILDTOOLS": "Output from BuildTools.jar",
+  "JARS_IN_DIRECTORY": "Jars in directory",
 
   "GLANCE": "Coup d'oeil sur les serveurs",
   "VERSION": "Version",
