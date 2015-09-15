@@ -115,11 +115,11 @@ app.filter('profile_downloaded', function() {
 })
 
 app.filter('remove_old_versions', function() {
-  return function(profiles) {
+  return function(profiles, remove_older_than) {
     var keep = [];
 
     for (var index in profiles)
-      if (parseFloat(profiles[index].version) >= 1.8)
+      if (parseFloat(profiles[index].version) >= parseFloat(remove_older_than))
           keep.push(profiles[index]);
 
     return keep;

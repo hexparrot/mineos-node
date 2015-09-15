@@ -736,7 +736,7 @@
                                             <tr ng-repeat="jar in profiles | 
                                                            profile_filter: {field: 'group', value: 'mojang'} | 
                                                            profile_filter: {field: 'type', value: 'release'} | 
-                                                           remove_old_versions | 
+                                                           remove_old_versions: 1.8 | 
                                                            orderBy:['+weight', '-releaseTime', 'id']">
                                                 <td>{{ jar.id }}</td>
                                                 <td>{{ spigot_list[jar.id].jarfiles.join(', ') }}</td>
