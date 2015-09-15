@@ -63,6 +63,8 @@
   "PROFILE_DESC": "Description du profil",
   "DOWNLOADED": "Téléchargé",
 
+  "SPIGOT_CRAFTBUKKIT": "Spigot / Craftbukkit",
+  "BUILDTOOLS_INSTRUCTIONS": "Select a BuildTools profile to compile Spigot/Craftbukkit with. Once complete, copy the compiled server jars to any server.",
   "BUILD_JAR": "Build Jarfile",
   "SELECT_BUILDTOOLS": "Select BuildTools.jar version",
   "OUTPUT_FROM_BUILDTOOLS": "Output from BuildTools.jar",

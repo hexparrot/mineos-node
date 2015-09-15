@@ -320,8 +320,6 @@ server.backend = function(base_dir, socket_emitter) {
           })
           break;
         case 'copy_to_server':
-          console.log(args);
-
           var rsync = require('rsync');
           var spigot_path = path.join(base_dir, mineos.DIRS['profiles'], 'spigot_' + args.version) + '/';
           var dest_path = path.join(base_dir, mineos.DIRS['servers'], args.server_name) + '/';
@@ -339,7 +337,6 @@ server.backend = function(base_dir, socket_emitter) {
           obj.set('--chown', '{0}:{1}'.format(OWNER_CREDS.uid, OWNER_CREDS.gid));
 
           obj.execute(function(error, code, cmd) {
-            console.log(error, code, cmd)
             var retval = {
               'command': 'BuildTools jar copy',
               'success': true,
