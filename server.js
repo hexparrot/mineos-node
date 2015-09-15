@@ -320,7 +320,42 @@ server.backend = function(base_dir, socket_emitter) {
           })
           break;
         case 'copy_to_server':
-          console.log(args)
+          console.log(args);
+
+          var rsync = require('rsync');
+          var spigot_path = path.join(base_dir, mineos.DIRS['profiles'], 'spigot_' + args.version) + '/';
+          var dest_path = path.join(base_dir, mineos.DIRS['servers'], args.server_name) + '/';
+          
+          var obj = rsync.build({
+            source: spigot_path,
+            destination: dest_path,
+            flags: 'au',
+            shell:'ssh'
+          });
+
+          obj.set('--include', '*.jar');
+          obj.set('--exclude', '*');
+          obj.set('--prune-empty-dirs');
+          obj.set('--chown', '{0}:{1}'.format(OWNER_CREDS.uid, OWNER_CREDS.gid));
+
+          obj.execute(function(error, code, cmd) {
+            console.log(error, code, cmd)
+            var retval = {
+              'command': 'BuildTools jar copy',
+              'success': true,
+              'help_text': ''
+            }
+
+            if (error) {
+              retval['success'] = false;
+              retval['help_text'] = "Error {0} ({1})".format(error, code);
+            }
+
+            self.front_end.emit('host_notice', retval);
+            for (var s in self.servers)
+              self.front_end.emit('track_server', s);
+          });
+
           break;
         case 'refresh_server_list':
           for (var s in self.servers)
