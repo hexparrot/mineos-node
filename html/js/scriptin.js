@@ -114,6 +114,18 @@ app.filter('profile_downloaded', function() {
   }
 })
 
+app.filter('remove_old_versions', function() {
+  return function(profiles) {
+    var keep = [];
+
+    for (var index in profiles)
+      if (parseFloat(profiles[index].version) >= 1.8)
+          keep.push(profiles[index]);
+
+    return keep;
+  }
+})
+
 /* controllers */
 
 app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate', function($scope, socket, Servers, $filter, $translate) {
