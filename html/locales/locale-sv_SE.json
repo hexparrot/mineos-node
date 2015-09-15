@@ -67,6 +67,8 @@
   "SELECT_BUILDTOOLS": "Select BuildTools.jar version",
   "OUTPUT_FROM_BUILDTOOLS": "Output from BuildTools.jar",
   "JARS_IN_DIRECTORY": "Jars in directory",
+  "JAR_COPY_DESC": "Copy compiled binaries to server directory",
+  "COPY_TO_SERVER": "Copy to Server",
 
   "GLANCE": "Server Överblick",
   "VERSION": "Version",

@@ -226,7 +226,6 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
   })
 
   socket.on('/', 'spigot_list', function(spigot_list) {
-    console.log(spigot_list)
     $scope.spigot_list = spigot_list;
   })
 
@@ -394,6 +393,18 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     },
     open_locales: function() {
       $('#modal_locales').modal('show');
+    },
+    open_copy_to_server: function(jarversion) {
+      $('#modal_spigotjar').modal('show');
+      $scope.jarcopy_version = jarversion;
+    },
+    close_copy_to_server: function(jarversion) {
+      $('#modal_spigotjar').modal('hide');
+      socket.emit('/', 'command', {
+        'command': 'copy_to_server',
+        'server_name': $scope.server_target,
+        'version': $scope.jarcopy_version
+      });
     }
   }
 

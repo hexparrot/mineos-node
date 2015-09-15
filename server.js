@@ -319,6 +319,9 @@ server.backend = function(base_dir, socket_emitter) {
             self.send_spigot_list();
           })
           break;
+        case 'copy_to_server':
+          console.log(args)
+          break;
         case 'refresh_server_list':
           for (var s in self.servers)
             self.front_end.emit('track_server', s);
@@ -348,7 +351,7 @@ server.backend = function(base_dir, socket_emitter) {
           })
           break;
         default:
-          logging.warning('Command ignored: no such command {0}'.format(args.command));
+          logging.warn('Command ignored: no such command {0}'.format(args.command));
           break;
       }
     }

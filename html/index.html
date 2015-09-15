@@ -742,7 +742,7 @@
                                                 <td>{{ spigot_list[jar.id].jarfiles.join(', ') }}</td>
                                                 <td>
                                                     <p>
-                                                        <button type="button" class="btn btn-mini btn-success" ng-click="host_command('build_jar', {builder: btprofile, version: jar.id})" ng-disabled="!btprofile" translate="BUILD_JAR"></button> 
+                                                        <button type="button" class="btn btn-mini btn-success" ng-click="host_command('build_jar', {builder: btprofile, version: jar.id})" ng-disabled="!btprofile" translate="BUILD_JAR"></button> <button type="button" class="btn btn-mini btn-success" ng-click="modals.open_copy_to_server(jar.id)" ng-disabled="!spigot_list[jar.id].jarfiles.length" translate="COPY_TO_SERVER"></button> 
                                                     </p>
                                                 </td>
                                             </tr>
@@ -1709,6 +1709,27 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-success" aria-hidden="true" translate="CREATE_FROM_ARCHIVE" ng-click="server_from_archive_create()"></button>
+                </div>
+            </div><!--/ Modal With Animation --> 
+
+            <!-- Modal With Animation -->
+            <div id="modal_spigotjar" class="modal hide fade">
+                <div class="modal-header">
+                    <h4 translate="COPY_TO_SERVER"></h4>
+                </div>
+                <div class="modal-body">
+                    <p translate="JAR_COPY_DESC"></p>
+                    <!-- Select -->
+                        <div class="control-group">
+                            <div class="controls">
+                                <select class="span2" ng-model="server_target" ng-options="name as name for (name, instance) in servers | membership">
+                                </select>
+                            </div>
+                        </div>
+                    <!--/ Select -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" ng-click="modals.close_copy_to_server(server_target, jar.id)" translate="COPY_TO_SERVER"></button>
                 </div>
             </div><!--/ Modal With Animation --> 
 
