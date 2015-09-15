@@ -743,7 +743,7 @@
                                                 <td>{{ spigot_list[jar.id].jarfiles.join(', ') }}</td>
                                                 <td>
                                                     <p>
-                                                        <button type="button" class="btn btn-mini btn-success" ng-click="host_command('build_jar', {builder: btprofile, version: jar.id})" ng-disabled="!btprofile" translate="BUILD_JAR"></button> <button type="button" class="btn btn-mini btn-success" ng-click="modals.open_copy_to_server(jar.id)" ng-disabled="!spigot_list[jar.id].jarfiles.length" translate="COPY_TO_SERVER"></button> 
+                                                        <button type="button" class="btn btn-mini btn-success" ng-click="host_command('build_jar', {builder: btprofile, version: jar.id})" ng-disabled="!btprofile" translate="BUILD_JAR"></button> <button type="button" class="btn btn-mini btn-success" ng-click="modals.open_copy_to_server(jar.id)" ng-show="spigot_list[jar.id].jarfiles.length" translate="COPY_TO_SERVER"></button> 
                                                     </p>
                                                 </td>
                                             </tr>
