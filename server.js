@@ -319,6 +319,24 @@ server.backend = function(base_dir, socket_emitter) {
             self.send_spigot_list();
           })
           break;
+        case 'delete_build':
+          var spigot_path = path.join(base_dir, mineos.DIRS['profiles'], 'spigot_' + args.version);
+          fs.remove(spigot_path, function(err) {
+            var retval = {
+              'command': 'Delete BuildTools jar',
+              'success': true,
+              'help_text': ''
+            }
+
+            if (err) {
+              retval['success'] = false;
+              retval['help_text'] = "Error {0}".format(err);
+            }
+
+            self.front_end.emit('host_notice', retval);
+            self.send_spigot_list();
+          })
+          break;
         case 'copy_to_server':
           var rsync = require('rsync');
           var spigot_path = path.join(base_dir, mineos.DIRS['profiles'], 'spigot_' + args.version) + '/';

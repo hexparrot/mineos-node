@@ -727,10 +727,9 @@
                                     <table class="table">
                                         <thead>
                                             <tr>
-                                                <th translate="IDENTIFIER"></th>
-                                                <th></th>
+                                                <th translate="IDENTIFIER" class="span4"></th>
+                                                <th translate="ACTIONS"></th>
                                             </tr>
-
                                         </thead>
                                         <tbody>
                                             <tr ng-repeat="jar in profiles | 
@@ -740,9 +739,9 @@
                                                            orderBy:['+weight', '-releaseTime', 'id']">
                                                 <td>{{ jar.id }}</td>
                                                 <td>
-                                                    <p>
-                                                        <button type="button" class="btn btn-mini btn-success" ng-click="host_command('build_jar', {builder: btprofile, version: jar.id})" ng-disabled="!btprofile" translate="BUILD_JAR"></button> <button type="button" class="btn btn-mini btn-primary" ng-click="modals.open_copy_to_server(jar.id)" ng-show="spigot_list[jar.id].jarfiles.length" translate="COPY_TO_SERVER"></button> 
-                                                    </p>
+                                                    <button type="button" class="btn btn-mini btn-success" ng-click="host_command('build_jar', {builder: btprofile, version: jar.id})" ng-disabled="!btprofile" translate="BUILD_JAR"></button>
+                                                    <button type="button" class="btn btn-mini btn-primary" ng-click="modals.open_copy_to_server(jar.id)" ng-show="spigot_list[jar.id].jarfiles.length" translate="COPY_TO_SERVER"></button>
+                                                    <button type="button" class="btn btn-mini btn-danger" ng-click="host_command('delete_build', {version: jar.id})" ng-show="spigot_list[jar.id].jarfiles.length" translate="DELETE"></button>
                                                 </td>
                                             </tr>
                                         </tbody>
