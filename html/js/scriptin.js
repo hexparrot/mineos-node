@@ -114,12 +114,25 @@ app.filter('profile_downloaded', function() {
   }
 })
 
+app.filter('remove_old_versions', function() {
+  return function(profiles, remove_older_than) {
+    var keep = [];
+
+    for (var index in profiles)
+      if (parseFloat(profiles[index].version) >= parseFloat(remove_older_than))
+          keep.push(profiles[index]);
+
+    return keep;
+  }
+})
+
 /* controllers */
 
 app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate', function($scope, socket, Servers, $filter, $translate) {
   $scope.page = 'dashboard';
   $scope.servers = Servers;
   $scope.current = null;
+  $scope.build_jar_log = [];
 
   $scope.serverprofiles = {
     group: 'mojang',
@@ -210,6 +223,16 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
 
   socket.on('/', 'archive_list', function(archive_data) {
     $scope.archive_list = archive_data;
+  })
+
+  socket.on('/', 'spigot_list', function(spigot_list) {
+    $scope.spigot_list = spigot_list;
+  })
+
+  socket.on('/', 'build_jar_output', function(data) {
+    while ($scope.build_jar_log.length > 25)
+      $scope.build_jar_log.splice(0,1);
+    $scope.build_jar_log.push(data);
   })
 
   socket.on('/', 'host_notice', function(data) {
@@ -370,6 +393,18 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     },
     open_locales: function() {
       $('#modal_locales').modal('show');
+    },
+    open_copy_to_server: function(jarversion) {
+      $('#modal_spigotjar').modal('show');
+      $scope.jarcopy_version = jarversion;
+    },
+    close_copy_to_server: function(jarversion) {
+      $('#modal_spigotjar').modal('hide');
+      socket.emit('/', 'command', {
+        'command': 'copy_to_server',
+        'server_name': $scope.server_target,
+        'version': $scope.jarcopy_version
+      });
     }
   }
 
