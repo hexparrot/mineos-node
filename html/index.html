@@ -835,7 +835,7 @@
                                                             <span class="icon icone-ticket"></span>
                                                         </div>
                                                         <figcaption>
-                                                            <h4>{{ servers[current].heartbeat.memory.VmRSS }}&nbsp;<small translate="MEMORY_FOOTPRINT"></small></h4>
+                                                            <h4>{{ servers[current].heartbeat.memory.VmRSS | kb_string_to_mb }}&nbsp;<small translate="MEMORY_FOOTPRINT"></small></h4>
                                                         </figcaption>
                                                     </figure><!--/ END Circular -->
                                                 </div>
