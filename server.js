@@ -182,6 +182,28 @@ server.backend = function(base_dir, socket_emitter) {
       })
   }
 
+  self.send_spigot_list = function() {
+    var profiles_dir = path.join(base_dir, mineos.DIRS['profiles']);
+    var spigot_profiles = {};
+
+    async.waterfall([
+      async.apply(fs.readdir, profiles_dir),
+      function(listing, cb) {
+        for (var i in listing) {
+          var match = listing[i].match(/spigot_([\d\.]+)/);
+          if (match)
+            spigot_profiles[match[1]] = {
+              'directory': match[0],
+              'jarfiles': fs.readdirSync(path.join(profiles_dir, match[0])).filter(function(a) { return a.match(/.+\.jar/i) })
+            }
+        }
+        cb();
+      }
+    ], function(err) {
+      self.front_end.emit('spigot_list', spigot_profiles);
+    })
+  }
+
   self.front_end.on('connection', function(socket) {
     var userid = require('userid');
     var fs = require('fs-extra');
@@ -239,12 +261,126 @@ server.backend = function(base_dir, socket_emitter) {
             }
               
           break;
+        case 'build_jar':
+          var which = require('which');
+          var child_process = require('child_process');
+
+          try {
+            var profile_path = path.join(base_dir, mineos.DIRS['profiles']);
+            var working_dir = path.join(profile_path, 'spigot_{0}'.format(args.version));
+            var bt_path = path.join(profile_path, args.builder.id, args.builder.filename);
+            var dest_path = path.join(working_dir, args.builder.filename);
+            var params = { cwd: working_dir };
+          } catch (e) {
+            logging.error('[WEBUI] Could not build jar; insufficient/incorrect arguments provided:', args);
+            logging.error(e);
+            return;
+          }
+
+          async.series([
+            async.apply(fs.mkdir, working_dir),
+            async.apply(fs.copy, bt_path, dest_path),
+            function(cb) {
+              var binary = which.sync('java');
+              var proc = child_process.spawn(binary, ['-jar', dest_path, '--rev', args.version], params);
+
+              proc.stdout.on('data', function (data) {
+                self.front_end.emit('build_jar_output', data.toString());
+                //logging.log('stdout: ' + data);
+              });
+
+              logging.info('[WEBUI] BuildTools starting with arguments:', args)
+
+              proc.stderr.on('data', function (data) {
+                self.front_end.emit('build_jar_output', data.toString());
+                logging.error('stderr: ' + data);
+              });
+
+              proc.on('close', function (code) {
+                cb(code);
+              });
+            }
+          ], function(err, results) {
+            logging.info('[WEBUI] BuildTools jar compilation finished {0} in {1}'.format( (err ? 'unsuccessfully' : 'successfully'), working_dir));
+            logging.info('[WEBUI] Buildtools used: {0}'.format(dest_path));
+
+            var retval = {
+              'command': 'BuildTools jar compilation',
+              'success': true,
+              'help_text': ''
+            }
+
+            if (err) {
+              retval['success'] = false;
+              retval['help_text'] = "Error {0} ({1}): {2}".format(err.errno, err.code, err.path);
+            }
+
+            self.front_end.emit('host_notice', retval);
+            self.send_spigot_list();
+          })
+          break;
+        case 'delete_build':
+          var spigot_path = path.join(base_dir, mineos.DIRS['profiles'], 'spigot_' + args.version);
+          fs.remove(spigot_path, function(err) {
+            var retval = {
+              'command': 'Delete BuildTools jar',
+              'success': true,
+              'help_text': ''
+            }
+
+            if (err) {
+              retval['success'] = false;
+              retval['help_text'] = "Error {0}".format(err);
+            }
+
+            self.front_end.emit('host_notice', retval);
+            self.send_spigot_list();
+          })
+          break;
+        case 'copy_to_server':
+          var rsync = require('rsync');
+          var spigot_path = path.join(base_dir, mineos.DIRS['profiles'], 'spigot_' + args.version) + '/';
+          var dest_path = path.join(base_dir, mineos.DIRS['servers'], args.server_name) + '/';
+          
+          var obj = rsync.build({
+            source: spigot_path,
+            destination: dest_path,
+            flags: 'au',
+            shell:'ssh'
+          });
+
+          obj.set('--include', '*.jar');
+          obj.set('--exclude', '*');
+          obj.set('--prune-empty-dirs');
+          obj.set('--chown', '{0}:{1}'.format(OWNER_CREDS.uid, OWNER_CREDS.gid));
+
+          obj.execute(function(error, code, cmd) {
+            var retval = {
+              'command': 'BuildTools jar copy',
+              'success': true,
+              'help_text': ''
+            }
+
+            if (error) {
+              retval['success'] = false;
+              retval['help_text'] = "Error {0} ({1})".format(error, code);
+            }
+
+            self.front_end.emit('host_notice', retval);
+            for (var s in self.servers)
+              self.front_end.emit('track_server', s);
+          });
+
+          break;
         case 'refresh_server_list':
           for (var s in self.servers)
             self.front_end.emit('track_server', s);
           break;
         case 'refresh_profile_list':
           self.send_profile_list();
+          break;
+        case 'refresh_spigot_list':
+          self.send_spigot_list();
           break;
         case 'create_from_archive':
           var instance = new mineos.mc(args.new_server_name, base_dir);
@@ -265,7 +401,7 @@ server.backend = function(base_dir, socket_emitter) {
           })
           break;
         default:
-          logging.warning('Command ignored: no such command {0}'.format(args.command));
+          logging.warn('Command ignored: no such command {0}'.format(args.command));
           break;
       }
     }
@@ -315,6 +451,7 @@ server.backend = function(base_dir, socket_emitter) {
     socket.on('command', webui_dispatcher);
     self.send_user_list();
     self.send_profile_list(true);
+    self.send_spigot_list();
     self.send_importable_list();
 
   })
@@ -1139,6 +1276,46 @@ function check_profiles(base_dir, callback) {
       }
       request({ url: FORGE_VERSIONS_URL, json: true }, handle_reply);
     },
+    spigot_buildtools: function(callback) {
+      var xml_parser = require('xml2js');
+
+      var SPIGOT_VERSIONS_URL = 'https://hub.spigotmc.org/jenkins/job/BuildTools/rssAll';
+      var path_prefix = path.join(base_dir, mineos.DIRS['profiles']);
+
+      function handle_reply(err, response, body) {
+        var p = [];
+
+        if (!err && (response || {}).statusCode === 200)
+          xml_parser.parseString(body, function(inner_err, result) {
+
+            for (var index in result.feed.entry) {
+              var item = new profile_template();
+              var ref_obj = result.feed.entry[index];
+              var num = ref_obj.title[0].match(/\#(\d+)/)[1];
+
+              item['id'] = 'BuildTools-{0}'.format(num);
+              item['time'] = new Date(ref_obj.updated[0]).getTime();
+              item['releaseTime'] = new Date(ref_obj.published[0]).getTime();
+              item['type'] = 'release';
+              item['group'] = 'spigot_buildtools';
+              item['webui_desc'] = ref_obj.title[0];
+              item['weight'] = 0;
+              item['filename'] = 'BuildTools.jar';
+              item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, item.filename));
+              item['version'] = num;
+              item['release_version'] = '';
+              item['url'] = 'https://hub.spigotmc.org/jenkins/job/BuildTools/{0}/artifact/target/BuildTools.jar'.format(num);
+
+              p.push(item);
+            }
+
+            callback(err || inner_err, p);
+          })
+        else
+          callback(null, p);
+      }
+      request({ url: SPIGOT_VERSIONS_URL, json: false }, handle_reply);
+    },
     pocketmine: function(callback) {
       var URL_DEVELOPMENT = "http://www.pocketmine.net/api/?channel=development";
       var URL_STABLE = "http://www.pocketmine.net/api/?channel=stable";
@@ -1413,6 +1590,46 @@ function download_profiles(base_dir, args, progress_update_fn, callback) {
       });
     },
     forge: function(inner_callback) {
+      var dest_dir = path.join(base_dir, 'profiles', args.id);
+      var dest_filepath = path.join(dest_dir, args.filename);
+
+      var url = args.url;
+
+      fs.ensureDir(dest_dir, function(err) {
+        if (err) {
+          logging.error('[WEBUI] Error attempting download:', err);
+        } else {
+          progress(request(url), {
+            throttle: 1000,
+            delay: 100
+          })
+            .on('complete', function(response) {
+              if (response.statusCode == 200) {
+                logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                args['dest_dir'] = dest_dir;
+                args['success'] = true;
+                args['progress']['percent'] = 100;
+                args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
+                args['suppress_popup'] = false;
+                inner_callback(args);
+              } else {
+                logging.error('[WEBUI] Server was unable to download file:', url);
+                logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                args['success'] = false;
+                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(args.filename, response.statusCode);
+                args['suppress_popup'] = false;
+                inner_callback(args);
+              }
+            })
+            .on('progress', function(state) {
+              args['progress'] = state;
+              progress_update_fn(args);
+            })
+            .pipe(fs.createWriteStream(dest_filepath))
+        }
+      });
+    },
+    spigot_buildtools: function(inner_callback) {
       var dest_dir = path.join(base_dir, 'profiles', args.id);
       var dest_filepath = path.join(dest_dir, args.filename);
 

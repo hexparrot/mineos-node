@@ -167,6 +167,15 @@
 
                                     <!-- START Menu -->
                                     <li class="accordion-group">
+                                        <a ng-click="change_page('buildtools')">
+                                            <span class="icon icone-tags"></span>
+                                            <span class="text" translate="SPIGOT_CRAFTBUKKIT"></span>
+                                        </a>
+                                    </li>
+                                    <!--/ END Menu -->
+
+                                    <!-- START Menu -->
+                                    <li class="accordion-group">
                                         <a ng-click="change_page('calendar')">
                                             <span class="icon icone-calendar"></span>
                                             <span class="text" translate="CALENDAR"></span>
@@ -641,6 +650,7 @@
                                                         <option value="ftb">Feed the Beast</option>
                                                         <option value="ftb_third_party">FTB-3rd Party</option>
                                                         <option value="forge">Forge</option>
+                                                        <option value="spigot_buildtools">Spigot Buildtools</option>
                                                         <option value="pocketmine">Pocketmine</option>
                                                         <option value="php">Pocketmine-php</option>
                                                         <option value="bungeecord">BungeeCord</option>
@@ -688,6 +698,82 @@
                     </div>
                     <!--/ END Row -->
 
+
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content - profiles -->
+                <div class="container-fluid" ng-show="page == 'buildtools'">
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Basic Table -->
+                        <div class="span12 widget">
+                            <header>
+                                <h4 class="title" translate="BUILDTOOLS"></h4> 
+                            </header>
+                            <section class="body">
+                                <div class="body-inner no-padding">
+                                    <p translate="BUILDTOOLS_INSTRUCTIONS"></p>
+                                    <!-- Select -->
+                                    <select class="" 
+                                        ng-model="btprofile" 
+                                        data-ng-options="p as p.id group by p.group for p in profiles | 
+                                        profile_filter: {field: 'group', value: 'spigot_buildtools'} | 
+                                        profile_downloaded: 'only_downloaded' | 
+                                        orderBy:'-releaseTime'">
+                                        <option value="" selected translate="SELECT_BUILDTOOLS"></option>
+                                    </select>
+                                    <!--/ Select -->
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th translate="IDENTIFIER" class="span4"></th>
+                                                <th translate="ACTIONS"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="jar in profiles | 
+                                                           profile_filter: {field: 'group', value: 'mojang'} | 
+                                                           profile_filter: {field: 'type', value: 'release'} | 
+                                                           remove_old_versions: 1.8 | 
+                                                           orderBy:['+weight', '-releaseTime', 'id']">
+                                                <td>{{ jar.id }}</td>
+                                                <td>
+                                                    <button type="button" class="btn btn-mini btn-success" ng-click="host_command('build_jar', {builder: btprofile, version: jar.id})" ng-disabled="!btprofile" translate="BUILD_JAR"></button>
+                                                    <button type="button" class="btn btn-mini btn-primary" ng-click="modals.open_copy_to_server(jar.id)" ng-show="spigot_list[jar.id].jarfiles.length" translate="COPY_TO_SERVER"></button>
+                                                    <button type="button" class="btn btn-mini btn-danger" ng-click="host_command('delete_build', {version: jar.id})" ng-show="spigot_list[jar.id].jarfiles.length" translate="DELETE"></button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Basic Table -->
+                    </div>
+                    <!--/ END Row -->
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Basic Table -->
+                        <div class="span12 widget dark stacked">
+                            <header>
+                                <h4 class="title" translate="OUTPUT_FROM_BUILDTOOLS"></h4>
+                            </header>
+                            <section class="body">
+                                <div class="body-inner no-padding">
+                                    <table class="table">
+                                        <tbody>
+                                            <tr ng-repeat="line in build_jar_log track by $index">
+                                                <td>{{ line }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Basic Table -->
+                    </div>
+                    <!--/ END Row -->
 
                 </div>
                 <!--/ END Content -->
@@ -1623,6 +1709,27 @@
                     <button class="btn btn-success" aria-hidden="true" translate="CREATE_FROM_ARCHIVE" ng-click="server_from_archive_create()"></button>
                 </div>
             </div><!--/ Modal With Animation -->
+
+            <!-- Modal With Animation -->
+            <div id="modal_spigotjar" class="modal hide fade">
+                <div class="modal-header">
+                    <h4 translate="SPIGOT_CRAFTBUKKIT"></h4>
+                </div>
+                <div class="modal-body">
+                    <p translate="JAR_COPY_DESC"></p>
+                    <!-- Select -->
+                        <div class="control-group">
+                            <div class="controls">
+                                <select class="span2" ng-model="server_target" ng-options="name as name for (name, instance) in servers | membership">
+                                </select>
+                            </div>
+                        </div>
+                    <!--/ Select -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" ng-click="modals.close_copy_to_server(server_target, jar.id)" translate="COPY_TO_SERVER"></button>
+                </div>
+            </div><!--/ Modal With Animation --> 
 
             </section>
             <!--/ END Template Main Content -->

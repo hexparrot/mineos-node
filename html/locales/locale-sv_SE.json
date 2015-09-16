@@ -10,6 +10,7 @@
   "CREATE_NEW_SERVER": "Skapa Ny Server",
   "IMPORT_SERVER": "Importera en Server",
   "PROFILES": "Profiler",
+  "BUILDTOOLS": "BuildTools",
   "CALENDAR": "Kalender",
 
   "SERVER_SETTINGS": "Server Inställningar",
@@ -61,6 +62,14 @@
   "PROFILE": "Profil",
   "PROFILE_DESC": "Profil beskrivning",
   "DOWNLOADED": "Nerladdad",
+
+  "SPIGOT_CRAFTBUKKIT": "Spigot / Craftbukkit",
+  "BUILDTOOLS_INSTRUCTIONS": "Select a BuildTools profile to compile Spigot/Craftbukkit with. Once complete, copy the compiled server jars to any server.",
+  "BUILD_JAR": "Build Jarfile",
+  "SELECT_BUILDTOOLS": "Select BuildTools.jar version",
+  "OUTPUT_FROM_BUILDTOOLS": "Output from BuildTools.jar",
+  "JAR_COPY_DESC": "Copy compiled binaries to server directory",
+  "COPY_TO_SERVER": "Copy to Server",
 
   "GLANCE": "Server Överblick",
   "VERSION": "Version",
