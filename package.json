@@ -2,7 +2,7 @@
   "name": "mineos-node",
   "description": "A Minecraft server manager and web user interface",
   "main": "mineos.js",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "author": "William Dizon",
   "license": "GPL-3.0",
   "keywords": [
