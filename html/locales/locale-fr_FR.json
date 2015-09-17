@@ -1,8 +1,8 @@
 {
   "WEBSITE_TITLE": "MineOS Interface Utilisateur Web",
   "NOTIFICATIONS": "Notifications",
-  "REFRESH_SERVER_LIST": "Actualiser la list des serveurs",
-  "REFRESH_PROFILE_LIST": "Actualiser la list des profils",
+  "REFRESH_SERVER_LIST": "Actualiser la liste des serveurs",
+  "REFRESH_PROFILE_LIST": "Actualiser la liste des profils",
   "LOG_OFF": "Déconnecter",
 
   "HOST_SETTINGS": "Paramètres de l'hôte",
@@ -14,8 +14,8 @@
   "CALENDAR": "Calendrier",
 
   "SERVER_SETTINGS": "Paramètres du serveur",
-  "SERVER_STATUS": "Status du Serveur",
-  "BACKUPS_AND_RESTORES": "Backups and Restores",
+  "SERVER_STATUS": "Statut du Serveur",
+  "BACKUPS_AND_RESTORES": "Sauvegardes et restaurations",
   "SERVER.PROPERTIES": "server.properties",
   "RESTORE_POINT": "Point de restauration",
   "RESTORE_POINTS": "Points de restauration",
@@ -144,10 +144,10 @@
   "CRONTAB_SCHEDULE": "Crontab Schedule",
   "CRON_EXPRESSION": "Cron Expression",
   "COMMAND_TO_RUN": "Commande à exécuter",
-  "SEND_TO_CONSOLE": "Envoyer à consoler",
+  "SEND_TO_CONSOLE": "Envoyer à la console",
   "ADDITIONAL_ARGUMENT": "Argument supplémentaire",
   "SUBMIT_CRONJOB": "Submit cronjob",
-  "SUSPEND": "suspendre",
+  "SUSPEND": "Suspendre",
 
   "CREDITS": "MineOS créé et maintenu par William Dizon",
 
@@ -170,9 +170,9 @@
 
   "SUCCEEDED": "Réussi",
   "FAILED": "Echoué",
-  "!up": "Server may not be up when performing this action.",
-  "up": "Server must be up when performing this action.",
-  "!exists": "Server may not exist when performing this action.",
+  "!up": "Le doit ètre etein pour faire cette action.",
+  "up": "Le doit ètre alummer pour faire cette action.",
+  "!exists": "Le serveur n'exists pas pour faire cette action.",
   "exists": "Le serveur n'est pas trouvable",
   "eula": "Le Contrat de Licence Utilisateur Final Mojang doit être accepté pour démarrer ce serveur."
 }
