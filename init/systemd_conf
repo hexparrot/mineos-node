@@ -3,6 +3,7 @@ Description=Start MineOS minecraft front-end
 After=network.target
 
 [Service]
+User=root
 WorkingDirectory=/usr/games/minecraft
 Type=forking
 ExecStart=/usr/bin/node service.js start
