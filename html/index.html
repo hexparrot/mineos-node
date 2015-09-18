@@ -714,16 +714,7 @@
                             <section class="body">
                                 <div class="body-inner no-padding">
                                     <p translate="BUILDTOOLS_INSTRUCTIONS"></p>
-                                    <!-- Select -->
-                                    <select class="" 
-                                        ng-model="btprofile" 
-                                        data-ng-options="p as p.id group by p.group for p in profiles | 
-                                        profile_filter: {field: 'group', value: 'spigot_buildtools'} | 
-                                        profile_downloaded: 'only_downloaded' | 
-                                        orderBy:'-releaseTime'">
-                                        <option value="" selected translate="SELECT_BUILDTOOLS"></option>
-                                    </select>
-                                    <!--/ Select -->
+                                    <button type="button" class="btn btn-mini btn-success" ng-click="host_command('download', {profile: buildtools_jar})" translate="DOWNLOAD_BUILDTOOLS"></button>
                                     <table class="table">
                                         <thead>
                                             <tr>
@@ -739,7 +730,7 @@
                                                            orderBy:['+weight', '-releaseTime', 'id']">
                                                 <td>{{ jar.id }}</td>
                                                 <td>
-                                                    <button type="button" class="btn btn-mini btn-success" ng-click="host_command('build_jar', {builder: btprofile, version: jar.id})" ng-disabled="!btprofile" translate="BUILD_JAR"></button>
+                                                    <button type="button" class="btn btn-mini btn-success" ng-click="host_command('build_jar', {builder: buildtools_jar, version: jar.id})" ng-disabled="!buildtools_jar.downloaded" translate="BUILD_JAR"></button>
                                                     <button type="button" class="btn btn-mini btn-primary" ng-click="modals.open_copy_to_server(jar.id)" ng-show="spigot_list[jar.id].jarfiles.length" translate="COPY_TO_SERVER"></button>
                                                     <button type="button" class="btn btn-mini btn-danger" ng-click="host_command('delete_build', {version: jar.id})" ng-show="spigot_list[jar.id].jarfiles.length" translate="DELETE"></button>
                                                 </td>

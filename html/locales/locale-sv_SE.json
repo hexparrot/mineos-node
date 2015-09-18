@@ -64,7 +64,8 @@
   "DOWNLOADED": "Nerladdad",
 
   "SPIGOT_CRAFTBUKKIT": "Spigot / Craftbukkit",
-  "BUILDTOOLS_INSTRUCTIONS": "Select a BuildTools profile to compile Spigot/Craftbukkit with. Once complete, copy the compiled server jars to any server.",
+  "BUILDTOOLS_INSTRUCTIONS": "Download the latest BuildTools.jar and then select Minecraft version to compile Spigot/Craftbukkit with. Once complete, copy the compiled server jars to any server.",
+  "DOWNLOAD_BUILDTOOLS": "Download latest BuildTools.jar",
   "BUILD_JAR": "Build Jarfile",
   "SELECT_BUILDTOOLS": "Select BuildTools.jar version",
   "OUTPUT_FROM_BUILDTOOLS": "Output from BuildTools.jar",

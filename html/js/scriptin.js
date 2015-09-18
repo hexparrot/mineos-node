@@ -211,6 +211,10 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
 
   socket.on('/', 'profile_list', function(profile_data) {
     $scope.profiles = profile_data;
+
+    for (var p in profile_data)
+      if (profile_data[p].id == 'BuildTools-latest')
+        $scope.buildtools_jar = profile_data[p];
   })
 
   socket.on('/', 'user_list', function(user_data) {

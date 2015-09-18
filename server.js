@@ -1276,7 +1276,7 @@ function check_profiles(base_dir, callback) {
       }
       request({ url: FORGE_VERSIONS_URL, json: true }, handle_reply);
     },
-    spigot_buildtools: function(callback) {
+    /*spigot_buildtools: function(callback) {
       var xml_parser = require('xml2js');
 
       var SPIGOT_VERSIONS_URL = 'https://hub.spigotmc.org/jenkins/job/BuildTools/rssAll';
@@ -1315,6 +1315,28 @@ function check_profiles(base_dir, callback) {
           callback(null, p);
       }
       request({ url: SPIGOT_VERSIONS_URL, json: false }, handle_reply);
+    },*/
+    spigot_buildtools: function(callback) {
+      var p = [];
+
+      var item = {};
+
+      item['id'] = 'BuildTools-latest';
+      item['time'] = new Date().getTime();
+      item['releaseTime'] = new Date().getTime();
+      item['type'] = 'release';
+      item['group'] = 'spigot_buildtools';
+      item['webui_desc'] = 'Latest BuildTools.jar for building Spigot/Craftbukkit';
+      item['weight'] = 0;
+      item['filename'] = 'BuildTools.jar';
+      item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, item.filename));
+      item['version'] = 0;
+      item['release_version'] = '';
+      item['url'] = 'https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar';
+
+      p.push(item);
+
+      callback(null, p);
     },
     pocketmine: function(callback) {
       var URL_DEVELOPMENT = "http://www.pocketmine.net/api/?channel=development";
