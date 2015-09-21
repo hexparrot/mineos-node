@@ -24,4 +24,4 @@ expect daemon
 chdir /usr/games/minecraft
 
 # Start the process
-exec /usr/bin/node service.js start
+exec sudo -u root /usr/bin/node service.js start
