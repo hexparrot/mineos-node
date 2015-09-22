@@ -23,17 +23,27 @@ table tbody tr a {
 }
 
 /* Console Styles */
-.console {
-    margin-bottom: 0px;
+.row-fluid .console {
+    margin-bottom: -1px;
     border-bottom: none;
     box-shadow: none;
+}
+
+.console-inner {
+    height: 450px;
+    overflow-y: scroll;
+}
+
+.console-inner .table td {
+    border-top: none;
+    padding: 0px;
+    line-height: 15px;
 }
 
 .console-input {
     border-color: #555;
     border: 1px solid;
     border-top: none;
-    position: relative;
 }
 
 .console-input label {
@@ -47,15 +57,4 @@ table tbody tr a {
     box-shadow: none;
     margin-bottom: 0px;
     margin-left:15px;
-}
-
-.console-inner {
-    height: 450px;
-    overflow-y: scroll;
-}
-
-.console-inner .table td {
-    border-top: none;
-    padding: 0px;
-    line-height: 15px;
 }
