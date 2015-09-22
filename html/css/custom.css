@@ -21,3 +21,20 @@ table tbody tr a {
 #sidebar #nav > ul > li > a {
 	cursor: pointer;
 }
+
+/* Console Styles */
+.console {
+    margin-bottom: 0px;
+    border-bottom: none;
+}
+
+.console-inner {
+    height: 400px;
+    overflow-y: scroll;
+}
+
+.console-inner .table td {
+    border-top: none;
+    padding: 0px;
+    line-height: 15px;
+}
