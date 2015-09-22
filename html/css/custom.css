@@ -26,10 +26,31 @@ table tbody tr a {
 .console {
     margin-bottom: 0px;
     border-bottom: none;
+    box-shadow: none;
+}
+
+.console-input {
+    border-color: #555;
+    border: 1px solid;
+    border-top: none;
+    position: relative;
+}
+
+.console-input label {
+    position: absolute;
+    padding: 4px 6px;
+}
+
+.console-input > input[class*="span"] {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    margin-bottom: 0px;
+    margin-left:15px;
 }
 
 .console-inner {
-    height: 400px;
+    height: 450px;
     overflow-y: scroll;
 }
 
