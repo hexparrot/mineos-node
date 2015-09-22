@@ -30,14 +30,15 @@ table tbody tr a {
 }
 
 .console-inner {
-    height: 450px;
+    height: 60vh;
     overflow-y: scroll;
+    font-family:monospace;
 }
 
 .console-inner .table td {
     border-top: none;
-    padding: 0px;
-    line-height: 15px;
+    padding: 0;
+    line-height: 1.25;
 }
 
 .console-input {
@@ -48,13 +49,13 @@ table tbody tr a {
 
 .console-input label {
     position: absolute;
-    padding: 4px 6px;
+    padding: .45em .6em;
 }
 
 .console-input > input[class*="span"] {
     border: none;
     background: transparent;
     box-shadow: none;
-    margin-bottom: 0px;
-    margin-left:15px;
+    margin-bottom: 0;
+    margin-left: 1em;
 }
