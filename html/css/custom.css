@@ -21,3 +21,41 @@ table tbody tr a {
 #sidebar #nav > ul > li > a {
 	cursor: pointer;
 }
+
+/* Console Styles */
+.row-fluid .console {
+    margin-bottom: -1px;
+    border-bottom: none;
+    box-shadow: none;
+}
+
+.console-inner {
+    height: 60vh;
+    overflow-y: scroll;
+    font-family:monospace;
+}
+
+.console-inner .table td {
+    border-top: none;
+    padding: 0;
+    line-height: 1.25;
+}
+
+.console-input {
+    border-color: #555;
+    border: 1px solid;
+    border-top: none;
+}
+
+.console-input label {
+    position: absolute;
+    padding: .45em .6em;
+}
+
+.console-input > input[class*="span"] {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    margin-bottom: 0;
+    margin-left: 1em;
+}
