@@ -30,7 +30,7 @@ table tbody tr a {
 }
 
 .console-inner {
-    height: 60vh;
+    height: 65vh;
     overflow-y: scroll;
     font-family:monospace;
 }
