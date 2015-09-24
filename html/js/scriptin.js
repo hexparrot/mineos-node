@@ -26,6 +26,34 @@ app.directive('ngEnter', function () {
   };
 });
 
+app.directive('stickyConsole', function () {
+  //http://eric.sau.pe/angularjs-detect-enter-key-ngenter/
+  return function (scope, element, attrs) {
+
+    var elem = angular.element(element)[0];
+    var follow = true;
+
+    // Setup binds to element
+    element.bind('scroll', function () {
+      // Start following if scroll bar is within 2px of
+      // the bottom
+      if(elem.scrollHeight - elem.scrollTop > elem.offsetHeight) {
+        follow = false;
+      } else {
+        follow = true;
+      }
+    });
+
+    // This event gets fired off constantly to check for updates.  I am
+    // using it to keep tabs on when the console should scroll down.
+    scope.$watch(function(){
+      if(follow) {
+        elem.scrollTop = elem.scrollHeight;
+      }
+    });
+  };
+});
+
 /* filters */
 
 app.filter('membership', function() {
@@ -123,6 +151,13 @@ app.filter('remove_old_versions', function() {
           keep.push(profiles[index]);
 
     return keep;
+  }
+})
+
+app.filter('colorize', function(){
+  // TODO: replace with color, instead of just cleaning it up
+  return function(str) {
+    return str.replace(/\[0;[0-9]+;[0-9]+m/ig,'');
   }
 })
 

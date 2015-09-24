@@ -1415,30 +1415,17 @@
 
                     <!-- START Row -->
                     <div class="row-fluid">
-                        <div class="body-inner">
-                            <div class="control-group">
-                                <div class="controls">
-                                    <input type="text" class="span12" ng-model="user_input" ng-enter="console_input()">
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                    <!--/ END Row -->
-
-                    <!-- START Row -->
-                    <div class="row-fluid">
                         <!-- START Basic Table -->
-                        <div class="span12 widget dark stacked">
+                        <div class="console span12 widget dark">
                             <header>
                                 <h4 class="title">logs/latest.log</h4>
                             </header>
                             <section class="body">
-                                <div class="body-inner no-padding">
+                                <div class="body-inner console-inner no-padding" sticky-console>
                                     <table class="table">
                                         <tbody>
                                             <tr ng-repeat="line in servers[current].live_logs['logs/latest.log'] track by $index">
-                                                <td>{{ line }}</td>
+                                                <td>{{ line | colorize }}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -1453,8 +1440,8 @@
                     <div class="row-fluid">
                         <div class="body-inner">
                             <div class="control-group">
-                                <div class="controls">
-                                    <input type="text" class="span12" ng-model="user_input" ng-enter="console_input()">
+                                <div class="controls console-input">
+                                    <label>&gt;</label><input type="text" class="span12" ng-model="user_input" ng-enter="console_input()">
                                 </div>
                             </div>
                         </div>
