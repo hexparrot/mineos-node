@@ -1,4 +1,4 @@
-var app = angular.module("mineos", ['angularMoment', 'pascalprecht.translate']);
+var app = angular.module("mineos", ['angularMoment', 'pascalprecht.translate', 'ngSanitize']);
 
 app.config(function ($translateProvider) {
   $translateProvider.useSanitizeValueStrategy('escape');
@@ -27,7 +27,6 @@ app.directive('ngEnter', function () {
 });
 
 app.directive('stickyConsole', function () {
-  //http://eric.sau.pe/angularjs-detect-enter-key-ngenter/
   return function (scope, element, attrs) {
 
     var elem = angular.element(element)[0];
@@ -154,12 +153,121 @@ app.filter('remove_old_versions', function() {
   }
 })
 
-app.filter('colorize', function(){
-  // TODO: replace with color, instead of just cleaning it up
-  return function(str) {
-    return str.replace(/\[0;[0-9]+;[0-9]+m/ig,'');
+app.filter('colorize', [ '$sce', function($sce){
+
+  const ANSI_COLOR_OFFSET = 30;
+
+  var Colors = [ 
+    'black'        // 30
+  , 'dark_red'     // 31
+  , 'dark_green'   // 32
+  , 'gold'         // 33
+  , 'dark_blue'    // 34
+  , 'dark_purple'  // 35
+  , 'dark_aqua'    // 36
+  , 'gray'         // 37
+  ];
+
+  var IntenseColors = [
+    'dark_gray'    // 30 with 1
+  , 'red'          // 31 with 1
+  , 'green'        // 32 with 1
+  , 'yellow'       // 33 with 1
+  , 'blue'         // 34 with 1
+  , 'light_purple' // 35 with 1
+  , 'aqua'         // 36 with 1
+  , 'white'        // 37 with 1
+  ];
+
+
+  function escapeChars(str){
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;")
   }
-})
+
+  return function(str) {
+    /* Regex Explanation from regex101.com
+      + /\[0;((?:\d+;?)+)m|\[m/g
+        + 1st Alternative: \[0;((?:\d+;?)+)m
+          + \[ matches the character [ literally
+          + 0; matches the characters 0; literally
+          + 1st Capturing group ((?:\d+;?)+)
+            + (?:\d+;?)+ Non-capturing group
+                + Quantifier: + Between one and unlimited times, as many times as possible, giving back as needed [greedy]
+              + \d+ match a digit [0-9]
+                + Quantifier: + Between one and unlimited times, as many times as possible, giving back as needed [greedy]
+              + ;? matches the character ; literally
+                + Quantifier: ? Between zero and one time, as many times as possible, giving back as needed [greedy]
+            + m matches the character m literally (case sensitive)
+        + 2nd Alternative: \[m
+          + \[ matches the character [ literally
+          + m matches the character m literally (case sensitive)
+      + g modifier: global. All matches (don't return on first match)
+
+        Note: "(" and ")" are needed for split otherwise matched content is ignored.
+    */
+    var splitString = str.split(/\[0;((?:\d+;?)+)m|\[m/g);
+
+    var spanOpen = false;
+    for ( i  in splitString ) {
+      // Every over cell should be format codes
+      if ( i % 2 == 1 ) {
+        // Check for closing span at end of array (there WILL be an undefined element)
+        if (splitString[i] == undefined) {
+          splitString[i] = spanOpen ? '</span>' : '';
+        }
+
+        // Colorize!
+        else {
+          // Setup new formatting span.  formatCodes
+          // are split first so we can reuse the array cell
+          // as a work area.
+          var formatCodes = splitString[i].split(';');
+          splitString[i] = spanOpen ? '</span>' : '';
+          splitString[i] += '<span class="';
+
+          // Parse the ANSI format codes and extract useable
+          // information into variables.
+          var intense;
+          var colorCode;
+          for (j in formatCodes) {
+            formatCode = parseInt(formatCodes[j]);
+
+            if (formatCode == 1) {
+              intense = true;
+            } else if (formatCode == 22) {
+              intense = false;
+            } else if (formatCode >= 30 && formatCode <= 37) {
+              colorCode = formatCode;
+            } else {
+              console.log('Unsupported format code: ' + formatCode);
+            }
+          }
+
+          // Add color class to span
+          if (intense) {
+            splitString[i] += IntenseColors[colorCode - ANSI_COLOR_OFFSET];
+          } else {
+            splitString[i] += Colors[colorCode - ANSI_COLOR_OFFSET];
+          }
+
+          // Close span off
+          splitString[i] += '">';
+          spanOpen = true;
+        }
+      } else {
+        splitString[i] = escapeChars(splitString[i]);
+      }
+    }
+
+    // needed so the color spans will be used as HTML and not as text
+    return $sce.trustAsHtml(splitString.join(''));
+  }
+}]);
 
 /* controllers */
 

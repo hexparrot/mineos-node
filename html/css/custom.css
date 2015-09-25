@@ -33,6 +33,8 @@ table tbody tr a {
     height: 65vh;
     overflow-y: scroll;
     font-family:monospace;
+    color: #FFFFFF;
+    background-color: #000000;
 }
 
 .console-inner .table td {
@@ -45,17 +47,43 @@ table tbody tr a {
     border-color: #555;
     border: 1px solid;
     border-top: none;
+    background-color: #000000;
 }
 
 .console-input label {
     position: absolute;
     padding: .45em .6em;
+    background-color: #000000;
+    color: #FFFFFF;
+    text-align: right;
 }
 
 .console-input > input[class*="span"] {
     border: none;
-    background: transparent;
+    background-color: #000000;
+    color: #FFFFFF;
     box-shadow: none;
     margin-bottom: 0;
-    margin-left: 1em;
+    padding-left: 2em;
+    border-radius: 0px;
+    -moz-border-radius: 0px;
+    -webkit-border-radius: 0px;
 }
+
+/* Minecraft Colors                 MC Code   ANSI Code   Other Codes*/
+.black        { color: #000000 } /*       0          30              */
+.dark_blue    { color: #0000AA } /*       1          34              */
+.dark_green   { color: #00AA00 } /*       2          32              */
+.dark_aqua    { color: #00AAAA } /*       3          36              */
+.dark_red     { color: #AA0000 } /*       4          31              */
+.dark_purple  { color: #AA00AA } /*       5          35              */
+.gold         { color: #FFAA00 } /*       6          33              */
+.gray         { color: #AAAAAA } /*       7          37              */
+.dark_gray    { color: #555555 } /*       8          30   1 - intense */
+.blue         { color: #5555FF } /*       9          34   1 - intense */
+.green        { color: #55FF55 } /*       a          32   1 - intense */
+.aqua         { color: #55FFFF } /*       b          36   1 - intense */
+.red          { color: #FF5555 } /*       c          31   1 - intense */
+.light_purple { color: #FF55FF } /*       d          35   1 - intense */
+.yellow       { color: #FFFF55 } /*       e          33   1 - intense */
+.white        { color: #FFFFFF } /*       f          37   1 - intense */

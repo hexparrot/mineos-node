@@ -1425,7 +1425,7 @@
                                     <table class="table">
                                         <tbody>
                                             <tr ng-repeat="line in servers[current].live_logs['logs/latest.log'] track by $index">
-                                                <td>{{ line | colorize }}</td>
+                                                <td ng-bind-html="line | colorize"></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -1768,6 +1768,7 @@
     <script src="/angular-translate/angular-translate-loader-static-files/angular-translate-loader-static-files.min.js"></script>
     <script src="/angular-moment/angular-moment.min.js"></script>
     <script src="/angular-moment-duration-format/moment-duration-format.js"></script>
+    <script src="/angular-sanitize/angular-sanitize.min.js"></script>
     <script src="js/scriptin.js"></script>
     <script src="js/plugins.js"></script>
     <script src="js/application.js"></script>
