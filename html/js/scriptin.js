@@ -155,28 +155,32 @@ app.filter('remove_old_versions', function() {
 
 app.filter('colorize', [ '$sce', function($sce){
 
-  const ANSI_COLOR_OFFSET = 30;
+  const ANSI_MIN_COLOR    = 30,
+        ANSI_MAX_COLOR    = 37,
+        ANSI_COLOR_OFFSET = 30,
+        ANSI_INTENSE_CODE = 1,
+        ANSI_NORMAL_CODE  = 22;
 
   var Colors = [ 
-    'black'        // 30
-  , 'dark_red'     // 31
-  , 'dark_green'   // 32
-  , 'gold'         // 33
-  , 'dark_blue'    // 34
-  , 'dark_purple'  // 35
-  , 'dark_aqua'    // 36
-  , 'gray'         // 37
+    'black',        // 30
+    'dark_red',     // 31
+    'dark_green',   // 32
+    'gold',         // 33
+    'dark_blue',    // 34
+    'dark_purple',  // 35
+    'dark_aqua',    // 36
+    'gray'          // 37
   ];
 
   var IntenseColors = [
-    'dark_gray'    // 30 with 1
-  , 'red'          // 31 with 1
-  , 'green'        // 32 with 1
-  , 'yellow'       // 33 with 1
-  , 'blue'         // 34 with 1
-  , 'light_purple' // 35 with 1
-  , 'aqua'         // 36 with 1
-  , 'white'        // 37 with 1
+    'dark_gray',    // 30 with 1
+    'red',          // 31 with 1
+    'green',        // 32 with 1
+    'yellow',       // 33 with 1
+    'blue',         // 34 with 1
+    'light_purple', // 35 with 1
+    'aqua',         // 36 with 1
+    'white',        // 37 with 1
   ];
 
 
@@ -214,14 +218,13 @@ app.filter('colorize', [ '$sce', function($sce){
 
     var spanOpen = false;
     for ( i  in splitString ) {
+
       // Every over cell should be format codes
       if ( i % 2 == 1 ) {
-        // Check for closing span at end of array (there WILL be an undefined element)
-        if (splitString[i] == undefined) {
-          splitString[i] = spanOpen ? '</span>' : '';
-        }
 
-        // Colorize!
+        // Check for closing span at end of array (there WILL be an undefined element)
+        if (splitString[i] == undefined)
+          splitString[i] = spanOpen ? '</span>' : '';
         else {
           // Setup new formatting span.  formatCodes
           // are split first so we can reuse the array cell
@@ -237,31 +240,28 @@ app.filter('colorize', [ '$sce', function($sce){
           for (j in formatCodes) {
             formatCode = parseInt(formatCodes[j]);
 
-            if (formatCode == 1) {
+            if (formatCode == ANSI_INTENSE_CODE)
               intense = true;
-            } else if (formatCode == 22) {
+            else if (formatCode == ANSI_NORMAL_CODE) 
               intense = false;
-            } else if (formatCode >= 30 && formatCode <= 37) {
+            else if (formatCode >= ANSI_MIN_COLOR && formatCode <= ANSI_MAX_COLOR)
               colorCode = formatCode;
-            } else {
+            else 
               console.log('Unsupported format code: ' + formatCode);
-            }
           }
 
           // Add color class to span
-          if (intense) {
+          if (intense)
             splitString[i] += IntenseColors[colorCode - ANSI_COLOR_OFFSET];
-          } else {
+          else
             splitString[i] += Colors[colorCode - ANSI_COLOR_OFFSET];
-          }
 
           // Close span off
           splitString[i] += '">';
           spanOpen = true;
         }
-      } else {
+      } else 
         splitString[i] = escapeChars(splitString[i]);
-      }
     }
 
     // needed so the color spans will be used as HTML and not as text
