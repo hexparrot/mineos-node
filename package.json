@@ -69,7 +69,8 @@
     "posix": "2.0.x",
     "crypt3": "0.1.x",
     "node-getopt": "0.2.x",
-    "chownr": "1.0.x"
+    "chownr": "1.0.x",
+    "angular-sanitize": "1.4.x"
   },
   "devDependencies": {
     "nodeunit": "0.9.x"
