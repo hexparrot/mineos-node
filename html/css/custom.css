@@ -70,15 +70,15 @@ table tbody tr a {
     -webkit-border-radius: 0px;
 }
 
-/* Minecraft Colors                 MC Code   ANSI Code   Other Codes*/
-.black        { color: #000000 } /*       0          30              */
-.dark_blue    { color: #0000AA } /*       1          34              */
-.dark_green   { color: #00AA00 } /*       2          32              */
-.dark_aqua    { color: #00AAAA } /*       3          36              */
-.dark_red     { color: #AA0000 } /*       4          31              */
-.dark_purple  { color: #AA00AA } /*       5          35              */
-.gold         { color: #FFAA00 } /*       6          33              */
-.gray         { color: #AAAAAA } /*       7          37              */
+/* Minecraft Colors                 MC Code   ANSI Code   Other Codes */
+.black        { color: #000000 } /*       0          30               */
+.dark_blue    { color: #0000AA } /*       1          34               */
+.dark_green   { color: #00AA00 } /*       2          32               */
+.dark_aqua    { color: #00AAAA } /*       3          36               */
+.dark_red     { color: #AA0000 } /*       4          31               */
+.dark_purple  { color: #AA00AA } /*       5          35               */
+.gold         { color: #FFAA00 } /*       6          33               */
+.gray         { color: #AAAAAA } /*       7          37               */
 .dark_gray    { color: #555555 } /*       8          30   1 - intense */
 .blue         { color: #5555FF } /*       9          34   1 - intense */
 .green        { color: #55FF55 } /*       a          32   1 - intense */
