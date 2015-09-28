@@ -196,6 +196,7 @@ mineos.dependencies(function(err, binaries) {
 	app.use('/moment', express.static(__dirname + '/node_modules/moment'));
 	app.use('/angular-moment', express.static(__dirname + '/node_modules/angular-moment'));
 	app.use('/angular-moment-duration-format', express.static(__dirname + '/node_modules/moment-duration-format/lib'));
+  app.use('/angular-sanitize', express.static(__dirname + '/node_modules/angular-sanitize'));
 	app.use('/admin', express.static(__dirname + '/html'));
 
 	process.on('SIGINT', function() {
