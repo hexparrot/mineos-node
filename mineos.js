@@ -1047,7 +1047,7 @@ mineos.mc = function(server_name, base_dir) {
     var fs = require('fs-extra');
     var archive_path = path.join(self.env['awd'], filename);
 
-    fs.delete(archive_path, function(err) {
+    fs.remove(archive_path, function(err) {
       callback(err);
     })
   }
