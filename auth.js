@@ -29,7 +29,7 @@ auth.authenticate_shadow = function(user, plaintext, callback) {
   }
 
   function posix(inner_callback) {
-    var crypt = require('crypt3');
+    var crypt = require('apache-crypt');
     var posix = require('posix');
 
     try {

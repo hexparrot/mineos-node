@@ -65,7 +65,7 @@
     "fireworm": "0.6.x",
     "request-progress": "0.3.x",
     "posix": "4.0.x",
-    "crypt3": "0.1.x",
+    "apache-crypt": "1.0.x",
     "node-getopt": "0.2.x",
     "chownr": "1.0.x",
     "angular-sanitize": "1.4.x"
