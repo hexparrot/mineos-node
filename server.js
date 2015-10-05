@@ -38,7 +38,8 @@ server.backend = function(base_dir, socket_emitter) {
       async.apply(which, 'git'),
       function(path, cb) {
         var child = require('child_process');
-        child.execFile(path, [ 'show', '--oneline', '-s' ], cb);
+        var opts = {cwd: __dirname};
+        child.execFile(path, [ 'show', '--oneline', '-s' ], opts, cb);
       },
       function(stdout, stderr, cb) {
         self.commit_msg = (stdout ? stdout : '');
