@@ -215,7 +215,15 @@ mineos.mc = function(server_name, base_dir) {
           memoized_files[fn](self.env.sc, cb);
         }
       }
-    ], callback);
+    ], function(err, retval) {
+      if (err) {
+        delete memoize_timestamps[fn];
+        delete memoized_files[fn];
+        callback(null, {});
+      } else {
+        callback(err, retval);
+      }
+    });
   }
 
   self.modify_sc = function(section, property, new_value, callback) {

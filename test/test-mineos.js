@@ -912,6 +912,41 @@ test.sc = function(test) {
   })
 }
 
+test.sc_deleted = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+  
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    function(callback) {
+      instance.sc(function(err, dict) {
+        test.ifError(err);
+        test.equal(dict.java.java_xmx, '256');
+        callback(err);
+      })
+    },
+    async.apply(fs.remove, instance.env['sc']),
+    function(callback) {
+      instance.sc(function(err, dict) {
+        test.ifError(err);
+        test.equal(Object.keys(dict).length, 0);
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'java', 'java_xmx', '1024'),
+    function(callback) {
+      instance.sc(function(err, dict) {
+        test.ifError(err);
+        test.equal(dict.java.java_xmx, '1024');
+        callback(err);
+      })
+    }
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
 test.sp = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
