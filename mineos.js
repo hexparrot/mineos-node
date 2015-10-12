@@ -1438,7 +1438,7 @@ mineos.mc = function(server_name, base_dir) {
       }
     ], function(err) {
       q.close();
-      callback(err, retval);
+      callback(null, retval);
     })
   }
 

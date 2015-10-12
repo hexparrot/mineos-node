@@ -1342,17 +1342,28 @@ test.query = function(test) {
 
   async.series([
     async.apply(instance.create, OWNER_CREDS),
-    async.apply(instance.modify_sp, 'enable-query', 'true'),
     async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
     async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
     async.apply(instance.copy_profile),
     function(callback) {
       instance.query(function(err, pingback) {
-        test.ok(err);
+        test.ifError(err);
         test.equal(Object.keys(pingback).length, 0);
         callback();
       })
     },
+    async.apply(instance.start),
+    function(callback) {
+      setTimeout(function() {
+        instance.query(function(err, pingback) {
+          test.ifError(err);
+          test.equal(Object.keys(pingback).length, 0);
+          callback(err);
+        })
+      }, 16000)
+    },
+    async.apply(instance.kill),
+    async.apply(instance.modify_sp, 'enable-query', 'true'),
     async.apply(instance.start),
     function(callback) {
       setTimeout(function() {
@@ -1370,7 +1381,7 @@ test.query = function(test) {
           test.equal(pingback.player_.length, 0);
           callback(err);
         })
-      }, 16000)
+      }, 6000)
     },
     async.apply(instance.kill)
   ], function(err) {
