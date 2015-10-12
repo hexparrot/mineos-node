@@ -68,7 +68,8 @@
     "apache-crypt": "1.0.x",
     "node-getopt": "0.2.x",
     "chownr": "1.0.x",
-    "angular-sanitize": "1.4.x"
+    "angular-sanitize": "1.4.x",
+    "mcquery": "0.2.x"
   },
   "devDependencies": {
     "nodeunit": "0.9.x"

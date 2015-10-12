@@ -1336,6 +1336,49 @@ test.ping_phar = function(test) {
   })
 }
 
+test.query = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.modify_sp, 'enable-query', 'true'),
+    async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
+    async.apply(instance.copy_profile),
+    function(callback) {
+      instance.query(function(err, pingback) {
+        test.ok(err);
+        test.equal(Object.keys(pingback).length, 0);
+        callback();
+      })
+    },
+    async.apply(instance.start),
+    function(callback) {
+      setTimeout(function() {
+        instance.query(function(err, pingback) {
+          test.ifError(err);
+          test.equal(pingback.hostname, 'A Minecraft Server');
+          test.equal(pingback.gametype, 'SMP');
+          test.equal(pingback.game_id, 'MINECRAFT');
+          test.equal(pingback.version, '1.7.9');
+          test.equal(pingback.plugins, '');
+          test.equal(pingback.map, 'world');
+          test.equal(pingback.numplayers, '0');
+          test.equal(pingback.maxplayers, '20');
+          test.equal(pingback.hostport, '25565');
+          test.equal(pingback.player_.length, 0);
+          callback(err);
+        })
+      }, 16000)
+    },
+    async.apply(instance.kill)
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
 test.memory = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);

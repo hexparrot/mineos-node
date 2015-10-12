@@ -1412,6 +1412,36 @@ mineos.mc = function(server_name, base_dir) {
     })  
   }
 
+  self.query = function(callback) {
+    var mcquery = require('mcquery');
+
+    var q = null;
+    var retval = {};
+
+    async.waterfall([
+      async.apply(self.property, 'server-port'),
+      function(port, cb) {
+        q = new mcquery('localhost', port);
+        cb();
+      },
+      function(cb) {
+        q.connect(function(err){
+          if (err || !q.online)
+            cb(err);
+          else
+            q.full_stat(cb);
+        });
+      },
+      function(pingback, cb) {
+        retval = pingback;
+        cb();
+      }
+    ], function(err) {
+      q.close();
+      callback(err, retval);
+    })
+  }
+
   self.previous_version = function(filepath, restore_as_of, callback) {
     var tmp = require('tmp');
     var binary = which.sync('rdiff-backup');
