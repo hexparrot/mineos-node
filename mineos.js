@@ -1180,6 +1180,11 @@ mineos.mc = function(server_name, base_dir) {
           }
         ], callback)
         break;
+      case 'query':
+        self.query(function(err, dict) {
+          callback(err, dict);
+        })
+        break;
       case 'server.properties':
         self.sp(function(err, dict) {
           callback(err, dict);
