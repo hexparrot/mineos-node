@@ -22,6 +22,10 @@ table tbody tr a {
 	cursor: pointer;
 }
 
+button.control_centering {
+    margin-bottom: 10px;
+}
+
 /* Console Styles */
 .row-fluid .console {
     margin-bottom: -1px;

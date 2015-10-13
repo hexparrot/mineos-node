@@ -563,6 +563,14 @@ function server_container(server_name, base_dir, socket_io) {
           else
             instance.property('ping', function(err, ping) { cb(null, err ? {} : ping) }) 
         })
+      },
+      'query': function(cb) {
+        instance.property('server.properties', function(err, dict) {
+          if (dict['enable-query'])
+            instance.property('query', cb);
+          else
+            cb(null, {}); //ignore query--wouldn't respond in any meaningful way
+        })
       }
     }, function(err, retval) {
       nsp.emit('heartbeat', {

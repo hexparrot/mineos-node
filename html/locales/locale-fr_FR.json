@@ -27,6 +27,7 @@
   "LOGGING": "Se connecter",
   "CONSOLE": "Console",
   "OTHER_FILES": "Autres fichiers",
+  "PLAYER_INTERACTION": "Player Interaction",
 
   "CURRENTLY_SELECTED_SERVER": "Serveur actuellement sélectionné",
   "SERVER_OVERVIEW": "Présentation des serveurs",

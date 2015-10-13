@@ -27,6 +27,7 @@
   "LOGGING": "Logging",
   "CONSOLE": "Console",
   "OTHER_FILES": "Other Files",
+  "PLAYER_INTERACTION": "Player Interaction",
 
   "CURRENTLY_SELECTED_SERVER": "Currently Selected Server",
   "SERVER_OVERVIEW": "Server Overview",

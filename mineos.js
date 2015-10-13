@@ -1180,6 +1180,11 @@ mineos.mc = function(server_name, base_dir) {
           }
         ], callback)
         break;
+      case 'query':
+        self.query(function(err, dict) {
+          callback(err, dict);
+        })
+        break;
       case 'server.properties':
         self.sp(function(err, dict) {
           callback(err, dict);
@@ -1410,6 +1415,36 @@ mineos.mc = function(server_name, base_dir) {
     self.sp(function(err, dict) {
       send_query_packet(dict['server-port']);
     })  
+  }
+
+  self.query = function(callback) {
+    var mcquery = require('mcquery');
+
+    var q = null;
+    var retval = {};
+
+    async.waterfall([
+      async.apply(self.property, 'server-port'),
+      function(port, cb) {
+        q = new mcquery('localhost', port);
+        cb();
+      },
+      function(cb) {
+        q.connect(function(err){
+          if (err || !q.online)
+            cb(err);
+          else
+            q.full_stat(cb);
+        });
+      },
+      function(pingback, cb) {
+        retval = pingback;
+        cb();
+      }
+    ], function(err) {
+      q.close();
+      callback(null, retval);
+    })
   }
 
   self.previous_version = function(filepath, restore_as_of, callback) {
