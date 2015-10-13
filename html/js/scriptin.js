@@ -445,6 +445,11 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     socket.emit($scope.current, 'cron', args);
   }
 
+  $scope.player_command = function(cmd, player, args) {
+    var full_cmd = '{0} {1} {2}'.format(cmd, player, args || '');
+    socket.emit($scope.current, 'command', {command: 'stuff', msg: full_cmd });
+  }
+
   $scope.console_input = function() {
     socket.emit($scope.current, 'command', {command: 'stuff', msg: $scope.user_input });
     $scope.user_input = '';
