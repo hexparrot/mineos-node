@@ -277,7 +277,7 @@
                                     <!--/ END Menu -->
 
                                     <!-- START Menu -->
-                                    <li class="accordion-group" ng-show="current && servers[current].heartbeat.query">
+                                    <li class="accordion-group" ng-show="current && servers[current].heartbeat.query.player_">
                                         <a ng-click="change_page('player_interaction')">
                                             <span class="icon icone-group"></span>
                                             <span class="text" translate="PLAYER_INTERACTION"></span>
@@ -1584,7 +1584,7 @@
                                 <div class="body-inner">
 
                                     <!-- Help Text -->
-                                    <div class="control-group" ng-repeat="player in servers[current].heartbeat.query.players_ track by $index">
+                                    <div class="control-group" ng-repeat="player in servers[current].heartbeat.query.player_ track by $index">
                                         <div class="controls">
                                             <input type="text" class="input-medium" ng-value="player" readonly />
                                             <select class="input-medium" ng-model="interaction.command">
