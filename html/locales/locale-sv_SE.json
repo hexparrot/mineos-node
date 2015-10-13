@@ -27,6 +27,7 @@
   "LOGGING": "Loggning",
   "CONSOLE": "Konsol",
   "OTHER_FILES": "Övriga Filer",
+  "PLAYER_INTERACTION": "Player Interaction",
 
   "CURRENTLY_SELECTED_SERVER": "Vald Server",
   "SERVER_OVERVIEW": "Server Översikt",

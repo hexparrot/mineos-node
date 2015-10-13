@@ -275,6 +275,15 @@
                                         </a>
                                     </li>
                                     <!--/ END Menu -->
+
+                                    <!-- START Menu -->
+                                    <li class="accordion-group" ng-show="current && servers[current].heartbeat.query">
+                                        <a ng-click="change_page('player_interaction')">
+                                            <span class="icon icone-group"></span>
+                                            <span class="text" translate="PLAYER_INTERACTION"></span>
+                                        </a>
+                                    </li>
+                                    <!--/ END Menu -->
                                 </ul>
                             </nav>
                             <!--/ END Sidebar Menu -->
@@ -1558,6 +1567,13 @@
 
                     </div>
                     <!--/ END Row -->
+
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content - PLAYER_INTERACTION -->
+                <div class="container-fluid" ng-show="page == 'player_interaction'">
+
 
                 </div>
                 <!--/ END Content -->
