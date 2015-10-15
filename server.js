@@ -43,7 +43,7 @@ server.backend = function(base_dir, socket_emitter) {
       },
       function(stdout, stderr, cb) {
         self.commit_msg = (stdout ? stdout : '');
-        logging.info(self.commit_msg);
+        logging.info('Starting up server, using commit:', self.commit_msg);
         cb();
       }
     ])
