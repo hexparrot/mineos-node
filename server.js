@@ -502,6 +502,8 @@ function server_container(server_name, base_dir, socket_io) {
       HEARTBEAT_INTERVAL_MS = 5000;
 
   logging.info('[{0}] Discovered server'.format(server_name));
+  async.series([ async.apply(instance.sync_chown) ]);
+
   make_tail('logs/latest.log');
   make_tail('server.log');
   make_tail('proxy.log.0');
