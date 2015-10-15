@@ -1500,6 +1500,27 @@ mineos.mc = function(server_name, base_dir) {
     ], callback)
   }
 
+  self.sync_chown = function(callback) {
+    // chowns awd,bwd,cwd to the owner of cwd.
+    // duplicates functionality of chown because it does not assume sp existence
+    var chownr = require('chownr');
+
+    async.series([
+      async.apply(fs.stat, self.env.cwd),
+      function(cb) {
+        fs.stat(self.env.cwd, function(err, stat_info) {
+          async.series([
+            async.apply(fs.ensureDir, self.env.bwd),
+            async.apply(fs.ensureDir, self.env.awd),
+            async.apply(chownr, self.env.cwd, stat_info.uid, stat_info.gid),
+            async.apply(chownr, self.env.bwd, stat_info.uid, stat_info.gid),
+            async.apply(chownr, self.env.awd, stat_info.uid, stat_info.gid),
+          ], cb)
+        })
+      }
+    ], callback)
+  }
+
   return self;
 }
 

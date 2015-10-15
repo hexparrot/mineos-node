@@ -1910,6 +1910,39 @@ test.chown_recursive = function(test) {
   })
 }
 
+test.sync_chown = function(test) {
+  var userid = require('userid');
+
+  var server_name = 'testing';
+  var server_path = path.join(BASE_DIR, mineos.DIRS['servers'], server_name);
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(fs.ensureDir, server_path),
+    async.apply(fs.chown, server_path, OWNER_CREDS.uid, OWNER_CREDS.gid),
+    function(callback) {
+      test.equal(fs.statSync(instance.env.cwd).uid, OWNER_CREDS.uid);
+      test.equal(fs.statSync(instance.env.cwd).gid, OWNER_CREDS.gid);
+      callback();
+    },
+    async.apply(instance.sync_chown),
+    function(callback) {
+      test.equal(fs.statSync(instance.env.cwd).uid, OWNER_CREDS.uid);
+      test.equal(fs.statSync(instance.env.cwd).gid, OWNER_CREDS.gid);
+
+      test.equal(fs.statSync(instance.env.bwd).uid, OWNER_CREDS.uid);
+      test.equal(fs.statSync(instance.env.bwd).gid, OWNER_CREDS.gid);
+
+      test.equal(fs.statSync(instance.env.awd).uid, OWNER_CREDS.uid);
+      test.equal(fs.statSync(instance.env.awd).gid, OWNER_CREDS.gid);
+      callback();
+    }
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
 test.broadcast_property = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
