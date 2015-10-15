@@ -22,9 +22,26 @@ test.authenticate_shadow = function(test) {
         test.equal(authed_user, false);
         callback(authed_user);
       })
+    },
+    function(callback) {
+      auth.authenticate_shadow('root', 'notthepassword', function(authed_user) {
+        test.equal(authed_user, false);
+        callback(authed_user);
+      })
+    },
+    function(callback) {
+      auth.authenticate_shadow('root', '', function(authed_user) {
+        test.equal(authed_user, false);
+        callback(authed_user);
+      })
+    },
+    function(callback) {
+      auth.authenticate_shadow('root', '!', function(authed_user) {
+        test.equal(authed_user, false);
+        callback(authed_user);
+      })
     }
   ], function(err, results) {
-    test.expect(3);
     test.done();
   })
 }

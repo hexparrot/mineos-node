@@ -13,7 +13,9 @@ auth.authenticate_shadow = function(user, plaintext, callback) {
         inner_callback(true)
       else {
         passwd.getShadow({username: user}, function(err, shadow_info) {
-          if (shadow_info) {
+          if (shadow_info && shadow_info.password == '!')
+            inner_callback(null, false);
+          else if (shadow_info) {
             var password_parts = shadow_info['password'].split(/\$/);
             var salt = password_parts[2];
             var new_hash = hash.sha512crypt(plaintext, salt);
