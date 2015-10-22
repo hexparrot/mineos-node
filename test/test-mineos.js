@@ -1699,6 +1699,67 @@ test.stuff = function(test) {
   })
 }
 
+test.saveall = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    function(callback) {
+      var DELAY_SECONDS = 5;
+      var start = new Date().getTime();
+
+      instance.saveall(DELAY_SECONDS, function(err) {
+        var end = new Date().getTime();
+        var time = end - start;
+
+        test.ok(time < 100);
+        callback(); 
+        //with server not up, it should complete nearly instantly
+      })
+    },
+    async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
+    async.apply(instance.copy_profile),
+    async.apply(instance.start),
+    function(callback) {
+      setTimeout(callback, 20000);
+    },
+    function(callback) {
+      var DELAY_SECONDS = 3;
+      var start = new Date().getTime();
+
+      instance.saveall(DELAY_SECONDS, function(err) {
+        var end = new Date().getTime();
+        var time = end - start;
+
+        test.ok(time > DELAY_SECONDS * 1000);
+        test.ok(time < (DELAY_SECONDS+1) * 1000);
+        callback(); //if true, error!
+        //this function should be (seconds * 1000) + (time to execute screen stuff).
+      })
+    },
+    function(callback) {
+      var DELAY_SECONDS = null;
+      var start = new Date().getTime();
+
+      instance.saveall(DELAY_SECONDS, function(err) {
+        var end = new Date().getTime();
+        var time = end - start;
+
+        test.ok(time > 5000);
+        test.ok(time < 6000);
+        callback(); //if true, error!
+        //with no specified delay, default to 5000
+      })
+    },
+    async.apply(instance.kill)
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
 test.check_eula = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
