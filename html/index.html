@@ -1235,7 +1235,7 @@
                                                             <button class="btn btn-small dropdown-toggle" data-toggle="dropdown">{{ 'ACTIONS' | translate }} <span class="caret"></span></button>
                                                             <ul class="dropdown-menu">
                                                                 <li><a ng-click="server_command('delete_archive', {filename: archive.filename})" translate="DELETE_THIS_ARCHIVE"></a></li>
-                                                                <li><a href="#"></a></li>
+                                                                <li><a ng-click="server_download_archive()" translate="DOWNLOAD_ARCHIVE"></a></li>
                                                                 <li><a ng-click="server_from_archive(archive.filename, current)" translate="CREATE_FROM_ARCHIVE"></a></li>
                                                             </ul>
                                                         </div><!--/ Button Dropdown -->

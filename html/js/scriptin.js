@@ -560,6 +560,11 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     }
   }
 
+  $scope.server_download_archive = function() {
+    console.log('Clicked download archive.');
+    // TODO complete this section. for now setting up the infrastructure
+  }
+
   $scope.server_from_archive = function(archive_filename, awd_dir) {
     $scope.archive_filename = archive_filename;
     $scope.awd_dir = awd_dir;

@@ -141,6 +141,7 @@
   "FILENAME": "Dateiname",
   "ACTIONS": "Kommandos",
   "DELETE_THIS_ARCHIVE": "Archiv löschen",
+  "DOWNLOAD_ARCHIVE": "Herunterladen Archiv",
   "CREATE_FROM_ARCHIVE": "Neuen Server aus Archiv erstellen",
 
   "CRONTAB_SCHEDULE": "Aufgabenplanung (Crontab)",
