@@ -141,6 +141,7 @@
   "FILENAME": "Nom de fichier",
   "ACTIONS": "Actions",
   "DELETE_THIS_ARCHIVE": "Supprimer ce Archives",
+  "DOWNLOAD_ARCHIVE": "Télécharger Archives",
   "CREATE_FROM_ARCHIVE": "Créer un serveur à partir d'une archives",
 
   "CRONTAB_SCHEDULE": "Crontab Schedule",
