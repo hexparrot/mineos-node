@@ -780,6 +780,73 @@ function server_container(server_name, base_dir, socket_io) {
     }
   }
 
+  self.direct_dispatch = function(user, args) {
+    var introspect = require('introspect');
+    var fn, required_args;
+    var arg_array = [];
+
+    async.waterfall([
+      async.apply(instance.property, 'owner'),
+      function(ownership_data, cb) {
+        var auth = require('./auth');
+        auth.test_membership(user, ownership_data.groupname, function(is_valid) {
+          cb(null, is_valid);
+        });
+      },
+      function(is_valid, cb) {
+        cb(!is_valid); //logical NOT'ted:  is_valid ? falsy error, !is_valid ? truthy error
+      }
+    ], function(err) {
+      if (err) {
+        logging.error('User "{0}" does not have permissions on [{1}]:'.format(user, args.server_name), args);
+      } else {
+        try {
+          fn = instance[args.command];
+          required_args = introspect(fn);
+          // receives an array of all expected arguments, using introspection.
+          // they are in order as listed by the function definition, which makes iteration possible.
+        } catch (e) { 
+          args.success = false;
+          args.error = e;
+          args.time_resolved = Date.now();
+          nsp.emit('server_fin', args);
+          logging.error('server_fin', args);
+
+          return;
+        }
+
+        for (var i in required_args) {
+          // all callbacks expected to follow the pattern (success, payload).
+          if (required_args[i] == 'callback') 
+            arg_array.push(function(err, payload) {
+              args.success = !err;
+              args.err = err;
+              args.time_resolved = Date.now();
+              nsp.emit('server_fin', args);
+              if (err)
+                logging.error('[{0}] command "{1}" errored out:'.format(server_name, args.command), args);
+              logging.log('server_fin', args)
+            })
+          else if (required_args[i] in args) {
+            arg_array.push(args[required_args[i]])
+          } else {
+            args.success = false;
+            logging.error('Provided values missing required argument', required_args[i]);
+            args.error = 'Provided values missing required argument: {0}'.format(required_args[i]);
+            nsp.emit('server_fin', args);
+            return;
+          }
+        }
+
+        if (args.command == 'delete')
+          self.cleanup();
+
+        logging.info('[{0}] received request "{1}"'.format(server_name, args.command))
+        fn.apply(instance, arg_array);
+      }
+    })
+  }
+
   nsp.on('connection', function(socket) {
     var ip_address = socket.request.connection.remoteAddress;
     var username = socket.request.user.username;

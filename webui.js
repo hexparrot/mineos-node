@@ -185,6 +185,35 @@ mineos.dependencies(function(err, binaries) {
 		})
 	);
 
+  app.all('/api/:server_name/:command', ensureAuthenticated, function(req, res) {
+    var target_server = req.params.server_name;
+    var user = req.user.username;
+    var instance = be.servers[target_server];
+
+    var args = req.body;
+    args['command'] = req.params.command;
+
+    if (instance)
+      instance.direct_dispatch(user, args);
+    else
+      console.error('Ignoring request by "', user, '"; no server found named [', target_server, ']');
+
+    res.end();
+  });
+
+  app.post('/admin/command', ensureAuthenticated, function(req, res) {
+    var target_server = req.body.server_name;
+    var instance = be.servers[target_server];
+    var user = req.user.username;
+    
+    if (instance)
+      instance.direct_dispatch(user, req.body);
+    else
+      console.error('Ignoring request by "', user, '"; no server found named [', target_server, ']');
+    
+    res.end();
+  });
+
 	app.get('/logout', function(req, res){
 		req.logout();
 		res.redirect('/admin/login.html');
