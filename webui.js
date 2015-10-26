@@ -185,7 +185,7 @@ mineos.dependencies(function(err, binaries) {
 		})
 	);
 
-  app.all('/api/:server_name/:command', function(req, res) {
+  app.all('/api/:server_name/:command', ensureAuthenticated, function(req, res) {
     var target_server = req.params.server_name;
     var user = req.user.username;
     var instance = be.servers[target_server];
