@@ -187,7 +187,14 @@ mineos.dependencies(function(err, binaries) {
 
   app.post('/admin/api/command', ensureAuthenticated, function(req, res) {
     var target_server = req.body.server_name;
-    be.servers[target_server].direct_dispatch(req.user.username, req.body);
+    var instance = be.servers[target_server];
+    var user = req.user.username;
+    
+    if (instance)
+      instance.direct_dispatch(user, req.body);
+    else
+      console.error('Ignoring request by "', user, '"; no server found named [', target_server, ']');
+    
     res.end();
   });
 
