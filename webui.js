@@ -185,6 +185,12 @@ mineos.dependencies(function(err, binaries) {
 		})
 	);
 
+  app.post('/admin/api/command', ensureAuthenticated, function(req, res) {
+    var target_server = req.body.server_name;
+    be.servers[target_server].direct_dispatch(req.user.username, req.body);
+    res.end();
+  });
+
 	app.get('/logout', function(req, res){
 		req.logout();
 		res.redirect('/admin/login.html');
