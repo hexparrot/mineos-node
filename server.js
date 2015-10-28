@@ -501,6 +501,7 @@ function server_container(server_name, base_dir, socket_io) {
       cron = {},
       heartbeat_interval = null,
       HEARTBEAT_INTERVAL_MS = 5000,
+      world_committer_interval = null,
       commit_interval = null,
       COMMIT_INTERVAL_MIN = null;
 
@@ -586,7 +587,7 @@ function server_container(server_name, base_dir, socket_io) {
     })
   }
 
-  setInterval(world_committer, 1 * 60 * 1000);
+  world_committer_interval = setInterval(world_committer, 1 * 60 * 1000);
 
   function world_committer() {
     async.waterfall([
@@ -696,6 +697,8 @@ function server_container(server_name, base_dir, socket_io) {
       tails[t].unwatch();
 
     clearInterval(heartbeat_interval);
+    clearInterval(commit_interval);
+    clearInterval(world_committer_interval);
     nsp.removeAllListeners();
   }
 
