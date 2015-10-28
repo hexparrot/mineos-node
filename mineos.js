@@ -1262,6 +1262,15 @@ mineos.mc = function(server_name, base_dir) {
           callback(err, !!(dict['minecraft'] || {}).unconventional);
         })
         break;
+      case 'commit_interval':
+        self.sc(function(err, dict) {
+          var interval = parseInt((dict['minecraft'] || {})['commit_interval']);
+          if (interval > 0)
+            callback(null, interval);
+          else
+            callback(null, null);
+        })
+        break;
       case 'eula':
         fs.readFile(path.join(self.env.cwd, 'eula.txt'), function(err, data) {
           if (err) {

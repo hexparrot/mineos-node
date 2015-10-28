@@ -2031,6 +2031,81 @@ test.broadcast_property = function(test) {
   })
 }
 
+test.commit_interval_property = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    function(callback) {
+      instance.property('commit_interval', function(err, commit_interval) {
+        test.ifError(err);
+        test.equal(commit_interval, null);
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'minecraft', 'commit_interval', 'true'),
+    function(callback) {
+      instance.property('commit_interval', function(err, commit_interval) {
+        test.ifError(err);
+        test.equal(commit_interval, null);
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'minecraft', 'commit_interval', 'false'),
+    function(callback) {
+      instance.property('commit_interval', function(err, commit_interval) {
+        test.ifError(err);
+        test.equal(commit_interval, null);
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'minecraft', 'commit_interval', '30'),
+    function(callback) {
+      instance.property('commit_interval', function(err, commit_interval) {
+        test.ifError(err);
+        test.equal(commit_interval, 30);
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'minecraft', 'commit_interval', '60'),
+    function(callback) {
+      instance.property('commit_interval', function(err, commit_interval) {
+        test.ifError(err);
+        test.equal(commit_interval, 60);
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'minecraft', 'commit_interval', '-60'),
+    function(callback) {
+      instance.property('commit_interval', function(err, commit_interval) {
+        test.ifError(err);
+        test.equal(commit_interval, null);
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'minecraft', 'commit_interval', '0'),
+    function(callback) {
+      instance.property('commit_interval', function(err, commit_interval) {
+        test.ifError(err);
+        test.equal(commit_interval, null);
+        callback(err);
+      })
+    },
+    async.apply(instance.modify_sc, 'minecraft', 'commit_interval', ''),
+    function(callback) {
+      instance.property('commit_interval', function(err, commit_interval) {
+        test.ifError(err);
+        test.equal(commit_interval, null);
+        callback(err);
+      })
+    }
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
 test.server_files_property = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
