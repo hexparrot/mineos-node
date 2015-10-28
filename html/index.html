@@ -916,7 +916,15 @@
                                                     <label class="checkbox">
                                                         <input id="unconventional"  type="checkbox" ng-model="unconventional_server" ng-change="change_sc('minecraft', 'unconventional', unconventional_server || 'false')"> {{ 'UNCONVENTIONAL_SERVER' | translate }}
                                                     </label>
-
+                                                    <div class="controls">
+                                                        <label class="control-label" translate="COMMIT_INTERVAL"></label>
+                                                        <input type="text" 
+                                                            class="span4"
+                                                            placeholder="60"
+                                                            ng-model="servers[current].sc.minecraft.commit_interval" 
+                                                            ng-change="change_sc('minecraft', 'commit_interval', servers[current].sc.minecraft.commit_interval)" 
+                                                            ng-model-options="{ updateOn: 'default blur', debounce: {'default': 1500, 'blur': 0} }">
+                                                    </div>
                                                 </div>
                                             </section>
                                         </div>
