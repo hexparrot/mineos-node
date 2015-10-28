@@ -500,7 +500,9 @@ function server_container(server_name, base_dir, socket_io) {
       notices = [],
       cron = {},
       heartbeat_interval = null,
-      HEARTBEAT_INTERVAL_MS = 5000;
+      HEARTBEAT_INTERVAL_MS = 5000,
+      commit_interval = null,
+      COMMIT_INTERVAL_MIN = null;
 
   logging.info('[{0}] Discovered server'.format(server_name));
   async.series([ async.apply(instance.sync_chown) ]);
@@ -582,6 +584,26 @@ function server_container(server_name, base_dir, socket_io) {
         'payload': retval
       })
     })
+  }
+
+  setInterval(world_committer, 1 * 60 * 1000);
+
+  function world_committer() {
+    async.waterfall([
+      async.apply(instance.property, 'commit_interval'),
+      function(minutes, cb) {
+        if (minutes && minutes != COMMIT_INTERVAL_MIN) {
+          COMMIT_INTERVAL_MIN = minutes;
+          commit_interval = setInterval(instance.saveall, minutes * 60 * 1000);
+          logging.info('[{0}] committing world to disk every'.format(server_name), minutes, 'minutes');
+        } else if (minutes === null) {
+          clearInterval(commit_interval);
+          logging.info('[{0}] not committing world to disk automatically'.format(server_name));
+        } else {
+          //logging.info('[{0}] committing world interval unchanged--ignoring this cycle.'.format(server_name))
+        }
+      }
+    ])
   }
 
   (function() {

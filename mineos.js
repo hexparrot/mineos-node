@@ -894,6 +894,34 @@ mineos.mc = function(server_name, base_dir) {
     ], callback);
   }
 
+  self.saveall = function(seconds_delay, callback) {
+    var params = { cwd: self.env.cwd };
+    var binary = which.sync('screen');
+    var FALLBACK_DELAY_SECONDS = 5;
+
+    async.series([
+      async.apply(self.verify, 'exists'),
+      async.apply(self.verify, 'up'),
+      function(cb) {
+        self.property('owner', function(err, result) {
+          params['uid'] = result['uid'];
+          params['gid'] = result['gid'];
+          cb(err);
+        })
+      },
+      function(cb) {
+        cb(null, child_process.spawn(binary, 
+                                     ['-S', 'mc-{0}'.format(self.server_name),
+                                      '-p', '0', '-X', 'eval', 'stuff "saveall\012"'.format(msg)],
+                                     params));
+      },
+      function(cb) {
+        var actual_delay = (parseInt(seconds_delay) || FALLBACK_DELAY_SECONDS) * 1000;
+        setTimeout(cb, actual_delay);
+      }
+    ], callback);
+  }
+
   self.archive = function(callback) {
     var strftime = require('strftime');
     var binary = which.sync('tar');
@@ -1232,6 +1260,15 @@ mineos.mc = function(server_name, base_dir) {
       case 'unconventional':
         self.sc(function(err, dict) {
           callback(err, !!(dict['minecraft'] || {}).unconventional);
+        })
+        break;
+      case 'commit_interval':
+        self.sc(function(err, dict) {
+          var interval = parseInt((dict['minecraft'] || {})['commit_interval']);
+          if (interval > 0)
+            callback(null, interval);
+          else
+            callback(null, null);
         })
         break;
       case 'eula':
