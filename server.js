@@ -599,7 +599,7 @@ function server_container(server_name, base_dir, socket_io) {
           logging.info('[{0}] committing world to disk every'.format(server_name), minutes, 'minutes');
         } else if (minutes === null) {
           clearInterval(commit_interval);
-          logging.info('[{0}] not committing world to disk automatically'.format(server_name));
+          //logging.info('[{0}] not committing world to disk automatically'.format(server_name));
         } else {
           //logging.info('[{0}] committing world interval unchanged--ignoring this cycle.'.format(server_name))
         }
