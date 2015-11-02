@@ -23,7 +23,7 @@ mineos.SP_DEFAULTS = {
   'level-type': 'DEFAULT',
   'level-name': 'world',
   'max-build-height': 256,
-  'generate-structures': 'false',
+  'generate-structures': 'true',
   'generator-settings': '',
   'server-ip': '0.0.0.0',
   'enable-query': 'false'
