@@ -26,6 +26,7 @@ mineos.SP_DEFAULTS = {
   'generate-structures': 'false',
   'generator-settings': '',
   'server-ip': '0.0.0.0',
+  'enable-query': 'false'
 }
 
 var PROC_PATH = null;
