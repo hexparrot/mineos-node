@@ -17,6 +17,11 @@
     "url": "https://github.com/hexparrot/mineos-node/issues"
   },
   "homepage": "https://github.com/hexparrot/mineos-node",
+  "scripts":{
+     "start":"node service.js start",
+     "stop":"node service.js stop",
+     "restart":"node service.js restart",
+  	},
   "dependencies": {
     "introspect": "0.0.x",
     "tail": "0.4.x",
