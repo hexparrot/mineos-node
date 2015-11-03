@@ -20,7 +20,7 @@
   "scripts":{
      "start":"node service.js start",
      "stop":"node service.js stop",
-     "restart":"node service.js restart",
+     "restart":"node service.js restart"
   	},
   "dependencies": {
     "introspect": "0.0.x",
