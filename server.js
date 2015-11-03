@@ -1204,7 +1204,6 @@ function check_profiles(base_dir, callback) {
             item['id'] = ref_obj['id'];
             item['time'] = ref_obj['time'];
             item['releaseTime'] = ref_obj['releaseTime'];
-            item['type'] = ref_obj['type'];
             item['group'] = 'mojang';
             item['webui_desc'] = 'Official Mojang Jar';
             item['weight'] = 0;
@@ -1213,6 +1212,16 @@ function check_profiles(base_dir, callback) {
             item['version'] = ref_obj['id'];
             item['release_version'] = ref_obj['id'];
             item['url'] = 'https://s3.amazonaws.com/Minecraft.Download/versions/{0}/minecraft_server.{0}.jar'.format(item.version);
+
+            switch(ref_obj['type']) {
+              case 'release':
+              case 'snapshot':
+                item['type'] = ref_obj['type'];
+                break;
+              default:
+                item['type'] = 'old_version'; //old_alpha, old_beta
+                break;
+            }
 
             p.push(item);
           }
