@@ -1,4 +1,4 @@
-FROM node:4.2
+FROM node:4-onbuild
 
 VOLUME /var/games/minecraft
 EXPOSE 8443 25565-25570
