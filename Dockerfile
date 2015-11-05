@@ -18,3 +18,5 @@ RUN cd /usr/games/minecraft && chmod +x generate-sslcert.sh; sync && ./generate-
 RUN cd /usr/games/minecraft && npm install
 
 RUN useradd mc && echo "mc:admin" | chpasswd
+
+ENTRYPOINT ["node","webui.js"]
