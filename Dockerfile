@@ -16,3 +16,5 @@ RUN mkdir -p /usr/games && cd /usr/games && git clone https://github.com/mjeries
 RUN cd /usr/games/minecraft && chmod +x generate-sslcert.sh; sync && ./generate-sslcert.sh
 ##install deps
 RUN cd /usr/games/minecraft && npm install
+
+RUN useradd mc && echo "mc:admin" | chpasswd
