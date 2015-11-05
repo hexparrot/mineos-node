@@ -2382,7 +2382,22 @@ test.server_files_property = function(test) {
         test.ok(server_files.indexOf('another.JAR') >= 0);
         callback(err);
       })
-    }
+    },
+    async.apply(fs.ensureFile, path.join(instance.env.cwd, 'Cuberite')),
+    async.apply(instance.modify_sc, 'minecraft', 'profile', ''),
+    function(callback) {
+      instance.property('server_files', function(err, server_files) {
+        test.ifError(err);
+        test.equal(server_files.length, 6);
+        test.ok(server_files.indexOf('myserver.jar') >= 0);
+        test.ok(server_files.indexOf('pocket.phar') >= 0);
+        test.ok(server_files.indexOf('pocket.PHAR') >= 0);
+        test.ok(server_files.indexOf('minecraft_server.1.7.9.jar') >= 0);
+        test.ok(server_files.indexOf('another.JAR') >= 0);
+        test.ok(server_files.indexOf('Cuberite') >= 0);
+        callback(err);
+      })
+    },
   ], function(err) {
     test.ifError(err);
     test.done();
