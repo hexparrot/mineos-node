@@ -663,6 +663,11 @@ mineos.mc = function(server_name, base_dir) {
       })
     }
 
+    function type_cuberite(inner_callback) {
+      var args = ['-dmS', 'mc-{0}'.format(self.server_name), './Cuberite'];
+      inner_callback(null, args);
+    }
+
     async.waterfall([
       async.apply(self.sc),
       function(sc_data, cb) {
@@ -678,6 +683,8 @@ mineos.mc = function(server_name, base_dir) {
             type_jar(cb);
         } else if (jarfile.slice(-5).toLowerCase() == '.phar')
           type_phar(cb);
+        else if (jarfile == 'Cuberite')
+          type_cuberite(cb);
       }
     ], callback)
   }
