@@ -738,8 +738,11 @@ mineos.mc = function(server_name, base_dir) {
 
         var all_files = [];
 
-        for (var i in incr_file_list)
+        for (var i in incr_file_list) {
+          if (incr_file_list[i].toString().match(/sent \d+ bytes/))
+            continue; //known pattern on freebsd: 'sent 79 bytes  received 19 bytes  196.00 bytes/sec'
           all_files = all_files.concat(incr_file_list[i].toString().split('\n'))
+        }
         
         cb(null, all_files.filter(function(n){ return n.length }));
       }
