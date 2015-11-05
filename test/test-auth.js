@@ -3,7 +3,8 @@ var auth = require('../auth');
 var test = exports;
 
 test.authenticate_shadow = function(test) {
-  //this test depends on the existence of system user "weak" with password "password"
+  // this test assumes:
+  // user "weak" with password "password"
   async.series([
     function(callback) {
       auth.authenticate_shadow('weak', 'password', function(authed_user) {
@@ -47,6 +48,10 @@ test.authenticate_shadow = function(test) {
 }
 
 test.test_membership = function(test) {
+  // this test assumes:
+  // user 'root' is part of group 'root'
+  // user 'will' is part of group 'sudo'
+
   async.series([
     function(callback) {
       auth.test_membership('root', 'root', function(is_member) {
@@ -90,6 +95,9 @@ test.test_membership = function(test) {
 }
 
 test.verify_ids = function(test) {
+  // this test assumes:
+  // UID and GID 1000 exist
+
   async.series([
     async.apply(auth.verify_ids, 1000, 1000),
     function(callback) {
