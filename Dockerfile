@@ -9,7 +9,7 @@ EXPOSE 8443 25565-25570
 ##update and accept all prompts
 RUN apt-get update -y
 ##install documented packages and accept all prompts
-RUN apt-get install -y npm git rdiff-backup screen openjdk-7-jre-headless
+RUN apt-get install -y npm git rdiff-backup screen openjdk-7-jre-headless rsync
 ##clone the repo
 RUN mkdir -p /usr/games && cd /usr/games && git clone https://github.com/mjeries/mineos-node.git minecraft
 ##generate a cert. sync before generating to avoid an error
