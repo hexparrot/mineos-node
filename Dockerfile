@@ -5,6 +5,9 @@ VOLUME /var/games/minecraft
 EXPOSE 8443 25565-25570
 
 
+##i want jdk8, so enable debian testing
+RUN echo "deb http://httpredir.debian.org/debian/ testing main" >> /etc/apt/sources.list
+
 ##update and accept all prompts
 RUN apt-get update -y
 
