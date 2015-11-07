@@ -9,7 +9,7 @@ EXPOSE 8443 25565-25570
 RUN apt-get update -y
 
 ##install documented packages and accept all prompts
-RUN apt-get install -y npm git rdiff-backup screen openjdk-7-jre-headless rsync
+RUN apt-get install -y npm git rdiff-backup screen openjdk-8-jre-headless rsync
 
 ##clone the repo
 RUN mkdir -p /usr/games; \
