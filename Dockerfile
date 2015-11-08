@@ -9,10 +9,14 @@ EXPOSE 8443 25565-25570
 RUN echo "deb http://httpredir.debian.org/debian/ testing main" >> /etc/apt/sources.list
 
 ##update and accept all prompts
-RUN apt-get update -y
-
-##install documented packages and accept all prompts
-RUN apt-get install -y npm git rdiff-backup screen openjdk-8-jre-headless rsync
+RUN apt-get update -y && apt-get install -y \
+  git \
+  rdiff-backup \
+  screen \
+  openjdk-8-jre-headless \
+  rsync \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
 ##clone the repo
 RUN mkdir -p /usr/games; \
