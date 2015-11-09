@@ -88,7 +88,7 @@
   "START_ON_BOOT": "Start server on boot",
   "UNCONVENTIONAL_SERVER": "This is not a conventional Minecraft server",
   "COPY_PROFILE": "Copy profile to live server files",
-  "COMMIT_INTERVAL": "Minutes between committing world to disk (via 'saveall')",
+  "COMMIT_INTERVAL": "Minutes between committing world to disk via 'save-all' (empty to disable)",
 
   "JAVA_SETTINGS": "Java Settings",
   "MEMORY_ALLOCATION": "RAM Einstellungen (Heapsize)",
