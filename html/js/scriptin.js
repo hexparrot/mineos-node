@@ -559,10 +559,19 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
       });
     }
   }
-
-  $scope.server_download_archive = function() {
-    console.log('Clicked download archive.');
-    // TODO complete this section. for now setting up the infrastructure
+  
+  $scope.server_download_archive = function(archive_filename, awd_dir) {
+    console.log('Initiated archive download.');
+    $scope.archive_filename = archive_filename;
+    $scope.awd_dir = awd_dir;    
+    // console.log($scope.archive_filename);
+    // console.log($scope.awd_dir);
+    $scope.archive_filepath = "//archive";
+    $scope.archive_filepath += "/";
+    $scope.archive_filepath += $scope.awd_dir;
+    $scope.archive_filepath += "/";
+    $scope.archive_filepath += $scope.archive_filename;
+    console.log($scope.archive_filepath);  
   }
 
   $scope.server_from_archive = function(archive_filename, awd_dir) {
