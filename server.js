@@ -506,7 +506,9 @@ function server_container(server_name, base_dir, socket_io) {
       COMMIT_INTERVAL_MIN = null;
 
   logging.info('[{0}] Discovered server'.format(server_name));
-  async.series([ async.apply(instance.sync_chown) ]);
+  //async.series([ async.apply(instance.sync_chown) ]);
+  //uncomment sync_chown to correct perms on server discovery
+  //commenting out for high cpu usage on startup
 
   make_tail('logs/latest.log');
   make_tail('server.log');
