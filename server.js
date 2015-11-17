@@ -107,13 +107,18 @@ server.backend = function(base_dir, socket_emitter) {
     fw
       .on('add', function(fp){
         var split = path.parse(fp);
-        if (split.dir == server_path) {
-          var server_name = split.base;
-          if (!(server_name in self.servers))
-            async.nextTick(function() {
-              self.servers[server_name] = new server_container(server_name, base_dir, self.front_end);
-              self.front_end.emit('track_server', server_name);
-            });
+        if (split.dir == server_path) {  //if fp is precisely server_path
+          var server_name = split.base;     //remainder is just server_name
+          if (!(server_name in self.servers)) { //if server_name not currently tracked
+            fs.lstat(fp, function(err, stat) { 
+              if (stat.isDirectory()) {   // check if fp is directory
+                async.nextTick(function() {
+                  self.servers[server_name] = new server_container(server_name, base_dir, self.front_end);
+                  self.front_end.emit('track_server', server_name);
+                });
+              }
+            })
+          }
         }
       })
       .on('remove', function(fp) {
@@ -580,7 +585,7 @@ function server_container(server_name, base_dir, socket_io) {
       },
       'query': function(cb) {
         instance.property('server.properties', function(err, dict) {
-          if (dict['enable-query'])
+          if ((dict || {})['enable-query'])
             instance.property('query', cb);
           else
             cb(null, {}); //ignore query--wouldn't respond in any meaningful way
