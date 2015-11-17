@@ -11,6 +11,7 @@ ExecStop=/usr/bin/node service.js stop
 ExecReload=/usr/bin/node service.js restart
 PIDFile=/var/run/mineos.pid
 Restart=always
+KillMode=process
 
 [Install]
 WantedBy=multi-user.target
