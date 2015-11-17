@@ -1229,20 +1229,41 @@ mineos.mc = function(server_name, base_dir) {
         break;
       case 'du_awd':
         var du = require('du');
+        var DU_TIMEOUT = 2000;
+
+        var timer = setTimeout(function() {
+          return(callback(null, 0));
+        }, DU_TIMEOUT)
+
         du(self.env.awd, { disk: true }, function (err, size) {
-          callback(err, size);
+          clearTimeout(timer);
+          return(callback(err, size));
         })
         break;
       case 'du_bwd':
         var du = require('du');
+        var DU_TIMEOUT = 3000;
+
+        var timer = setTimeout(function() {
+          return(callback(null, 0));
+        }, DU_TIMEOUT)
+
         du(self.env.bwd, { disk: true }, function (err, size) {
-          callback(err, size);
+          clearTimeout(timer);
+          return(callback(err, size));
         })
         break;
       case 'du_cwd':
         var du = require('du');
+        var DU_TIMEOUT = 2000;
+
+        var timer = setTimeout(function() {
+          return(callback(null, 0));
+        }, DU_TIMEOUT)
+
         du(self.env.cwd, { disk: true }, function (err, size) {
-          callback(err, size);
+          clearTimeout(timer);
+          return(callback(err, size));
         })
         break;
       case 'broadcast':
