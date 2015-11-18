@@ -102,6 +102,7 @@ server.backend = function(base_dir, socket_emitter) {
     var server_path = path.join(base_dir, mineos.DIRS['servers']);
     
     var fw = fireworm(server_path);
+    fw.ignore('**/*.*')
     fw.add('**');
 
     fw
