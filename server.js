@@ -499,10 +499,8 @@ function server_container(server_name, base_dir, socket_io) {
       tails = {},
       notices = [],
       cron = {},
-      heartbeat_interval = null,
+      intervals = {},
       HEARTBEAT_INTERVAL_MS = 5000,
-      world_committer_interval = null,
-      commit_interval = null,
       COMMIT_INTERVAL_MIN = null;
 
   logging.info('[{0}] Discovered server'.format(server_name));
@@ -556,7 +554,7 @@ function server_container(server_name, base_dir, socket_io) {
     fw.on('change', handle_event);
   })();
 
-  heartbeat_interval = setInterval(heartbeat, HEARTBEAT_INTERVAL_MS);
+  intervals['heartbeat'] = setInterval(heartbeat, HEARTBEAT_INTERVAL_MS);
 
   function heartbeat() {
     async.series({
@@ -587,7 +585,7 @@ function server_container(server_name, base_dir, socket_io) {
     })
   }
 
-  world_committer_interval = setInterval(world_committer, 1 * 60 * 1000);
+  intervals['world_commit'] = setInterval(world_committer, 1 * 60 * 1000);
 
   function world_committer() {
     async.waterfall([
@@ -595,10 +593,10 @@ function server_container(server_name, base_dir, socket_io) {
       function(minutes, cb) {
         if (minutes && minutes != COMMIT_INTERVAL_MIN) {
           COMMIT_INTERVAL_MIN = minutes;
-          commit_interval = setInterval(instance.saveall, minutes * 60 * 1000);
+          intervals['commit'] = setInterval(instance.saveall, minutes * 60 * 1000);
           logging.info('[{0}] committing world to disk every'.format(server_name), minutes, 'minutes');
         } else if (minutes === null) {
-          clearInterval(commit_interval);
+          clearInterval(intervals['commit']);
           //logging.info('[{0}] not committing world to disk automatically'.format(server_name));
         } else {
           //logging.info('[{0}] committing world interval unchanged--ignoring this cycle.'.format(server_name))
@@ -696,9 +694,9 @@ function server_container(server_name, base_dir, socket_io) {
     for (var t in tails)
       tails[t].unwatch();
 
-    clearInterval(heartbeat_interval);
-    clearInterval(commit_interval);
-    clearInterval(world_committer_interval);
+    for (var i in intervals)
+      clearInterval(intervals[i]);
+
     nsp.removeAllListeners();
   }
 
