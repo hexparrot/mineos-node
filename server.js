@@ -591,16 +591,16 @@ function server_container(server_name, base_dir, socket_io) {
     async.waterfall([
       async.apply(instance.property, 'commit_interval'),
       function(minutes, cb) {
-        if (minutes && minutes != COMMIT_INTERVAL_MIN) {
+        if (minutes != COMMIT_INTERVAL_MIN) { //upon change or init
           COMMIT_INTERVAL_MIN = minutes;
-          intervals['commit'] = setInterval(instance.saveall, minutes * 60 * 1000);
-          logging.info('[{0}] committing world to disk every'.format(server_name), minutes, 'minutes');
-        } else if (minutes === null) {
-          clearInterval(intervals['commit']);
-          //logging.info('[{0}] not committing world to disk automatically'.format(server_name));
-        } else {
-          //logging.info('[{0}] committing world interval unchanged--ignoring this cycle.'.format(server_name))
-        }
+          if (minutes > 0) {
+            logging.info('[{0}] committing world to disk every {1} minutes.'.format(server_name, minutes));
+            intervals['commit'] = setInterval(instance.saveall, minutes * 60 * 1000);
+          } else {
+            logging.info('[{0}] not committing world to disk automatically (interval set to {1})'.format(server_name, minutes));
+            clearInterval(intervals['commit']);
+          } 
+        } 
       }
     ])
   }
