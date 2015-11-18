@@ -916,7 +916,7 @@ mineos.mc = function(server_name, base_dir) {
       function(cb) {
         cb(null, child_process.spawn(binary, 
                                      ['-S', 'mc-{0}'.format(self.server_name),
-                                      '-p', '0', '-X', 'eval', 'stuff "save-all\012"'.format(msg)],
+                                      '-p', '0', '-X', 'eval', 'stuff "save-all\012"'],
                                      params));
       },
       function(cb) {
