@@ -396,8 +396,6 @@ server.backend = function(base_dir, socket_emitter) {
           break;
         case 'refresh_profile_list':
           self.send_profile_list();
-          break;
-        case 'refresh_spigot_list':
           self.send_spigot_list();
           break;
         case 'create_from_archive':
