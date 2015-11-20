@@ -98,11 +98,22 @@ server.backend = function(base_dir, socket_emitter) {
   })();
 
   (function() {
-    var fireworm = require('fireworm');
     var server_path = path.join(base_dir, mineos.DIRS['servers']);
     
-    var fw = fireworm(server_path);
-    fw.ignore('**/*.*')
+    //http://stackoverflow.com/a/24594123/1191579
+    var discovered_servers = fs.readdirSync(server_path).filter(function(p) {
+      return fs.statSync(path.join(server_path, p)).isDirectory();
+    });
+
+    for (var i in discovered_servers) {
+      var server_name = discovered_servers[i];
+      self.servers[server_name] = new server_container(server_name, base_dir, self.front_end);
+      self.front_end.emit('track_server', server_name);
+    }
+
+    var fireworm = require('fireworm');
+    
+    var fw = fireworm(server_path, {ignoreInitial: true});
     fw.add('**');
 
     fw
@@ -113,7 +124,7 @@ server.backend = function(base_dir, socket_emitter) {
           fs.lstat(fp, function(err, stat) { 
             if (stat.isDirectory())      // check if fp is directory
               if (!(server_name in self.servers)) { //if server_name not currently tracked
-                self.servers[server_name] = null;   
+                self.servers[server_name] = null;
                 //if new server_container() isn't instant, double broadcast might trigger this if/then twice
                 //setting to null is immediate and prevents double execution
                 self.servers[server_name] = new server_container(server_name, base_dir, self.front_end);
