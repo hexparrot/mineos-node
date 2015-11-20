@@ -358,6 +358,8 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     for (var p in profile_data)
       if (profile_data[p].id == 'BuildTools-latest')
         $scope.buildtools_jar = profile_data[p];
+      else if (profile_data[p].id == 'PaperTools-latest')
+        $scope.papertools_jar = profile_data[p];
   })
 
   socket.on('/', 'user_list', function(user_data) {
@@ -546,16 +548,18 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     open_locales: function() {
       $('#modal_locales').modal('show');
     },
-    open_copy_to_server: function(jarversion) {
+    open_copy_to_server: function(jarversion, type) {
       $('#modal_spigotjar').modal('show');
       $scope.jarcopy_version = jarversion;
+      $scope.jarcopy_type = type;
     },
     close_copy_to_server: function(jarversion) {
       $('#modal_spigotjar').modal('hide');
       socket.emit('/', 'command', {
         'command': 'copy_to_server',
         'server_name': $scope.server_target,
-        'version': $scope.jarcopy_version
+        'version': $scope.jarcopy_version,
+        'type': $scope.jarcopy_type
       });
     }
   }
