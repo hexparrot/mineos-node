@@ -98,30 +98,53 @@ server.backend = function(base_dir, socket_emitter) {
   })();
 
   (function() {
-    var fireworm = require('fireworm');
     var server_path = path.join(base_dir, mineos.DIRS['servers']);
     
-    var fw = fireworm(server_path);
-    fw.add('**/server.properties');
+    //http://stackoverflow.com/a/24594123/1191579
+    var discovered_servers = fs.readdirSync(server_path).filter(function(p) {
+      return fs.statSync(path.join(server_path, p)).isDirectory();
+    });
+
+    for (var i in discovered_servers) {
+      var server_name = discovered_servers[i];
+      self.servers[server_name] = new server_container(server_name, base_dir, self.front_end);
+      self.front_end.emit('track_server', server_name);
+    }
+
+    var fireworm = require('fireworm');
+    
+    var fw = fireworm(server_path, {ignoreInitial: true});
+    fw.add('**');
 
     fw
       .on('add', function(fp){
-        var server_name = path.basename(path.dirname(fp));
-        if (!(server_name in self.servers))
-          async.nextTick(function() {
-            self.servers[server_name] = new server_container(server_name, base_dir, self.front_end);
-            self.front_end.emit('track_server', server_name);
-          });
+        var split = path.parse(fp);
+        if (split.dir == server_path) {  //if fp is precisely server_path
+          var server_name = split.base;  //remainder is just server_name
+          fs.lstat(fp, function(err, stat) { 
+            if (stat.isDirectory())      // check if fp is directory
+              if (!(server_name in self.servers)) { //if server_name not currently tracked
+                self.servers[server_name] = null;
+                //if new server_container() isn't instant, double broadcast might trigger this if/then twice
+                //setting to null is immediate and prevents double execution
+                self.servers[server_name] = new server_container(server_name, base_dir, self.front_end);
+                self.front_end.emit('track_server', server_name);
+              }
+          })
+        }
       })
       .on('remove', function(fp) {
-        var server_name = path.basename(path.dirname(fp));
-        try {
-          self.servers[server_name].cleanup();
-          delete self.servers[server_name];
-        } catch (e) {
-          //if server has already been deleted and this is running for reasons unknown, catch and ignore
+        var split = path.parse(fp);
+        if (split.dir == server_path) {
+          var server_name = split.base;
+          try {
+            self.servers[server_name].cleanup();
+            delete self.servers[server_name];
+          } catch (e) {
+            //if server has already been deleted and this is running for reasons unknown, catch and ignore
+          }
+          self.front_end.emit('untrack_server', server_name);
         }
-        self.front_end.emit('untrack_server', server_name);
       })
   })();
 
@@ -518,7 +541,9 @@ function server_container(server_name, base_dir, socket_io) {
       COMMIT_INTERVAL_MIN = null;
 
   logging.info('[{0}] Discovered server'.format(server_name));
-  async.series([ async.apply(instance.sync_chown) ]);
+  //async.series([ async.apply(instance.sync_chown) ]);
+  //uncomment sync_chown to correct perms on server discovery
+  //commenting out for high cpu usage on startup
 
   make_tail('logs/latest.log');
   make_tail('server.log');
@@ -584,7 +609,7 @@ function server_container(server_name, base_dir, socket_io) {
       },
       'query': function(cb) {
         instance.property('server.properties', function(err, dict) {
-          if (dict['enable-query'])
+          if ((dict || {})['enable-query'])
             instance.property('query', cb);
           else
             cb(null, {}); //ignore query--wouldn't respond in any meaningful way
