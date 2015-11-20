@@ -733,11 +733,13 @@
                                 <div class="body-inner no-padding">
                                     <p translate="BUILDTOOLS_INSTRUCTIONS"></p>
                                     <button type="button" class="btn btn-mini btn-success" ng-click="host_command('download', {profile: buildtools_jar})" translate="DOWNLOAD_BUILDTOOLS"></button>
+                                    <button type="button" class="btn btn-mini btn-success" ng-click="host_command('download', {profile: papertools_jar})" translate="DOWNLOAD_PAPERTOOLS"></button>
                                     <table class="table">
                                         <thead>
                                             <tr>
                                                 <th translate="IDENTIFIER" class="span4"></th>
-                                                <th translate="ACTIONS"></th>
+                                                <th>Spigot</th>
+                                                <th>PaperSpigot</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -748,9 +750,14 @@
                                                            orderBy:['+weight', '-releaseTime', 'id']">
                                                 <td>{{ jar.id }}</td>
                                                 <td>
-                                                    <button type="button" class="btn btn-mini btn-success" ng-click="host_command('build_jar', {builder: buildtools_jar, version: jar.id})" ng-disabled="!buildtools_jar.downloaded" translate="BUILD_JAR"></button>
-                                                    <button type="button" class="btn btn-mini btn-primary" ng-click="modals.open_copy_to_server(jar.id)" ng-show="spigot_list[jar.id].jarfiles.length" translate="COPY_TO_SERVER"></button>
-                                                    <button type="button" class="btn btn-mini btn-danger" ng-click="host_command('delete_build', {version: jar.id})" ng-show="spigot_list[jar.id].jarfiles.length" translate="DELETE"></button>
+                                                    <button type="button" class="btn btn-mini btn-success" ng-click="host_command('build_jar', {builder: buildtools_jar, version: jar.id})" ng-disabled="!buildtools_jar.downloaded" translate="BUILD_SPIGOT"></button>
+                                                    <button type="button" class="btn btn-mini btn-danger" ng-click="host_command('delete_build', {version: jar.id, type: 'spigot'})" ng-show="spigot_list['spigot_' + jar.id].jarfiles.length" translate="DELETE"></button>
+                                                    <button type="button" class="btn btn-mini btn-primary" ng-click="modals.open_copy_to_server(jar.id, 'spigot')" ng-show="spigot_list['spigot_' + jar.id].jarfiles.length" translate="COPY_TO_SERVER"></button>
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-mini btn-success" ng-click="host_command('build_jar', {builder: papertools_jar, version: jar.id})" ng-disabled="!papertools_jar.downloaded" translate="BUILD_SPIGOT"></button>
+                                                    <button type="button" class="btn btn-mini btn-danger" ng-click="host_command('delete_build', {version: jar.id, type: 'paperspigot'})" ng-show="spigot_list['paperspigot_' + jar.id].jarfiles.length" translate="DELETE"></button>
+                                                    <button type="button" class="btn btn-mini btn-primary" ng-click="modals.open_copy_to_server(jar.id, 'paperspigot')" ng-show="spigot_list['paperspigot_' + jar.id].jarfiles.length" translate="COPY_TO_SERVER"></button>
                                                 </td>
                                             </tr>
                                         </tbody>
