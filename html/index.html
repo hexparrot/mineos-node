@@ -1491,30 +1491,17 @@
 
                     <!-- START Row -->
                     <div class="row-fluid">
-                        <div class="body-inner">
-                            <div class="control-group">
-                                <div class="controls">
-                                    <input type="text" class="span12" ng-model="user_input" ng-enter="console_input()">
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                    <!--/ END Row -->
-
-                    <!-- START Row -->
-                    <div class="row-fluid">
                         <!-- START Basic Table -->
-                        <div class="span12 widget dark stacked">
+                        <div class="console span12 widget dark">
                             <header>
                                 <h4 class="title">server.log</h4>
                             </header>
                             <section class="body">
-                                <div class="body-inner no-padding">
+                                <div class="body-inner console-inner no-padding" sticky-console>
                                     <table class="table">
                                         <tbody>
                                             <tr ng-repeat="line in servers[current].live_logs['server.log'] track by $index">
-                                                <td>{{ line }}</td>
+                                                <td ng-bind-html="line | colorize"></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -1529,8 +1516,8 @@
                     <div class="row-fluid">
                         <div class="body-inner">
                             <div class="control-group">
-                                <div class="controls">
-                                    <input type="text" class="span12" ng-model="user_input" ng-enter="console_input()">
+                                <div class="controls console-input">
+                                    <label>&gt;</label><input type="text" class="span12" ng-model="user_input" ng-enter="console_input()">
                                 </div>
                             </div>
                         </div>
@@ -1546,30 +1533,17 @@
 
                     <!-- START Row -->
                     <div class="row-fluid">
-                        <div class="body-inner">
-                            <div class="control-group">
-                                <div class="controls">
-                                    <input type="text" class="span12" ng-model="user_input" ng-enter="console_input()">
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                    <!--/ END Row -->
-
-                    <!-- START Row -->
-                    <div class="row-fluid">
                         <!-- START Basic Table -->
-                        <div class="span12 widget dark stacked">
+                        <div class="console span12 widget dark">
                             <header>
                                 <h4 class="title">proxy.log.0</h4>
                             </header>
                             <section class="body">
-                                <div class="body-inner no-padding">
+                                <div class="body-inner console-inner no-padding" sticky-console>
                                     <table class="table">
                                         <tbody>
                                             <tr ng-repeat="line in servers[current].live_logs['proxy.log.0'] track by $index">
-                                                <td>{{ line }}</td>
+                                                <td ng-bind-html="line | colorize"></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -1579,20 +1553,6 @@
                         <!--/ END Basic Table -->
                     </div>
                     <!--/ END Row -->
-
-                    <!-- START Row -->
-                    <div class="row-fluid">
-                        <div class="body-inner">
-                            <div class="control-group">
-                                <div class="controls">
-                                    <input type="text" class="span12" ng-model="user_input" ng-enter="console_input()">
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                    <!--/ END Row -->
-
                 </div>
                 <!--/ END Content -->
 
