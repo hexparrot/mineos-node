@@ -99,53 +99,49 @@ server.backend = function(base_dir, socket_emitter) {
 
   (function() {
     var server_path = path.join(base_dir, mineos.DIRS['servers']);
-    
-    //http://stackoverflow.com/a/24594123/1191579
-    var discovered_servers = fs.readdirSync(server_path).filter(function(p) {
-      return fs.statSync(path.join(server_path, p)).isDirectory();
-    });
 
-    for (var i in discovered_servers) {
-      var server_name = discovered_servers[i];
-      self.servers[server_name] = new server_container(server_name, base_dir, self.front_end);
-      self.front_end.emit('track_server', server_name);
+    function discover() {
+      //http://stackoverflow.com/a/24594123/1191579
+      return fs.readdirSync(server_path).filter(function(p) {
+        return fs.statSync(path.join(server_path, p)).isDirectory();
+      });
     }
 
-    var fireworm = require('fireworm');
-    
-    var fw = fireworm(server_path, {ignoreInitial: true});
-    fw.add('**');
+    function track(sn) {
+      self.servers[sn] = null;
+      //if new server_container() isn't instant, double broadcast might trigger this if/then twice
+      //setting to null is immediate and prevents double execution
+      self.servers[sn] = new server_container(sn, base_dir, self.front_end);
+      self.front_end.emit('track_server', sn);
+    }
 
-    fw
-      .on('add', function(fp){
-        var split = path.parse(fp);
-        if (split.dir == server_path) {  //if fp is precisely server_path
-          var server_name = split.base;  //remainder is just server_name
-          fs.lstat(fp, function(err, stat) { 
-            if (stat.isDirectory())      // check if fp is directory
-              if (!(server_name in self.servers)) { //if server_name not currently tracked
-                self.servers[server_name] = null;
-                //if new server_container() isn't instant, double broadcast might trigger this if/then twice
-                //setting to null is immediate and prevents double execution
-                self.servers[server_name] = new server_container(server_name, base_dir, self.front_end);
-                self.front_end.emit('track_server', server_name);
-              }
-          })
-        }
-      })
-      .on('remove', function(fp) {
-        var split = path.parse(fp);
-        if (split.dir == server_path) {
-          var server_name = split.base;
-          try {
-            self.servers[server_name].cleanup();
-            delete self.servers[server_name];
-          } catch (e) {
-            //if server has already been deleted and this is running for reasons unknown, catch and ignore
-          }
-          self.front_end.emit('untrack_server', server_name);
-        }
-      })
+    function untrack(sn) {
+      try {
+        self.servers[sn].cleanup();
+        delete self.servers[sn];
+      } catch (e) {
+        //if server has already been deleted and this is running for reasons unknown, catch and ignore
+      } finally {
+        self.front_end.emit('untrack_server', sn);
+      }
+    }
+    
+    var discovered_servers = discover();
+    for (var i in discovered_servers)
+      track(discovered_servers[i]);
+
+    fs.watch(server_path, function() {
+      var current_servers = discover();
+
+      for (var i in current_servers)
+        if (!(current_servers[i] in self.servers)) //if detected directory not a discovered server, track
+          track(current_servers[i]);
+
+      for (var s in self.servers)
+        if (current_servers.indexOf(s) < 0)
+          untrack(s);
+
+    })
   })();
 
   (function() {
