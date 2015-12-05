@@ -1252,7 +1252,7 @@
                                             <tr ng-repeat="archive in servers[current].page_data.glance.archives">
                                                 <td>{{ archive.time | amDateFormat: "dddd, MMMM Do YYYY, h:mm:ss a"  }}</td>
                                                 <td>{{ archive.size | bytes_to_mb }}</td>
-                                                <td>{{ archive.filename }}</td>
+                                                <td><a ng-click="server_download_archive(archive.filename, current)">{{ archive.filename }}</a></td>
                                                 <td>
                                                     <p>
                                                         <!-- Button Dropdown -->
@@ -1260,7 +1260,7 @@
                                                             <button class="btn btn-small dropdown-toggle" data-toggle="dropdown">{{ 'ACTIONS' | translate }} <span class="caret"></span></button>
                                                             <ul class="dropdown-menu">
                                                                 <li><a ng-click="server_command('delete_archive', {filename: archive.filename})" translate="DELETE_THIS_ARCHIVE"></a></li>
-                                                                <li><a href="#"></a></li>
+                                                                <li><a ng-click="server_download_archive(archive.filename, current)" translate="DOWNLOAD_ARCHIVE"></a></li>
                                                                 <li><a ng-click="server_from_archive(archive.filename, current)" translate="CREATE_FROM_ARCHIVE"></a></li>
                                                             </ul>
                                                         </div><!--/ Button Dropdown -->
