@@ -10,7 +10,7 @@ ExecStart=/usr/bin/node service.js start
 ExecStop=/usr/bin/node service.js stop
 ExecReload=/usr/bin/node service.js restart
 PIDFile=/var/run/mineos.pid
-Restart=always
+Restart=on-failure
 KillMode=process
 
 [Install]
