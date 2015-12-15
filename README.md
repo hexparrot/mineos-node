@@ -12,7 +12,7 @@ This has been tested on Debian, Ubuntu, ArchLinux, and FreeBSD and should work o
 Installation
 ------------
 
-MineOS is distributed (right now) through github and downloads its dependencies with npm.
+MineOS is distributed through github and downloads its dependencies with npm.
 
 MineOS requires root-privileges, as the authentication relies on the underlying system's /etc/shadow.
 
@@ -58,7 +58,10 @@ Things to watch out for
 ------
 
 On FreeBSD, you will need to mount a Linux-compatible /proc filesystem, i.e., linprocfs,
-at /usr/compat/linux/proc in order for the web-ui to work.
+at /usr/compat/linux/proc in order for the web-ui to work. In addition, where CLANG is
+default for your system, you'll need to build the NPM modules differently:
+
+    echo "CXX=c++ npm install" | sh
 
 Mineos-node requires rsync 3.1.x or later, 3.0.x does not have the ability to chown
 on copy, which is essential for profiles. Depending on your distribution, you may need
