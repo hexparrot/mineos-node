@@ -8,7 +8,7 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 #i want jdk8, so enable debian testing
-RUN echo "deb http://httpredir.debian.org/debian/ testing main" >> /etc/apt/sources.list
+RUN echo "deb http://ftp.us.debian.org/debian/ testing main" >> /etc/apt/sources.list
 
 #update and accept all prompts
 RUN apt-get update -y && apt-get install -y \
