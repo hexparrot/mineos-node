@@ -22,7 +22,7 @@ server.backend = function(base_dir, socket_emitter) {
   self.front_end = socket_emitter;
   self.commit_msg = '';
 
-  process.umask(this.UMASK);
+  process.umask(UMASK);
 
   fs.ensureDirSync(base_dir);
   fs.ensureDirSync(path.join(base_dir, mineos.DIRS['servers']));
