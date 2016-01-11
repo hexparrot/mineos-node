@@ -60,6 +60,11 @@ Clone the repository on the host OS, then run:
 
     docker run -itdP --name=mineos-node hexparrot/mineos-node
 
+Specify the ports manually if you do not want them to change when restarting the container.
+For example:
+
+    docker run -itd -p 8443:8443 -p 25565:25565 -p 25566:25566 -p 25567:25567 -p 25568:25568 -p 25569:25569 --name=mineos-node hexparrot/mineos-node
+
 
 Things to watch out for
 ------
