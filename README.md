@@ -53,7 +53,14 @@ To use the webui as a background daemon:
 To start the webui in the foreground:
 
     node webui.js
-    
+
+Docker
+------
+Clone the repository on the host OS, then run:
+
+    docker run -itdP --name=mineos-node hexparrot/mineos-node
+
+
 Things to watch out for
 ------
 
