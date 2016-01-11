@@ -2,7 +2,7 @@ FROM node:4
 
 VOLUME /var/games/minecraft
 #arbitrarily assigned ports for 5 servers. change if you need to.
-EXPOSE 8443 25565-25570
+EXPOSE 8443 25565-25569
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
