@@ -30,3 +30,5 @@ RUN chmod +x generate-sslcert.sh; \
 
 RUN useradd mc; \
   echo "mc:admin" | chpasswd
+
+CMD [ "npm", "start" ]
