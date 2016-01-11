@@ -18,10 +18,8 @@
   },
   "homepage": "https://github.com/hexparrot/mineos-node",
   "scripts":{
-     "start":"node service.js start",
-     "stop":"node service.js stop",
-     "restart":"node service.js restart"
-  	},
+     "start":"node webui.js"
+  },
   "dependencies": {
     "introspect": "0.0.x",
     "tail": "0.4.x",
