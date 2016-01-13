@@ -17,6 +17,9 @@
     "url": "https://github.com/hexparrot/mineos-node/issues"
   },
   "homepage": "https://github.com/hexparrot/mineos-node",
+  "scripts":{
+     "start":"node webui.js"
+  },
   "dependencies": {
     "introspect": "0.0.x",
     "tail": "0.4.x",
