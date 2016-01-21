@@ -776,11 +776,11 @@
                                 <h4 class="title" translate="OUTPUT_FROM_BUILDTOOLS"></h4>
                             </header>
                             <section class="body">
-                                <div class="body-inner no-padding">
+                                <div class="body-inner console-inner no-padding" sticky-console>
                                     <table class="table">
                                         <tbody>
                                             <tr ng-repeat="line in build_jar_log track by $index">
-                                                <td>{{ line }}</td>
+                                                <td ng-bind-html="line"></td>
                                             </tr>
                                         </tbody>
                                     </table>

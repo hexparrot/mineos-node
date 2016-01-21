@@ -379,8 +379,9 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
   })
 
   socket.on('/', 'build_jar_output', function(data) {
-    while ($scope.build_jar_log.length > 25)
-      $scope.build_jar_log.splice(0,1);
+    //removed to allow access to all produced log entries
+    //while ($scope.build_jar_log.length > 40)
+    //  $scope.build_jar_log.splice(0,1);
     $scope.build_jar_log.push(data);
   })
 
