@@ -179,6 +179,11 @@ mineos.dependencies(function(err, binaries) {
 		res.sendfile('/html/login.html');
 	});
 
+  app.get('/.well-known/acme-challenge/:randstring', function(req, res){
+    var path = require('path');
+    res.sendfile( path.join(response_options.root, '/html/.well-known/acme-challenge', req.params.randstring) );
+  });
+
 	app.post('/auth', passport.authenticate('local-signin', {
 		successRedirect: '/admin/index.html',
 		failureRedirect: '/admin/login.html'
