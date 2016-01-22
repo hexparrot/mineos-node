@@ -127,8 +127,29 @@ server.backend = function(base_dir, socket_emitter) {
     }
     
     var discovered_servers = discover();
-    for (var i in discovered_servers)
+    for (var i in discovered_servers) {
+      var cwd = path.join(base_dir, mineos.DIRS['servers'], discovered_servers[i]);
+      var bwd = path.join(base_dir, mineos.DIRS['backup'], discovered_servers[i]);
+      var awd = path.join(base_dir, mineos.DIRS['archive'], discovered_servers[i]);
+
+      try {
+        fs.accessSync(cwd, fs.F_OK)
+        fs.accessSync(bwd, fs.F_OK)
+        fs.accessSync(awd, fs.F_OK)
+      } catch (e) {
+        logging.warn('Not all directories present for server:', discovered_servers[i]);
+        logging.info('Creating and chowning /{servers,backup,archive}/' + discovered_servers[i]);
+        var chownr = require('chownr');
+        var stat_info = fs.statSync(cwd);
+        fs.ensureDirSync(bwd);
+        fs.ensureDirSync(awd);
+        chownr.sync(cwd, stat_info.uid, stat_info.gid);
+        chownr.sync(bwd, stat_info.uid, stat_info.gid);
+        chownr.sync(awd, stat_info.uid, stat_info.gid);
+      }
+      
       track(discovered_servers[i]);
+    }
 
     fs.watch(server_path, function() {
       var current_servers = discover();
