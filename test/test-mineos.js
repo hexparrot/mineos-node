@@ -539,6 +539,19 @@ test.get_start_args_phar = function(test) {
         test.equal(args[3], 'PocketMine-MP.phar');
         callback(err);
       })
+    },
+    function(callback) {
+      var php7_path = path.join(instance.env.cwd, 'bin', 'php7', 'bin');
+      fs.mkdirsSync(php7_path);
+      fs.ensureFileSync(path.join(php7_path, 'php'));
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2], './bin/php7/bin/php');
+        test.equal(args[3], 'PocketMine-MP.phar');
+        callback(err);
+      })
     }
   ], function(err) {
     test.ifError(err);

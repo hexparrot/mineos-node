@@ -623,7 +623,13 @@ mineos.mc = function(server_name, base_dir) {
     function type_phar(inner_callback) {
       async.series({
         'binary': function (cb) {
-          cb(null, './bin/php5/bin/php')
+          var php7 = path.join(self.env.cwd, '/bin/php7/bin/php');
+          try {
+            fs.accessSync(php7, fs.F_OK)
+            cb(null, './bin/php7/bin/php');
+          } catch (e) {
+            cb(null, './bin/php5/bin/php');
+          }
         },
         'pharfile': function (cb) {
           self.sc(function (err, dict) {
