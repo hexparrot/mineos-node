@@ -1512,7 +1512,7 @@ function check_profiles(base_dir, callback) {
       }, handle_reply)
     },
     php: function(callback) {
-      BUILD_REGEX = /^[\w]+BUILD="([^"]+)"/
+      BUILD_REGEX = /<a class="nodeFileName"[^\>]+>(PHP_[0-9\.]+_[^\.]+\.tar.gz)<\/a>/
       var p = [];
 
       function handle_reply(err, response, body) {
@@ -1522,21 +1522,22 @@ function check_profiles(base_dir, callback) {
             var matching = lines[i].match(BUILD_REGEX);
             if (matching) {
               var item = new profile_template();
+              var short_id = matching[1].replace(/\.tar\.gz/, '');
               item['group'] = 'php';
               item['type'] = 'release';
-              item['id'] = matching[1];
+              item['id'] = short_id;
               item['webui_desc'] = 'PHP binary for Pocketmine';
               item['weight'] = 12;
-              item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], matching[1], '{0}.tar.gz'.format(matching[1])));
-              item['filename'] = '{0}.tar.gz'.format(matching[1]);
-              item['url'] = 'https://dl.bintray.com/pocketmine/PocketMine/{0}'.format(item.filename);
+              item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], short_id, matching[1]));
+              item['filename'] = matching[1];
+              item['url'] = 'https://bintray.com/artifact/download/pocketmine/PocketMine/{0}'.format(item.filename);
               p.push(item);
             }
           }
         }
         callback(err, p);
       }
-      request('http://get.pocketmine.net', handle_reply);
+      request('https://bintray.com/package/files/pocketmine/PocketMine/Unix-PHP-Binaries', handle_reply);
     },
     bungeecord: function(callback) {
       var xml_parser = require('xml2js');
