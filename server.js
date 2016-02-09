@@ -1534,7 +1534,7 @@ function check_profiles(base_dir, callback) {
       }, handle_reply)
     },
     php: function(callback) {
-      BUILD_REGEX = /<a class="nodeFileName"[^\>]+>(PHP_[0-9\.]+_[^\.]+\.tar.gz)<\/a>/
+      BUILD_REGEX = /<a class="nodeFileName"[^\>]+>(PHP_([0-9\.]+)_[^\.]+\.tar.gz)<\/a>/
       var p = [];
 
       function handle_reply(err, response, body) {
@@ -1546,9 +1546,12 @@ function check_profiles(base_dir, callback) {
               var item = new profile_template();
               var short_id = matching[1].replace(/\.tar\.gz/, '');
               item['group'] = 'php';
-              item['type'] = 'release';
+              if (matching[2][0] == '7')
+                item['type'] = 'snapshot';
+              else
+                item['type'] = 'release';
               item['id'] = short_id;
-              item['webui_desc'] = 'PHP binary for Pocketmine';
+              item['webui_desc'] = 'PHP{0} binary for Pocketmine'.format(matching[2][0]);
               item['weight'] = 12;
               item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], short_id, matching[1]));
               item['filename'] = matching[1];
