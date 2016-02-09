@@ -1466,6 +1466,28 @@ function check_profiles(base_dir, callback) {
 
       callback(null, p);
     },
+    imagicalmine: function(callback) {
+      var p = [];
+
+      var item = {};
+
+      item['id'] = 'imagicalmine';
+      item['time'] = new Date().getTime();
+      item['releaseTime'] = new Date().getTime();
+      item['type'] = 'release';
+      item['group'] = 'imagicalmine';
+      item['webui_desc'] = 'Third-party Pocketmine build';
+      item['weight'] = 0;
+      item['filename'] = 'ImagicalMine.phar';
+      item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, item.filename));
+      item['version'] = 0;
+      item['release_version'] = '';
+      item['url'] = 'http://jenkins.imagicalmine.net:8080/job/ImagicalMine/lastStableBuild/artifact/releases/ImagicalMine.phar';
+
+      p.push(item);
+
+      callback(null, p);
+    },
     pocketmine: function(callback) {
       var URL_DEVELOPMENT = "http://www.pocketmine.net/api/?channel=development";
       var URL_STABLE = "http://www.pocketmine.net/api/?channel=stable";
@@ -1821,6 +1843,46 @@ function download_profiles(base_dir, args, progress_update_fn, callback) {
       });
     },
     spigot: function(inner_callback) {
+      var dest_dir = path.join(base_dir, 'profiles', args.id);
+      var dest_filepath = path.join(dest_dir, args.filename);
+
+      var url = args.url;
+
+      fs.ensureDir(dest_dir, function(err) {
+        if (err) {
+          logging.error('[WEBUI] Error attempting download:', err);
+        } else {
+          progress(request(url), {
+            throttle: 1000,
+            delay: 100
+          })
+            .on('complete', function(response) {
+              if (response.statusCode == 200) {
+                logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                args['dest_dir'] = dest_dir;
+                args['success'] = true;
+                args['progress']['percent'] = 100;
+                args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
+                args['suppress_popup'] = false;
+                inner_callback(args);
+              } else {
+                logging.error('[WEBUI] Server was unable to download file:', url);
+                logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                args['success'] = false;
+                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(args.filename, response.statusCode);
+                args['suppress_popup'] = false;
+                inner_callback(args);
+              }
+            })
+            .on('progress', function(state) {
+              args['progress'] = state;
+              progress_update_fn(args);
+            })
+            .pipe(fs.createWriteStream(dest_filepath))
+        }
+      });
+    },
+    imagicalmine: function(inner_callback) {
       var dest_dir = path.join(base_dir, 'profiles', args.id);
       var dest_filepath = path.join(dest_dir, args.filename);
 
