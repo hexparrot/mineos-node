@@ -353,6 +353,15 @@ mineos.mc = function(server_name, base_dir) {
           if (files.length == 1) {
             remainder = files[0];
             cb(null);
+          } else if (files.length == 4) {
+            var sp_idx = files.indexOf('server.properties');
+            var sc_idx = files.indexOf('server.config');
+            var cc_idx = files.indexOf('cron.config');
+            if (sp_idx >= 0) { files.splice(sp_idx, 1) }
+            if (sc_idx >= 0) { files.splice(sc_idx, 1) }
+            if (cc_idx >= 0) { files.splice(cc_idx, 1) }
+            remainder = files[0]
+            cb(!(files.length == 1)) // logically NOT-ing so len==1 continues
           } else
             cb(true);
         },
@@ -375,7 +384,7 @@ mineos.mc = function(server_name, base_dir) {
                 var old_filepath = path.join(old_dir, file);
                 var new_filepath = path.join(source_dir, file);
 
-                fs.move(old_filepath, new_filepath, inner_cb)
+                fs.move(old_filepath, new_filepath, { clobber: true }, inner_cb)
               }, cb);
             else
               cb(err);
