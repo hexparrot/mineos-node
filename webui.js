@@ -81,11 +81,13 @@ function ensureAuthenticated(req, res, next) {
   res.redirect('/admin/login.html');
 }
 
+var token = require('crypto').randomBytes(48).toString('hex');
+
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(methodOverride());
 app.use(expressSession({ 
-  secret: 'session_secret', 
-  key:'express.sid', 
+  secret: token,
+  key: 'express.sid',
   store: sessionStore,
   resave: false,
   saveUninitialized: false
@@ -97,7 +99,7 @@ var io = require('socket.io')(http)
 io.use(passportSocketIO.authorize({
   cookieParser: cookieParser,       // the same middleware you registrer in express
   key:          'express.sid',       // the name of the cookie where express/connect stores its session_id
-  secret:       'session_secret',    // the session_secret to parse the cookie
+  secret:       token,    // the session_secret to parse the cookie
   store:        sessionStore        // we NEED to use a sessionstore. no memorystore please
 }));
 
