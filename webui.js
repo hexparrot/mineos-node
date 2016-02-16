@@ -3,6 +3,7 @@
 var mineos = require('./mineos');
 var server = require('./server');
 var async = require('async');
+var fs = require('fs-extra');
 
 var express = require('express');
 var passport = require('passport');
@@ -54,11 +55,15 @@ passport.use('local-signin', new LocalStrategy(
     .then(function (user) {
       if (user) {
         console.log('Successful login attempt for username:', username);
+        var logstring = new Date().toString() + ' - success from: ' + req.connection.remoteAddress + ' user: ' + username + '\n';
+        fs.appendFileSync('/var/log/mineos.auth.log', logstring);
         done(null, user);
       }
     })
     .fail(function (err) {
       console.log('Unsuccessful login attempt for username:', username);
+      var logstring = new Date().toString() + ' - failure from: ' + req.connection.remoteAddress + ' user: ' + username + '\n';
+      fs.appendFileSync('/var/log/mineos.auth.log', logstring);
       done(null);
     });
   }
@@ -125,7 +130,6 @@ function tally(callback) {
 
 function read_ini(filepath) {
   var ini = require('ini');
-  var fs = require('fs');
   try {
     var data = fs.readFileSync(filepath);
     return ini.parse(data.toString());
@@ -140,8 +144,6 @@ mineos.dependencies(function(err, binaries) {
     console.log(binaries);
     process.exit(1);
   } 
-
-  var fs = require('fs-extra');
 
   var mineos_config = read_ini('/etc/mineos.conf') || read_ini('/usr/local/etc/mineos.conf') || {};
   var base_directory = '/var/games/minecraft';
