@@ -547,7 +547,7 @@ function server_container(server_name, base_dir, socket_io) {
 
   (function() {
     var fireworm = require('fireworm');
-    var fw = fireworm(instance.env.cwd, {skipDirEntryPatterns: ['world', 'dynmap', 'plugins', 'logs']});
+    var fw = fireworm(instance.env.cwd, {skipDirEntryPatterns: ['world', 'dynmap', 'plugins', 'web', 'logs']});
 
     fw.add('**/server.properties');
     fw.add('**/server.config');
@@ -827,7 +827,7 @@ function server_container(server_name, base_dir, socket_io) {
       logging.info('[{0}] Watching for file generation: {1}'.format(server_name, rel_filepath));
       
       var fireworm = require('fireworm');
-      var fw = fireworm(instance.env.cwd, {skipDirEntryPatterns: ['world', 'dynmap', 'plugins']});
+      var fw = fireworm(instance.env.cwd, {skipDirEntryPatterns: ['world', 'dynmap', 'web', 'plugins']});
 
       fw.add('**/{0}'.format(rel_filepath));
       fw.on('add', function(fp) {
