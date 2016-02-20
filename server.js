@@ -429,9 +429,10 @@ server.backend = function(base_dir, socket_emitter) {
             async.apply(instance.verify, '!exists'),
             async.apply(instance.create_from_archive, OWNER_CREDS, filepath)
           ], function(err, results) {
-            if (!err)
+            if (!err) {
               logging.info('[{0}] Server created in filesystem.'.format(args.new_server_name));
-            else
+              setTimeout(function(){ self.front_end.emit('track_server', args.new_server_name) }, 1000);
+            } else
               logging.error(err);
           })
           break;
