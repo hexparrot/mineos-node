@@ -1223,7 +1223,7 @@ function check_profiles(base_dir, callback) {
 
   var SOURCES = {
     mojang: function(callback) {
-      var MOJANG_VERSIONS_URL = 'http://s3.amazonaws.com/Minecraft.Download/versions/versions.json';
+      var MOJANG_VERSIONS_URL = 'https://launchermeta.mojang.com/mc/game/version_manifest.json';
       var path_prefix = path.join(base_dir, mineos.DIRS['profiles']);
 
       function handle_reply(err, response, body) {
