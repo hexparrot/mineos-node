@@ -1513,12 +1513,14 @@ mineos.mc = function(server_name, base_dir) {
         cb();
       },
       function(cb) {
-        q.connect(function(err){
+        try {
+          q.connect(function(err){
           if (err || !q.online)
             cb(err);
           else
             q.full_stat(cb);
-        });
+          });
+        } catch (e) { cb(true) }
       },
       function(pingback, cb) {
         retval = pingback;
