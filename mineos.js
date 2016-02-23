@@ -1507,27 +1507,30 @@ mineos.mc = function(server_name, base_dir) {
     var retval = {};
 
     async.waterfall([
+      async.apply(self.sc),
+      function(dict, cb) {
+        var jarfile = (dict.java || {}).jarfile;
+        cb(jarfile.slice(-5).toLowerCase() == '.phar')
+      },
       async.apply(self.property, 'server-port'),
       function(port, cb) {
         q = new mcquery('localhost', port);
         cb();
       },
       function(cb) {
-        try {
-          q.connect(function(err){
-          if (err || !q.online)
-            cb(err);
-          else
-            q.full_stat(cb);
-          });
-        } catch (e) { cb(true) }
+        q.connect(function(err){
+        if (err || !q.online)
+          cb(err);
+        else
+          q.full_stat(cb);
+        });
       },
       function(pingback, cb) {
         retval = pingback;
         cb();
       }
     ], function(err) {
-      q.close();
+      try { q.close() } catch (e) {}
       callback(null, retval);
     })
   }
