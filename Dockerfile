@@ -1,34 +1,36 @@
 FROM node:5
+MAINTAINER William Dizon <wdchromium@gmail.com>
 
-VOLUME /var/games/minecraft
 #arbitrarily assigned ports for 5 servers. change if you need to.
-EXPOSE 8443 25565-25569
+EXPOSE 8443 25565
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+RUN useradd -ms /bin/bash mc
+RUN echo 'mc:minecraft' | chpasswd
 
-#i want jdk8, so enable debian testing
-RUN echo "deb http://ftp.us.debian.org/debian/ testing main" >> /etc/apt/sources.list
+#add testing repository for OpenJDK8
+RUN echo "deb http://http.debian.net/debian jessie-backports main" >> /etc/apt/sources.list
 
 #update and accept all prompts
-RUN apt-get update -y && apt-get install -y \
+RUN apt-get update && apt-get install -y \
+  supervisor \
   rdiff-backup \
   screen \
   openjdk-8-jre-headless \
   rsync \
+  git \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-COPY package.json /usr/src/app/
-RUN npm install
-COPY . /usr/src/app
+RUN mkdir -p /var/games/minecraft \
+  && mkdir -p /usr/games/minecraft
 
-#generate a cert. sync before generating to avoid an error
-RUN chmod +x generate-sslcert.sh; \
-  sync; \
-  ./generate-sslcert.sh
+RUN cd /usr/games/minecraft \
+  && git clone https://github.com/hexparrot/mineos-node.git . \
+  && sh generate-sslcert.sh \
+  && npm install \
+  && chmod +x webui.js mineos_console.js service.js \
+  && cp init/supervisor_conf /etc/supervisor/conf.d/mineos.conf \
+  && sed -i -e 's/\/usr\/bin\/node/\/usr\/local\/bin\/node/' /etc/supervisor/conf.d/mineos.conf
 
-RUN useradd mc; \
-  echo "mc:admin" | chpasswd
-
-CMD [ "npm", "start" ]
+VOLUME /var/games/minecraft
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]

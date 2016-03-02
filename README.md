@@ -56,15 +56,10 @@ To start the webui in the foreground:
 
 Docker
 ------
-Clone the repository on the host OS, then run:
 
-    docker run -itdP --name=mineos-node hexparrot/mineos-node
+For any ports other than 25565, you should manually add the ports:
 
-Specify the ports manually if you do not want them to change when restarting the container.
-For example:
-
-    docker run -itd -p 8443:8443 -p 25565:25565 -p 25566:25566 -p 25567:25567 -p 25568:25568 -p 25569:25569 --name=mineos-node hexparrot/mineos-node
-
+    docker run -itd -p 8443:8443 -p 25565:25565 -v /var/games/minecraft:/var/games/minecraft hexparrot/mineos:node-ubuntu
 
 Things to watch out for
 ------
