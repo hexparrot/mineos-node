@@ -1510,7 +1510,10 @@ mineos.mc = function(server_name, base_dir) {
       async.apply(self.sc),
       function(dict, cb) {
         var jarfile = (dict.java || {}).jarfile;
-        cb(jarfile.slice(-5).toLowerCase() == '.phar')
+        if (jarfile)
+          cb(jarfile.slice(-5).toLowerCase() == '.phar');
+        else
+          cb(true);
       },
       async.apply(self.property, 'server-port'),
       function(port, cb) {
