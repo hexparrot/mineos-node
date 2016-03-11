@@ -1496,10 +1496,15 @@ function check_profiles(base_dir, callback) {
       var p = [];
 
       function handle_reply(err, retval) {
-        for (var r in retval) 
+        for (var r in retval) {
           if ((retval[r] || {}).statusCode == 200) {
             var item = new profile_template();
-            var ref_obj = JSON.parse(retval[r].body);
+            var ref_obj = null;
+            try {
+              ref_obj = JSON.parse(retval[r].body);
+            } catch (e) {
+              break;
+            };
 
             item['id'] = 'PocketMine-{0}'.format(ref_obj['build']);
             item['time'] = ref_obj['date'];
@@ -1526,6 +1531,7 @@ function check_profiles(base_dir, callback) {
 
             p.push(item);
           }
+        }
         callback(null, p)
       }
 
