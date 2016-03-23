@@ -1183,6 +1183,11 @@ mineos.mc = function(server_name, base_dir) {
           callback(true, null);
         }
         break;
+      case 'level-name':
+        var sp = self.sp(function(err, dict) {
+          callback(err, dict['level-name'] || 'world');
+        })
+        break;
       case 'server-port':
         var sp = self.sp(function(err, dict) {
           callback(err, dict['server-port']);

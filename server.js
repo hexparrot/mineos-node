@@ -831,14 +831,18 @@ function server_container(server_name, base_dir, socket_io) {
       }
       logging.info('[{0}] Watching for file generation: {1}'.format(server_name, rel_filepath));
       
-      var fireworm = require('fireworm');
-      var fw = fireworm(instance.env.cwd, {skipDirEntryPatterns: ['world', 'dynmap', 'web', 'plugins']});
+      instance.property('level-name', function(err, levelname) {
+        var fireworm = require('fireworm');
+        var skipdirs = ['world', 'dynmap', 'web', 'plugins'];
+        if (levelname) { skipdirs.push(levelname) };
+        var fw = fireworm(instance.env.cwd, {skipDirEntryPatterns: skipdirs});
 
-      fw.add('**/{0}'.format(rel_filepath));
-      fw.on('add', function(fp) {
-        fw.clear();
-        logging.info('[{0}] {1} created! Watchfile {2} closed'.format(server_name, path.basename(fp), rel_filepath));
-        async.nextTick(function() { make_tail(rel_filepath) });
+        fw.add('**/{0}'.format(rel_filepath));
+        fw.on('add', function(fp) {
+          fw.clear();
+          logging.info('[{0}] {1} created! Watchfile {2} closed'.format(server_name, path.basename(fp), rel_filepath));
+          async.nextTick(function() { make_tail(rel_filepath) });
+        })
       })
     }
   }
