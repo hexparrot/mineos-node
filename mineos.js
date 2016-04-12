@@ -1183,11 +1183,6 @@ mineos.mc = function(server_name, base_dir) {
           callback(true, null);
         }
         break;
-      case 'level-name':
-        var sp = self.sp(function(err, dict) {
-          callback(err, dict['level-name'] || 'world');
-        })
-        break;
       case 'server-port':
         var sp = self.sp(function(err, dict) {
           callback(err, dict['server-port']);
@@ -1248,61 +1243,49 @@ mineos.mc = function(server_name, base_dir) {
         })
         break;
       case 'du_awd':
-        try {
-          var du = require('du');
-          var DU_TIMEOUT = 2000;
+        var du = require('du');
+        var DU_TIMEOUT = 2000;
 
-          var timer = setTimeout(function() {
-            timer = null;
-            return(callback(null, 0));
-          }, DU_TIMEOUT)
+        var timer = setTimeout(function() {
+          timer = null;
+          return(callback(null, 0));
+        }, DU_TIMEOUT)
 
-          du(self.env.awd, { disk: true }, function (err, size) {
-            clearTimeout(timer);
-            if (timer)
-              return(callback(err, size));
-          })
-        } catch (e) {
-          callback(null, 0);
-        }
+        du(self.env.awd, { disk: true }, function (err, size) {
+          clearTimeout(timer);
+          if (timer)
+            return(callback(err, size));
+        })
         break;
       case 'du_bwd':
-        try {
-          var du = require('du');
-          var DU_TIMEOUT = 3000;
+        var du = require('du');
+        var DU_TIMEOUT = 3000;
 
-           var timer = setTimeout(function() {
-            timer = null;
-            return(callback(null, 0));
-          }, DU_TIMEOUT)
+        var timer = setTimeout(function() {
+          timer = null;
+          return(callback(null, 0));
+        }, DU_TIMEOUT)
 
-          du(self.env.bwd, { disk: true }, function (err, size) {
-            clearTimeout(timer);
-            if (timer)
-              return(callback(err, size));
-          })
-        } catch (e) {
-          callback(null, 0);
-        }
+        du(self.env.bwd, { disk: true }, function (err, size) {
+          clearTimeout(timer);
+          if (timer)
+            return(callback(err, size));
+        })
         break;
       case 'du_cwd':
-        try {
-          var du = require('du');
-          var DU_TIMEOUT = 3000;
+        var du = require('du');
+        var DU_TIMEOUT = 3000;
 
-          var timer = setTimeout(function() {
-            timer = null
-            return(callback(null, 0));
-          }, DU_TIMEOUT)
+        var timer = setTimeout(function() {
+          timer = null
+          return(callback(null, 0));
+        }, DU_TIMEOUT)
 
-          du(self.env.cwd, { disk: true }, function (err, size) {
-            clearTimeout(timer);
-            if (timer)
-              return(callback(err, size));
-          })
-        } catch (e) {
-          callback(null, 0);
-        }
+        du(self.env.cwd, { disk: true }, function (err, size) {
+          clearTimeout(timer);
+          if (timer)
+            return(callback(err, size));
+        })
         break;
       case 'broadcast':
         self.sc(function(err, dict) {
