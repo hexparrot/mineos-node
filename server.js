@@ -12,7 +12,7 @@ logging.add(logging.transports.File, {
   handleExceptions: true
 });
 
-server.backend = function(base_dir, socket_emitter) {
+server.backend = function(base_dir, socket_emitter, user_config) {
   var self = this;
 
   self.servers = {};
@@ -245,13 +245,24 @@ server.backend = function(base_dir, socket_emitter) {
 
           async.series([
             async.apply(instance.verify, '!exists'),
+            function(cb) {
+              var whitelisted_creators = [username];
+              if ( (user_config || {}).creators ) {
+                whitelisted_creators = user_config['creators'].split(',');
+                whitelisted_creators = whitelisted_creators.filter(function(e){return e});
+                logging.info('Explicitly authorized server creators are:', whitelisted_creators);
+              }
+              cb(!(whitelisted_creators.indexOf(username) >= 0))
+            },
             async.apply(instance.create, OWNER_CREDS),
             async.apply(instance.overlay_sp, args.properties),
           ], function(err, results) {
             if (!err)
               logging.info('[{0}] Server created in filesystem.'.format(args.server_name));
-            else
+            else {
+              logging.info('[{0}] Failed to create server in filesystem as user {1}.'.format(args.server_name, username));
               logging.error(err);
+            }
           })
           break;
         case 'create_unconventional_server':
