@@ -89,7 +89,7 @@
                                     <div class="controls">
                                         <span>
                                             <label class="checkbox">
-                                                <input type="checkbox" name="hide"> Hide password <a href="http://www.nngroup.com/articles/stop-password-masking/">&nbsp;(?)</a>
+                                                <input type="checkbox" checked=true name="hide"> Hide password <a href="http://www.nngroup.com/articles/stop-password-masking/">&nbsp;(?)</a>
                                             </label>
                                             
                                         </span>
@@ -168,7 +168,7 @@
     <script type="text/javascript">
       $(document).ready(function () {
         try {
-          $('input[name=password]').attr('type', 'text');
+          $('input[name=password]').attr('type', 'password');
           $('input[name=hide]').on('change', function () {
             if ($(this).is(':checked'))
               $('input[name=password]').attr('type', 'password');
