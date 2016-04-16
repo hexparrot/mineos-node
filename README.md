@@ -22,7 +22,7 @@ Do not install this atop an existing MineOS system, since the installation locat
     apt-get install -y nodejs nodejs-legacy npm git rdiff-backup screen openjdk-7-jre-headless
     mkdir -p /usr/games
     cd /usr/games
-    git clone https://github.com/hexparrot/mineos-node.git minecraft
+    git clone https://github.com/MrBretze/mineos-node.git minecraft
     cd minecraft
     chmod +x generate-sslcert.sh
     ./generate-sslcert.sh
