@@ -1339,8 +1339,8 @@ ul.check li:last-child {
 	display: block;
 	width: 100%;
 	min-height: 50px;
-	background-color: #23282D; /* 0 */
-	border-bottom: 2px solid #E66432; /* -2 */
+	background-color: #dc143c; /* 0 */
+	border-bottom: 2px solid #bd1134; /* -2 */
 }
 /* Fixed Header */
 .fixed-header #header {
