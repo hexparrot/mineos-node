@@ -40,7 +40,7 @@ blockquote.pull-right { border-right: 5px solid #55859f; /* 0 */ }
 
 #footer .totop:hover { background-color: #55859f; /* 0 */ }
 
-#header > .toolbar > li.open > a:after { border-color: transparent transparent #55859f transparent; /* 0 */ }
+#header > .toolbar > li.open > a:after { border-color: transparent transparent #E66432 transparent; /* 0 */ }
 
 #header .dropdown-menu > header { background-color: #55859f; /* 0 */ }
 

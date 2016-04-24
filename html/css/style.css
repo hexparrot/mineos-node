@@ -1665,7 +1665,7 @@ ul.check li:last-child {
 	-o-transition: color .3s ease;
 	transition: color .3s ease;
 }
-#header .dropdown-menu > footer > a:hover { color: #E66432; /* Dark -4 */ }
+#header .dropdown-menu > footer > a:hover { color: #E0835F; /* Dark -4 */ }
 #header .dropdown-menu > footer > .icon {
 	color: #555;
 	font-size: 14px;
