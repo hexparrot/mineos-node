@@ -4,5 +4,5 @@ body:before {
     bottom: 0;
     width: 100%;
     content: "";
-    background: url('../../img/background/1.jpg') repeat;
+    background: url('http://time4play.net/wp-content/themes/accesspress-parallax/images/bg.png') repeat;
 }
