@@ -1,6 +1,7 @@
 #header { 
 	background-color: #23282D; /* 0 */ 
 	border-bottom: 3px solid #E66432; /* -2 */
+	height: 60px
 }
 
 .pagination ul > li > a:hover, 
