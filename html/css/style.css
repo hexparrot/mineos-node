@@ -1658,14 +1658,14 @@ ul.check li:last-child {
 	text-align: center;
 }
 #header .dropdown-menu > footer > a {
-	color: #6eadc5; /* Normal */
+	color: #E66432; /* Normal */
 	-webkit-transition: color .3s ease;
 	-moz-transition: color .3s ease;
 	-ms-transition: color .3s ease;
 	-o-transition: color .3s ease;
 	transition: color .3s ease;
 }
-#header .dropdown-menu > footer > a:hover { color: #448eab; /* Dark -4 */ }
+#header .dropdown-menu > footer > a:hover { color: #E66432; /* Dark -4 */ }
 #header .dropdown-menu > footer > .icon {
 	color: #555;
 	font-size: 14px;
