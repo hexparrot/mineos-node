@@ -1418,6 +1418,7 @@ ul.check li:last-child {
 ----------------------------------------------------------------------------- */
 #header > .toolbar {
 	margin-right: 20px;
+	margin-top: 15px;
 	position: relative;
 	display: inline-block;
 	float: right;
