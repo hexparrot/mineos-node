@@ -383,8 +383,8 @@ form .input-icon {
 .btn:active,
 .btn.active { background-color: #eee \9; }
 .btn-primary {
-	border-color: #4272d7 #4272d7 #2552b0;
-	background-color: #4272d7;
+	border-color: #FFF #FFF #FFF;
+	background-color: #E66432;
 	background-image: none;
 	filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
 }
@@ -396,7 +396,7 @@ form .input-icon {
 .btn-primary[disabled],
 .btn-group.open .btn-primary.dropdown-toggle {
 	outline: none;
-	background-color: #507cda;
+	background-color: #E0835F;
 }
 .btn-primary:active,
 .btn-primary.active { background-color: #507cda \9; }
@@ -2501,12 +2501,6 @@ ul.check li:last-child {
 .widget.teal > header > .toolbar > li > a { color: #eee; text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.1); }
 .widget.teal > header > .toolbar > li > a:hover,
 .widget.teal > header > .toolbar > li.open > a { background-color: rgba(0, 0, 0, 0.1); color: #eee; }
-.widget.teal,
-.widget.teal.borderless > header { border-color: #00A0B1; }
-.widget.teal.stacked {
-	-webkit-box-shadow: 0 5px 0 -4px #fff, 0 5px 0 -3px #00A0B1, 0 11px 0 -8px #fff, 0 11px 0 -7px #00A0B1;
-	box-shadow: 0 5px 0 -4px #fff, 0 5px 0 -3px #00A0B1, 0 11px 0 -8px #fff, 0 11px 0 -7px #00A0B1;
-}
 .widget.teal > header > .nav-tabs > li > a { background-color: #00A0B1; color: #eee; }
 .widget.teal > header > .nav-tabs > .active > a { background-color: #fefefe; color: #555; }
 .widget.teal > header > .nav-tabs > li > a,
