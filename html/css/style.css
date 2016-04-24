@@ -1417,6 +1417,7 @@ ul.check li:last-child {
 /* 1.2.1 Toolbar
 ----------------------------------------------------------------------------- */
 #header > .toolbar {
+	margin-top: 15px;
 	position: relative;
 	display: inline-block;
 	float: right;
