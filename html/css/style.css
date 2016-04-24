@@ -1699,7 +1699,7 @@ ul.check li:last-child {
 	bottom: 0;
 	display: block;
 	width: 220px;
-	background-color: #555;
+	background-color: #23282D;
 	content: "";
 }
 .nav-open #sidebar:before {
@@ -1778,9 +1778,9 @@ ul.check li:last-child {
 #sidebar .divider {
 	position: relative;
 	padding: 0px 10px;
-	border-top: 1px solid #777;
-	border-bottom: 1px solid #4c4c4c;
-	background-color: #666;
+    border-top: 1px solid #e66432;
+    border-bottom: 1px solid #e66432;
+    background-color: #e66432;
 	-webkit-box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.1);
 	box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.1);
 	color: #eee;
