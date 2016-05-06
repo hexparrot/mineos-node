@@ -76,6 +76,7 @@
   "COPY_TO_SERVER": "Copy to Server",
 
   "GLANCE": "Server Överblick",
+  "INVALID_SERVER_NAME": "Server may contain only letters, numbers and underscores. This server cannot be managed with MineOS without being renamed.",
   "VERSION": "Version",
   "REPORTED_VERSION": "Ping Version",
   "MEMORY_FOOTPRINT": "Minnes Användning",

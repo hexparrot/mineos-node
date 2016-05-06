@@ -801,6 +801,11 @@
                     <div class="row-fluid">
                         <!-- START Default Widget -->
                         <div class="widget borderless">
+                            <!-- Alert Error -->
+                            <div class="alert alert-error" ng-if="!valid_server_name(current)">
+                                <strong translate="INVALID_SERVER_NAME"></strong>
+                            </div>
+                            <!--/ Alert Error -->
                             <header>
                                 <h4 class="title"><span class="icon icone-globe"></span> {{ 'GLANCE' | translate }}</h4>
                             </header>
@@ -871,8 +876,8 @@
                                                 <div class="body-inner">
 
                                                     <div class="span4">
-                                                        <button type="button" class="btn btn-success span12" ng-disabled="servers[current].heartbeat.up" ng-click="server_command('start')" translate="START" ng-show="(servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
-                                                        <button type="button" class="btn btn-success span12" ng-disabled="servers[current].heartbeat.up" ng-click="modals.open_new_server()" translate="START" ng-show="!(servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
+                                                        <button type="button" class="btn btn-success span12" ng-disabled="servers[current].heartbeat.up || !valid_server_name(current)" ng-click="server_command('start')" translate="START" ng-show="(servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
+                                                        <button type="button" class="btn btn-success span12" ng-disabled="servers[current].heartbeat.up || !valid_server_name(current)" ng-click="modals.open_new_server()" translate="START" ng-show="!(servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
                                                     </div>
 
                                                     <div class="span4">

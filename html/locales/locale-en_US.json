@@ -75,7 +75,8 @@
   "JAR_COPY_DESC": "Copy compiled binaries to server directory",
   "COPY_TO_SERVER": "Copy to Server",
 
-  "GLANCE": "Server at a Glance", 
+  "GLANCE": "Server at a Glance",
+  "INVALID_SERVER_NAME": "Server may contain only letters, numbers and underscores. This server cannot be managed with MineOS without being renamed.",
   "VERSION": "Version",
   "REPORTED_VERSION": "Ping Version",
   "MEMORY_FOOTPRINT": "Memory Footprint",

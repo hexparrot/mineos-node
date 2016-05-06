@@ -422,6 +422,10 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     };
 
   /* other functions */
+
+  $scope.valid_server_name = function(server_name) {
+    return /^(?!\.)[a-zA-Z0-9_\.]+$/.test(server_name);
+  }
   
   $scope.change_locale = function(locale) {
     $translate.use(locale);
