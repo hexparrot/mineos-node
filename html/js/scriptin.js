@@ -572,6 +572,7 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
   }
 
   $scope.server_from_archive_create = function() {
+    var regex_valid_server_name = /^(?!\.)[a-zA-Z0-9_\.]+$/;
     var obj = {
       'command': 'create_from_archive',
       'new_server_name': $scope.new_server_name,
@@ -583,9 +584,16 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     else
       obj['awd_dir'] = null;
 
-    socket.emit('/', 'command', obj);
-    $('#modal_server_from_archive').modal('hide');
-    $scope.change_page('dashboard', $scope.new_server_name);
+    if (!regex_valid_server_name.test($scope.new_server_name)) {
+      $.gritter.add({
+        title: "Invalid server name",
+        text: "Alphanumerics and underscores only (no spaces)."
+      })
+    } else {
+      socket.emit('/', 'command', obj);
+      $('#modal_server_from_archive').modal('hide');
+      $scope.change_page('dashboard', $scope.new_server_name);
+    }
   }
 
   $scope.update_loadavg = function(new_datapoint) {
