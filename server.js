@@ -1540,6 +1540,49 @@ function check_profiles(base_dir, callback) {
         'development': async.retry(2, async.apply(request, URL_DEVELOPMENT)),
       }, handle_reply)
     },
+    mianite: function(callback) {
+      var MIANITE_VERSIONS_URL = "http://mianite.us/repo?api=true";
+
+      var p = [];
+
+      function handle_reply(err, retval) {
+        if ((retval || {}).statusCode == 200) {
+          var objects = JSON.parse(retval.body)
+          for (var r in objects) {
+            var item = new profile_template();
+            var ref_obj = objects[r];
+            var version = ref_obj.version.match(/[\d+]\.[\d+]\.[\d+]/)[0];
+
+            item['id'] = ref_obj['version'];
+            item['group'] = 'mianite';
+            item['webui_desc'] = 'Realm of Mianite {0}'.format(version);
+            item['weight'] = 10;
+            item['filename'] = path.basename(ref_obj['download']);
+            item['url'] = ref_obj['download'];
+            item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, item.filename));
+            item['version'] = version;
+            item['release_version'] = version;
+
+            switch (ref_obj['version_tag']) {
+              case 'Recommended':
+                item['type'] = 'release';
+                break;
+              default:
+                if (ref_obj.version.match(/RC|A/))
+                  item['type'] = 'snapshot';
+                else
+                  item['type'] = 'release';
+                break;
+            }
+
+            p.push(item);
+          }
+        }
+        callback(null, p)
+      }
+
+      request(MIANITE_VERSIONS_URL, handle_reply);
+    },
     php: function(callback) {
       BUILD_REGEX = /<a class="nodeFileName"[^\>]+>(PHP_([0-9\.]+)_[^\.]+\.tar.gz)<\/a>/
       var p = [];
@@ -1730,6 +1773,49 @@ function download_profiles(base_dir, args, progress_update_fn, callback) {
       });
     },
     ftb_third_party: function(inner_callback) {
+      var unzip = require('unzip');
+
+      var dest_dir = path.join(base_dir, 'profiles', args.id);
+      var dest_filepath = path.join(dest_dir, args.filename);
+
+      var url = args.url;
+
+      fs.ensureDir(dest_dir, function(err) {
+        if (err) {
+          logging.error('[WEBUI] Error attempting download:', err);
+        } else {
+          progress(request(url), {
+            throttle: 1000,
+            delay: 100
+          })
+            .on('complete', function(response) {
+              if (response.statusCode == 200) {
+                logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                args['dest_dir'] = dest_dir;
+                args['success'] = true;
+                args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
+
+                fs.createReadStream(dest_filepath)
+                  .pipe(unzip.Extract({ path: dest_dir }).on('close', function() {
+                    inner_callback(args);
+                  }));
+              } else {
+                logging.error('[WEBUI] Server was unable to download file:', url);
+                logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                args['success'] = false;
+                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(args.filename, response.statusCode);
+                inner_callback(args);
+              }
+            })
+            .on('progress', function(state) {
+              args['progress'] = state;
+              progress_update_fn(args);
+            })
+            .pipe(fs.createWriteStream(dest_filepath))
+        }
+      });
+    },
+    mianite: function(inner_callback) {
       var unzip = require('unzip');
 
       var dest_dir = path.join(base_dir, 'profiles', args.id);
