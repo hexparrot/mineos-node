@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "introspect": "0.0.x",
-    "tail": "1.0.x",
+    "tail": "1.1.x",
     "node-uuid": "1.4.x",
     "fs-extra": "0.26.x",
     "async": "1.5.x",
