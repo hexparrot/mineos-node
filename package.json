@@ -72,7 +72,8 @@
     "node-getopt": "0.2.x",
     "chownr": "1.0.x",
     "angular-sanitize": "1.5.x",
-    "mcquery": "0.2.x"
+    "mcquery": "0.2.x",
+    "authenticate-pam": "1.0.x"
   },
   "devDependencies": {
     "nodeunit": "0.9.x"
