@@ -76,6 +76,8 @@
   "COPY_TO_SERVER": "Kopier til Server",
 
   "GLANCE": "Serveroverblikk",
+  "INVALID_SERVER_NAME": "Server may contain only letters, numbers and underscores. This server cannot be managed with MineOS without being renamed.",
+  "LOG_TAILING_RATE_LIMITED": "The server has been generating logs beyond the rate-limit threshold. Log tailing has stopped and can be re-enabled by refreshing the webui.",
   "VERSION": "Versjon",
   "REPORTED_VERSION": "Serverversjon",
   "MEMORY_FOOTPRINT": "Minnebruk",
@@ -91,6 +93,7 @@
   "UNCONVENTIONAL_SERVER": "Dette er IKKE en konvensjonell server",
   "COPY_PROFILE": "Kopier profilfiler til serverområde",
   "COMMIT_INTERVAL": "Tidsintervall i minutter mellom lagring av spillets verdensfiler til disk via 'save-all' (La stå tomt for å skru av lagring)",
+
   "JAVA_SETTINGS": "Javainstillninger",
   "MEMORY_ALLOCATION": "Minneallokering (Heapsize)",
   "JAVA_XMX": "-Xmx",
