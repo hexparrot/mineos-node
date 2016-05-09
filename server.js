@@ -548,7 +548,7 @@ function server_container(server_name, base_dir, socket_io) {
 
   (function() {
     var fireworm = require('fireworm');
-    var fw = fireworm(instance.env.cwd, {skipDirEntryPatterns: ['world', 'dynmap', 'plugins', 'web', 'logs']});
+    var fw = fireworm(instance.env.cwd, {skipDirEntryPatterns: ['world', 'dynmap', 'plugins', 'web', 'logs', 'region', 'playerdata', 'stats', 'data']});
 
     fw.add('**/server.properties');
     fw.add('**/server.config');
