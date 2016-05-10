@@ -673,6 +673,7 @@
                                                         <option value="ftb">Feed the Beast</option>
                                                         <option value="ftb_third_party">FTB-3rd Party</option>
                                                         <option value="forge">Forge</option>
+                                                        <option value="mianite">Mianite</option>
                                                         <option value="pocketmine">Pocketmine</option>
                                                         <option value="imagicalmine">ImagicalMine</option>
                                                         <option value="php">Pocketmine-php</option>
@@ -805,6 +806,11 @@
                     <div class="row-fluid">
                         <!-- START Default Widget -->
                         <div class="widget borderless">
+                            <!-- Alert Error -->
+                            <div class="alert alert-error" ng-if="!valid_server_name(current)">
+                                <strong translate="INVALID_SERVER_NAME"></strong>
+                            </div>
+                            <!--/ Alert Error -->
                             <header>
                                 <h4 class="title"><span class="icon icone-globe"></span> {{ 'GLANCE' | translate }}</h4>
                             </header>
@@ -875,8 +881,8 @@
                                                 <div class="body-inner">
 
                                                     <div class="span4">
-                                                        <button type="button" class="btn btn-success span12" ng-disabled="servers[current].heartbeat.up" ng-click="server_command('start')" translate="START" ng-show="(servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
-                                                        <button type="button" class="btn btn-success span12" ng-disabled="servers[current].heartbeat.up" ng-click="modals.open_new_server()" translate="START" ng-show="!(servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
+                                                        <button type="button" class="btn btn-success span12" ng-disabled="servers[current].heartbeat.up || !valid_server_name(current)" ng-click="server_command('start')" translate="START" ng-show="(servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
+                                                        <button type="button" class="btn btn-success span12" ng-disabled="servers[current].heartbeat.up || !valid_server_name(current)" ng-click="modals.open_new_server()" translate="START" ng-show="!(servers[current].sc.java.jarfile && servers[current].sc.java.java_xmx)"></button>
                                                     </div>
 
                                                     <div class="span4">
@@ -1456,6 +1462,11 @@
                     <div class="row-fluid">
                         <!-- START Basic Table -->
                         <div class="console span12 widget dark">
+                            <!-- Alert Error -->
+                            <div class="alert alert-error" ng-if="!servers[current].auto_rate_interval">
+                                <strong translate="LOG_TAILING_RATE_LIMITED"></strong>
+                            </div>
+                            <!--/ Alert Error -->
                             <header>
                                 <h4 class="title">logs/latest.log</h4>
                             </header>
@@ -1633,6 +1644,7 @@
                               <option value="en_US">en_US</option>
                               <option value="de_DE">de_DE</option>
                               <option value="fr_FR">fr_FR</option>
+                              <option value="no_NB">no_NB</option>
                               <option value="sv_SE">sv_SE</option>
                           </select>
                       </div>

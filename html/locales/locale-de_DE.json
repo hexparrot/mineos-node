@@ -76,6 +76,8 @@
   "COPY_TO_SERVER": "Copy to Server",
 
   "GLANCE": "Server-Details",
+  "INVALID_SERVER_NAME": "Server may contain only letters, numbers and underscores. This server cannot be managed with MineOS without being renamed.",
+  "LOG_TAILING_RATE_LIMITED": "The server has been generating logs beyond the rate-limit threshold. Log tailing has stopped and can be re-enabled by refreshing the webui.",
   "VERSION": "Version",
   "REPORTED_VERSION": "Interne Version",
   "MEMORY_FOOTPRINT": "Speicherverbrauch (RAM)",

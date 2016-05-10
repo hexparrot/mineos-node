@@ -422,6 +422,10 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     };
 
   /* other functions */
+
+  $scope.valid_server_name = function(server_name) {
+    return /^(?!\.)[a-zA-Z0-9_\.]+$/.test(server_name);
+  }
   
   $scope.change_locale = function(locale) {
     $translate.use(locale);
@@ -572,6 +576,7 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
   }
 
   $scope.server_from_archive_create = function() {
+    var regex_valid_server_name = /^(?!\.)[a-zA-Z0-9_\.]+$/;
     var obj = {
       'command': 'create_from_archive',
       'new_server_name': $scope.new_server_name,
@@ -583,9 +588,16 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     else
       obj['awd_dir'] = null;
 
-    socket.emit('/', 'command', obj);
-    $('#modal_server_from_archive').modal('hide');
-    $scope.change_page('dashboard', $scope.new_server_name);
+    if (!regex_valid_server_name.test($scope.new_server_name)) {
+      $.gritter.add({
+        title: "Invalid server name",
+        text: "Alphanumerics and underscores only (no spaces)."
+      })
+    } else {
+      socket.emit('/', 'command', obj);
+      $('#modal_server_from_archive').modal('hide');
+      $scope.change_page('dashboard', $scope.new_server_name);
+    }
   }
 
   $scope.update_loadavg = function(new_datapoint) {
@@ -716,6 +728,14 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
     me.live_logs = {};
     me.notices = {};
     me.latest_notice = {};
+    me.AUTO_RATE_THRESHOLD_PER_SECOND = 50;
+    me.auto_rate_counter = 0;
+    me.auto_rate_interval = setInterval(function() {
+      if (me.auto_rate_counter > me.AUTO_RATE_THRESHOLD_PER_SECOND)
+        me.auto_rate_interval = null;
+      else
+        me.auto_rate_counter = 0;
+    }, 1000);
 
     me.channel.on(server_name, 'heartbeat', function(data) {
       var previous_state = me.heartbeat;
@@ -736,7 +756,10 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
 
     me.channel.on(server_name, 'tail_data', function(data) {
       try {
-        me.live_logs[data.filepath].push(data.payload);
+        if (me.auto_rate_interval) {
+          me.live_logs[data.filepath].push(data.payload);
+          me.auto_rate_counter += 1;
+        }
       } catch (e) {
         me.live_logs[data.filepath] = [data.payload];
       }
