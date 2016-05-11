@@ -449,6 +449,8 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
 
   $scope.cron_command = function(cmd, args) {
     args['operation'] = cmd;
+    if (args['command'] != 'stuff')
+      args['msg'] = '';
     socket.emit($scope.current, 'cron', args);
   }
 
