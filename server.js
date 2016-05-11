@@ -538,6 +538,20 @@ function server_container(server_name, base_dir, socket_io) {
       COMMIT_INTERVAL_MIN = null;
 
   logging.info('[{0}] Discovered server'.format(server_name));
+
+  // check that awd and bwd also exist alongside cwd or create and chown
+  var missing_dir = false;
+  try { fs.accessSync(instance.env.bwd, fs.F_OK) } catch (e) { missing_dir = true }
+  try { fs.accessSync(instance.env.awd, fs.F_OK) } catch (e) { missing_dir = true }
+
+  if (missing_dir) {
+    async.series([
+      async.apply(fs.ensureDir, instance.env.bwd),
+      async.apply(fs.ensureDir, instance.env.awd),
+      async.apply(instance.sync_chown)
+    ]);
+  }
+
   //async.series([ async.apply(instance.sync_chown) ]);
   //uncomment sync_chown to correct perms on server discovery
   //commenting out for high cpu usage on startup
