@@ -759,9 +759,6 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
         if (me.auto_rate_interval) {
           me.live_logs[data.filepath].push(data.payload);
           me.auto_rate_counter += 1;
-        } else {
-          //This a temp Fix !
-          me.live_logs[data.filepath].push(data.payload);
         }
       } catch (e) {
         me.live_logs[data.filepath] = [data.payload];
