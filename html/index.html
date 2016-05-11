@@ -728,6 +728,11 @@
                     <div class="row-fluid">
                         <!-- START Basic Table -->
                         <div class="span12 widget">
+                            <!-- Alert Error -->
+                            <div class="alert alert-error" ng-if="!servers[current].auto_rate_interval">
+                                <strong translate="LOG_TAILING_RATE_LIMITED"></strong>
+                            </div>
+                            <!--/ Alert Error -->
                             <header>
                                 <h4 class="title" translate="BUILDTOOLS"></h4> 
                             </header>
