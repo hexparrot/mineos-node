@@ -38,6 +38,7 @@ auth.authenticate_shadow = function(user, plaintext, callback) {
       var posix = require('posix');
     } catch (e) {
       inner_callback(true);
+      return;
     }
 
     try {
@@ -57,6 +58,7 @@ auth.authenticate_shadow = function(user, plaintext, callback) {
       var pam = require('authenticate-pam');
     } catch (e) {
       inner_callback(true);
+      return;
     }
 
     pam.authenticate(user, plaintext, function(err) {
@@ -69,7 +71,7 @@ auth.authenticate_shadow = function(user, plaintext, callback) {
 
   pam(function(pam_passed) {
     if (typeof pam_passed == 'string')
-      callback(pam_passed)
+      callback(pam_passed);
     else
       etc_shadow(function(etc_passed) {
         if (typeof etc_passed == 'string')
