@@ -36,7 +36,7 @@ rm -rf node_modules && npm install --no-spin >> $LOG
 if [ $? -eq 0 ]; then ECHO_LOG "OK"; else ECHO_LOG "FAILED" && exit 1; fi
 
 ECHO_LOG_N "Setting node javascript files to executable..."
-chmod +x mineos_console.js webui.js reset_scripts.sh >> $LOG
+chmod +x mineos_console.js webui.js update_webui.sh reset_webui.sh >> $LOG
 if [ $? -eq 0 ]; then ECHO_LOG "OK"; else ECHO_LOG "FAILED" && exit 1; fi
 
 ECHO_LOG_N "Script execution ended on: "
