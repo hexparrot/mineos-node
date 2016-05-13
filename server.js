@@ -7,6 +7,8 @@ var logging = require('winston');
 var fs = require('fs-extra');
 var server = exports;
 
+var UMASK = 0002;
+
 logging.add(logging.transports.File, {
   filename: '/var/log/mineos.log',
   handleExceptions: true
@@ -20,7 +22,7 @@ server.backend = function(base_dir, socket_emitter) {
   self.front_end = socket_emitter;
   self.commit_msg = '';
 
-  process.umask(0002);
+  process.umask(UMASK);
 
   fs.ensureDirSync(base_dir);
   fs.ensureDirSync(path.join(base_dir, mineos.DIRS['servers']));

@@ -1,6 +1,7 @@
 var fs = require('fs-extra');
 var path = require('path');
 var events = require('events');
+var server = require('./server');
 var async = require('async');
 var child_process = require('child_process');
 var which = require('which');
@@ -121,7 +122,7 @@ mineos.mc = function(server_name, base_dir) {
   var self = this;
   self.server_name = server_name;
 
-  process.umask(0002);
+  process.umask(server.UMASK);
 
   self.env = {
     base_dir: base_dir,

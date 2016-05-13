@@ -229,7 +229,7 @@ mineos.dependencies(function(err, binaries) {
 	app.use('/moment', express.static(__dirname + '/node_modules/moment'));
 	app.use('/angular-moment', express.static(__dirname + '/node_modules/angular-moment'));
 	app.use('/angular-moment-duration-format', express.static(__dirname + '/node_modules/moment-duration-format/lib'));
-  app.use('/angular-sanitize', express.static(__dirname + '/node_modules/angular-sanitize'));
+    app.use('/angular-sanitize', express.static(__dirname + '/node_modules/angular-sanitize'));
 	app.use('/admin', express.static(__dirname + '/html'));
 
 	process.on('SIGINT', function() {
@@ -241,6 +241,12 @@ mineos.dependencies(function(err, binaries) {
   var SOCKET_PORT = null;
   var SOCKET_HOST = '0.0.0.0';
   var USE_HTTPS = true;
+  var UMASK = 0002;
+
+  if('umask' in mineos_config) {
+     UMASK = mineos_config['umask']
+     server.UMASK = UMASK;
+  }
 
   if ('use_https' in mineos_config)
     USE_HTTPS = mineos_config['use_https'];
