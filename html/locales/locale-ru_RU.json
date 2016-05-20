@@ -149,35 +149,35 @@
   "CRONTAB_SCHEDULE": "Расписание Crontab",
   "CRON_EXPRESSION": "Выражение Cron",
   "COMMAND_TO_RUN": "Команда для запуска",
-  "SEND_TO_CONSOLE": "Send to console",
-  "ADDITIONAL_ARGUMENT": "Additional argument",
-  "SUBMIT_CRONJOB": "Submit cronjob",
-  "SUSPEND": "Suspend",
+  "SEND_TO_CONSOLE": "Отправить в командную строку",
+  "ADDITIONAL_ARGUMENT": "Дополнительный аргумент",
+  "SUBMIT_CRONJOB": "Создать задание",
+  "SUSPEND": "Приостановить",
 
-  "CREDITS": "MineOS created and maintained by William Dizon",
+  "CREDITS": "MineOS разработан и поддерживается William Dizon",
 
-  "CHANGE_LOCALE": "Change Localization",
+  "CHANGE_LOCALE": "Сменить язык",
 
   "EULA_DETECTED": "Minecraft EULA",
-  "EULA_MUST_BE_ACCEPTED": "Mojang requires Minecraft server admins to accept the End User License Agreement before hosting a Minecraft server. This is done by changing 'eula=false' to 'eula=true' in eula.txt in your server root.",
-  "ACCEPT_EULA": "Accept EULA",
-  "READ_THE_EULA": "Read the Minecraft EULA",
+  "EULA_MUST_BE_ACCEPTED": "Mojang требует от администраторов серверов Minecraft принятия лицензионного соглашения с конечным пользователем (EULA)  до запуска сервера Minecraft. Это можно осуществить заменой значения 'eula=false' на 'eula=true' в файле eula.txt в корневой папке сервера.",
+  "ACCEPT_EULA": "Принять EULA",
+  "READ_THE_EULA": "Прочитать Minecraft EULA",
 
-  "STARTING_A_NEW_SERVER": "Starting a new server",
-  "NEW_SERVER_OVERVIEW": "Starting a new server requires at least the following initial configuration: a runnable server JAR and the Java maximum heap size. Select a profile to expand additional JAR files.",
+  "STARTING_A_NEW_SERVER": "Запуск нового сервера",
+  "NEW_SERVER_OVERVIEW": "Запуск нового сервера требует по крайней мере следующей начальной конфигурации: рабочий JAR-файл сервера и максимальный размер памяти Java. Выберите профиль, чтобы увидеть дополнительные JAR-файлы.",
 
-  "CREATE_SERVER_FROM_ARCHIVE": "Create a new server from an existing archive",
-  "SERVER_FROM_ARCHIVE_DESC": "Please type in the name of the new server to create",
+  "CREATE_SERVER_FROM_ARCHIVE": "Создать новый сервер из существующего архива",
+  "SERVER_FROM_ARCHIVE_DESC": "Пожалуйста, введите имя нового сервера для создания",
 
-  "ADD_SP_ATTRIBUTE": "Add new attribute",
-  "SP_DESCRIPTION": "Add a new attribute/value pair to server.properties.",
-  "SP_ADD": "Add",
+  "ADD_SP_ATTRIBUTE": "Добавить новый параметр",
+  "SP_DESCRIPTION": "Добавить новую пару параметр/значение в server.properties.",
+  "SP_ADD": "Добавление",
 
-  "SUCCEEDED": "succeeded",
-  "FAILED": "failed",
-  "!up": "Server may not be up when performing this action.",
-  "up": "Server must be up when performing this action.",
-  "!exists": "Server may not exist when performing this action.",
-  "exists": "Cannot find server to act on.",
-  "eula": "The Mojang End-User Licesnce Agreement must be accepted to start this server."
+  "SUCCEEDED": "успешно",
+  "FAILED": "неудачно",
+  "!up": "Сервер мог быть выключен при выполнении этой команды.",
+  "up": "Сервер должен быть запущен для этой команды.",
+  "!exists": "Сервер мог не существовать при выполнении этой команды.",
+  "exists": "Не найден сервер для выполнения команды",
+  "eula": "Для запуска этого сервера необходимо принять лицензионное соглашение с конечным пользователем (EULA)."
 }
