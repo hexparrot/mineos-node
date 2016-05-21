@@ -6,24 +6,25 @@ auth.authenticate_shadow = function(user, plaintext, callback) {
   var fs = require('fs-extra');
 
   function etc_shadow(inner_callback) {
+    // return true if error, false if auth failed, string for user if successful
     var passwd = require('etc-passwd');
 
     fs.stat('/etc/shadow', function(err, stat_info) {
       if (err)
-        inner_callback(true)
+        inner_callback(true);
       else {
         passwd.getShadow({username: user}, function(err, shadow_info) {
           if (shadow_info && shadow_info.password == '!')
-            inner_callback(null, false);
+            inner_callback(false);
           else if (shadow_info) {
             var password_parts = shadow_info['password'].split(/\$/);
             var salt = password_parts[2];
             var new_hash = hash.sha512crypt(plaintext, salt);
 
             var passed = (new_hash == shadow_info['password'] ? user : false);
-            inner_callback(null, passed);
+            inner_callback(passed);
           } else {
-            inner_callback(null, false);
+            inner_callback(true);
           }
         })
       }
@@ -31,8 +32,14 @@ auth.authenticate_shadow = function(user, plaintext, callback) {
   }
 
   function posix(inner_callback) {
-    var crypt = require('apache-crypt');
-    var posix = require('posix');
+    // return true if error, false if auth failed, string for user if successful
+    try {
+      var crypt = require('apache-crypt');
+      var posix = require('posix');
+    } catch (e) {
+      inner_callback(true);
+      return;
+    }
 
     try {
       var user_data = posix.getpwnam(user);
@@ -41,18 +48,42 @@ auth.authenticate_shadow = function(user, plaintext, callback) {
       else
         inner_callback(false);
     } catch (e) {
-      inner_callback(false);
+      inner_callback(true);
     }
   }
 
-  etc_shadow(function(err, result_passed) {
-    if (err) {
-      posix(function(result_passed) {
-        callback(result_passed);
-      });
-    } else {
-      callback(result_passed);
+  function pam(inner_callback) {
+    // return true if error, false if auth failed, string for user if successful
+    try {
+      var pam = require('authenticate-pam');
+    } catch (e) {
+      inner_callback(true);
+      return;
     }
+
+    pam.authenticate(user, plaintext, function(err) {
+      if (err)
+        inner_callback(false);
+      else
+        inner_callback(user);
+    })
+  }
+
+  pam(function(pam_passed) {
+    if (typeof pam_passed == 'string')
+      callback(pam_passed);
+    else
+      etc_shadow(function(etc_passed) {
+        if (typeof etc_passed == 'string')
+          callback(etc_passed)
+        else
+          posix(function(posix_passed) {
+            if (typeof posix_passed == 'string')
+              callback(posix_passed)
+            else
+              callback(false);
+          })
+      })
   })
 }
 

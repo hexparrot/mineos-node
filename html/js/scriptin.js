@@ -449,6 +449,8 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
 
   $scope.cron_command = function(cmd, args) {
     args['operation'] = cmd;
+    if (args['command'] != 'stuff')
+      args['msg'] = '';
     socket.emit($scope.current, 'cron', args);
   }
 
@@ -728,7 +730,7 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
     me.live_logs = {};
     me.notices = {};
     me.latest_notice = {};
-    me.AUTO_RATE_THRESHOLD_PER_SECOND = 50;
+    me.AUTO_RATE_THRESHOLD_PER_SECOND = 65;
     me.auto_rate_counter = 0;
     me.auto_rate_interval = setInterval(function() {
       if (me.auto_rate_counter > me.AUTO_RATE_THRESHOLD_PER_SECOND)
