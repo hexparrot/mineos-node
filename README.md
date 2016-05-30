@@ -54,13 +54,6 @@ To start the webui in the foreground:
 
     node webui.js
 
-Docker
-------
-
-For any ports other than 25565, you should manually add the ports:
-
-    docker run -itd -p 8443:8443 -p 25565:25565 -e USER_PASSWORD=mypass -e USER_NAME=mc -v /var/games/minecraft:/var/games/minecraft hexparrot/mineos:node-jessie
-
 Things to watch out for
 ------
 
