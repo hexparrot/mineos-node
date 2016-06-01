@@ -1507,57 +1507,6 @@ function check_profiles(base_dir, callback) {
 
       callback(null, p);
     },
-    pocketmine: function(callback) {
-      var URL_DEVELOPMENT = "http://www.pocketmine.net/api/?channel=development";
-      var URL_STABLE = "http://www.pocketmine.net/api/?channel=stable";
-
-      var p = [];
-
-      function handle_reply(err, retval) {
-        for (var r in retval) {
-          if ((retval[r] || {}).statusCode == 200) {
-            var item = new profile_template();
-            var ref_obj = null;
-            try {
-              ref_obj = JSON.parse(retval[r].body);
-            } catch (e) {
-              break;
-            };
-
-            item['id'] = 'PocketMine-{0}'.format(ref_obj['build']);
-            item['time'] = ref_obj['date'];
-            item['releaseTime'] = ref_obj['date'];
-            //item['type'] = 'release';
-            item['group'] = 'pocketmine';
-            item['webui_desc'] = '{0} (api: {1})'.format(ref_obj['version'], ref_obj['api_version']);
-            item['weight'] = 10;
-            item['channel'] = r;
-            item['filename'] = path.basename(ref_obj['download_url']);
-            item['url'] = ref_obj['download_url'];
-            item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, item.filename));
-            item['version'] = null;
-            item['release_version'] = ref_obj['build'];
-
-            switch (r) {
-              case 'stable':
-                item['type'] = 'release';
-                break;
-              case 'development':
-                item['type'] = 'snapshot';
-                break;
-            }
-
-            p.push(item);
-          }
-        }
-        callback(null, p)
-      }
-
-      async.auto({
-        'stable': async.retry(2, async.apply(request, URL_STABLE)),
-        'development': async.retry(2, async.apply(request, URL_DEVELOPMENT)),
-      }, handle_reply)
-    },
     mianite: function(callback) {
       var MIANITE_VERSIONS_URL = "http://mianite.us/repo?api=true";
 
@@ -1600,37 +1549,6 @@ function check_profiles(base_dir, callback) {
       }
 
       request(MIANITE_VERSIONS_URL, handle_reply);
-    },
-    php: function(callback) {
-      BUILD_REGEX = /<a class="nodeFileName"[^\>]+>(PHP_([0-9\.]+)_[^\.]+\.tar.gz)<\/a>/
-      var p = [];
-
-      function handle_reply(err, response, body) {
-        if (!err && (response || {}).statusCode == 200) {
-          var lines = body.split('\n');
-          for (var i in lines) {
-            var matching = lines[i].match(BUILD_REGEX);
-            if (matching) {
-              var item = new profile_template();
-              var short_id = matching[1].replace(/\.tar\.gz/, '');
-              item['group'] = 'php';
-              if (matching[2][0] == '7')
-                item['type'] = 'snapshot';
-              else
-                item['type'] = 'release';
-              item['id'] = short_id;
-              item['webui_desc'] = 'PHP{0} binary for Pocketmine'.format(matching[2][0]);
-              item['weight'] = 12;
-              item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], short_id, matching[1]));
-              item['filename'] = matching[1];
-              item['url'] = 'https://bintray.com/artifact/download/pocketmine/PocketMine/{0}'.format(item.filename);
-              p.push(item);
-            }
-          }
-        }
-        callback(err, p);
-      }
-      request('https://bintray.com/package/files/pocketmine/PocketMine/Unix-PHP-Binaries', handle_reply);
     },
     bungeecord: function(callback) {
       var xml_parser = require('xml2js');
@@ -2076,93 +1994,6 @@ function download_profiles(base_dir, args, progress_update_fn, callback) {
                 args['success'] = false;
                 args['help_text'] = 'Remote server did not return {0} (status {1})'.format(args.filename, response.statusCode);
                 args['suppress_popup'] = false;
-                inner_callback(args);
-              }
-            })
-            .on('progress', function(state) {
-              args['progress'] = state;
-              progress_update_fn(args);
-            })
-            .pipe(fs.createWriteStream(dest_filepath))
-        }
-      });
-    },
-    pocketmine: function(inner_callback) {
-      var dest_dir = path.join(base_dir, 'profiles', args.id);
-      var dest_filepath = path.join(dest_dir, args.filename);
-
-      var url = args.url;
-
-      fs.ensureDir(dest_dir, function(err) {
-        if (err) {
-          logging.error('[WEBUI] Error attempting download:', err);
-        } else {
-          progress(request(url), {
-            throttle: 1000,
-            delay: 100
-          })
-            .on('complete', function(response) {
-              if (response.statusCode == 200) {
-                logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
-                args['dest_dir'] = dest_dir;
-                args['success'] = true;
-                args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
-                inner_callback(args);
-              } else {
-                logging.error('[WEBUI] Server was unable to download file:', url);
-                logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
-                args['success'] = false;
-                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(args.filename, response.statusCode);
-                inner_callback(args);
-              }
-            })
-            .on('progress', function(state) {
-              args['progress'] = state;
-              progress_update_fn(args);
-            })
-            .pipe(fs.createWriteStream(dest_filepath))
-        }
-      });
-    },
-    php: function(inner_callback) {
-      var tarball = require('tarball-extract')
-
-      var dest_dir = path.join(base_dir, 'profiles', args.id);
-      var dest_filepath = path.join(dest_dir, args.filename);
-
-      var url = args.url;
-
-      fs.ensureDir(dest_dir, function(err) {
-        if (err) {
-          logging.error('[WEBUI] Error attempting download:', err);
-        } else {
-          progress(request(url), {
-            throttle: 1000,
-            delay: 100
-          })
-            .on('complete', function(response) {
-              if (response.statusCode == 200) {
-                logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
-                args['dest_dir'] = dest_dir;
-                args['success'] = true;
-                args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
-
-                async.series([
-                  async.apply(tarball.extractTarball, dest_filepath, dest_dir)
-                ], function(err) {
-                  if (err) {
-                    args['success'] = false;
-                    args['help_text'] = 'Successfully downloaded, but failed to extract {0}'.format(dest_filepath);
-                    inner_callback(args);
-                  } else {
-                    inner_callback(args);
-                  }
-                })
-              } else {
-                logging.error('[WEBUI] Server was unable to download file:', url);
-                logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
-                args['success'] = false;
-                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(args.filename, response.statusCode);
                 inner_callback(args);
               }
             })
