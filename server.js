@@ -246,10 +246,12 @@ server.backend = function(base_dir, socket_emitter, user_config) {
           async.series([
             async.apply(instance.verify, '!exists'),
             function(cb) {
-              var whitelisted_creators = [username];
-              if ( (user_config || {}).creators ) {
+              var whitelisted_creators = [username]; //by default, accept create attempt by current user
+              if ( (user_config || {}).creators ) {  //if creators key:value pair exists, use it
                 whitelisted_creators = user_config['creators'].split(',');
-                whitelisted_creators = whitelisted_creators.filter(function(e){return e});
+                whitelisted_creators = whitelisted_creators.filter(function(e){return e}); //remove non-truthy entries like ''
+                whitelisted_creators = whitelisted_creators.map(function(e) {return e.trim()}); //remove trailing and tailing whitespace
+
                 logging.info('Explicitly authorized server creators are:', whitelisted_creators);
               }
               cb(!(whitelisted_creators.indexOf(username) >= 0))
