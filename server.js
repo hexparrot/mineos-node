@@ -493,6 +493,7 @@ server.backend = function(base_dir, socket_emitter, user_config) {
     logging.info('[WEBUI] {0} connected from {1}'.format(username, ip_address));
     socket.emit('whoami', username);
     socket.emit('commit_msg', self.commit_msg);
+    socket.emit('change_locale', (user_config || {})['webui_locale']);
 
     for (var server_name in self.servers)
       socket.emit('track_server', server_name);

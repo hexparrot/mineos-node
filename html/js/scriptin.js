@@ -397,6 +397,10 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     });
   })
 
+  socket.on('/', 'change_locale', function(locale) {
+    $translate.use(locale);
+  })
+
   socket.on('/', 'file_progress', function(data) {
     for (var p in $scope.profiles)
       if (data.group == $scope.profiles[p].group &&
