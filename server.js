@@ -1433,8 +1433,10 @@ function check_profiles(base_dir, callback) {
             item['release_version'] = ref_obj['version'];
             item['url'] = 'http://files.minecraftforge.net/maven/net/minecraftforge/forge/{0}-{1}/{2}'.format(ref_obj['mcversion'], ref_obj['version'], item['filename']);
 
-            if (parseFloat(ref_obj['mcversion']) > 1.6)
-              p.push(item);
+            var ver = ref_obj['mcversion'].match(/(\d+)\.(\d+)\.?(\d+)?/);
+
+            if (parseInt(ver[1]) >= 1 && parseInt(ver[2]) >= 6)
+              p.push(item); // 1.x major, .6 minor, chosen because 1.6.1 changed the installation process so drastically
           }
 
         callback(err, p);
