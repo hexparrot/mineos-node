@@ -1427,11 +1427,17 @@ function check_profiles(base_dir, callback) {
             item['group'] = 'forge';
             item['webui_desc'] = 'Forge Jar (build {0})'.format(ref_obj['build']);
             item['weight'] = 0;
-            item['filename'] = 'forge-{0}-{1}-installer.jar'.format(ref_obj['mcversion'], ref_obj['version']);
+            if (ref_obj['branch'])
+              item['filename'] = 'forge-{0}-{1}-{2}-installer.jar'.format(ref_obj['mcversion'], ref_obj['version'], ref_obj['branch']);
+            else
+              item['filename'] = 'forge-{0}-{1}-installer.jar'.format(ref_obj['mcversion'], ref_obj['version']);
             item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, item.filename));
             item['version'] = ref_obj['mcversion'];
             item['release_version'] = ref_obj['version'];
-            item['url'] = 'http://files.minecraftforge.net/maven/net/minecraftforge/forge/{0}-{1}/{2}'.format(ref_obj['mcversion'], ref_obj['version'], item['filename']);
+            if (ref_obj['branch'])
+              item['url'] = 'http://files.minecraftforge.net/maven/net/minecraftforge/forge/{0}-{1}-{2}/{3}'.format(ref_obj['mcversion'], ref_obj['version'], ref_obj['branch'], item['filename']);
+            else
+              item['url'] = 'http://files.minecraftforge.net/maven/net/minecraftforge/forge/{0}-{1}/{2}'.format(ref_obj['mcversion'], ref_obj['version'], item['filename']);
 
             var ver = ref_obj['mcversion'].match(/(\d+)\.(\d+)\.?(\d+)?/);
 
