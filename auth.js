@@ -45,7 +45,15 @@ auth.authenticate_shadow = function(user, plaintext, callback) {
       var user_data = posix.getpwnam(user);
       if (crypt(plaintext, user_data.passwd) == user_data.passwd)
         inner_callback(user);
-      else
+      else if (user_data) {
+        // the crypt hash method fails on FreeNAS so try the sha512
+        var password_parts = user_data.passwd.split(/\$/);
+        var salt = password_parts[2];
+        var new_hash = hash.sha512crypt(plaintext, salt);
+
+        var passed = (new_hash == user_data.passwd ? user : false);
+        inner_callback(passed);
+	  } else 
         inner_callback(false);
     } catch (e) {
       inner_callback(true);
@@ -70,6 +78,7 @@ auth.authenticate_shadow = function(user, plaintext, callback) {
   }
 
   pam(function(pam_passed) {
+    //due to the stack of different auths, a false if auth failed is largely ignored
     if (typeof pam_passed == 'string')
       callback(pam_passed);
     else

@@ -144,10 +144,23 @@ app.filter('profile_downloaded', function() {
 app.filter('remove_old_versions', function() {
   return function(profiles, remove_older_than) {
     var keep = [];
+    var min_ver = remove_older_than.match(/(\d+)\.(\d+)\.(\d+)/);
+    var major = parseInt(min_ver[1]);
+    var minor = parseInt(min_ver[2]);
+    var patch = parseInt(min_ver[3]);
 
-    for (var index in profiles)
-      if (parseFloat(profiles[index].version) >= parseFloat(remove_older_than))
+    for (var index in profiles) {
+      var ver = profiles[index].version.match(/(\d+)\.(\d+)\.?(\d+)?/);
+
+      if (parseInt(ver[1]) > major)
+        keep.push(profiles[index]);
+      else if (parseInt(ver[1]) == major)
+        if (parseInt(ver[2]) > minor)
           keep.push(profiles[index]);
+        else if (parseInt(ver[2]) == minor)
+          if (parseInt(ver[3]) || 0 >= patch)
+            keep.push(profiles[index]);
+    }
 
     return keep;
   }

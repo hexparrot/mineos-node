@@ -727,11 +727,6 @@
                     <div class="row-fluid">
                         <!-- START Basic Table -->
                         <div class="span12 widget">
-                            <!-- Alert Error -->
-                            <div class="alert alert-error" ng-if="!servers[current].auto_rate_interval">
-                                <strong translate="LOG_TAILING_RATE_LIMITED"></strong>
-                            </div>
-                            <!--/ Alert Error -->
                             <header>
                                 <h4 class="title" translate="BUILDTOOLS"></h4> 
                             </header>
@@ -752,7 +747,7 @@
                                             <tr ng-repeat="jar in profiles | 
                                                            profile_filter: {field: 'group', value: 'mojang'} | 
                                                            profile_filter: {field: 'type', value: 'release'} | 
-                                                           remove_old_versions: 1.8 | 
+                                                           remove_old_versions: '1.8.0' | 
                                                            orderBy:['+weight', '-releaseTime', 'id']">
                                                 <td>{{ jar.id }}</td>
                                                 <td>
@@ -1567,6 +1562,18 @@
                             </section>
                         </div>
                         <!--/ END Basic Table -->
+                    </div>
+                    <!--/ END Row -->
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <div class="body-inner">
+                            <div class="control-group">
+                                <div class="controls console-input">
+                                    <label>&gt;</label><input type="text" class="span12" ng-model="user_input" ng-enter="console_input()">
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                     <!--/ END Row -->
                 </div>
