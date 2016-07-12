@@ -166,7 +166,7 @@ mineos.dependencies(function(err, binaries) {
     console.info('base_directory not specified in mineos.conf, using default:', base_directory);
   }
 
-  var be = new server.backend(base_directory, io);
+  var be = new server.backend(base_directory, io, mineos_config);
 
   tally();
   setInterval(tally, 7200000); //7200000 == 120min
