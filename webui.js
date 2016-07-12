@@ -27,10 +27,10 @@ var localAuth = function (username, password) {
   var deferred = Q.defer();
 
   auth.authenticate_shadow(username, password, function(authed_user) {
-  	if (authed_user)
-		deferred.resolve({ username: authed_user });
-	else
-		deferred.reject(new Error('incorrect password'));
+    if (authed_user)
+        deferred.resolve({ username: authed_user });
+    else
+        deferred.reject(new Error('incorrect password'));
   })
 
   return deferred.promise;
@@ -171,23 +171,23 @@ mineos.dependencies(function(err, binaries) {
   tally();
   setInterval(tally, 7200000); //7200000 == 120min
 
-	app.get('/', function(req, res){
-		res.redirect('/admin/index.html');
-	});
+    app.get('/', function(req, res){
+        res.redirect('/admin/index.html');
+    });
 
-	app.get('/admin/index.html', ensureAuthenticated, function(req, res){
-		res.sendfile('/html/index.html', response_options);
-	});
+    app.get('/admin/index.html', ensureAuthenticated, function(req, res){
+        res.sendfile('/html/index.html', response_options);
+    });
 
-	app.get('/login', function(req, res){
-		res.sendfile('/html/login.html');
-	});
+    app.get('/login', function(req, res){
+        res.sendfile('/html/login.html');
+    });
 
-	app.post('/auth', passport.authenticate('local-signin', {
-		successRedirect: '/admin/index.html',
-		failureRedirect: '/admin/login.html'
-		})
-	);
+    app.post('/auth', passport.authenticate('local-signin', {
+        successRedirect: '/admin/index.html',
+        failureRedirect: '/admin/login.html'
+        })
+    );
 
   app.all('/api/:server_name/:command', ensureAuthenticated, function(req, res) {
     var target_server = req.params.server_name;
@@ -218,25 +218,25 @@ mineos.dependencies(function(err, binaries) {
     res.end();
   });
 
-	app.get('/logout', function(req, res){
-		req.logout();
-		res.redirect('/admin/login.html');
-	});
+  app.get('/logout', function(req, res){
+    req.logout();
+    res.redirect('/admin/login.html');
+  });
 
-	app.use('/socket.io', express.static(__dirname + '/node_modules/socket.io'));
-	app.use('/angular', express.static(__dirname + '/node_modules/angular'));
-	app.use('/angular-translate', express.static(__dirname + '/node_modules/angular-translate/dist'));
-	app.use('/moment', express.static(__dirname + '/node_modules/moment'));
-	app.use('/angular-moment', express.static(__dirname + '/node_modules/angular-moment'));
-	app.use('/angular-moment-duration-format', express.static(__dirname + '/node_modules/moment-duration-format/lib'));
+  app.use('/socket.io', express.static(__dirname + '/node_modules/socket.io'));
+  app.use('/angular', express.static(__dirname + '/node_modules/angular'));
+  app.use('/angular-translate', express.static(__dirname + '/node_modules/angular-translate/dist'));
+  app.use('/moment', express.static(__dirname + '/node_modules/moment'));
+  app.use('/angular-moment', express.static(__dirname + '/node_modules/angular-moment'));
+  app.use('/angular-moment-duration-format', express.static(__dirname + '/node_modules/moment-duration-format/lib'));
   app.use('/angular-sanitize', express.static(__dirname + '/node_modules/angular-sanitize'));
-	app.use('/admin', express.static(__dirname + '/html'));
+  app.use('/admin', express.static(__dirname + '/html'));
 
-	process.on('SIGINT', function() {
-		console.log("Caught interrupt signal; closing webui....");
-		be.shutdown();
-		process.exit();
-	});
+  process.on('SIGINT', function() {
+    console.log("Caught interrupt signal; closing webui....");
+    be.shutdown();
+    process.exit();
+  });
 
   var SOCKET_PORT = null;
   var SOCKET_HOST = '0.0.0.0';
@@ -291,4 +291,3 @@ mineos.dependencies(function(err, binaries) {
   setInterval(session_cleanup, 3600000); //check for expired sessions every hour
 
 })
-
