@@ -945,7 +945,8 @@ mineos.mc = function(server_name, base_dir) {
     var strftime = require('strftime');
     var binary = which.sync('tar');
     var filename = 'server-{0}_{1}.tgz'.format(self.server_name, strftime('%Y-%m-%d_%H:%M:%S'));
-    var args = ['czf', path.join(self.env.awd, filename), '.'];
+    var filepath = path.join(self.env.awd, filename);
+    var args = ['czf', filepath, '.'];
 
     var params = { cwd: self.env.cwd }; //awd!
 
@@ -957,11 +958,106 @@ mineos.mc = function(server_name, base_dir) {
           cb(err);
         })
       },
-      function(cb) {
-        var proc = child_process.spawn(binary, args, params);
-        proc.once('exit', function(code) {
-          cb(code);
-        })
+      async.apply(self.verify, 'exists'),
+      function(archive_complete_cb) {
+        var Tail = require('tail').Tail;
+        var tail = new Tail(path.join(self.env.cwd, 'logs/latest.log'));
+        var save_off_regex = /Turned off world auto-saving/
+        var save_already_off_regex = /Saving is already turned off/;
+        var save_on_regex = /(Turned on world auto-saving)|(Saving is already turned on)/;
+        var restore_autosave = true;
+        var tail_waiting = null;
+        var save_off_timer = null;
+        var save_on_timer = null;
+        var result_code = null;
+
+        var send_save_off_cmd = function() {
+            tail_waiting = 'save_off';
+            save_off_timer = setTimeout(save_off_timeout, 2000);
+            self.stuff('save-off', null);
+        };
+
+        var save_off_timeout = function() {
+            if (tail_waiting === 'save_off') {
+                save_off_timer = null;
+                save_off_complete();
+            }
+        };
+
+        var save_off_complete = function() {
+            tail_waiting = null;
+            if (save_off_timer) {
+                clearTimeout(save_off_timer);
+                save_off_timer = null;
+            }
+            do_archive(send_save_on_cmd);
+        };
+
+        var do_archive = function(cb) {
+            var proc = child_process.spawn(binary, args, params);
+            proc.once('exit', function(code) {
+              result_code = code;
+              cb();
+            });
+        };
+
+        var send_save_on_cmd = function() {
+            if (restore_autosave) {
+                tail_waiting = 'save_on';
+                save_on_timer = setTimeout(save_on_timeout, 2000);
+                self.stuff('save-on', null);
+            }
+            else {
+                save_on_complete();
+            }
+        };
+
+        var save_on_timeout = function() {
+            if (tail_waiting === 'save_on') {
+                save_on_timer = null;
+                save_on_complete();
+            }
+        };
+
+        var save_on_complete = function() {
+            tail_waiting = null;
+            if (save_on_timer) {
+                clearTimeout(save_on_timer);
+                save_on_timer = null;
+            }
+            tail.unwatch();
+            archive_complete_cb(result_code, filepath);
+        };
+
+        tail.on('line', function(data) {
+            if (tail_waiting === 'save_off') {
+                if (data.match(save_off_regex)) {
+                    save_off_complete();
+                }
+                else if (data.match(save_already_off_regex)) {
+                    restore_autosave = false;
+                    save_off_complete();
+                }
+            }
+            else if (tail_waiting === 'save_on') {
+                if (data.match(save_on_regex)) {
+                    save_on_complete();
+                }
+            }
+        });
+
+        self.verify('up', function(err) {
+            if (err) {
+                // server is not running, just make the archive
+                do_archive(function() {
+                    archive_complete_cb(result_code, filepath);
+                });
+            }
+            else {
+                // server is running, disable saving during archival
+                send_save_off_cmd();
+            }
+        });
       }
     ], callback);
   }
