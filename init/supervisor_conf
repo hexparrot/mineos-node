@@ -1,6 +1,7 @@
 [program:mineos]
 command=/usr/bin/node webui.js
 directory=/usr/games/minecraft
+environment=HOME=/root
 user=root
 autostart=true
 autorestart=true
