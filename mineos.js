@@ -960,38 +960,15 @@ mineos.mc = function(server_name, base_dir) {
       },
       async.apply(self.verify, 'exists'),
       function(archive_complete_cb) {
-        var Tail = require('tail').Tail;
-        var tail = new Tail(path.join(self.env.cwd, 'logs/latest.log'));
-        var save_off_regex = /Turned off world auto-saving/
-        var save_already_off_regex = /Saving is already turned off/;
-        var save_on_regex = /(Turned on world auto-saving)|(Saving is already turned on)/;
+        var save_off_regex = /INFO]: Turned off world auto-saving/
+        var save_already_off_regex = /INFO]: Saving is already turned off/;
+        var save_all_regex = /INFO]: Saved the world/;
+        var save_on_regex = /INFO]: ((Turned on world auto-saving)|(Saving is already turned on))/;
         var restore_autosave = true;
-        var tail_waiting = null;
-        var save_off_timer = null;
-        var save_on_timer = null;
         var result_code = null;
 
-        var send_save_off_cmd = function() {
-            tail_waiting = 'save_off';
-            save_off_timer = setTimeout(save_off_timeout, 2000);
-            self.stuff('save-off', null);
-        };
-
-        var save_off_timeout = function() {
-            if (tail_waiting === 'save_off') {
-                save_off_timer = null;
-                save_off_complete();
-            }
-        };
-
-        var save_off_complete = function() {
-            tail_waiting = null;
-            if (save_off_timer) {
-                clearTimeout(save_off_timer);
-                save_off_timer = null;
-            }
-            do_archive(send_save_on_cmd);
-        };
+        var LogEvent = require('./src/logevent').LogEvent;
+        var logevent = new LogEvent(path.join(self.env.cwd, 'logs/latest.log'));
 
         var do_archive = function(cb) {
             var proc = child_process.spawn(binary, args, params);
@@ -1001,10 +978,19 @@ mineos.mc = function(server_name, base_dir) {
             });
         };
 
+        var send_save_off_cmd = function() {
+            logevent.set_state('save_off');
+            self.stuff('save-off', null);
+        };
+
+        var send_save_all_cmd = function() {
+            logevent.set_state('save_all');
+            self.stuff('save-all', null);
+        };
+
         var send_save_on_cmd = function() {
             if (restore_autosave) {
-                tail_waiting = 'save_on';
-                save_on_timer = setTimeout(save_on_timeout, 2000);
+                logevent.set_state('save_on');
                 self.stuff('save-on', null);
             }
             else {
@@ -1012,49 +998,49 @@ mineos.mc = function(server_name, base_dir) {
             }
         };
 
-        var save_on_timeout = function() {
-            if (tail_waiting === 'save_on') {
-                save_on_timer = null;
-                save_on_complete();
-            }
+        var save_off_complete = function(autosave) {
+            restore_autosave = autosave;
+            send_save_all_cmd();
         };
 
         var save_on_complete = function() {
-            tail_waiting = null;
-            if (save_on_timer) {
-                clearTimeout(save_on_timer);
-                save_on_timer = null;
-            }
-            tail.unwatch();
-            archive_complete_cb(result_code, filepath);
+            logevent.unwatch();
+            archive_complete_cb(result_code, { filename: filepath } );
         };
 
-        tail.on('line', function(data) {
-            if (tail_waiting === 'save_off') {
-                if (data.match(save_off_regex)) {
-                    save_off_complete();
-                }
-                else if (data.match(save_already_off_regex)) {
-                    restore_autosave = false;
-                    save_off_complete();
-                }
-            }
-            else if (tail_waiting === 'save_on') {
-                if (data.match(save_on_regex)) {
-                    save_on_complete();
-                }
-            }
-        });
+        logevent.append([
+            { state: 'save_off',
+              regex: save_off_regex,
+              timeout: 1000,
+              callback: save_off_complete,
+              param: true },
+            { state: 'save_off',
+              regex: save_already_off_regex,
+              timeout: 1000,
+              callback: save_off_complete,
+              param: false },
+            { state: 'save_all',
+              regex: save_all_regex,
+              timeout: 20000, // give minecraft some time to save
+              callback: do_archive,
+              param: send_save_on_cmd },
+            { state: 'save_on',
+              regex: save_on_regex,
+              timeout: 1000,
+              callback: save_on_complete,
+              param: null }
+        ]);
 
         self.verify('up', function(err) {
             if (err) {
                 // server is not running, just make the archive
                 do_archive(function() {
-                    archive_complete_cb(result_code, filepath);
+                    archive_complete_cb(result_code, { filename: filepath });
                 });
             }
             else {
                 // server is running, disable saving during archival
+                logevent.watch();
                 send_save_off_cmd();
             }
         });
