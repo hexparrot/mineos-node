@@ -4,6 +4,7 @@ var events = require('events');
 var async = require('async');
 var child_process = require('child_process');
 var which = require('which');
+var BackupSequence = require('./src/backup_sequence').BackupSequence;
 var mineos = exports;
 
 mineos.DIRS = {
@@ -960,89 +961,27 @@ mineos.mc = function(server_name, base_dir) {
       },
       async.apply(self.verify, 'exists'),
       function(archive_complete_cb) {
-        var save_off_regex = /INFO]: Turned off world auto-saving/
-        var save_already_off_regex = /INFO]: Saving is already turned off/;
-        var save_all_regex = /INFO]: Saved the world/;
-        var save_on_regex = /INFO]: ((Turned on world auto-saving)|(Saving is already turned on))/;
-        var restore_autosave = true;
-        var result_code = null;
-
-        var LogEvent = require('./src/logevent').LogEvent;
-        var logevent = new LogEvent(path.join(self.env.cwd, 'logs/latest.log'));
+        var log_path = path.join(self.env.cwd, 'logs/latest.log');
 
         var do_archive = function(cb) {
-            var proc = child_process.spawn(binary, args, params);
-            proc.once('exit', function(code) {
-              result_code = code;
-              cb();
-            });
+          var proc = child_process.spawn(binary, args, params);
+          proc.once('exit', cb);
         };
 
-        var send_save_off_cmd = function() {
-            logevent.set_state('save_off');
-            self.stuff('save-off', null);
+        var backup_sequence_complete = function(result_code) {
+          archive_complete_cb(result_code, { filename: filepath });
         };
-
-        var send_save_all_cmd = function() {
-            logevent.set_state('save_all');
-            self.stuff('save-all', null);
-        };
-
-        var send_save_on_cmd = function() {
-            if (restore_autosave) {
-                logevent.set_state('save_on');
-                self.stuff('save-on', null);
-            }
-            else {
-                save_on_complete();
-            }
-        };
-
-        var save_off_complete = function(autosave) {
-            restore_autosave = autosave;
-            send_save_all_cmd();
-        };
-
-        var save_on_complete = function() {
-            logevent.unwatch();
-            archive_complete_cb(result_code, { filename: filepath } );
-        };
-
-        logevent.append([
-            { state: 'save_off',
-              regex: save_off_regex,
-              timeout: 1000,
-              callback: save_off_complete,
-              param: true },
-            { state: 'save_off',
-              regex: save_already_off_regex,
-              timeout: 1000,
-              callback: save_off_complete,
-              param: false },
-            { state: 'save_all',
-              regex: save_all_regex,
-              timeout: 20000, // give minecraft some time to save
-              callback: do_archive,
-              param: send_save_on_cmd },
-            { state: 'save_on',
-              regex: save_on_regex,
-              timeout: 1000,
-              callback: save_on_complete,
-              param: null }
-        ]);
 
         self.verify('up', function(err) {
-            if (err) {
-                // server is not running, just make the archive
-                do_archive(function() {
-                    archive_complete_cb(result_code, { filename: filepath });
-                });
-            }
-            else {
-                // server is running, disable saving during archival
-                logevent.watch();
-                send_save_off_cmd();
-            }
+          if (err) {
+            // server is not running: just make the archive
+            do_archive(backup_sequence_complete);
+          }
+          else {
+            // server is running: ensure backup consistency by running the proper command sequence
+            var backup_sequence = new BackupSequence(self, log_path, do_archive, backup_sequence_complete);
+            backup_sequence.start();
+          }
         });
       }
     ], callback);
