@@ -1000,11 +1000,30 @@ mineos.mc = function(server_name, base_dir) {
           cb(err);
         })
       },
-      function(cb) {
-        var proc = child_process.spawn(binary, args, params);
-        proc.once('exit', function(code) {
-          cb(code);
-        })
+      async.apply(self.verify, 'exists'),
+      function(backup_complete_cb) {
+        var log_path = path.join(self.env.cwd, 'logs/latest.log');
+
+        var do_backup = function(cb) {
+          var proc = child_process.spawn(binary, args, params);
+          proc.once('exit', cb);
+        };
+
+        var backup_sequence_complete = function(result_code) {
+          backup_complete_cb(result_code);
+        };
+
+        self.verify('up', function(err) {
+          if (err) {
+            // server is not running: just make the archive
+            do_backup(backup_sequence_complete);
+          }
+          else {
+            // server is running: ensure backup consistency by running the proper command sequence
+            var backup_sequence = new BackupSequence(self, log_path, do_backup, backup_sequence_complete);
+            backup_sequence.start();
+          }
+        });
       }
     ], callback)
   }
