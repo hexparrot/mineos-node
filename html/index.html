@@ -941,12 +941,16 @@
                                                     </label>
                                                     <div class="controls">
                                                         <label class="control-label" translate="COMMIT_INTERVAL"></label>
-                                                        <input type="text" 
+                                                        <div class="control-group">
+                                                            <input type="text" 
                                                             class="span4"
                                                             placeholder="60"
                                                             ng-model="servers[current].sc.minecraft.commit_interval" 
                                                             ng-change="change_sc('minecraft', 'commit_interval', servers[current].sc.minecraft.commit_interval)" 
                                                             ng-model-options="{ updateOn: 'default blur', debounce: {'default': 1500, 'blur': 0} }">
+
+                                                            <button type="button" class="btn span2 pull-left" ng-click="server_command('saveall_latest_log')" ng-show="current && servers[current].live_logs['logs/latest.log'].length">save-all</button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </section>
