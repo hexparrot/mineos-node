@@ -1773,6 +1773,93 @@ test.saveall = function(test) {
   })
 }
 
+test.property_autosave_179 = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
+    async.apply(instance.copy_profile),
+    async.apply(instance.start),
+    function(callback) {
+      setTimeout(callback, 20000);
+    },
+    function(callback) {
+      instance.property('autosave', function(err, autosave_enabled) {
+        test.ifError(err);
+        test.ok(autosave_enabled);
+        callback(err);
+      })
+    },
+    async.apply(instance.stuff, 'save-on'),
+    function(callback) {
+      instance.property('autosave', function(err, autosave_enabled) {
+        test.ifError(err);
+        test.ok(autosave_enabled);
+        callback(err);
+      })
+    },
+    async.apply(instance.stuff, 'save-off'),
+    function(callback) {
+      instance.property('autosave', function(err, autosave_enabled) {
+        test.ifError(err);
+        test.ok(!autosave_enabled);
+        callback(err);
+      })
+    },
+    async.apply(instance.kill)
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
+test.property_autosave_1102 = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.modify_sc, 'minecraft', 'profile', '1.10.2'),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.10.2.jar'),
+    async.apply(instance.copy_profile),
+    async.apply(instance.accept_eula),
+    async.apply(instance.start),
+    function(callback) {
+      setTimeout(callback, 20000);
+    },
+    function(callback) {
+      instance.property('autosave', function(err, autosave_enabled) {
+        test.ifError(err);
+        test.ok(autosave_enabled);
+        callback(err);
+      })
+    },
+    async.apply(instance.stuff, 'save-on'),
+    function(callback) {
+      instance.property('autosave', function(err, autosave_enabled) {
+        test.ifError(err);
+        test.ok(autosave_enabled);
+        callback(err);
+      })
+    },
+    async.apply(instance.stuff, 'save-off'),
+    function(callback) {
+      instance.property('autosave', function(err, autosave_enabled) {
+        test.ifError(err);
+        test.ok(!autosave_enabled);
+        callback(err);
+      })
+    },
+    async.apply(instance.kill)
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
 test.check_eula = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
