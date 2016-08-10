@@ -120,6 +120,7 @@
   "ARCHIVE_CREATED": "Archiv erstellt",
   "ARCHIVE_FAILED": "Archiv: Erstellung fehlgeschlagen",
   "CREATE_NEW_ARCHIVE": "Neues Archiv erstellen",
+  "COMMIT_THEN_CREATE_ARCHIVE": "save-all then create archive",
 
   "OWNERSHIP_AND_DISK_USAGE": "Besitzrechte und Festplatten",
   "SERVER_OWNER": "Besitzer Server (unix owner)",

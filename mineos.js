@@ -985,7 +985,7 @@ mineos.mc = function(server_name, base_dir) {
     var filename = 'server-{0}_{1}.tgz'.format(self.server_name, strftime('%Y-%m-%d_%H:%M:%S'));
     var args = ['czf', path.join(self.env.awd, filename), '.'];
 
-    var params = { cwd: self.env.cwd }; //awd!
+    var params = { cwd: self.env.cwd };
 
     async.series([
       function(cb) {
@@ -1000,6 +1000,46 @@ mineos.mc = function(server_name, base_dir) {
         proc.once('exit', function(code) {
           cb(code);
         })
+      }
+    ], callback);
+  }
+
+  self.archive_with_commit = function(callback) {
+    var strftime = require('strftime');
+    var binary = which.sync('tar');
+    var filename = 'server-{0}_{1}.tgz'.format(self.server_name, strftime('%Y-%m-%d_%H:%M:%S'));
+    var args = ['czf', path.join(self.env.awd, filename), '.'];
+
+    var params = { cwd: self.env.cwd };
+    var autosave = true;
+
+    async.series([
+      function(cb) {
+        self.property('autosave', function(err, result) {
+          autosave = result;
+          cb(err);
+        })
+      },
+      async.apply(self.stuff, 'save-off'),
+      async.apply(self.saveall_latest_log),
+      function(cb) {
+        self.property('owner', function(err, result) {
+          params['uid'] = result['uid'];
+          params['gid'] = result['gid'];
+          cb(err);
+        })
+      },
+      function(cb) {
+        var proc = child_process.spawn(binary, args, params);
+        proc.once('exit', function(code) {
+          cb(null);
+        })
+      },
+      function(cb) {
+        if (autosave)
+          self.stuff('save-on', cb);
+        else
+          cb(null);
       }
     ], callback);
   }

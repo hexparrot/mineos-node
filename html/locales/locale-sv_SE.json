@@ -120,6 +120,7 @@
   "ARCHIVE_CREATED": "Arkiv skapat",
   "ARCHIVE_FAILED": "Arkiv misslyckades",
   "CREATE_NEW_ARCHIVE": "Skapa nytt arkiv",
+  "COMMIT_THEN_CREATE_ARCHIVE": "save-all then create archive",
 
   "OWNERSHIP_AND_DISK_USAGE": "Ägande och Diskanvändning",
   "SERVER_OWNER": "Server Ägare",

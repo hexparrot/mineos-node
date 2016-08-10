@@ -120,6 +120,7 @@
   "ARCHIVE_CREATED": "Archive créé",
   "ARCHIVE_FAILED": "Tentative d'archive échouée",
   "CREATE_NEW_ARCHIVE": "Créer une nouvelle archive",
+  "COMMIT_THEN_CREATE_ARCHIVE": "save-all then create archive",
 
   "OWNERSHIP_AND_DISK_USAGE": "Propriétaire et utilisation du disque",
   "SERVER_OWNER": "Propriétaire du serveur ",
