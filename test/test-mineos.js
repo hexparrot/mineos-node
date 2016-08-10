@@ -1773,6 +1773,38 @@ test.saveall = function(test) {
   })
 }
 
+test.saveall_latest_log = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
+    async.apply(instance.copy_profile),
+    function(callback) {
+      instance.saveall_latest_log(function(err) {
+        test.ok(err); //there should be an error here, server is down
+        callback(!err);
+      })
+    },
+    async.apply(instance.start),
+    function(callback) {
+      setTimeout(callback, 20000);
+    },
+    function(callback) {
+      instance.saveall_latest_log(function(err) {
+        test.ifError(err);
+        callback(err);
+      })
+    },
+    async.apply(instance.kill)
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
 test.property_autosave_179 = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);

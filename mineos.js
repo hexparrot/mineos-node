@@ -941,6 +941,44 @@ mineos.mc = function(server_name, base_dir) {
     ], callback);
   }
 
+  self.saveall_latest_log = function(callback) {
+    var TIMEOUT_LENGTH = 10000;
+    var tail = require('tail').Tail;
+
+    try { 
+      var new_tail = new tail(path.join(self.env.cwd, 'logs/latest.log'));
+    } catch (e) {
+      callback(true);
+      return;
+    }
+
+    var timeout = setTimeout(function(){
+      new_tail.unwatch();
+      callback(true);
+    }, TIMEOUT_LENGTH);
+
+    new_tail.on('line', function(data) {
+      var match = data.match(/INFO]: Saved the world/);
+      if (match) { //previously on, return true
+        clearTimeout(timeout);
+        new_tail.unwatch();
+        callback(null);
+      }
+    })
+
+    async.waterfall([
+      async.apply(self.verify, 'exists'),
+      async.apply(self.verify, 'up'),
+      async.apply(self.stuff, 'save-all')
+    ], function(err) {
+      if (err) {
+        clearTimeout(timeout);
+        new_tail.unwatch();
+        callback(true);
+      }
+    });
+  }
+
   self.archive = function(callback) {
     var strftime = require('strftime');
     var binary = which.sync('tar');
