@@ -844,7 +844,7 @@ function server_container(server_name, base_dir, socket_io) {
     }
 
     try {
-      var new_tail = new tail(abs_filepath, {follow: true});
+      var new_tail = new tail(abs_filepath);
       logging.info('[{0}] Created tail on {1}'.format(server_name, rel_filepath));
       new_tail.on('line', function(data) {
         //logging.info('[{0}] {1}: transmitting new tail data'.format(server_name, rel_filepath));
