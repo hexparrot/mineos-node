@@ -1333,6 +1333,7 @@
                                                                     <option translate="RESTART" value="restart"></option>
                                                                     <option translate="CREATE_NEW_RESTORE_POINT" value="backup"></option>
                                                                     <option translate="CREATE_NEW_ARCHIVE" value="archive"></option>
+                                                                    <option ng-show="current && servers[current].live_logs['logs/latest.log'].length" translate="COMMIT_THEN_CREATE_ARCHIVE" value="archive_with_commit"></option>
                                                                     <option translate="SEND_TO_CONSOLE" value="stuff"></option>
                                                                 </select>
                                                             </div>

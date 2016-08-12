@@ -1470,7 +1470,7 @@ mineos.mc = function(server_name, base_dir) {
 
         var timeout = setTimeout(function(){
           new_tail.unwatch();
-          callback(null, true); //default to true for unsupported server functionality fallback
+          return callback(null, true); //default to true for unsupported server functionality fallback
         }, TIMEOUT_LENGTH);
 
         new_tail.on('line', function(data) {
@@ -1478,7 +1478,7 @@ mineos.mc = function(server_name, base_dir) {
           if (match) { //previously on, return true
             clearTimeout(timeout);
             new_tail.unwatch();
-            callback(null, true);
+            return callback(null, true);
           }
           var match = data.match(/INFO]: Turned on world auto-saving/);
           if (match) { //previously off, return false
@@ -1486,7 +1486,7 @@ mineos.mc = function(server_name, base_dir) {
             new_tail.unwatch();
 
             self.stuff('save-off', function() { //reset initial state
-              callback(null, false); //return initial state
+              return callback(null, false); //return initial state
             });
           }
         })
