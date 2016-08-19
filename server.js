@@ -1540,7 +1540,12 @@ function check_profiles(base_dir, callback) {
           for (var r in objects) {
             var item = new profile_template();
             var ref_obj = objects[r];
-            var version = ref_obj.version.match(/[\d+]\.[\d+]\.[\d+]/)[0];
+            try {
+              var version = ref_obj.version.match(/[\d+]\.[\d+]\.[\d+]/)[0];
+            } catch (e) {
+              continue;
+            }
+            
 
             item['id'] = ref_obj['version'];
             item['group'] = 'mianite';
