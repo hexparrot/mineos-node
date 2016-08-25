@@ -1,5 +1,5 @@
 {
-  "WEBSITE_TITLE": "MineOS Interface Utilisateur Web",
+  "WEBSITE_TITLE": "MineOS : Interface utilisateur Web",
   "NOTIFICATIONS": "Notifications",
   "REFRESH_SERVER_LIST": "Actualiser la liste des serveurs",
   "REFRESH_PROFILE_LIST": "Actualiser la liste des profils",
@@ -52,7 +52,7 @@
   "OFFICIAL_MOJANG_SERVER_JARS": "Jars officiels de Mojang",
   "AVAILABLE_SERVER_JARS": "Jars/Packs disponibles",
   "IDENTIFIER": "ID",
-  "RELEASE_TIMESTAMP": "Horodatagede sortie",
+  "RELEASE_TIMESTAMP": "Date de sortie",
   "RELEASE_TYPE": "Type de sortie",
   "RELEASE": "Stable",
   "OLD_VERSION": "Ancienne version",
@@ -65,10 +65,10 @@
   "DOWNLOADED": "Téléchargé",
 
   "SPIGOT_CRAFTBUKKIT": "Spigot / Craftbukkit",
-  "BUILDTOOLS_INSTRUCTIONS": "Téléchargez le dernier fichier jar du constructeur (BuildTools) puis sélectionnez la version Minecraft pour compiler Spigot/CraftBukkit. Une fois terminé, copiez le fichier jar compilé dans un serveur. Votre serveur n'aura pas besoin d'un profil.",
+  "BUILDTOOLS_INSTRUCTIONS": "Téléchargez le dernier fichier JAR du constructeur (BuildTools) puis sélectionnez la version Minecraft pour compiler Spigot/CraftBukkit. Une fois terminé, copiez le fichier jar compilé dans un serveur. Votre serveur n'aura pas besoin de profil.",
   "DOWNLOAD_BUILDTOOLS": "Télécharger le dernier BuildTools.jar",
   "DOWNLOAD_PAPERTOOLS": "Télécharger le dernier PaperTools.jar",
-  "BUILD_JAR": "Construire le fichier jar",
+  "BUILD_JAR": "Construire le fichier JAR",
   "BUILD_SPIGOT": "Construire Spigot",
   "BUILD_PAPER": "Construire PaperSpigot",
   "OUTPUT_FROM_BUILDTOOLS": "Sortie de BuildTools.jar",
@@ -76,21 +76,21 @@
   "COPY_TO_SERVER": "Copier dans le serveur",
 
   "GLANCE": "Coup d'oeil sur les serveurs",
-  "INVALID_SERVER_NAME": "Server may contain only letters, numbers and underscores. This server cannot be managed with MineOS without being renamed.",
-  "LOG_TAILING_RATE_LIMITED": "The server has been generating logs beyond the rate-limit threshold. Log tailing has stopped and can be re-enabled by refreshing the webui.",
+  "INVALID_SERVER_NAME": "Le nom du serveur ne peut contenir que des lettres, chiffres et caractères de soulignement (underscore). Ce serveur ne peut pas être géré avec MineOS sans être renommé correctement.",
+  "LOG_TAILING_RATE_LIMITED": "Le serveur a généré trop de logs dans un temps limité. Le suivi des logs est arrêté et peut être réactivé par l'actualisation de l'interface web.",
   "VERSION": "Version",
   "REPORTED_VERSION": "Version (ping)",
   "MEMORY_FOOTPRINT": "Empreinte mémoire",
 
   "SERVER_ACTIONS": "Actions sur le serveur",
   "START": "Démarrer",
-  "STOP": "Arrêtez",
+  "STOP": "Arrêter",
   "RESTART": "Redémarrer",
-  "STOP_AND_BACKUP": "Arrêtez et faire une sauvegarde",
+  "STOP_AND_BACKUP": "Arrêter et faire une sauvegarde",
   "KILL": "Tuer",
   "BROADCAST_TO_LAN": "Diffuser sur le réseau local (LAN)",
   "START_ON_BOOT": "Démarrer le serveur à l'amorçage",
-  "UNCONVENTIONAL_SERVER": "Ceci ne est pas un serveur Minecraft conventionnel",
+  "UNCONVENTIONAL_SERVER": "Ceci n'est pas un serveur Minecraft conventionnel",
   "COPY_PROFILE": "Copier le profil dans les fichiers du serveur",
   "COMMIT_INTERVAL": "Minutes entre la sauvegarde du monde via « save-all » (vide pour désactiver)",
 
@@ -103,7 +103,7 @@
   "CHANGE_PROFILE_TO": "Changer le profil :",
   "CHANGE_JARFILE_TO": "Changer le fichier jar éxécuté :",
   "ADDITIONAL_JAVA_ARGS": "Arguments Java additionnels :",
-  "ADDITIONAL_JAR_ARGS": "Arguments Jar additionnels :",
+  "ADDITIONAL_JAR_ARGS": "Arguments JAR additionnels :",
 
   "MOST_RECENT_RESTORE_POINT": "Point de restauration le plus récent ",
   "OLDEST_RESTORE_POINT": "Point de restauration le plus ancien ",
@@ -120,7 +120,7 @@
   "ARCHIVE_CREATED": "Archive créé",
   "ARCHIVE_FAILED": "Tentative d'archive échouée",
   "CREATE_NEW_ARCHIVE": "Créer une nouvelle archive",
-  "COMMIT_THEN_CREATE_ARCHIVE": "save-all then create archive",
+  "COMMIT_THEN_CREATE_ARCHIVE": "« save-all » puis créer une archive",
 
   "OWNERSHIP_AND_DISK_USAGE": "Propriétaire et utilisation du disque",
   "SERVER_OWNER": "Propriétaire du serveur ",
@@ -159,9 +159,9 @@
 
   "CREDITS": "MineOS est créé et maintenu par William Dizon",
 
-  "CHANGE_LOCALE": "Changer de localisation",
+  "CHANGE_LOCALE": "Changer de langue",
 
-  "EULA_DETECTED": "Minecraft EULA",
+  "EULA_DETECTED": "CGU Minecraft (EULA)",
   "EULA_MUST_BE_ACCEPTED": "Mojang à besoin que l'administrateur du serveur accepte les conditions générales d'utilisation (CGU en français ou EULA en anglais) avant d'héberger un serveur Minecraft. Cela peut être fait en modifiant la ligne « eula=false » en « eula=true » dans le fichier eula.txt situé à la racine de votre serveur.",
   "ACCEPT_EULA": "Accepter les CGU (EULA)",
   "READ_THE_EULA": "Lire les CGU (EULA) de Minecraft",
@@ -182,5 +182,5 @@
   "up": "Le serveur doit être démarré pour effectuer cette action.",
   "!exists": "On dirait que le serveur n'existe pas.",
   "exists": "Le serveur est introuvable.",
-  "eula": "Les conditions générales d'utilisation de Mojang (Minecraft EULA) doivent être acceptées pour démarrer ce serveur."
+  "eula": "Les conditions générales d'utilisation (EULA) de Mojang doivent être acceptées pour démarrer ce serveur."
 }
