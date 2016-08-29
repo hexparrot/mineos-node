@@ -18,6 +18,10 @@ table tbody tr a, .pointer {
 	font-family:monospace;
 }
 
+.nocaps {
+    text-transform: none !important;
+}
+
 #sidebar #nav > ul > li > a {
 	cursor: pointer;
 }

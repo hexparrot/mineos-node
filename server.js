@@ -573,6 +573,7 @@ function server_container(server_name, base_dir, socket_io) {
   make_tail('logs/latest.log');
   make_tail('server.log');
   make_tail('proxy.log.0');
+  make_tail('logs/fml-server-latest.log');
 
   (function() {
     var fireworm = require('fireworm');

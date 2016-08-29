@@ -253,16 +253,16 @@
                                     <li class="accordion-group" ng-show="current && servers[current].live_logs['logs/latest.log'].length">
                                         <a ng-click="change_page('console')">
                                             <span class="icon icone-desktop"></span>
-                                            <span class="text">logs/latest.log</span>
+                                            <span class="text nocaps">logs/latest.log</span>
                                         </a>
                                     </li>
-                                    <!--/ END Menu -->                                    
+                                    <!--/ END Menu -->
 
                                     <!-- START Menu -->
                                     <li class="accordion-group" ng-show="current && servers[current].live_logs['server.log'].length">
                                         <a ng-click="change_page('console2')">
                                             <span class="icon icone-desktop"></span>
-                                            <span class="text">server.log</span>
+                                            <span class="text nocaps">server.log</span>
                                         </a>
                                     </li>
                                     <!--/ END Menu -->
@@ -271,7 +271,16 @@
                                     <li class="accordion-group" ng-show="current && servers[current].live_logs['proxy.log.0'].length">
                                         <a ng-click="change_page('console3')">
                                             <span class="icon icone-desktop"></span>
-                                            <span class="text">proxy.log.0</span>
+                                            <span class="text nocaps">proxy.log.0</span>
+                                        </a>
+                                    </li>
+                                    <!--/ END Menu -->
+
+                                    <!-- START Menu -->
+                                    <li class="accordion-group" ng-show="current && servers[current].live_logs['logs/fml-server-latest.log'].length">
+                                        <a ng-click="change_page('console4')">
+                                            <span class="icon icone-desktop"></span>
+                                            <span class="text nocaps">logs/fml-server-latest.log</span>
                                         </a>
                                     </li>
                                     <!--/ END Menu -->
@@ -1579,6 +1588,34 @@
                             </div>
                         </div>
 
+                    </div>
+                    <!--/ END Row -->
+                </div>
+                <!--/ END Content -->
+
+                <!-- START Content - CONSOLE3 -->
+                <div class="container-fluid" ng-show="page == 'console4'">
+
+                    <!-- START Row -->
+                    <div class="row-fluid">
+                        <!-- START Basic Table -->
+                        <div class="console span12 widget dark">
+                            <header>
+                                <h4 class="title">logs/fml-server-latest.log</h4>
+                            </header>
+                            <section class="body">
+                                <div class="body-inner console-inner no-padding" sticky-console>
+                                    <table class="table">
+                                        <tbody>
+                                            <tr ng-repeat="line in servers[current].live_logs['logs/fml-server-latest.log'] track by $index">
+                                                <td ng-bind-html="line | colorize"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+                        <!--/ END Basic Table -->
                     </div>
                     <!--/ END Row -->
                 </div>
