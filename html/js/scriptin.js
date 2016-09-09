@@ -747,14 +747,15 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
     me.live_logs = {};
     me.notices = {};
     me.latest_notice = {};
-    me.AUTO_RATE_THRESHOLD_PER_SECOND = 65;
+    me.AUTO_RATE_THRESHOLD_PER_SECOND = 80;
+    me.AUTO_RATE_SUSTAINED_DURATION = 2; //how long (in seconds) must rate be sustained to trigger
     me.auto_rate_counter = 0;
     me.auto_rate_interval = setInterval(function() {
-      if (me.auto_rate_counter > me.AUTO_RATE_THRESHOLD_PER_SECOND)
+      if (me.auto_rate_counter * me.AUTO_RATE_SUSTAINED_DURATION > me.AUTO_RATE_THRESHOLD_PER_SECOND * me.AUTO_RATE_SUSTAINED_DURATION)
         me.auto_rate_interval = null;
       else
         me.auto_rate_counter = 0;
-    }, 1000);
+    }, 1000 * me.AUTO_RATE_SUSTAINED_DURATION);
 
     me.channel.on(server_name, 'heartbeat', function(data) {
       var previous_state = me.heartbeat;
