@@ -39,7 +39,7 @@
   "LOAD_AVERAGES": "Усредненные нагрузки",
   "SERVER": "Сервер",
   "TYPE": "Тип",
-  "PORT": "Прот",
+  "PORT": "Порт",
   "STATUS": "Статус",
   "MEMORY": "Память",
   "UP": "Вверх",
@@ -50,7 +50,7 @@
   "UNCONVENTIONAL_SERVER_TYPE": "Это не шаблонный сервер, например, прокси-сервер или сервер распределения нагрузки.", 
 
   "OFFICIAL_MOJANG_SERVER_JARS": "Официальные серверные Jar-файлы от Mojang",
-  "AVAILABLE_SERVER_JARS": "Доступные серверные Jars-файлы/Сборки",
+  "AVAILABLE_SERVER_JARS": "Доступные серверные Jar-файлы/Сборки",
   "IDENTIFIER": "Код",
   "RELEASE_TIMESTAMP": "Время выпуска",
   "RELEASE_TYPE": "Тип Выпуска",
@@ -105,7 +105,7 @@
 
   "MOST_RECENT_RESTORE_POINT": "Последняя точка восстановления",
   "OLDEST_RESTORE_POINT": "Самая ранняя точка восстановления",
-  "SPACE_USED_RESTORES": "Размер всех точеек востановления",
+  "SPACE_USED_RESTORES": "Размер всех точек воcстановления",
   "SUCCESS": "успешно",
   "RESTORE_POINT_CREATED": "Точка восстановления создана",
   "FAILURE": "О нет!",
