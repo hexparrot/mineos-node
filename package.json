@@ -32,7 +32,7 @@
     "procfs-stats": "1.0.x",
     "whoami": "0.0.x",
     "userid": "0.2.x",
-    "express": "3.21.x",
+    "express": "4.0.x",
     "socket.io": "1.5.x",
     "du": "0.1.x",
     "body-parser": "1.14.x",
