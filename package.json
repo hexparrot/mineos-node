@@ -45,7 +45,7 @@
     "cron": "1.1.x",
     "object-hash": "1.1.x",
     "tmp": "0.0.x",
-    "request": "2.67.x",
+    "request": "2.74.0",
     "rsync": "0.4.x",
     "etc-passwd": "0.1.x",
     "xml2js": "0.4.x",
