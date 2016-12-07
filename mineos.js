@@ -29,16 +29,25 @@ mineos.SP_DEFAULTS = {
   'enable-query': 'false'
 }
 
-var PROC_PATH = null;
+var proc_paths = [
+  '/proc',
+  '/usr/compat/linux/proc',
+  '/system/lxproc'
+]
 
-try {
-  fs.statSync('/proc/uptime');
-  PROC_PATH = '/proc';
-} catch (e) {
-  try {
-    fs.statSync('/usr/compat/linux/proc/uptime');
-    PROC_PATH = '/usr/compat/linux/proc';
-  } catch (e) {}
+var PROC_PATH = null;
+var proc;
+
+for (proc in proc_paths) {
+  if (proc_paths.hasOwnProperty(proc)) {
+    try {
+      fs.statSync(proc_paths[proc] + '/uptime');
+      PROC_PATH = proc_paths[proc];
+      break;
+    } catch (e) {
+      continue;
+    }
+  }
 }
 
 mineos.server_list = function(base_dir) {
