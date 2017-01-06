@@ -1341,7 +1341,7 @@ function check_profiles(base_dir, callback) {
                   new_item['webui_desc'] = ref_obj['name'];
                   new_item['weight'] = 3;
                   new_item['filename'] = ref_obj['serverPack'];
-                  new_item['url'] = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(ref_obj.dir, ref_obj.version.replace(/\./g, '_'), ref_obj.serverPack);
+                  new_item['url'] = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(ref_obj.dir, old_versions[idx].replace(/\./g, '_'), ref_obj.serverPack);
                   new_item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], new_item.id, new_item.filename));
                   new_item['version'] = ref_obj['mcVersion'];
                   new_item['release_version'] = old_versions[idx];
