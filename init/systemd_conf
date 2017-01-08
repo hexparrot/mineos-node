@@ -6,6 +6,7 @@ After=network.target
 User=root
 WorkingDirectory=/usr/games/minecraft
 Type=forking
+Environment="SHELL=/bin/bash"
 ExecStart=/usr/bin/node service.js start
 ExecStop=/usr/bin/node service.js stop
 ExecReload=/usr/bin/node service.js restart
