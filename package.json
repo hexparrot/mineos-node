@@ -50,6 +50,7 @@
     "etc-passwd": "0.1.x",
     "xml2js": "0.4.x",
     "unzip": "0.1.x",
+    "adm-zip": "0.4.x",
     "line-by-line": "0.1.x",
     "passport": "0.3.x",
     "passport-local": "1.0.x",
@@ -72,7 +73,8 @@
     "node-getopt": "0.2.x",
     "chownr": "1.0.x",
     "angular-sanitize": "1.5.x",
-    "mcquery": "0.2.x"
+    "mcquery": "0.2.x",
+    "adm-zip": "0.4.x"
   },
   "devDependencies": {
     "nodeunit": "0.9.x"

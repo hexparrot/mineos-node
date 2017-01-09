@@ -1768,9 +1768,16 @@ function download_profiles(base_dir, args, progress_update_fn, callback) {
                 args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
 
                 fs.createReadStream(dest_filepath)
-                  .pipe(unzip.Extract({ path: dest_dir }).on('close', function() {
-                    inner_callback(args);
-                  }));
+                  .pipe(unzip.Extract({ path: dest_dir })
+                          .on('close', function() { inner_callback(args); })
+                          .on('error', function() {
+                            logging.error('Unzip error occurred, falling back to adm-zip');
+                            var admzip = require('adm-zip');
+                            var zip = new admzip(dest_filepath); 
+                            zip.extractAllTo(dest_dir, true); //true => overwrite
+                            inner_callback(args);
+                          })
+                       );
               } else {
                 logging.error('[WEBUI] Server was unable to download file:', url);
                 logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
@@ -1811,9 +1818,16 @@ function download_profiles(base_dir, args, progress_update_fn, callback) {
                 args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
 
                 fs.createReadStream(dest_filepath)
-                  .pipe(unzip.Extract({ path: dest_dir }).on('close', function() {
-                    inner_callback(args);
-                  }));
+                  .pipe(unzip.Extract({ path: dest_dir })
+                          .on('close', function() { inner_callback(args); })
+                          .on('error', function() {
+                            logging.error('Unzip error occurred, falling back to adm-zip');
+                            var admzip = require('adm-zip');
+                            var zip = new admzip(dest_filepath);
+                            zip.extractAllTo(dest_dir, true); //true => overwrite
+                            inner_callback(args);
+                          })
+                       );
               } else {
                 logging.error('[WEBUI] Server was unable to download file:', url);
                 logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
@@ -1854,9 +1868,16 @@ function download_profiles(base_dir, args, progress_update_fn, callback) {
                 args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
 
                 fs.createReadStream(dest_filepath)
-                  .pipe(unzip.Extract({ path: dest_dir }).on('close', function() {
-                    inner_callback(args);
-                  }));
+                  .pipe(unzip.Extract({ path: dest_dir })
+                          .on('close', function() { inner_callback(args); })
+                          .on('error', function() {
+                            logging.error('Unzip error occurred, falling back to adm-zip');
+                            var admzip = require('adm-zip');
+                            var zip = new admzip(dest_filepath);
+                            zip.extractAllTo(dest_dir, true); //true => overwrite
+                            inner_callback(args);
+                          })
+                       );
               } else {
                 logging.error('[WEBUI] Server was unable to download file:', url);
                 logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
