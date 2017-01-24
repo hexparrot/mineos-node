@@ -38,7 +38,11 @@ try {
   try {
     fs.statSync('/usr/compat/linux/proc/uptime');
     PROC_PATH = '/usr/compat/linux/proc';
-  } catch (e) {}
+  } catch (e) {
+      try {
+          PROC_PATH = '/proc';
+      } catch (e) {}
+  }
 }
 
 mineos.server_list = function(base_dir) {
