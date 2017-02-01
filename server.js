@@ -577,7 +577,13 @@ function server_container(server_name, base_dir, socket_io) {
 
   (function() {
     var fireworm = require('fireworm');
-    var fw = fireworm(instance.env.cwd, {skipDirEntryPatterns: ['world', 'dynmap', 'plugins', 'web', 'logs', 'region', 'playerdata', 'stats', 'data']});
+
+    var skip_dirs = fs.readdirSync(instance.env.cwd).filter(function(p) {
+      return fs.statSync(path.join(instance.env.cwd, p)).isDirectory();
+    });
+    logging.info('[{0}] Using skipDirEntryPatterns: {1}'.format(server_name, skip_dirs));
+
+    var fw = fireworm(instance.env.cwd, {skipDirEntryPatterns: skip_dirs});
 
     fw.add('**/server.properties');
     fw.add('**/server.config');
