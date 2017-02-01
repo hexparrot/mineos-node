@@ -581,6 +581,12 @@ function server_container(server_name, base_dir, socket_io) {
     var skip_dirs = fs.readdirSync(instance.env.cwd).filter(function(p) {
       return fs.statSync(path.join(instance.env.cwd, p)).isDirectory();
     });
+
+    var default_skips = ['world', 'world_the_end', 'world_nether', 'dynmap', 'plugins', 'web', 'logs', 'region', 'playerdata', 'stats', 'data'];
+    for (var i in default_skips)
+      if (skip_dirs.indexOf(default_skips[i]) == -1)
+        skip_dirs.push(default_skips[i]);
+
     logging.info('[{0}] Using skipDirEntryPatterns: {1}'.format(server_name, skip_dirs));
 
     var fw = fireworm(instance.env.cwd, {skipDirEntryPatterns: skip_dirs});
