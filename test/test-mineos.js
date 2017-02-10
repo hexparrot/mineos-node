@@ -1195,6 +1195,21 @@ test.properties = function(test) {
           callback(err);
         })
       }, 200)
+    },
+    function(callback) {
+      instance.property('FTBInstall.sh', function(err, retval) {
+        test.ifError(err);
+        test.equal(retval, false);
+        callback(err);
+      }) //part 1/3
+    },
+    async.apply(fs.outputFile, path.join(instance.env.cwd, 'FTBInstall.sh'), "\n"), //part 2/3
+    function(callback) {
+      instance.property('FTBInstall.sh', function(err, retval) {
+        test.ifError(err);
+        test.equal(retval, true);
+        callback(err);
+      }) //part 3/3
     }
   ], function(err) {
     test.ifError(err);

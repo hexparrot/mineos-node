@@ -1493,6 +1493,11 @@ mineos.mc = function(server_name, base_dir) {
 
         self.stuff('save-on');
         break;
+      case 'FTBInstall.sh':
+        fs.stat(path.join(self.env.cwd, 'FTBInstall.sh'), function(err, stat_data) {
+          callback(null, !!stat_data);
+        })
+        break;
       default:
         callback(true, undefined);
         break;
