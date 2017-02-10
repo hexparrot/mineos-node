@@ -908,9 +908,6 @@
                                                                        ng-disabled="!servers[current].heartbeat.up"></a></li>
                                                                 <li><a href="#" translate="STOP_AND_BACKUP"
                                                                        ng-click="server_command('stop_and_backup')"></a></li>
-                                                                <li><a href="#" translate=""
-                                                                       ng-click="server_command('run_installer')"
-                                                                       ng-disabled="!servers[current].heartbeat.up">FTBInstall.sh</a></li>
                                                                 <li><a href="#" translate="RESTART"
                                                                        ng-click="server_command('restart')"></a></li>
                                                                 <li><a href="#" translate="KILL" 
@@ -940,6 +937,7 @@
                                                         </div>
                                                         <div class="controls">
                                                             <button class="btn btn-default" ng-click="server_command('copy_profile')" translate="COPY_PROFILE"></button>
+                                                            <button class="btn btn-default" ng-click="server_command('run_installer')" ng-hide="!servers[current].page_data.glance.ftb_installer">FTBInstall.sh</button>
                                                         </div>
                                                     </div><!--/ Select -->
                                                     <label class="checkbox">
