@@ -1732,6 +1732,27 @@ mineos.mc = function(server_name, base_dir) {
     ], callback)
   }
 
+  self.run_installer = function(callback) {
+    var args = ['FTBInstall.sh'];
+    var params = { cwd: self.env.cwd };
+
+    async.waterfall([
+      async.apply(self.verify, 'exists'),
+      async.apply(self.verify, '!up'),
+      async.apply(self.property, 'owner'),
+      function(owner, cb) {
+        params['uid'] = owner['uid'];
+        params['gid'] = owner['gid'];
+        cb();
+      },
+      async.apply(which, 'sh'),
+      function(binary, cb) {
+        var proc = child_process.spawn(binary, args, params);
+        proc.once('close', cb);
+      }
+    ], callback)
+  }
+
   return self;
 }
 

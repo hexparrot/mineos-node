@@ -2819,3 +2819,21 @@ test.create_unconventional_server = function(test) {
     test.done();
   })
 }
+
+test.run_installer = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(fs.outputFile, path.join(instance.env.cwd, 'FTBInstall.sh'), '#!/bin/sh\ntouch worked.txt'),
+    async.apply(instance.run_installer),
+    function(callback) {
+      test.equal(fs.existsSync(path.join(instance.env.cwd, 'worked.txt')), true);
+      callback(null);
+    }
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
