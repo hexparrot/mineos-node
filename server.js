@@ -873,7 +873,8 @@ function server_container(server_name, base_dir, socket_io) {
       logging.info('[{0}] Watching for file generation: {1}'.format(server_name, rel_filepath));
       
       var fireworm = require('fireworm');
-      var fw = fireworm(instance.env.cwd, {skipDirEntryPatterns: ['world', 'dynmap', 'web', 'plugins']});
+      var default_skips = ['world', 'world_the_end', 'world_nether', 'dynmap', 'plugins', 'web', 'region', 'playerdata', 'stats', 'data'];
+      var fw = fireworm(instance.env.cwd, {skipDirEntryPatterns: default_skips});
 
       fw.add('**/{0}'.format(rel_filepath));
       fw.on('add', function(fp) {
