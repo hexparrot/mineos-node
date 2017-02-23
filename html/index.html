@@ -937,6 +937,7 @@
                                                         </div>
                                                         <div class="controls">
                                                             <button class="btn btn-default" ng-click="server_command('copy_profile')" translate="COPY_PROFILE"></button>
+                                                            <button class="btn btn-default" ng-click="server_command('run_installer')" ng-hide="!servers[current].page_data.glance.ftb_installer">FTBInstall.sh</button>
                                                         </div>
                                                     </div><!--/ Select -->
                                                     <label class="checkbox">

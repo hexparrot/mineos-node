@@ -1493,6 +1493,11 @@ mineos.mc = function(server_name, base_dir) {
 
         self.stuff('save-on');
         break;
+      case 'FTBInstall.sh':
+        fs.stat(path.join(self.env.cwd, 'FTBInstall.sh'), function(err, stat_data) {
+          callback(null, !!stat_data);
+        })
+        break;
       default:
         callback(true, undefined);
         break;
@@ -1728,6 +1733,27 @@ mineos.mc = function(server_name, base_dir) {
             async.apply(chownr, self.env.awd, stat_info.uid, stat_info.gid),
           ], cb)
         })
+      }
+    ], callback)
+  }
+
+  self.run_installer = function(callback) {
+    var args = ['FTBInstall.sh'];
+    var params = { cwd: self.env.cwd };
+
+    async.waterfall([
+      async.apply(self.verify, 'exists'),
+      async.apply(self.verify, '!up'),
+      async.apply(self.property, 'owner'),
+      function(owner, cb) {
+        params['uid'] = owner['uid'];
+        params['gid'] = owner['gid'];
+        cb();
+      },
+      async.apply(which, 'sh'),
+      function(binary, cb) {
+        var proc = child_process.spawn(binary, args, params);
+        proc.once('close', cb);
       }
     ], callback)
   }

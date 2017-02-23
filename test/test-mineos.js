@@ -1195,6 +1195,21 @@ test.properties = function(test) {
           callback(err);
         })
       }, 200)
+    },
+    function(callback) {
+      instance.property('FTBInstall.sh', function(err, retval) {
+        test.ifError(err);
+        test.equal(retval, false);
+        callback(err);
+      }) //part 1/3
+    },
+    async.apply(fs.outputFile, path.join(instance.env.cwd, 'FTBInstall.sh'), "\n"), //part 2/3
+    function(callback) {
+      instance.property('FTBInstall.sh', function(err, retval) {
+        test.ifError(err);
+        test.equal(retval, true);
+        callback(err);
+      }) //part 3/3
     }
   ], function(err) {
     test.ifError(err);
@@ -2813,6 +2828,24 @@ test.create_unconventional_server = function(test) {
         test.ifError(!err);
         callback(!err);
       })
+    }
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
+test.run_installer = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(fs.outputFile, path.join(instance.env.cwd, 'FTBInstall.sh'), '#!/bin/sh\ntouch worked.txt'),
+    async.apply(instance.run_installer),
+    function(callback) {
+      test.equal(fs.existsSync(path.join(instance.env.cwd, 'worked.txt')), true);
+      callback(null);
     }
   ], function(err) {
     test.ifError(err);
