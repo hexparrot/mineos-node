@@ -1474,6 +1474,84 @@ function check_profiles(base_dir, callback) {
       }
       request({ url: FORGE_VERSIONS_URL, json: true }, handle_reply);
     },
+    paperspigot: function(callback) {
+      var p = [];
+
+      var item = {};
+
+      item['id'] = 'paperspigot-latest';
+      item['time'] = new Date().getTime();
+      item['releaseTime'] = new Date().getTime();
+      item['type'] = 'release';
+      item['group'] = 'paperspigot';
+      item['webui_desc'] = 'Latest paperclip release';
+      item['weight'] = 0;
+      item['filename'] = 'paperclip.jar';
+      item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, item.filename));
+      item['version'] = 0;
+      item['release_version'] = '';
+      item['url'] = 'https://ci.destroystokyo.com/job/PaperSpigot/lastSuccessfulBuild/artifact/paperclip.jar';
+      p.push(JSON.parse(JSON.stringify(item)));
+
+      item['version'] = '1072';
+      item['id'] = 'paperspigot-{0}'.format(item.version);
+      item['time'] = new Date().getTime();
+      item['releaseTime'] = new Date().getTime();
+      item['type'] = 'release';
+      item['group'] = 'paperspigot';
+      item['release_version'] = '1.11.2';
+      item['webui_desc'] = 'Paperclip build {0} (mc version: {1})'.format(item.version, item['release_version']);
+      item['weight'] = 0;
+      item['filename'] = 'paperclip.jar';
+      item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, item.filename));
+      item['url'] = 'https://ci.destroystokyo.com/job/PaperSpigot/{0}/artifact/paperclip.jar'.format(item.version);
+      p.push(JSON.parse(JSON.stringify(item)));
+
+      item['version'] = '916';
+      item['id'] = 'paperspigot-{0}'.format(item.version);
+      item['time'] = new Date().getTime();
+      item['releaseTime'] = new Date().getTime();
+      item['type'] = 'release';
+      item['group'] = 'paperspigot';
+      item['release_version'] = '1.10.2';
+      item['webui_desc'] = 'Paperclip build {0} (mc version: {1})'.format(item.version, item['release_version']);
+      item['weight'] = 0;
+      item['filename'] = 'paperclip.jar';
+      item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, item.filename));
+      item['url'] = 'https://ci.destroystokyo.com/job/PaperSpigot/{0}/artifact/paperclip.jar'.format(item.version);
+      p.push(JSON.parse(JSON.stringify(item)));
+
+      item['version'] = '773';
+      item['id'] = 'paperspigot-{0}'.format(item.version);
+      item['time'] = new Date().getTime();
+      item['releaseTime'] = new Date().getTime();
+      item['type'] = 'release';
+      item['group'] = 'paperspigot';
+      item['release_version'] = '1.9.4';
+      item['webui_desc'] = 'Paperclip build {0} (mc version: {1})'.format(item.version, item['release_version']);
+      item['weight'] = 0;
+      item['filename'] = 'paperclip.jar';
+      item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, item.filename));
+      item['url'] = 'https://ci.destroystokyo.com/job/PaperSpigot/{0}/artifact/paperclip.jar'.format(item.version);
+      p.push(JSON.parse(JSON.stringify(item)));
+
+      item['version'] = '443';
+      item['id'] = 'paperspigot-{0}'.format(item.version);
+      item['time'] = new Date().getTime();
+      item['releaseTime'] = new Date().getTime();
+      item['type'] = 'release';
+      item['group'] = 'paperspigot';
+      item['release_version'] = '1.8.8';
+      item['webui_desc'] = 'Paperclip build {0} (mc version: {1})'.format(item.version, item['release_version']);
+      item['weight'] = 0;
+      item['filename'] = 'paperclip.jar';
+      item['downloaded'] = fs.existsSync(path.join(base_dir, mineos.DIRS['profiles'], item.id, item.filename));
+      item['url'] = 'https://ci.destroystokyo.com/job/PaperSpigot/{0}/artifact/Paperclip.jar'.format(item.version);
+      //uppercase Paperclip.jar for some reason (old convention, perhaps)
+      p.push(JSON.parse(JSON.stringify(item)));
+
+      callback(null, p);
+    },
     spigot: function(callback) {
       var p = [];
 
@@ -1883,6 +1961,46 @@ function download_profiles(base_dir, args, progress_update_fn, callback) {
       });
     },
     forge: function(inner_callback) {
+      var dest_dir = path.join(base_dir, 'profiles', args.id);
+      var dest_filepath = path.join(dest_dir, args.filename);
+
+      var url = args.url;
+
+      fs.ensureDir(dest_dir, function(err) {
+        if (err) {
+          logging.error('[WEBUI] Error attempting download:', err);
+        } else {
+          progress(request(url), {
+            throttle: 1000,
+            delay: 100
+          })
+            .on('complete', function(response) {
+              if (response.statusCode == 200) {
+                logging.log('[WEBUI] Successfully downloaded {0} to {1}'.format(url, dest_filepath));
+                args['dest_dir'] = dest_dir;
+                args['success'] = true;
+                args['progress']['percent'] = 100;
+                args['help_text'] = 'Successfully downloaded {0} to {1}'.format(url, dest_filepath);
+                args['suppress_popup'] = false;
+                inner_callback(args);
+              } else {
+                logging.error('[WEBUI] Server was unable to download file:', url);
+                logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                args['success'] = false;
+                args['help_text'] = 'Remote server did not return {0} (status {1})'.format(args.filename, response.statusCode);
+                args['suppress_popup'] = false;
+                inner_callback(args);
+              }
+            })
+            .on('progress', function(state) {
+              args['progress'] = state;
+              progress_update_fn(args);
+            })
+            .pipe(fs.createWriteStream(dest_filepath))
+        }
+      });
+    },
+    paperspigot: function(inner_callback) {
       var dest_dir = path.join(base_dir, 'profiles', args.id);
       var dest_filepath = path.join(dest_dir, args.filename);
 
