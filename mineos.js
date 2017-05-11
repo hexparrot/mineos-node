@@ -36,18 +36,13 @@ var proc_paths = [
 ]
 
 var PROC_PATH = null;
-var proc;
 
-for (proc in proc_paths) {
-  if (proc_paths.hasOwnProperty(proc)) {
-    try {
-      fs.statSync(proc_paths[proc] + '/uptime');
-      PROC_PATH = proc_paths[proc];
-      break;
-    } catch (e) {
-      continue;
-    }
-  }
+for (var proc in proc_paths) {
+  try {
+    fs.statSync(path.join(proc_paths[proc], 'uptime'));
+    PROC_PATH = proc_paths[proc];
+    break;
+  } catch (e) {}
 }
 
 mineos.server_list = function(base_dir) {
