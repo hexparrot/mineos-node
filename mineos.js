@@ -29,15 +29,19 @@ mineos.SP_DEFAULTS = {
   'enable-query': 'false'
 }
 
+var proc_paths = [
+  '/proc',
+  '/usr/compat/linux/proc',
+  '/system/lxproc'
+]
+
 var PROC_PATH = null;
 
-try {
-  fs.statSync('/proc/uptime');
-  PROC_PATH = '/proc';
-} catch (e) {
+for (var proc in proc_paths) {
   try {
-    fs.statSync('/usr/compat/linux/proc/uptime');
-    PROC_PATH = '/usr/compat/linux/proc';
+    fs.statSync(path.join(proc_paths[proc], 'uptime'));
+    PROC_PATH = proc_paths[proc];
+    break;
   } catch (e) {}
 }
 
