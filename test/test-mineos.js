@@ -2852,3 +2852,56 @@ test.run_installer = function(test) {
     test.done();
   })
 }
+
+test.renice = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    function(callback) {
+      instance.renice(5, function(err) {
+        test.ok(err); //looking for positive error
+        callback(!err);
+      })
+    },
+    async.apply(instance.create, OWNER_CREDS),
+    function(callback) {
+      instance.renice(5, function(err) {
+        test.ok(err); //looking for positive error
+        callback(!err);
+      })
+    },
+    async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
+    async.apply(instance.copy_profile),
+    async.apply(instance.start),
+    function(callback) {
+      setTimeout(callback, 20000);
+    },
+    function(callback) {
+      instance.renice(5, function(err) {
+        test.ifError(err);
+        callback(err);
+      })
+    },
+    function(callback) {
+      var nice_matches = false;
+
+      instance.property('java_pid', function(err, pid) {
+        var child_process = require('child_process');
+        var ps = child_process.spawn('ps', ['-p', pid, '-o', 'ni']);
+        ps.stdout.on('data', function(data) {
+          var second_line = parseInt(data.toString().split('\n')[1]);
+          test.equal(5, second_line)
+        })
+        ps.on('exit', callback);
+      })
+    },
+    async.apply(instance.kill)
+  ], function(err) {
+    test.ifError(err);
+    test.expect(5);
+    test.done();
+  })
+}
+

@@ -1762,6 +1762,35 @@ mineos.mc = function(server_name, base_dir) {
     ], callback)
   }
 
+  self.renice = function(niceness, callback) {
+    var binary = null;
+    var params = { cwd: self.env.cwd };
+
+    async.waterfall([
+      async.apply(self.verify, 'exists'),
+      async.apply(self.verify, 'up'),
+      async.apply(self.property, 'owner'),
+      function(owner, cb) {
+        params['uid'] = owner['uid'];
+        params['gid'] = owner['gid'];
+        cb();
+      },
+      async.apply(which, 'renice'),
+      function(bin, cb) {
+        binary = bin;
+        cb();
+      },
+      async.apply(self.property, 'java_pid')
+    ], function(err, pid) {
+      if (!err) {
+        var proc = child_process.spawn(binary, ["-n", niceness, "-p", pid], params);
+        proc.once('close', callback);
+      } else {
+        callback(true);
+      }
+    })
+  }
+
   return self;
 }
 
