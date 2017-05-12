@@ -966,7 +966,7 @@
                                         <div class="span6 widget">
                                             <header>
                                                  <h4 class="title"><span class="icon icone-ticket"></span>{{ 'JAVA_SETTINGS' | translate }}</h4>
-                                                 <span class="badge badge-success pull-right" ng-click="modals.open_modal_niceness()" >{{ servers[current].niceness }}</span>
+                                                 <span class="badge pull-right" ng-click="modals.open_modal_niceness()" ng-class="{'badge-important': servers[current].niceness < 0, 'badge-success': servers[current].niceness == 0, 'badge-warning': servers[current].niceness > 0}">{{ servers[current].niceness }}</span>
                                             </header>
                                             <section class="body">
                                                 <div class="body-inner">
