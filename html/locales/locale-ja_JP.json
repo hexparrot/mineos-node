@@ -104,6 +104,8 @@
   "CHANGE_JARFILE_TO": "実行 jarを変更:",
   "ADDITIONAL_JAVA_ARGS": "追加のJava引数:",
   "ADDITIONAL_JAR_ARGS": "追加のJar引数:",
+  "CHANGE_NICENESS": "Change Process Niceness",
+  "NICENESS_DESC": "Niceness can range from -20 (highest priority scheduling) to 19 (lowest).  The default is 0.",
 
   "MOST_RECENT_RESTORE_POINT": "最新の復元ポイント",
   "OLDEST_RESTORE_POINT": "最古の復元ポイント",

@@ -964,7 +964,10 @@
 
                                         <!-- START Button Default -->
                                         <div class="span6 widget">
-                                            <header><h4 class="title"><span class="icon icone-ticket"></span>{{ 'JAVA_SETTINGS' | translate }}</h4></header>
+                                            <header>
+                                                 <h4 class="title"><span class="icon icone-ticket"></span>{{ 'JAVA_SETTINGS' | translate }}</h4>
+                                                 <span class="badge badge-success pull-right" ng-click="modals.open_modal_niceness()" >{{ servers[current].niceness }}</span>
+                                            </header>
                                             <section class="body">
                                                 <div class="body-inner">
                                                     <!-- Select -->
@@ -1833,6 +1836,29 @@
                     <button type="button" class="btn btn-success" ng-click="modals.close_copy_to_server(server_target, jar.id)" translate="COPY_TO_SERVER"></button>
                 </div>
             </div><!--/ Modal With Animation --> 
+
+            <!-- Modal With Animation -->
+            <div id="modal_niceness" class="modal hide fade">
+                <div class="modal-header">
+                    <h4 translate="CHANGE_NICENESS"></h4>
+                </div>
+                <div class="modal-body">
+                    <p translate="NICENESS_DESC"></p>
+                    <!-- Select -->
+                        <div class="control-group">
+                            <div class="controls">
+                                <input type="text"
+                                    ng-model="servers[current].niceness"
+                                    ng-change="server_command('renice', {niceness: servers[current].niceness})"
+                                    ng-model-options="{ updateOn: 'default blur', debounce: {'default': 1500, 'blur': 0} }">
+                            </div>
+                        </div>
+                    <!--/ Select -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" ng-click="modals.close_modal_niceness()" translate="">RENICE</button>
+                </div>
+            </div><!--/ Modal With Animation -->
 
             </section>
             <!--/ END Template Main Content -->
