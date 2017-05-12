@@ -102,6 +102,8 @@
   "CHANGE_JARFILE_TO": "Сменить JAR-файл:",
   "ADDITIONAL_JAVA_ARGS": "Дополнительные аргументы Java:",
   "ADDITIONAL_JAR_ARGS": "Дополнительные аргументы Jar:",
+  "CHANGE_NICENESS": "Change Process Niceness",
+  "NICENESS_DESC": "Niceness can range from -20 (highest priority scheduling) to 19 (lowest).  The default is 0.",
 
   "MOST_RECENT_RESTORE_POINT": "Последняя точка восстановления",
   "OLDEST_RESTORE_POINT": "Самая ранняя точка восстановления",

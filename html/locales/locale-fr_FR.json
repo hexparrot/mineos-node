@@ -104,6 +104,8 @@
   "CHANGE_JARFILE_TO": "Changer le fichier jar éxécuté :",
   "ADDITIONAL_JAVA_ARGS": "Arguments Java additionnels :",
   "ADDITIONAL_JAR_ARGS": "Arguments JAR additionnels :",
+  "CHANGE_NICENESS": "Change Process Niceness",
+  "NICENESS_DESC": "Niceness can range from -20 (highest priority scheduling) to 19 (lowest).  The default is 0.",
 
   "MOST_RECENT_RESTORE_POINT": "Point de restauration le plus récent ",
   "OLDEST_RESTORE_POINT": "Point de restauration le plus ancien ",
