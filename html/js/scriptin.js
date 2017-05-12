@@ -585,6 +585,12 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
         'version': $scope.jarcopy_version,
         'type': $scope.jarcopy_type
       });
+    },
+    open_modal_niceness: function() {
+      $('#modal_niceness').modal('show');
+    },
+    close_modal_niceness: function() {
+      $('#modal_niceness').modal('hide');
     }
   }
 
@@ -747,6 +753,7 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
     me.live_logs = {};
     me.notices = {};
     me.latest_notice = {};
+    me.niceness = 0;
     me.AUTO_RATE_THRESHOLD_PER_SECOND = 80;
     me.AUTO_RATE_SUSTAINED_DURATION = 2; //how long (in seconds) must rate be sustained to trigger
     me.auto_rate_counter = 0;
