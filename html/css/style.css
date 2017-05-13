@@ -383,8 +383,8 @@ form .input-icon {
 .btn:active,
 .btn.active { background-color: #eee \9; }
 .btn-primary {
-	border-color: #4272d7 #4272d7 #2552b0;
-	background-color: #4272d7;
+	border-color: #FFF #FFF #FFF;
+	background-color: #E66432;
 	background-image: none;
 	filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
 }
@@ -396,7 +396,7 @@ form .input-icon {
 .btn-primary[disabled],
 .btn-group.open .btn-primary.dropdown-toggle {
 	outline: none;
-	background-color: #507cda;
+	background-color: #E0835F;
 }
 .btn-primary:active,
 .btn-primary.active { background-color: #507cda \9; }
@@ -1417,10 +1417,11 @@ ul.check li:last-child {
 /* 1.2.1 Toolbar
 ----------------------------------------------------------------------------- */
 #header > .toolbar {
+	margin-right: 20px;
+	margin-top: 15px;
 	position: relative;
 	display: inline-block;
 	float: right;
-	margin: 0 10px;
 	min-width: 300px;
 	vertical-align: top;
 	text-align: right;
@@ -1657,14 +1658,14 @@ ul.check li:last-child {
 	text-align: center;
 }
 #header .dropdown-menu > footer > a {
-	color: #6eadc5; /* Normal */
+	color: #E66432; /* Normal */
 	-webkit-transition: color .3s ease;
 	-moz-transition: color .3s ease;
 	-ms-transition: color .3s ease;
 	-o-transition: color .3s ease;
 	transition: color .3s ease;
 }
-#header .dropdown-menu > footer > a:hover { color: #448eab; /* Dark -4 */ }
+#header .dropdown-menu > footer > a:hover { color: #E0835F; /* Dark -4 */ }
 #header .dropdown-menu > footer > .icon {
 	color: #555;
 	font-size: 14px;
@@ -1698,7 +1699,7 @@ ul.check li:last-child {
 	bottom: 0;
 	display: block;
 	width: 220px;
-	background-color: #555;
+	background-color: #23282D;
 	content: "";
 }
 .nav-open #sidebar:before {
@@ -1777,9 +1778,9 @@ ul.check li:last-child {
 #sidebar .divider {
 	position: relative;
 	padding: 0px 10px;
-	border-top: 1px solid #777;
-	border-bottom: 1px solid #4c4c4c;
-	background-color: #666;
+    border-top: 1px solid #e66432;
+    border-bottom: 1px solid #e66432;
+    background-color: #e66432;
 	-webkit-box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.1);
 	box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.1);
 	color: #eee;
@@ -2063,8 +2064,8 @@ ul.check li:last-child {
 	display: block;
 	width: 100%;
 	bottom: 0px;
-	background-color: #555;
-	color: #aaa;
+	background-color: #23282D;
+	color: #E66432;
 	padding: 8px 10px 8px 230px;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
@@ -2501,12 +2502,6 @@ ul.check li:last-child {
 .widget.teal > header > .toolbar > li > a { color: #eee; text-shadow: 0px 1px 0px rgba(0, 0, 0, 0.1); }
 .widget.teal > header > .toolbar > li > a:hover,
 .widget.teal > header > .toolbar > li.open > a { background-color: rgba(0, 0, 0, 0.1); color: #eee; }
-.widget.teal,
-.widget.teal.borderless > header { border-color: #00A0B1; }
-.widget.teal.stacked {
-	-webkit-box-shadow: 0 5px 0 -4px #fff, 0 5px 0 -3px #00A0B1, 0 11px 0 -8px #fff, 0 11px 0 -7px #00A0B1;
-	box-shadow: 0 5px 0 -4px #fff, 0 5px 0 -3px #00A0B1, 0 11px 0 -8px #fff, 0 11px 0 -7px #00A0B1;
-}
 .widget.teal > header > .nav-tabs > li > a { background-color: #00A0B1; color: #eee; }
 .widget.teal > header > .nav-tabs > .active > a { background-color: #fefefe; color: #555; }
 .widget.teal > header > .nav-tabs > li > a,
