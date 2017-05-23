@@ -1716,7 +1716,7 @@ test.stuff = function(test) {
     async.apply(instance.copy_profile),
     async.apply(instance.start),
     function(callback) {
-      setTimeout(callback, 20000);
+      setTimeout(callback, 10000);
     },
     async.apply(instance.stuff, 'op hexparrot'),
     async.apply(instance.kill)
@@ -1751,7 +1751,7 @@ test.saveall = function(test) {
     async.apply(instance.copy_profile),
     async.apply(instance.start),
     function(callback) {
-      setTimeout(callback, 20000);
+      setTimeout(callback, 10000);
     },
     function(callback) {
       var DELAY_SECONDS = 3;
@@ -1805,7 +1805,7 @@ test.saveall_latest_log = function(test) {
     },
     async.apply(instance.start),
     function(callback) {
-      setTimeout(callback, 20000);
+      setTimeout(callback, 10000);
     },
     function(callback) {
       instance.saveall_latest_log(function(err) {
@@ -1831,7 +1831,7 @@ test.property_autosave_179 = function(test) {
     async.apply(instance.copy_profile),
     async.apply(instance.start),
     function(callback) {
-      setTimeout(callback, 20000);
+      setTimeout(callback, 10000);
     },
     function(callback) {
       instance.property('autosave', function(err, autosave_enabled) {
@@ -1875,7 +1875,7 @@ test.property_autosave_1102 = function(test) {
     async.apply(instance.accept_eula),
     async.apply(instance.start),
     function(callback) {
-      setTimeout(callback, 20000);
+      setTimeout(callback, 10000);
     },
     function(callback) {
       instance.property('autosave', function(err, autosave_enabled) {
@@ -2876,7 +2876,7 @@ test.renice = function(test) {
     async.apply(instance.copy_profile),
     async.apply(instance.start),
     function(callback) {
-      setTimeout(callback, 20000);
+      setTimeout(callback, 10000);
     },
     function(callback) {
       instance.renice(5, function(err) {
