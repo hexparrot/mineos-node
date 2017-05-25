@@ -167,8 +167,9 @@
 
     <script type="text/javascript">
       $(document).ready(function () {
+        var MASK_PASSWORD = false;
         try {
-          $('input[name=password]').attr('type', 'text');
+          $('input[name=password]').attr('type', (MASK_PASSWORD ? 'password' : 'text'));
           $('input[name=hide]').on('change', function () {
             if ($(this).is(':checked'))
               $('input[name=password]').attr('type', 'password');
