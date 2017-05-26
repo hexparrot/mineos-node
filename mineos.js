@@ -4,6 +4,7 @@ var events = require('events');
 var async = require('async');
 var child_process = require('child_process');
 var which = require('which');
+var BackupSequence = require('./src/backup_sequence').BackupSequence;
 var mineos = exports;
 
 mineos.DIRS = {
@@ -987,7 +988,8 @@ mineos.mc = function(server_name, base_dir) {
     var strftime = require('strftime');
     var binary = which.sync('tar');
     var filename = 'server-{0}_{1}.tgz'.format(self.server_name, strftime('%Y-%m-%d_%H:%M:%S'));
-    var args = ['czf', path.join(self.env.awd, filename), '.'];
+    var filepath = path.join(self.env.awd, filename);
+    var args = ['czf', filepath, '.'];
 
     var params = { cwd: self.env.cwd };
 
@@ -999,11 +1001,30 @@ mineos.mc = function(server_name, base_dir) {
           cb(err);
         })
       },
-      function(cb) {
-        var proc = child_process.spawn(binary, args, params);
-        proc.once('exit', function(code) {
-          cb(code);
-        })
+      async.apply(self.verify, 'exists'),
+      function(archive_complete_cb) {
+        var log_path = path.join(self.env.cwd, 'logs/latest.log');
+
+        var do_archive = function(cb) {
+          var proc = child_process.spawn(binary, args, params);
+          proc.once('exit', cb);
+        };
+
+        var backup_sequence_complete = function(result_code) {
+          archive_complete_cb(result_code, { filename: filepath });
+        };
+
+        self.verify('up', function(err) {
+          if (err) {
+            // server is not running: just make the archive
+            do_archive(backup_sequence_complete);
+          }
+          else {
+            // server is running: ensure backup consistency by running the proper command sequence
+            var backup_sequence = new BackupSequence(self, log_path, do_archive, backup_sequence_complete);
+            backup_sequence.start();
+          }
+        });
       }
     ], callback);
   }
@@ -1061,11 +1082,30 @@ mineos.mc = function(server_name, base_dir) {
           cb(err);
         })
       },
-      function(cb) {
-        var proc = child_process.spawn(binary, args, params);
-        proc.once('exit', function(code) {
-          cb(code);
-        })
+      async.apply(self.verify, 'exists'),
+      function(backup_complete_cb) {
+        var log_path = path.join(self.env.cwd, 'logs/latest.log');
+
+        var do_backup = function(cb) {
+          var proc = child_process.spawn(binary, args, params);
+          proc.once('exit', cb);
+        };
+
+        var backup_sequence_complete = function(result_code) {
+          backup_complete_cb(result_code);
+        };
+
+        self.verify('up', function(err) {
+          if (err) {
+            // server is not running: just make the archive
+            do_backup(backup_sequence_complete);
+          }
+          else {
+            // server is running: ensure backup consistency by running the proper command sequence
+            var backup_sequence = new BackupSequence(self, log_path, do_backup, backup_sequence_complete);
+            backup_sequence.start();
+          }
+        });
       }
     ], callback)
   }
