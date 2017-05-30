@@ -84,13 +84,18 @@ server.backend = function(base_dir, socket_emitter, user_config) {
   })();
 
   (function() {
+    var procfs = require('procfs-stats');
     var HOST_HEARTBEAT_DELAY_MS = 1000;
 
     function host_heartbeat() {
-      self.front_end.emit('host_heartbeat', {
-        'uptime': os.uptime(),
-        'freemem': os.freemem(),
-        'loadavg': os.loadavg()
+      async.waterfall([
+        async.apply(procfs.meminfo)
+      ], function(err, meminfo) {
+        self.front_end.emit('host_heartbeat', {
+          'uptime': os.uptime(),
+          'freemem': meminfo['MemAvailable'] * 1024,
+          'loadavg': os.loadavg()
+        })
       })
     }
 
