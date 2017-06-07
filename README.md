@@ -16,10 +16,13 @@ MineOS is distributed through github and downloads its dependencies with npm.
 
 MineOS requires root-privileges, as the authentication relies on the underlying system's /etc/shadow.
 
-Do not install this atop an existing MineOS system, since the installation location is the same /usr/games/minecraft. Using an apt-get based Linux distribution:
+Do not install this atop an existing MineOS system (using the Python-based webui), since the installation location is the same /usr/games/minecraft. Following are steps for installing MineOS on an apt-get based distribution, such as Debian or Ubuntu.  These instructions are detailed further (as well as for additional distributions) on the [MineOS wiki](https://minecraft.codeemo.com/mineoswiki/index.php?title=Installing_MineOS).
 
+Using an apt-get based Linux distribution:
+
+    curl -sL https://deb.nodesource.com/setup_4.x | bash -
     apt-get update
-    apt-get install -y nodejs nodejs-legacy npm git rdiff-backup screen openjdk-7-jre-headless
+    apt-get install -y nodejs git rdiff-backup screen build-essential openjdk-8-jre-headless
     mkdir -p /usr/games
     cd /usr/games
     git clone https://github.com/hexparrot/mineos-node.git minecraft
