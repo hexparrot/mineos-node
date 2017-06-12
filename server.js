@@ -93,7 +93,7 @@ server.backend = function(base_dir, socket_emitter, user_config) {
       ], function(err, meminfo) {
         self.front_end.emit('host_heartbeat', {
           'uptime': os.uptime(),
-          'freemem': meminfo['MemAvailable'] * 1024,
+          'freemem': (meminfo ? meminfo['MemAvailable'] * 1024 : os.memfree()),
           'loadavg': os.loadavg()
         })
       })
