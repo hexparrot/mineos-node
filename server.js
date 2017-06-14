@@ -116,7 +116,7 @@ server.backend = function(base_dir, socket_emitter, user_config) {
       self.servers[sn] = null;
       //if new server_container() isn't instant, double broadcast might trigger this if/then twice
       //setting to null is immediate and prevents double execution
-      self.servers[sn] = new server_container(sn, base_dir, self.front_end);
+      self.servers[sn] = new server_container(sn, user_config, self.front_end);
       self.front_end.emit('track_server', sn);
     }
 
@@ -540,10 +540,10 @@ server.backend = function(base_dir, socket_emitter, user_config) {
   return self;
 }
 
-function server_container(server_name, base_dir, socket_io) {
+function server_container(server_name, user_config, socket_io) {
   // when evoked, creates a permanent 'mc' instance, namespace, and place for file tails. 
   var self = this;
-  var instance = new mineos.mc(server_name, base_dir),
+  var instance = new mineos.mc(server_name, user_config.base_directory),
       nsp = socket_io.of('/{0}'.format(server_name)),
       tails = {},
       notices = [],
@@ -571,10 +571,19 @@ function server_container(server_name, base_dir, socket_io) {
   //uncomment sync_chown to correct perms on server discovery
   //commenting out for high cpu usage on startup
 
-  make_tail('logs/latest.log');
-  make_tail('server.log');
-  make_tail('proxy.log.0');
-  make_tail('logs/fml-server-latest.log');
+  var files_to_tail = ['logs/latest.log', 'server.log', 'proxy.log.0', 'logs/fml-server-latest.log'];
+  if ( (user_config || {}).additional_logfiles ) {  //if additional_logfiles key:value pair exists, use it
+    var additional = user_config['additional_logfiles'].split(',');
+    additional = additional.filter(function(e){return e}); //remove non-truthy entries like ''
+    additional = additional.map(function(e) {return e.trim()}); //remove trailing and tailing whitespace
+    additional = additional.map(function(e) {return path.normalize(e).replace(/^(\.\.[\/\\])+/, '')}); //normalize path, remove traversal
+
+    logging.info('Explicitly added files to tail are:', additional);
+    files_to_tail = files_to_tail.concat(additional);
+  }
+
+  for (var i in files_to_tail)
+    make_tail(files_to_tail[i]);
 
   (function() {
     var fireworm = require('fireworm');
@@ -879,9 +888,11 @@ function server_container(server_name, base_dir, socket_io) {
 
       fw.add('**/{0}'.format(rel_filepath));
       fw.on('add', function(fp) {
-        fw.clear();
-        logging.info('[{0}] {1} created! Watchfile {2} closed'.format(server_name, path.basename(fp), rel_filepath));
-        async.nextTick(function() { make_tail(rel_filepath) });
+        if (abs_filepath == fp) {
+          fw.clear();
+          logging.info('[{0}] {1} created! Watchfile {2} closed'.format(server_name, path.basename(fp), rel_filepath));
+          async.nextTick(function() { make_tail(rel_filepath) });
+        }
       })
     }
   }
@@ -1083,6 +1094,11 @@ function server_container(server_name, base_dir, socket_io) {
       }
     }
 
+    function get_available_tails() {
+      for (t in tails)
+        get_file_contents(tails[t].filename.replace(instance.env.cwd + '/', ''));
+    }
+
     function get_prop(requested) {
       logging.info('[{0}] {1} requesting property: {2}'.format(server_name, ip_address, requested.property));
       instance.property(requested.property, function(err, retval) {
@@ -1107,7 +1123,7 @@ function server_container(server_name, base_dir, socket_io) {
             'ftb_installer': async.apply(instance.property, 'FTBInstall.sh'),
             'eula': async.apply(instance.property, 'eula'),
             'base_dir': function(cb) {
-              cb(null, base_dir)
+              cb(null, user_config.base_directory)
             }
           }, function(err, results) {
             if (err instanceof Object)
@@ -1228,6 +1244,7 @@ function server_container(server_name, base_dir, socket_io) {
 
         socket.on('command', produce_receipt);
         socket.on('get_file_contents', get_file_contents);
+        socket.on('get_available_tails', get_available_tails);
         socket.on('property', get_prop);
         socket.on('page_data', get_page_data);
         socket.on('cron', manage_cron);

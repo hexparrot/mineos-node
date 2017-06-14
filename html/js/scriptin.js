@@ -289,6 +289,7 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
   $scope.servers = Servers;
   $scope.current = null;
   $scope.build_jar_log = [];
+  $scope.user_input = { input: { text: '' } }; //convoluted structure required; see http://jsfiddle.net/sirhc/z9cGm/#run
 
   $scope.serverprofiles = {
     group: 'mojang',
@@ -477,8 +478,8 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
   }
 
   $scope.console_input = function() {
-    socket.emit($scope.current, 'command', {command: 'stuff', msg: $scope.user_input });
-    $scope.user_input = '';
+    socket.emit($scope.current, 'command', {command: 'stuff', msg: $scope.user_input['input'].text });
+    $scope.user_input['input'].text = '';
   }
 
   $scope.change_sc = function(section, property, new_value) {
@@ -860,9 +861,7 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
 
     me.channel.emit(server_name, 'server-icon.png');
     me.channel.emit(server_name, 'page_data', 'glance');
-    me.channel.emit(server_name, 'get_file_contents', 'proxy.log.0');
-    me.channel.emit(server_name, 'get_file_contents', 'logs/latest.log');
-    me.channel.emit(server_name, 'get_file_contents', 'server.log');
+    me.channel.emit(server_name, 'get_available_tails');
     me.channel.emit(server_name, 'req_server_activity');
     me.channel.emit(server_name, 'config.yml');
     me.channel.emit(server_name, 'cron.config');
