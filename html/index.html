@@ -1471,8 +1471,8 @@
                         <div class="row-fluid">
                             <div class="body-inner">
                                 <div class="control-group">
-                                    <div class="controls console-input">
-                                        <label>&gt;</label><input type="text" class="span12" ng-model="user_input" ng-enter="console_input()">
+                                    <div class="controls console-input" ng-repeat="obj in user_input">
+                                        <label>&gt;</label><input type="text" class="span12" ng-model="obj.text" ng-enter="console_input()">
                                     </div>
                                 </div>
                             </div>
