@@ -392,6 +392,10 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     $scope.spigot_list = spigot_list;
   })
 
+  socket.on('/', 'locale_list', function(locale_list) {
+    $scope.locale_list = locale_list;
+  })
+
   socket.on('/', 'build_jar_output', function(data) {
     //removed to allow access to all produced log entries
     //while ($scope.build_jar_log.length > 40)

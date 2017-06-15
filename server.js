@@ -230,6 +230,24 @@ server.backend = function(base_dir, socket_emitter, user_config) {
     })
   }
 
+  self.send_locale_list = function() {
+    async.waterfall([
+      async.apply(fs.readdir, path.join(__dirname, 'html', 'locales')),
+      function (locale_paths, cb) {
+        var locales = locale_paths.map(function(r) {
+          return r.match(/^locale-([a-z]{2}_[A-Z]{2}).json$/)[1];
+        })
+        cb(null, locales);
+      }
+    ], function(err, output) {
+      logging.info(output);
+      if (!err)
+        self.front_end.emit('locale_list', output);
+      else
+        self.front_end.emit('locale_list', ['en_US']);
+    })
+  }
+
   self.front_end.on('connection', function(socket) {
     var userid = require('userid');
     var fs = require('fs-extra');
@@ -504,6 +522,7 @@ server.backend = function(base_dir, socket_emitter, user_config) {
     self.send_profile_list(true);
     self.send_spigot_list();
     self.send_importable_list();
+    self.send_locale_list();
 
   })
 
