@@ -227,10 +227,11 @@ app.filter('colorize', [ '$sce', function($sce){
 
         Note: "(" and ")" are needed for split otherwise matched content is ignored.
     */
+    str = str.split('\033').join('');
     var splitString = str.split(/\[0;((?:\d+;?)+)m|\[m/g);
 
     var spanOpen = false;
-    for ( i  in splitString ) {
+    for ( i in splitString ) {
 
       // Every over cell should be format codes
       if ( i % 2 == 1 ) {
