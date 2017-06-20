@@ -349,21 +349,73 @@ server.backend = function(base_dir, socket_emitter, user_config) {
           })
           break;
         case 'download':
-          function progress_emitter(args) {
-            self.front_end.emit('file_progress', args);
-          }
-
-          for (var idx in self.profiles)
+          for (var idx in self.profiles) {
             if (self.profiles[idx].id == args.profile.id) {
-              var download_profiles = require('./profiles.js')['download_profiles'];
+              var SOURCES = require('./profiles.js')['profile_manifests'];
+              var profile_dir = path.join(base_dir, 'profiles', args.profile.id);
+              var dest_filepath = path.join(profile_dir, args.profile.filename);
 
-              download_profiles(base_dir, self.profiles[idx], progress_emitter, function(retval){
-                self.front_end.emit('host_notice', retval);
+              async.series([
+                async.apply(fs.ensureDir, profile_dir),
+                function(cb) {
+                  var progress = require('request-progress');
+                  var request = require('request');
+
+                  progress(request(args.profile.url), { throttle: 250, delay: 100 })
+                    .on('error', function(err) {
+                      logging.error(err);
+                    })
+                    .on('progress', function(state) {
+                      args.profile.progress = state;
+                      self.front_end.emit('file_progress', args.profile);
+                    })
+                    .on('complete', function(response) {
+                      if (response.statusCode == 200) {
+                        logging.info('[WEBUI] Successfully downloaded {0} to {1}'.format(args.profile.url, dest_filepath));
+                      } else {
+                        logging.error('[WEBUI] Server was unable to download file:', args.profile.url);
+                        logging.error('[WEBUI] Remote server returned status {0} with headers:'.format(response.statusCode), response.headers);
+                      }
+                      cb(response.statusCode != 200);
+                    })
+                    .pipe(fs.createWriteStream(dest_filepath))
+                },
+                function(cb) {
+                  switch(path.extname(args.profile.filename).toLowerCase()) {
+                    case '.jar':
+                      cb();
+                      break;
+                    case '.zip':
+                      var unzip = require('unzip');
+                      fs.createReadStream(dest_filepath)
+                        .pipe(unzip.Extract({ path: profile_dir })
+                                .on('close', function() { cb() })
+                                .on('error', function() {
+                                  //Unzip error occurred, falling back to adm-zip
+                                  var admzip = require('adm-zip');
+                                  var zip = new admzip(dest_filepath);
+                                  zip.extractAllTo(profile_dir, true); //true => overwrite
+                                  cb();
+                                })
+                             );
+                      break;
+                    default:
+                      cb();
+                      break;
+                  }
+                },
+                function(cb) {
+                  if ('postdownload' in SOURCES[args.profile['group']])
+                    SOURCES[args.profile['group']].postdownload(profile_dir, dest_filepath, cb);
+                  else
+                    cb();
+                }
+              ], function(err, output) {
                 self.send_profile_list();
-              });
+              })
               break;
             }
-
+          }
           break;
         case 'build_jar':
           var which = require('which');
