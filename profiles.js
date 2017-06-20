@@ -17,9 +17,8 @@ function profile_template() {
   }
 }
 
-exports.profile_manifests = [
-  {
-    id: 'mojang',
+exports.profile_manifests = {
+  mojang: {
     name: "Mojang Official Minecraft Jars",
     request_args: {
       url: 'https://launchermeta.mojang.com/mc/game/version_manifest.json',
@@ -59,10 +58,9 @@ exports.profile_manifests = [
       } catch (e) {}
 
       callback(null, p);
-    } //end handler
+    }, //end handler
   },
-  {
-    id: 'ftb',
+  ftb: {
     name: 'Feed the Beast Server Packs',
     request_args: {
       url: 'http://ftb.cursecdn.com/FTB2/static/modpacks.xml',
@@ -122,8 +120,7 @@ exports.profile_manifests = [
       callback(null, p);
     } //end handler
   },
-  {
-    id: 'ftb_third_party',
+  ftb_third_party: {
     name: 'Feed the Beast Third-Party Server Packs',
     request_args: {
       url: 'http://ftb.cursecdn.com/FTB2/static/thirdparty.xml',
@@ -183,8 +180,7 @@ exports.profile_manifests = [
       callback(null, p);
     } //end handler
   },
-  {
-    id: 'forge',
+  forge: {
     name: 'Forge Mod',
     request_args: {
       url: 'http://files.minecraftforge.net/maven/net/minecraftforge/forge/promotions.json',
@@ -228,8 +224,7 @@ exports.profile_manifests = [
       callback(null, p);
     } //end handler
   },
-  {
-    id: 'paperspigot',
+  paperspigot: {
     name: 'PaperSpigot',
     handler: function(profile_dir, callback) {
       var p = [];
@@ -313,8 +308,7 @@ exports.profile_manifests = [
       callback(null, p);
     } //end handler
   },
-  {
-    id: 'spigot',
+  spigot: {
     name: 'Spigot',
     handler: function(profile_dir, callback) {
       var p = [];
@@ -342,8 +336,7 @@ exports.profile_manifests = [
       callback(null, p);
     } //end handler
   },
-  {
-    id: 'imagicalmine',
+  imagicalmine: {
     name: 'Imagicalmine',
     handler: function(profile_dir, callback) {
       var p = [];
@@ -370,8 +363,7 @@ exports.profile_manifests = [
       callback(null, p);
     } //end handler
   },
-  {
-    id: 'mianite',
+  mianite: {
     name: 'Mianite',
     request_args: {
       url: 'http://mianite.us/repo?api=true',
@@ -420,8 +412,7 @@ exports.profile_manifests = [
       callback(null, p);
     } //end handler
   },
-  {
-    id: 'bungeecord',
+  bungeecord: {
     name: 'BungeeCord',
     request_args: {
       url: 'http://ci.md-5.net/job/BungeeCord/rssAll',
@@ -461,8 +452,7 @@ exports.profile_manifests = [
       callback(null, p);
     } //end handler
   },
-  {
-    id: 'spongevanilla',
+  spongevanilla: {
     name: 'SpongeVanilla',
     request_args: {
       url: 'https://repo.spongepowered.org/maven/org/spongepowered/spongevanilla/maven-metadata.xml',
@@ -515,10 +505,7 @@ exports.profile_manifests = [
       callback(null, p);
     } //end handler
   }
-
-
-
-];
+};
 
 exports.download_profiles = function download_profiles(base_dir, args, progress_update_fn, callback) {
   var request = require('request');
