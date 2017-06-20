@@ -201,13 +201,55 @@ server.backend = function(base_dir, socket_emitter, user_config) {
     if (send_existing && self.profiles.length) //if requesting to just send what you already have AND they are already present
       self.front_end.emit('profile_list', self.profiles);
     else {
-      var check_profiles = require('./profiles.js')['check_profiles'];
+      var request = require('request');
+      var profile_dir = path.join(base_dir, mineos.DIRS['profiles']);
+      var SIMULTANEOUS_DOWNLOADS = 3;
+      var SOURCES = [];
+      var profiles = [];
 
-      check_profiles(base_dir, function(err, all_profiles) {
-        if (!err)
-          self.profiles = all_profiles;
-        self.front_end.emit('profile_list', self.profiles);
-      })
+      try {
+        SOURCES = require('./profiles.js')['profile_manifests'];
+      } catch (e) {
+        logging.error('Unable to parse profiles.js--no profiles loaded!');
+        logging.error(e);
+        return; // just bail out if profiles.js cannot be required for syntax issues
+      }
+
+      async.forEachOfLimit(
+        SOURCES,
+        SIMULTANEOUS_DOWNLOADS,
+        function(collection, key, outer_cb) {
+          if ('request_args' in collection) {
+            async.waterfall([
+              async.apply(request, collection.request_args),
+              function(response, body, cb) {
+                cb(response.statusCode != 200, body)
+              },
+              function(body, cb) {
+                collection.handler(profile_dir, body, cb);
+              }
+            ], function(err, output) {
+              logging.info("Downloaded information for collection: {0} ({1} entries)".format(collection.name, output.length));
+              profiles = profiles.concat(output);
+              outer_cb(err)
+            }); //end waterfall
+          } else { //for profiles like paperspigot which are hardcoded
+            async.waterfall([
+              function(cb) {
+                collection.handler(profile_dir, cb);
+              }
+            ], function(err, output) {
+              logging.info("Downloaded information for collection: {0} ({1} entries)".format(collection.name, output.length));
+              profiles = profiles.concat(output);
+              outer_cb(err)
+            }); //end waterfall
+          }
+        },
+        function(err) {
+          self.profiles = profiles;
+          self.front_end.emit('profile_list', self.profiles);
+        }
+      ) //end forEachOfLimit
     }
   }
 
