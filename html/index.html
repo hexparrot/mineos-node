@@ -646,18 +646,10 @@
                                         <tbody>
                                             <tr>
                                                 <td>
-                                                    <select ng-model="serverprofiles.group" class="span12">
-                                                        <option selected value="mojang">Mojang</option>
-                                                        <option value="ftb">Feed the Beast</option>
-                                                        <option value="ftb_third_party">FTB-3rd Party</option>
-                                                        <option value="forge">Forge</option>
-                                                        <option value="mianite">Mianite</option>
-                                                        <option value="paperspigot">PaperSpigot</option>
-                                                        <option value="imagicalmine">ImagicalMine</option>
-                                                        <option value="bungeecord">BungeeCord</option>
-                                                        <option value="spongevanilla">SpongeVanilla</option>
-                                                        <option value="cuberite">Cuberite</option>
-                                                        <option value="all">Show All</option>
+                                                    <select class="span12"
+                                                      style="text-transform:capitalize;"
+                                                      ng-options="v as v for (k,v) in unique_profile_groups()"
+                                                      ng-model="serverprofiles.group">
                                                     </select>
                                                 </td>
                                                 <td></td>
