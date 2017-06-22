@@ -646,17 +646,10 @@
                                         <tbody>
                                             <tr>
                                                 <td>
-                                                    <select ng-model="serverprofiles.group" class="span12">
-                                                        <option selected value="mojang">Mojang</option>
-                                                        <option value="ftb">Feed the Beast</option>
-                                                        <option value="ftb_third_party">FTB-3rd Party</option>
-                                                        <option value="forge">Forge</option>
-                                                        <option value="mianite">Mianite</option>
-                                                        <option value="paperspigot">PaperSpigot</option>
-                                                        <option value="imagicalmine">ImagicalMine</option>
-                                                        <option value="bungeecord">BungeeCord</option>
-                                                        <option value="spongevanilla">SpongeVanilla</option>
-                                                        <option value="all">Show All</option>
+                                                    <select class="span12"
+                                                      style="text-transform:capitalize;"
+                                                      ng-options="v as v for (k,v) in unique_profile_groups()"
+                                                      ng-model="serverprofiles.group">
                                                     </select>
                                                 </td>
                                                 <td></td>
@@ -951,8 +944,15 @@
                                                             </select>
                                                         </div>
                                                     </div><!--/ Select -->
+                                                    <!--/ Unconventional server console textbox -->
+                                                    <div class="controls" ng-show="servers[current].sc.minecraft.unconventional">
+                                                        <label class="control-label" translate="CONSOLE"></label>
+                                                        <div class="controls console-input" ng-repeat="obj in user_input">
+                                                            <label>&gt;</label><input type="text" class="span6" ng-model="obj.text" ng-enter="console_input()">
+                                                        </div>
+                                                    </div>
                                                     <!-- Help Text -->
-                                                    <div class="control-group">
+                                                    <div class="control-group" ng-hide="servers[current].sc.minecraft.unconventional">
                                                         <label class="control-label" translate="MEMORY_ALLOCATION"></label>
                                                         <div class="controls">
                                                             <div class="input-prepend input-append">
@@ -974,8 +974,9 @@
                                                                 <span class="add-on" translate="MB_ABBREVIATION"></span>
                                                             </div>
                                                         </div>
-                                                    </div><!--/ Help Text -->
-                                                    <div class="controls">
+                                                    </div>
+                                                    <!--/ Help Text -->
+                                                    <div class="controls" ng-hide="servers[current].sc.minecraft.unconventional">
                                                         <label class="control-label" translate="ADDITIONAL_JAVA_ARGS"></label>
                                                         <input type="text" 
                                                             class="span6"
@@ -984,7 +985,7 @@
                                                             ng-change="change_sc('java', 'java_tweaks', servers[current].sc.java.java_tweaks)" 
                                                             ng-model-options="{ updateOn: 'default blur', debounce: {'default': 1500, 'blur': 0} }">
                                                     </div>
-                                                    <div class="controls">
+                                                    <div class="controls" ng-hide="servers[current].sc.minecraft.unconventional">
                                                         <label class="control-label" translate="ADDITIONAL_JAR_ARGS"></label>
                                                         <input type="text" 
                                                             class="span6"

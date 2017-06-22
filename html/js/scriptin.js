@@ -350,6 +350,16 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     return capacity;
   }
 
+  $scope.unique_profile_groups = function() {
+    var groups = [];
+    if($scope.profiles)
+      $.each($scope.profiles, function(idx, data) {
+        if (groups.indexOf(data.group) < 0)
+          groups.push(data.group)
+      })
+    return groups;
+  }
+
   /* socket handlers */
 
   socket.on('/', 'whoami', function(username) {

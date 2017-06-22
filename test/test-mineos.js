@@ -324,6 +324,16 @@ test.get_start_args = function(test) {
         callback(err);
       })
     },
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'Cuberite'),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2], './Cuberite');
+        callback(err);
+      })
+    }
   ], function(err) {
     test.ifError(err);
     test.done();
@@ -517,6 +527,28 @@ test.get_start_args_forge = function(test) {
         callback(err);
       })
     },
+  ], function(err) {
+    test.ifError(err);
+    test.done();
+  })
+}
+
+test.get_start_args_cuberite = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(instance.modify_sc, 'java', 'jarfile', 'Cuberite'),
+    function(callback) {
+      instance.get_start_args(function(err, args) {
+        test.ifError(err);
+        test.equal(args[0], '-dmS');
+        test.equal(args[1], 'mc-testing');
+        test.equal(args[2], './Cuberite');
+        callback(err);
+      })
+    }
   ], function(err) {
     test.ifError(err);
     test.done();
@@ -2350,7 +2382,22 @@ test.server_files_property = function(test) {
         test.ok(server_files.indexOf('another.JAR') >= 0);
         callback(err);
       })
-    }
+    },
+    async.apply(fs.ensureFile, path.join(instance.env.cwd, 'Cuberite')),
+    async.apply(instance.modify_sc, 'minecraft', 'profile', ''),
+    function(callback) {
+      instance.property('server_files', function(err, server_files) {
+        test.ifError(err);
+        test.equal(server_files.length, 6);
+        test.ok(server_files.indexOf('myserver.jar') >= 0);
+        test.ok(server_files.indexOf('pocket.phar') >= 0);
+        test.ok(server_files.indexOf('pocket.PHAR') >= 0);
+        test.ok(server_files.indexOf('minecraft_server.1.7.9.jar') >= 0);
+        test.ok(server_files.indexOf('another.JAR') >= 0);
+        test.ok(server_files.indexOf('Cuberite') >= 0);
+        callback(err);
+      })
+    },
   ], function(err) {
     test.ifError(err);
     test.done();
