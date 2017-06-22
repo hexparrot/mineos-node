@@ -618,4 +618,79 @@ exports.profile_manifests = {
       ], callback)
     }
   },
+  all_the_mods: {
+    name: 'All the Mods',
+    request_args: {
+      url: 'https://raw.githubusercontent.com/AllTheMods/ModpackMakingUtils/master/atmpacks.json',
+      json: true
+    },
+    handler: function(profile_dir, body, callback) {
+      var p = [];
+
+      try {
+        for (var index in body['allthepacks']['modpacks']) {
+          var item = new profile_template();
+          var ref_obj = body['allthepacks']['modpacks'][index];
+
+          item['id'] = '{0}-{1}'.format(ref_obj['id'], ref_obj['packversion']);
+          item['time'] = new Date().getTime();
+          item['releaseTime'] = new Date().getTime();
+          item['type'] = 'release';
+          item['group'] = 'all_the_mods';
+          item['webui_desc'] = '{0} (mc version: {1})'.format(ref_obj['name'], ref_obj['mcversion']);
+          item['weight'] = 0;
+          item['filename'] = 'download.zip';
+          item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
+          item['version'] = ref_obj['mcversion'];
+          item['release_version'] = ref_obj['packversion'];
+          item['url'] = ref_obj['server']['download'];
+
+          p.push(item);
+        }
+      } catch (e) {}
+
+      callback(null, p);
+    }, //end handler
+    postdownload: function(profile_dir, dest_filepath, callback) {
+      var inside_dir = null;
+
+      async.waterfall([
+        async.apply(fs.readdir, profile_dir),
+        function(entries, cb) {
+          var d = entries.filter(function(e) {
+            var p = path.join(profile_dir, e);
+            return fs.statSync(p).isDirectory();
+          })
+          cb(null, d[0]);
+        },
+        function(container_dir, cb) {
+          inside_dir = path.join(profile_dir, container_dir);
+          fs.readdir(inside_dir, function(err, files) {
+            if (!err)
+              async.each(files, function(file, inner_cb) {
+                var old_filepath = path.join(inside_dir, file);
+                var new_filepath = path.join(profile_dir, file);
+
+                fs.move(old_filepath, new_filepath, inner_cb);
+              }, cb);
+            else
+              cb(err);
+          })
+        },
+        function(cb) {
+          var request = require('request');
+          var FORGE_DEST = path.join(profile_dir, 'forge-{0}-{1}-installer.jar'.format('1.10.2', '12.18.3.2316'));
+          var FORGE_URL = 'http://files.minecraftforge.net/maven/net/minecraftforge/forge/{0}-{1}/forge-{0}-{1}-installer.jar'.format('1.10.2', '12.18.3.2316');
+
+          request(FORGE_URL)
+            .on('error', function(err) {})
+            .on('complete', function(response) { cb() })
+            .pipe(fs.createWriteStream(FORGE_DEST))
+        },
+        function(cb) {
+          fs.truncate(dest_filepath, 0, cb); // empties contents but keeps filename for existsSync
+        }
+      ], callback)
+    } //end postdownload
+  }
 };
