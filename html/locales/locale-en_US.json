@@ -64,8 +64,8 @@
   "PROFILE_DESC": "Profile Description",
   "DOWNLOADED": "Downloaded",
 
-  "SPIGOT_CRAFTBUKKIT": "Spigot / Craftbukkit",
-  "BUILDTOOLS_INSTRUCTIONS": "Download the latest builder jarfile and then select Minecraft version to compile Spigot/Craftbukkit with. Once complete, copy the compiled server jars to any server. Your server will not need a profile.",
+  "SPIGOT_CRAFTBUKKIT": "Spigot",
+  "BUILDTOOLS_INSTRUCTIONS": "Download the latest builder jarfile and then select Minecraft version to compile Spigot with. Once complete, copy the compiled server jars to any server. Your server will not need a profile.",
   "DOWNLOAD_BUILDTOOLS": "Download latest BuildTools.jar",
   "DOWNLOAD_PAPERTOOLS": "Download latest PaperTools.jar",
   "BUILD_JAR": "Build Jarfile",
