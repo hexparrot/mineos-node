@@ -466,7 +466,15 @@ mineos.mc = function(server_name, base_dir) {
   }
 
   self.accept_eula = function(callback) {
-    fs.outputFile(path.join(self.env.cwd, 'eula.txt'), 'eula=true', callback);
+    var EULA_PATH = path.join(self.env.cwd, 'eula.txt');
+
+    async.waterfall([
+      async.apply(fs.outputFile, EULA_PATH, 'eula=true'),
+      async.apply(fs.stat, self.env.cwd),
+      function(stat, cb) {
+        fs.chown(EULA_PATH, stat.uid, stat.gid, cb);
+      }
+    ], callback)
   }
 
   self.delete = function(callback) {

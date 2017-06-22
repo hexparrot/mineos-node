@@ -2027,6 +2027,12 @@ test.accept_eula = function(test) {
     function(eula_value, cb) {
       test.equal(eula_value, true);
       cb();
+    },
+    async.apply(fs.stat, path.join(instance.env.cwd, 'eula.txt')),
+    function(stat, cb) {
+      test.equal(stat.uid, OWNER_CREDS.uid);
+      test.equal(stat.gid, OWNER_CREDS.gid);
+      cb();
     }
   ], function(err) {
     test.done();
