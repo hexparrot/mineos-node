@@ -163,7 +163,9 @@ mineos.dependencies(function(err, binaries) {
 
     console.info('base_directory found in mineos.conf, using:', base_directory);
   } else {
-    console.info('base_directory not specified in mineos.conf, using default:', base_directory);
+    console.error('base_directory not specified--missing mineos.conf?');
+    console.error('Aborting startup.');
+    process.exit(4); 
   }
 
   var be = new server.backend(base_directory, io, mineos_config);
