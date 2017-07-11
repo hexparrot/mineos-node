@@ -897,6 +897,25 @@ test.backup = function(test) {
   })
 }
 
+test.backup_exclude_dynmap = function(test) {
+  var server_name = 'testing';
+  var instance = new mineos.mc(server_name, BASE_DIR);
+
+  async.series([
+    async.apply(instance.create, OWNER_CREDS),
+    async.apply(fs.mkdir, path.join(instance.env.cwd, 'dynmap')),
+    async.apply(instance.backup),
+    function(callback) {
+      test.equal(fs.readdirSync(instance.env.bwd).length, 4);
+      callback(null);
+    }
+  ], function(err) {
+    test.ifError(err);
+    test.expect(2);
+    test.done();
+  })
+}
+
 test.restore = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);

@@ -1065,7 +1065,7 @@ mineos.mc = function(server_name, base_dir) {
 
   self.backup = function(callback) {
     var binary = which.sync('rdiff-backup');
-    var args = ['{0}/'.format(self.env.cwd), self.env.bwd];
+    var args = ['--exclude', path.join(self.env.cwd, 'dynmap'), '{0}/'.format(self.env.cwd), self.env.bwd];
     var params = { cwd: self.env.bwd } //bwd!
 
     async.series([
