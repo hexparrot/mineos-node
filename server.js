@@ -707,7 +707,12 @@ function server_container(server_name, user_config, socket_io) {
     var fireworm = require('fireworm');
 
     var skip_dirs = fs.readdirSync(instance.env.cwd).filter(function(p) {
-      return fs.statSync(path.join(instance.env.cwd, p)).isDirectory();
+      try {
+        return fs.statSync(path.join(instance.env.cwd, p)).isDirectory();
+      } catch (e) {
+        logging.error(e);
+        return false;
+      }
     });
 
     var default_skips = ['world', 'world_the_end', 'world_nether', 'dynmap', 'plugins', 'web', 'logs', 'region', 'playerdata', 'stats', 'data'];
