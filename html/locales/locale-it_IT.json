@@ -51,6 +51,7 @@
 
   "OFFICIAL_MOJANG_SERVER_JARS": "Jar Server ufficiali Mojang",
   "AVAILABLE_SERVER_JARS": "Server Jar/Pacchetti disponibili",
+  "NO_PROFILES_DOWNLOADED": "No profiles are available; check internet connectivity and refresh the profile list.",
   "IDENTIFIER": "ID",
   "RELEASE_TIMESTAMP": "Timestamp Release",
   "RELEASE_TYPE": "Tipo Release",

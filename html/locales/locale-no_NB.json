@@ -51,6 +51,7 @@
 
   "OFFICIAL_MOJANG_SERVER_JARS": "Offisiell Mojangversjon",
   "AVAILABLE_SERVER_JARS": "Tilgjengelige Server Jars/Pakker",
+  "NO_PROFILES_DOWNLOADED": "No profiles are available; check internet connectivity and refresh the profile list.",
   "IDENTIFIER": "ID",
   "RELEASE_TIMESTAMP": "Sluppet",
   "RELEASE_TYPE": "Type",

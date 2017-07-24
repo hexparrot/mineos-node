@@ -51,6 +51,7 @@
 
   "OFFICIAL_MOJANG_SERVER_JARS": "Mojang公式 サーバーJar",
   "AVAILABLE_SERVER_JARS": "利用可能なサーバー Jar/Pack",
+  "NO_PROFILES_DOWNLOADED": "No profiles are available; check internet connectivity and refresh the profile list.",
   "IDENTIFIER": "ID",
   "RELEASE_TIMESTAMP": "リリース タイムスタンプ",
   "RELEASE_TYPE": "リリース タイプ",

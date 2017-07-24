@@ -51,6 +51,7 @@
 
   "OFFICIAL_MOJANG_SERVER_JARS": "Officiella Mojang Server Jars",
   "AVAILABLE_SERVER_JARS": "Tillgängliga Server Jars/Paket",
+  "NO_PROFILES_DOWNLOADED": "No profiles are available; check internet connectivity and refresh the profile list.",
   "IDENTIFIER": "ID",
   "RELEASE_TIMESTAMP": "Släpptidsstämpel",
   "RELEASE_TYPE": "Släpp Typ",

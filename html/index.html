@@ -631,6 +631,9 @@
                         <div class="span12 widget">
                             <header>
                                 <h4 class="title" translate="AVAILABLE_SERVER_JARS"></h4> 
+                                <div class="alert alert-error" ng-if="!profiles.length">
+                                    <strong translate="NO_PROFILES_DOWNLOADED"></strong>
+                                </div>
                             </header>
                             <section class="body">
                                 <div class="body-inner no-padding">
