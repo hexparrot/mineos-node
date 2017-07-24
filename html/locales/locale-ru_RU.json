@@ -51,6 +51,7 @@
 
   "OFFICIAL_MOJANG_SERVER_JARS": "Официальные серверные Jar-файлы от Mojang",
   "AVAILABLE_SERVER_JARS": "Доступные серверные Jar-файлы/Сборки",
+  "NO_PROFILES_DOWNLOADED": "No profiles are available; check internet connectivity and refresh the profile list.",
   "IDENTIFIER": "Код",
   "RELEASE_TIMESTAMP": "Время выпуска",
   "RELEASE_TYPE": "Тип Выпуска",

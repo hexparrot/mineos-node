@@ -229,9 +229,13 @@ server.backend = function(base_dir, socket_emitter, user_config) {
                 collection.handler(profile_dir, body, cb);
               }
             ], function(err, output) {
-              logging.info("Downloaded information for collection: {0} ({1} entries)".format(collection.name, output.length));
-              profiles = profiles.concat(output);
-              outer_cb(err)
+              if (err || typeof output == 'undefined')
+                logging.error("Unable to retrieve profile: {0}. Please check your internet connectivity.".format(key));
+              else {
+                logging.info("Downloaded information for collection: {0} ({1} entries)".format(collection.name, output.length));
+                profiles = profiles.concat(output);
+              }
+              outer_cb(err);
             }); //end waterfall
           } else { //for profiles like paperspigot which are hardcoded
             async.waterfall([
@@ -239,9 +243,13 @@ server.backend = function(base_dir, socket_emitter, user_config) {
                 collection.handler(profile_dir, cb);
               }
             ], function(err, output) {
-              logging.info("Downloaded information for collection: {0} ({1} entries)".format(collection.name, output.length));
-              profiles = profiles.concat(output);
-              outer_cb(err)
+              if (err || typeof output == 'undefined')
+                logging.error("Unable to retrieve profile: {0}. Please check your internet connectivity.".format(key));
+              else {
+                logging.info("Downloaded information for collection: {0} ({1} entries)".format(collection.name, output.length));
+                profiles = profiles.concat(output);
+              }
+              outer_cb(err);
             }); //end waterfall
           }
         },
