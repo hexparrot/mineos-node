@@ -360,6 +360,38 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     return groups;
   }
 
+  $scope.extra_action = function(action) {
+    var profile = 'default';
+
+    try {
+      profile = $scope.servers[$scope.current]['sc']['minecraft']['profile'].toLowerCase();
+    } catch (e) {
+      return false; //catches missing 'profile' val in sc or no current server selected
+    }
+
+    var EXTRA_ACTIONS = {
+      'bungeecord': ['end'],
+      'nukkit': ['stop', 'stop_and_backup', 'restart', 'save-all', 'save-on', 'save-off', 'reload'],
+      'paperspigot': ['stop', 'stop_and_backup', 'restart', 'save-all', 'save-on', 'save-off'],
+      'cuberite': ['stop', 'stop_and_backup', 'restart', 'save-all', 'reload'],
+      'default': ['stop', 'stop_and_backup', 'restart', 'save-all', 'save-on', 'save-off']
+    }
+
+    var show = false;
+    if (profile.startsWith('bungee'))
+      show = EXTRA_ACTIONS['bungeecord'].indexOf(action) >= 0;
+    else if (profile.startsWith('cuberite'))
+      show = EXTRA_ACTIONS['cuberite'].indexOf(action) >= 0;
+    else if (profile.startsWith('nukkit'))
+      show = EXTRA_ACTIONS['nukkit'].indexOf(action) >= 0;
+    else if (profile.startsWith('paperspigot'))
+      show = EXTRA_ACTIONS['paperspigot'].indexOf(action) >= 0;
+    else
+      show = EXTRA_ACTIONS['default'].indexOf(action) >= 0;
+
+    return !show;
+  }
+
   /* socket handlers */
 
   socket.on('/', 'whoami', function(username) {

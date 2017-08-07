@@ -865,18 +865,37 @@
                                                                     ng-click="server_command('kill')" 
                                                                     ng-hide="!servers[current].sc.minecraft.unconventional"
                                                                     ></button>
-                                                            <button class="btn btn-danger dropdown-toggle" data-toggle="dropdown" ng-hide="servers[current].sc.minecraft.unconventional"><span class="caret"></span></button>
-                                                            <ul class="dropdown-menu" ng-hide="servers[current].sc.minecraft.unconventional">
+                                                            <button class="btn btn-danger dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+                                                            <ul class="dropdown-menu">
                                                                 <li><a href="#" translate="STOP"
-                                                                       ng-click="server_command('stop')" 
-                                                                       ng-disabled="!servers[current].heartbeat.up"></a></li>
+                                                                       ng-hide="extra_action('stop')"
+                                                                       ng-disabled="!servers[current].heartbeat.up"
+                                                                       ng-click="server_command('stop')"></a></li>
                                                                 <li><a href="#" translate="STOP_AND_BACKUP"
+                                                                       ng-hide="extra_action('stop_and_backup')"
                                                                        ng-click="server_command('stop_and_backup')"></a></li>
                                                                 <li><a href="#" translate="RESTART"
+                                                                       ng-hide="extra_action('restart')"
                                                                        ng-click="server_command('restart')"></a></li>
-                                                                <li><a href="#" translate="KILL" 
+                                                                <li><a href="#" translate="KILL"
                                                                        ng-click="server_command('kill')"
                                                                        ng-disabled="!servers[current].heartbeat.up"></a></li>
+                                                                <li><a><span class="monospace" translate="SERVER_ACTIONS"></span>:</a></li>
+                                                                <li><a href="#" class="monospace"
+                                                                       ng-hide="extra_action('reload')"
+                                                                       ng-click="player_command('reload', '', '')">/reload</a></li>
+                                                                <li><a href="#" class="monospace"
+                                                                       ng-hide="extra_action('save-all')"
+                                                                       ng-click="player_command('save-all', '', '')">/save-all</a></li>
+                                                                <li><a href="#" class="monospace"
+                                                                       ng-hide="extra_action('save-on')"
+                                                                       ng-click="player_command('save-on', '', '')">/save-on</a></li>
+                                                                <li><a href="#" class="monospace"
+                                                                       ng-hide="extra_action('save-off')"
+                                                                       ng-click="player_command('save-off', '', '')">/save-off</a></li>
+                                                                <li><a href="#" class="monospace"
+                                                                       ng-hide="extra_action('end')"
+                                                                       ng-click="player_command('end', '', '')">/end</a></li>
                                                             </ul>
                                                         </div>
                                                     </div>
