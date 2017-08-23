@@ -342,10 +342,13 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
   }
 
   $scope.player_capacity = function() {
+    //variable for populating players online circular gauge
     var capacity = 0;
     $.each(Servers, function(server_name, instance) {
       if ('sp' in instance)
-        capacity += instance.sp['max-players'];
+        try {
+          capacity += parseInt(instance.sp['max-players']);
+        } catch (e) {}
     })
     return capacity;
   }
