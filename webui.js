@@ -6,6 +6,7 @@ var async = require('async');
 var fs = require('fs-extra');
 
 var express = require('express');
+var compression = require('compression');
 var passport = require('passport');
 var LocalStrategy = require('passport-local');
 var passportSocketIO = require("passport.socketio");
@@ -90,6 +91,7 @@ var token = require('crypto').randomBytes(48).toString('hex');
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(methodOverride());
+app.use(compression());
 app.use(expressSession({ 
   secret: token,
   key: 'express.sid',
