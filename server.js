@@ -1099,6 +1099,8 @@ function server_container(server_name, user_config, socket_io) {
     var ip_address = socket.request.connection.remoteAddress;
     var username = socket.request.user.username;
     var NOTICES_QUEUE_LENGTH = 10; // 0 < q <= 10
+    var last_increment_check = Date.now();
+    var increment_fn = async.memoize(instance.list_increments);
 
     function server_dispatcher(args) {
       var introspect = require('introspect');
@@ -1242,9 +1244,17 @@ function server_container(server_name, user_config, socket_io) {
       switch (page) {
         case 'glance':
           logging.debug('[{0}] {1} requesting server at a glance info'.format(server_name, username));
+          var TIME_BETWEEN_CHECKS = 10; //seconds holdout between list_increment checks
+
+          if ( Date.now() - last_increment_check >= TIME_BETWEEN_CHECKS * 1000 ) {
+            //if time elapsed exceeds TIME_BETWEEN_CHECKS, make a new call
+            logging.debug('[{0}] refreshing list_increment call'.format(server_name));
+            increment_fn = async.memoize(instance.list_increments);
+            last_increment_check = Date.now();
+          }
 
           async.parallel({
-            'increments': async.apply(instance.list_increments),
+            'increments': async.apply(increment_fn),
             'archives': async.apply(instance.list_archives),
             'du_awd': async.apply(instance.property, 'du_awd'),
             'du_bwd': async.apply(instance.property, 'du_bwd'),
