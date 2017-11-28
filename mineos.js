@@ -32,7 +32,8 @@ mineos.SP_DEFAULTS = {
 var proc_paths = [
   '/usr/compat/linux/proc',
   '/system/lxproc',
-  '/proc'
+  '/proc',
+  '/compat/linux/proc'
 ]
 
 var PROC_PATH = null;
