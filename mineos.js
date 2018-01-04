@@ -1161,7 +1161,7 @@ mineos.mc = function(server_name, base_dir) {
           })
 
           all_info.sort(function(a, b) {
-            return a.time.getTime() - b.time.getTime();
+            return b.time.getTime() - a.time.getTime();
           });
 
           callback(err || inner_err, all_info);
