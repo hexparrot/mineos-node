@@ -29,6 +29,7 @@ Using an apt-get based Linux distribution:
     cd minecraft
     chmod +x generate-sslcert.sh
     ./generate-sslcert.sh
+    cp mineos.conf /etc/mineos.conf
     npm install
     
 For hosts using 'upstart':
