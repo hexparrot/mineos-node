@@ -79,6 +79,6 @@
     "xml2js": "0.4.x"
   },
   "devDependencies": {
-    "nodeunit": "0.9.x"
+    "nodeunit": "^0.9.5"
   }
 }
