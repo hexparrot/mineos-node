@@ -51,7 +51,7 @@
 
   "OFFICIAL_MOJANG_SERVER_JARS": "Официальные серверные Jar-файлы от Mojang",
   "AVAILABLE_SERVER_JARS": "Доступные серверные Jar-файлы/Сборки",
-  "NO_PROFILES_DOWNLOADED": "No profiles are available; check internet connectivity and refresh the profile list.",
+  "NO_PROFILES_DOWNLOADED": "Профили не доступны для скачивания; Проверьте соединение с Интернетом и обновите список профилей.",
   "IDENTIFIER": "Код",
   "RELEASE_TIMESTAMP": "Время выпуска",
   "RELEASE_TYPE": "Тип Выпуска",
@@ -97,21 +97,21 @@
   "MEMORY_ALLOCATION": "Выделенная память (Heapsize)",
   "JAVA_XMX": "-Xmx",
   "JAVA_XMS": "-Xms",
-  "MB_ABBREVIATION": "MB",
+  "MB_ABBREVIATION": "Мб",
   "SELECT_SERVER_PROFILE": "Выберите профиль сервера",
   "CHANGE_PROFILE_TO": "Сменить профиль:",
   "CHANGE_JARFILE_TO": "Сменить JAR-файл:",
   "ADDITIONAL_JAVA_ARGS": "Дополнительные аргументы Java:",
   "ADDITIONAL_JAR_ARGS": "Дополнительные аргументы Jar:",
-  "CHANGE_NICENESS": "Change Process Niceness",
-  "NICENESS_DESC": "Niceness can range from -20 (highest priority scheduling) to 19 (lowest).  The default is 0.",
+  "CHANGE_NICENESS": "Изменить значение Niceness процесса (приоритет)",
+  "NICENESS_DESC": "Значение Niceness меняется от -20 (наивысший приоритет) до 19 (низший).  По умолчанию 0.",
 
   "MOST_RECENT_RESTORE_POINT": "Последняя точка восстановления",
   "OLDEST_RESTORE_POINT": "Самая ранняя точка восстановления",
   "SPACE_USED_RESTORES": "Размер всех точек воcстановления",
   "SUCCESS": "успешно",
   "RESTORE_POINT_CREATED": "Точка восстановления создана",
-  "FAILURE": "О нет!",
+  "FAILURE": "Неудачно!",
   "RESTORE_POINT_FAILED": "Попытка создания точки восстановления неудачна",
   "CREATE_NEW_RESTORE_POINT": "Создать новую точку восстановления",
 
@@ -157,7 +157,7 @@
   "SUBMIT_CRONJOB": "Создать задание",
   "SUSPEND": "Приостановить",
 
-  "CREDITS": "MineOS разработан и поддерживается William Dizon",
+  "CREDITS": "MineOS разработан и поддерживается William Dizon. Русский перевод Angel the SiliconHeart",
 
   "CHANGE_LOCALE": "Сменить язык",
 
