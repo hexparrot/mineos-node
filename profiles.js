@@ -38,7 +38,9 @@ exports.profile_manifests = {
             var parsed = JSON.parse(body);
             for (var idx in p)
               if (p[idx]['id'] == obj['id'])
-                p[idx]['url'] = parsed['downloads']['server']['url'];
+                try {
+                  p[idx]['url'] = parsed['downloads']['server']['url'];
+                } catch (e) {}
             inner_cb();
           }
         ])
