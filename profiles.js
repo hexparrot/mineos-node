@@ -25,7 +25,29 @@ exports.profile_manifests = {
       json: true
     },
     handler: function(profile_dir, body, callback) {
+      var request = require('request');
       var p = [];
+
+      var q = async.queue(function(obj, cb) {
+        async.waterfall([
+          async.apply(request, obj.url),
+          function(response, body, inner_cb) {
+            inner_cb(response.statusCode != 200, body)
+          },
+          function(body, inner_cb) {
+            var parsed = JSON.parse(body);
+            for (var idx in p)
+              if (p[idx]['id'] == obj['id'])
+                try {
+                  p[idx]['url'] = parsed['downloads']['server']['url'];
+                } catch (e) {}
+            inner_cb();
+          }
+        ])
+        cb();
+      }, 2);
+
+      q.pause();
 
       try {  // BEGIN PARSING LOGIC
 	for (var index in body.versions) {
@@ -46,18 +68,27 @@ exports.profile_manifests = {
 
 	  switch(ref_obj['type']) {
 	    case 'release':
+	      item['type'] = ref_obj['type'];
+              p.push(item);
+	      break;
 	    case 'snapshot':
 	      item['type'] = ref_obj['type'];
+              q.push({ id: item['id'], url: ref_obj.url });
+              p.push(item);
 	      break;
 	    default:
 	      item['type'] = 'old_version'; //old_alpha, old_beta
+              //q.push({ id: item['id'], url: ref_obj.url });
 	      break;
 	  }
-	  p.push(item);
+          //p.push(item);
 	}
       } catch (e) {}
 
-      callback(null, p);
+      q.resume();
+      q.drain = function() {
+        callback(null, p);
+      }
     }, //end handler
     postdownload: function(profile_dir, dest_filepath, callback) {
       callback();
