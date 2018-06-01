@@ -1,8 +1,5 @@
-FROM debian:jessie
+FROM debian:stretch
 MAINTAINER William Dizon <wdchromium@gmail.com>
-
-#add testing repository for OpenJDK8
-RUN echo "deb http://http.debian.net/debian jessie-backports main" >> /etc/apt/sources.list
 
 #update and accept all prompts
 RUN apt-get update && apt-get install -y \
@@ -13,11 +10,12 @@ RUN apt-get update && apt-get install -y \
   git \
   curl \
   rlwrap \
-  && apt-get install -y -t jessie-backports openjdk-8-jre-headless ca-certificates-java \
+  default-jre-headless \
+  ca-certificates-java \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 #install node from nodesource
-RUN curl https://deb.nodesource.com/node_4.x/pool/main/n/nodejs/nodejs_4.6.2-1nodesource1~jessie1_amd64.deb > node.deb \
+RUN curl https://deb.nodesource.com/node_8.x/pool/main/n/nodejs/nodejs_8.9.4-1nodesource1_amd64.deb > node.deb \
  && dpkg -i node.deb \
  && rm node.deb
 
