@@ -116,7 +116,6 @@ function retrieve_property(args, callback) {
 }
 
 var base_dir = (opt.options || {}).d || '/var/games/minecraft';
-var instance = new mineos.mc(opt.options.server_name, base_dir);
 
 if ('version' in opt.options) {
   return_git_commit_hash(function(code, hash) {
@@ -124,18 +123,21 @@ if ('version' in opt.options) {
       console.log(hash);
     process.exit(code);
   })
-} else if (opt.argv[0] in instance) { //first provided param matches a function name) {
-  handle_server(opt, function(code, retval) {
-    for (var idx in retval)
-      console.log(retval[idx])
-    process.exit(code);
-  })
 } else {
-  retrieve_property(opt, function(code, retval) {
-    for (var idx in retval)
-      console.log(retval[idx])
-    process.exit(code);
-  })
+  var instance = new mineos.mc(opt.options.server_name, base_dir);
+  if (opt.argv[0] in instance) { //first provided param matches a function name) {
+    handle_server(opt, function(code, retval) {
+      for (var idx in retval)
+        console.log(retval[idx])
+      process.exit(code);
+    })
+  } else {
+    retrieve_property(opt, function(code, retval) {
+      for (var idx in retval)
+        console.log(retval[idx])
+      process.exit(code);
+    })
+  }
 }
 
 String.prototype.format = function() {
