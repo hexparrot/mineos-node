@@ -69,6 +69,7 @@ exports.profile_manifests = {
 	  switch(ref_obj['type']) {
 	    case 'release':
 	      item['type'] = ref_obj['type'];
+              q.push({ id: item['id'], url: ref_obj.url });
               p.push(item);
 	      break;
 	    case 'snapshot':
