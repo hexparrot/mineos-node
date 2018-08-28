@@ -732,6 +732,8 @@ function server_container(server_name, user_config, socket_io) {
 
     var fw = fireworm(instance.env.cwd, {skipDirEntryPatterns: skip_dirs});
 
+    for (var i in skip_dirs)
+      fw.ignore(skip_dirs[i]);
     fw.add('**/server.properties');
     fw.add('**/server.config');
     fw.add('**/cron.config');
@@ -739,8 +741,8 @@ function server_container(server_name, user_config, socket_io) {
     fw.add('**/server-icon.png');
     fw.add('**/config.yml');
 
+    var FS_DELAY = 250; 
     function handle_event(fp) {
-      var FS_DELAY = 250;
       // because it is unknown when fw triggers on add/change and
       // further because if it catches DURING the write, it will find
       // the file has 0 size, adding arbitrary delay.
