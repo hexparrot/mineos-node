@@ -32,7 +32,7 @@ git reset --hard origin/master >> $LOG
 if [ $? -eq 0 ]; then ECHO_LOG "OK"; else ECHO_LOG "FAILED" && exit 1; fi
 
 ECHO_LOG_N "Deleting npm module dependencies and rebuilding..."
-rm -rf node_modules && npm install --no-spin >> $LOG
+rm -rf node_modules && npm install --no-spin --unsafe-perm >> $LOG
 if [ $? -eq 0 ]; then ECHO_LOG "OK"; else ECHO_LOG "FAILED" && exit 1; fi
 
 ECHO_LOG_N "Setting node javascript files to executable..."
