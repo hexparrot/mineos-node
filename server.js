@@ -735,7 +735,7 @@ function server_container(server_name, user_config, socket_io) {
     var fw = fireworm(instance.env.cwd, {skipDirEntryPatterns: skip_dirs});
 
     for (var i in skip_dirs) {
-	//fw.ignore(skip_dirs[i]);
+	fw.ignore(skip_dirs[i]);
     }
     fw.add('**/server.properties');
     fw.add('**/server.config');
