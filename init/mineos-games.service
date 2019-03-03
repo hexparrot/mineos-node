@@ -1,0 +1,16 @@
+[Unit]
+Description=Stop MineOS-controlled minecraft games at shutdown
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/usr/games/minecraft
+Type=oneshot
+Environment="SHELL=/bin/bash"
+ExecStart=/bin/true
+ExecStop=/usr/bin/node mineos_shutdown.js
+StandardOutput=syslog
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
