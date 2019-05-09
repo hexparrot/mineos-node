@@ -104,6 +104,7 @@ The Angular.JS-based web user interface capable of:
 * restore server from previous restore point
 * see filesystem usage of live server files, archives, and restore points
 * authentication via shadow passwords (/etc/shadow) of underlying Linux system
+* authentication via LDAP
 * logs all user actions to file
 * cronjobs saved to portable format cron.config
 * server can be daemonized to background
