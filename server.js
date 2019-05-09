@@ -308,9 +308,10 @@ server.backend = function(base_dir, socket_emitter, user_config) {
     var ip_address = socket.request.connection.remoteAddress;
     var username = socket.request.user.username;
 
+
     var OWNER_CREDS = {
       uid: userid.uid(username),
-      gid: userid.gid(username)
+      gid: userid.gids(username)[0]
     }
 
     function webui_dispatcher (args) {
@@ -602,7 +603,7 @@ server.backend = function(base_dir, socket_emitter, user_config) {
 
       var gg = passwd.getGroups()
         .on('group', function(group_data) {
-          if (group_data.users.indexOf(username) >= 0 || group_data.gid == userid.gid(username)) {
+          if (group_data.users.indexOf(username) >= 0 || group_data.gid == userid.gids(username)[0]) {
             if (group_data.gid > 0) {
               groups.push({
                 groupname: group_data.groupname,

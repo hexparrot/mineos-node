@@ -21,6 +21,18 @@ var http = require('http').Server(app);
 
 var response_options = {root: __dirname};
 
+function read_ini(filepath) {
+  var ini = require('ini');
+  try {
+    var data = fs.readFileSync(filepath);
+    return ini.parse(data.toString());
+  } catch (e) {
+    return null;
+  }
+}
+
+var mineos_config = read_ini('/etc/mineos.conf') || read_ini('/usr/local/etc/mineos.conf') || {};
+
 // Authorization
 var localAuth = function (username, password) {
   var Q = require('q');
@@ -69,6 +81,47 @@ passport.use('local-signin', new LocalStrategy(
     });
   }
 ));
+
+
+var OPTS = {
+  server: {
+    url: mineos_config['ldap']['url'],
+    bindDN: mineos_config['ldap']['bindDN'],
+    bindCredentials: mineos_config['ldap']['bindCredentials'],
+    searchBase: mineos_config['ldap']['searchBase'],
+    searchFilter: mineos_config['ldap']['searchFilter'],
+    groupSearchBase: mineos_config['ldap']['groupSearchBase'],
+    groupSearchFilter: mineos_config['ldap']['groupSearchFilter'],
+    groupDnProperty: mineos_config['ldap']['groupDnProperty']
+  },
+  passReqToCallback : true
+};
+var LdapStrategy = require('passport-ldapauth');
+passport.use('ldap', new LdapStrategy(OPTS, function(req, user, done) {
+  if (mineos_config['ldap']['groupSearchFilter'] === '' || mineos_config['ldap']['groupSearchBase'] === '' || user['_groups'].length >= 1) {
+    try {
+      var userid = require('userid');
+      userid.uid(user[mineos_config['ldap']['fullName']]);
+      console.log('Successful login attempt for username:', user[mineos_config['ldap']['fullName']]);
+      var logstring = new Date().toString() + ' - success from: ' + req.connection.remoteAddress + ' user: ' + user[mineos_config['ldap']['fullName']] + '\n';
+      fs.appendFileSync('/var/log/mineos.auth.log', logstring);
+      done(null, { username: user[mineos_config['ldap']['fullName']] });
+    } catch (error) {
+      console.log('Ldap: Unix user not found for username:', user[mineos_config['ldap']['fullName']]);
+      var logstring = new Date().toString() + ' - failure from: ' + req.connection.remoteAddress + ' user: ' + user[mineos_config['ldap']['fullName']] + ' (unix user not found)\n';
+      fs.appendFileSync('/var/log/mineos.auth.log', logstring);
+      done(null)
+    }
+
+  }
+  else{
+    console.log('Unsuccessful login attempt for username:', user[mineos_config['ldap']['fullName']]);
+    var logstring = new Date().toString() + ' - failure from: ' + req.connection.remoteAddress + ' user: ' + user[mineos_config['ldap']['fullName']] + '\n';
+    fs.appendFileSync('/var/log/mineos.auth.log', logstring);
+    done(null);
+  }
+
+}));
 
 // clean up sessions that go stale over time
 function session_cleanup() {
@@ -130,16 +183,6 @@ function tally(callback) {
   })
 }
 
-function read_ini(filepath) {
-  var ini = require('ini');
-  try {
-    var data = fs.readFileSync(filepath);
-    return ini.parse(data.toString());
-  } catch (e) {
-    return null;
-  }
-}
-
 mineos.dependencies(function(err, binaries) {
   if (err) {
     console.error('MineOS is missing dependencies:', err);
@@ -147,7 +190,6 @@ mineos.dependencies(function(err, binaries) {
     process.exit(1);
   } 
 
-  var mineos_config = read_ini('/etc/mineos.conf') || read_ini('/usr/local/etc/mineos.conf') || {};
   var base_directory = '/var/games/minecraft';
 
   if ('base_directory' in mineos_config) {
@@ -187,7 +229,7 @@ mineos.dependencies(function(err, binaries) {
         res.sendfile('/html/login.html');
     });
 
-    app.post('/auth', passport.authenticate('local-signin', {
+    app.post('/auth', passport.authenticate(mineos_config['auth_method'], {
         successRedirect: '/admin/index.html',
         failureRedirect: '/admin/login.html'
         })
