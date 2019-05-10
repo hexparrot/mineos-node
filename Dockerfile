@@ -22,7 +22,7 @@ RUN curl https://deb.nodesource.com/node_8.x/pool/main/n/nodejs/nodejs_8.9.4-1no
 #download mineos from github
 RUN mkdir /usr/games/minecraft \
   && cd /usr/games/minecraft \
-  && git clone --depth=1 https://github.com/hexparrot/mineos-node.git . \
+  && git clone --depth=1 https://github.com/bethington/mineos-node.git . \
   && cp mineos.conf /etc/mineos.conf \
   && chmod +x webui.js mineos_console.js service.js
 
@@ -44,5 +44,5 @@ CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
-EXPOSE 8443 25565-25570
+EXPOSE 8080 8443 25560-25570
 VOLUME /var/games/minecraft
