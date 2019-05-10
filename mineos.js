@@ -15,13 +15,13 @@ mineos.DIRS = {
 }
 
 mineos.SP_DEFAULTS = {
-  'server-port': 25565,
+  'server-port': 25560,
   'max-players': 20,
   'level-seed': '',
   'gamemode': 0,
   'difficulty': 1,
   'level-type': 'DEFAULT',
-  'level-name': 'world',
+  'level-name': 'xebyte',
   'max-build-height': 256,
   'generate-structures': 'true',
   'generator-settings': '',
