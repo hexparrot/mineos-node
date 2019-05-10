@@ -244,7 +244,7 @@ mineos.dependencies(function(err, binaries) {
 
   var SOCKET_PORT = null;
   var SOCKET_HOST = '0.0.0.0';
-  var USE_HTTPS = true;
+  var USE_HTTPS = false;
 
   if ('use_https' in mineos_config)
     USE_HTTPS = mineos_config['use_https'];
