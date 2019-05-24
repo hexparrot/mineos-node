@@ -1,4 +1,4 @@
-# docker build -t bethington/minos .
+# docker build -t bethington/mineos .
 FROM debian:stretch
 MAINTAINER William Dizon <wdchromium@gmail.com>
 
