@@ -1066,8 +1066,8 @@
                                             </header>
                                             <section class="body">
                                                 <div class="body-inner">
-                                                    <p>{{ 'MOST_RECENT_ARCHIVE' | translate }}: <a title="{{ servers[current].page_data.glance.archives[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" rel="tooltip" am-time-ago="servers[current].page_data.glance.archives.slice(-1)[0].time"></a></p>
-                                                    <p>{{ 'OLDEST_ARCHIVE' | translate }}: <a title="{{ servers[current].page_data.glance.archives.slice(-1)[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" rel="tooltip" am-time-ago="servers[current].page_data.glance.archives[0].time"></a></p>
+                                                    <p>{{ 'MOST_RECENT_ARCHIVE' | translate }}: <a title="{{ servers[current].page_data.glance.archives.slice(-1)[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" rel="tooltip" am-time-ago="servers[current].page_data.glance.archives.slice(-1)[0].time"></a></p>
+                                                    <p>{{ 'OLDEST_ARCHIVE' | translate }}: <a title="{{ servers[current].page_data.glance.archives[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" rel="tooltip" am-time-ago="servers[current].page_data.glance.archives[0].time"></a></p>
                                                     <p>{{ 'SPACE_USED_ARCHIVES' | translate }}: {{ servers[current].page_data.glance.du_awd | bytes_to_mb }}</p>
                                                     <!-- Alert Error -->
                                                     <div class="alert alert-success" ng-show="servers[current].latest_notice['archive'].success">
