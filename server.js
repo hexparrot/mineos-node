@@ -446,7 +446,7 @@ server.backend = function(base_dir, socket_emitter, user_config) {
             async.apply(fs.copy, bt_path, dest_path),
             function(cb) {
               var binary = which.sync('java');
-              var proc = child_process.spawn(binary, ['-jar', dest_path, '--rev', args.version], params);
+              var proc = child_process.spawn(binary, ['-Xms512M', '-jar', dest_path, '--rev', args.version], params);
 
               proc.stdout.on('data', function (data) {
                 self.front_end.emit('build_jar_output', data.toString());
