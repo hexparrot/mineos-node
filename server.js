@@ -732,18 +732,6 @@ function server_container(server_name, user_config, socket_io) {
 
     logging.info('[{0}] Using skipDirEntryPatterns: {1}'.format(server_name, skip_dirs));
 
-    var fw = fireworm(instance.env.cwd, {skipDirEntryPatterns: skip_dirs});
-
-    for (var i in skip_dirs) {
-	fw.ignore(skip_dirs[i]);
-    }
-    fw.add('**/server.properties');
-    fw.add('**/server.config');
-    fw.add('**/cron.config');
-    fw.add('**/eula.txt');
-    fw.add('**/server-icon.png');
-    fw.add('**/config.yml');
-
     var FS_DELAY = 250; 
     function handle_event(fp) {
       // because it is unknown when fw triggers on add/change and
@@ -773,8 +761,22 @@ function server_container(server_name, user_config, socket_io) {
       }
     }
 
-    fw.on('add', handle_event);
-    fw.on('change', handle_event);
+    try {
+      var fw = fireworm(instance.env.cwd, {skipDirEntryPatterns: skip_dirs});
+
+      for (var i in skip_dirs) {
+	fw.ignore(skip_dirs[i]);
+      }
+      fw.add('**/server.properties');
+      fw.add('**/server.config');
+      fw.add('**/cron.config');
+      fw.add('**/eula.txt');
+      fw.add('**/server-icon.png');
+      fw.add('**/config.yml');
+
+      fw.on('add', handle_event);
+      fw.on('change', handle_event);
+    } catch (e) {}
   })();
 
   intervals['heartbeat'] = setInterval(heartbeat, HEARTBEAT_INTERVAL_MS);
