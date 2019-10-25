@@ -780,7 +780,10 @@ function server_container(server_name, user_config, socket_io) {
   intervals['heartbeat'] = setInterval(heartbeat, HEARTBEAT_INTERVAL_MS);
 
   function heartbeat() {
-    async.series({
+    clearInterval(intervals['heartbeat']);
+    intervals['heartbeat'] = setInterval(heartbeat, HEARTBEAT_INTERVAL_MS * 3);
+
+    async.parallel({
       'up': function(cb) { instance.property('up', function(err, is_up) { cb(null, is_up) }) },
       'memory': function(cb) { instance.property('memory', function(err, mem) { cb(null, err ? {} : mem) }) },
       'ping': function(cb) {
@@ -800,6 +803,9 @@ function server_container(server_name, user_config, socket_io) {
         })
       }
     }, function(err, retval) {
+      clearInterval(intervals['heartbeat']);
+      intervals['heartbeat'] = setInterval(heartbeat, HEARTBEAT_INTERVAL_MS);
+
       nsp.emit('heartbeat', {
         'server_name': server_name,
         'timestamp': Date.now(),
