@@ -230,7 +230,7 @@ server.backend = function(base_dir, socket_emitter, user_config) {
               }
             ], function(err, output) {
               if (err || typeof output == 'undefined')
-                logging.error("Unable to retrieve profile: {0}. Please check your internet connectivity.".format(key));
+                logging.error("Unable to retrieve profile: {0}. The definition for this profile may be improperly formed or is pointing to an invalid URI.".format(key));
               else {
                 logging.info("Downloaded information for collection: {0} ({1} entries)".format(collection.name, output.length));
                 profiles = profiles.concat(output);
@@ -244,7 +244,7 @@ server.backend = function(base_dir, socket_emitter, user_config) {
               }
             ], function(err, output) {
               if (err || typeof output == 'undefined')
-                logging.error("Unable to retrieve profile: {0}. Please check your internet connectivity.".format(key));
+                logging.error("Unable to retrieve profile: {0}. The definition for this profile may be improperly formed or is pointing to an invalid URI.".format(key));
               else {
                 logging.info("Downloaded information for collection: {0} ({1} entries)".format(collection.name, output.length));
                 profiles = profiles.concat(output);
