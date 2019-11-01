@@ -235,7 +235,7 @@ server.backend = function(base_dir, socket_emitter, user_config) {
                 logging.info("Downloaded information for collection: {0} ({1} entries)".format(collection.name, output.length));
                 profiles = profiles.concat(output);
               }
-              outer_cb(err);
+              outer_cb();
             }); //end waterfall
           } else { //for profiles like paperspigot which are hardcoded
             async.waterfall([
@@ -249,7 +249,7 @@ server.backend = function(base_dir, socket_emitter, user_config) {
                 logging.info("Downloaded information for collection: {0} ({1} entries)".format(collection.name, output.length));
                 profiles = profiles.concat(output);
               }
-              outer_cb(err);
+              outer_cb();
             }); //end waterfall
           }
         },
