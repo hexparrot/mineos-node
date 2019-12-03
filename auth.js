@@ -105,7 +105,7 @@ auth.test_membership = function(username, group, callback) {
     .on('group', function(group_data) {
       if (group == group_data.groupname)
         try {
-          if (group_data.users.indexOf(username) >= 0 || group_data.gid == userid.gid(username)) 
+          if (group_data.users.indexOf(username) >= 0 || group_data.gid == userid.gids(username)[0])
             membership_valid = true;
         } catch (e) {}
     })
