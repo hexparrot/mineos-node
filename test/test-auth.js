@@ -5,7 +5,14 @@ var test = exports;
 test.authenticate_shadow = function(test) {
   // this test assumes:
   // user "weak" with password "password"
+  // user "madeup" with group membership: users (no existence of 'madeup' group)
   async.series([
+    function(callback) {
+      auth.authenticate_shadow('madeup', 'password', function(authed_user) {
+        test.equal(authed_user, 'madeup');
+        callback(!authed_user);
+      })
+    },
     function(callback) {
       auth.authenticate_shadow('weak', 'password', function(authed_user) {
         test.equal(authed_user, 'weak');
