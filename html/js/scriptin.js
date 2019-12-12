@@ -1,4 +1,5 @@
 var app = angular.module("mineos", ['angularMoment', 'pascalprecht.translate', 'ngSanitize']);
+var ansi_up = new AnsiUp;
 
 app.config(function ($translateProvider) {
   $translateProvider.useSanitizeValueStrategy('escape');
@@ -207,79 +208,8 @@ app.filter('colorize', [ '$sce', function($sce){
   }
 
   return function(str) {
-    /* Regex Explanation from regex101.com
-      + /\[0;((?:\d+;?)+)m|\[m/g
-        + 1st Alternative: \[0;((?:\d+;?)+)m
-          + \[ matches the character [ literally
-          + 0; matches the characters 0; literally
-          + 1st Capturing group ((?:\d+;?)+)
-            + (?:\d+;?)+ Non-capturing group
-                + Quantifier: + Between one and unlimited times, as many times as possible, giving back as needed [greedy]
-              + \d+ match a digit [0-9]
-                + Quantifier: + Between one and unlimited times, as many times as possible, giving back as needed [greedy]
-              + ;? matches the character ; literally
-                + Quantifier: ? Between zero and one time, as many times as possible, giving back as needed [greedy]
-            + m matches the character m literally (case sensitive)
-        + 2nd Alternative: \[m
-          + \[ matches the character [ literally
-          + m matches the character m literally (case sensitive)
-      + g modifier: global. All matches (don't return on first match)
-
-        Note: "(" and ")" are needed for split otherwise matched content is ignored.
-    */
-    str = str.split('\033').join('');
-    var splitString = str.split(/\[0;((?:\d+;?)+)m|\[m/g);
-
-    var spanOpen = false;
-    for ( i in splitString ) {
-
-      // Every over cell should be format codes
-      if ( i % 2 == 1 ) {
-
-        // Check for closing span at end of array (there WILL be an undefined element)
-        if (splitString[i] == undefined)
-          splitString[i] = spanOpen ? '</span>' : '';
-        else {
-          // Setup new formatting span.  formatCodes
-          // are split first so we can reuse the array cell
-          // as a work area.
-          var formatCodes = splitString[i].split(';');
-          splitString[i] = spanOpen ? '</span>' : '';
-          splitString[i] += '<span class="';
-
-          // Parse the ANSI format codes and extract useable
-          // information into variables.
-          var intense;
-          var colorCode;
-          for (j in formatCodes) {
-            formatCode = parseInt(formatCodes[j]);
-
-            if (formatCode == ANSI_INTENSE_CODE)
-              intense = true;
-            else if (formatCode == ANSI_NORMAL_CODE) 
-              intense = false;
-            else if (formatCode >= ANSI_MIN_COLOR && formatCode <= ANSI_MAX_COLOR)
-              colorCode = formatCode;
-            else 
-              console.log('Unsupported format code: ' + formatCode);
-          }
-
-          // Add color class to span
-          if (intense)
-            splitString[i] += IntenseColors[colorCode - ANSI_COLOR_OFFSET];
-          else
-            splitString[i] += Colors[colorCode - ANSI_COLOR_OFFSET];
-
-          // Close span off
-          splitString[i] += '">';
-          spanOpen = true;
-        }
-      } else 
-        splitString[i] = escapeChars(splitString[i]);
-    }
-
-    // needed so the color spans will be used as HTML and not as text
-    return $sce.trustAsHtml(splitString.join(''));
+	  var html = ansi_up.ansi_to_html(str);
+	  return $sce.trustAsHtml(html);
   }
 }]);
 

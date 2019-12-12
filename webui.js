@@ -235,6 +235,7 @@ mineos.dependencies(function(err, binaries) {
   app.use('/angular-moment-duration-format', express.static(__dirname + '/node_modules/moment-duration-format/lib'));
   app.use('/angular-sanitize', express.static(__dirname + '/node_modules/angular-sanitize'));
   app.use('/admin', express.static(__dirname + '/html'));
+  app.use('/ansi_up', express.static(__dirname + '/node_modules/ansi_up'));
 
   process.on('SIGINT', function() {
     console.log("Caught interrupt signal; closing webui....");
