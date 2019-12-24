@@ -108,7 +108,8 @@ server.backend = function(base_dir, socket_emitter, user_config) {
     function discover() {
       //http://stackoverflow.com/a/24594123/1191579
       return fs.readdirSync(server_path).filter(function(p) {
-        return fs.statSync(path.join(server_path, p)).isDirectory();
+        //check if path exists, in case of broken symlink
+        return fs.existsSync(path.join(server_path, p)) && fs.statSync(path.join(server_path, p)).isDirectory();
       });
     }
 
@@ -744,7 +745,7 @@ function server_container(server_name, user_config, socket_io) {
     fw.add('**/server-icon.png');
     fw.add('**/config.yml');
 
-    var FS_DELAY = 250; 
+    var FS_DELAY = 250;
     function handle_event(fp) {
       // because it is unknown when fw triggers on add/change and
       // further because if it catches DURING the write, it will find
@@ -1401,4 +1402,3 @@ function server_container(server_name, user_config, socket_io) {
 
   }) //nsp on connect container ends
 }
-
