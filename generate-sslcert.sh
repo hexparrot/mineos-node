@@ -18,7 +18,7 @@ set ${O:="TurnKey Linux"}
 set ${OU:="Software appliances"}
 
 set ${DAYS:=3650}
-set ${BITS:=1024}
+set ${BITS:=2048}
 set ${KEYPASS:=<blank>}           # workaround: no way of passing a blank pass
 set ${CERTFILE:="/etc/ssl/certs/mineos.pem"}
 set ${CRTFILE:="/etc/ssl/certs/mineos.crt"}
