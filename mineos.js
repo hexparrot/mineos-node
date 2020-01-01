@@ -446,8 +446,7 @@ mineos.mc = function(server_name, base_dir) {
       case 'tgz':
       case 'tar':
         var binary = which.sync('tar');
-        var args = ['--force-local',
-                    '-xf', dest_filepath];
+        var args = ['-xf', dest_filepath];
         var params = { cwd: self.env.cwd,
                        uid: owner.uid,
                        gid: owner.gid };
