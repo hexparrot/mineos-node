@@ -260,13 +260,16 @@ mineos.dependencies(function(err, binaries) {
     else
       SOCKET_PORT = 8080;
 
-  if (USE_HTTPS)
+  if (USE_HTTPS) {
+    keyfile = mineos_config['ssl_private_key'] || '/etc/ssl/certs/mineos.key';
+    certfile = mineos_config['ssl_certificate'] || '/etc/ssl/certs/mineos.crt';
     async.parallel({
-      key: async.apply(fs.readFile, mineos_config['ssl_private_key'] || '/etc/ssl/certs/mineos.key'),
-      cert: async.apply(fs.readFile, mineos_config['ssl_certificate'] || '/etc/ssl/certs/mineos.crt')
+      key: async.apply(fs.readFile, keyfile),
+      cert: async.apply(fs.readFile, certfile)
     }, function(err, ssl) {
       if (err) {
-        console.error('Could not locate required SSL files /etc/ssl/certs/mineos.{key,crt}, aborting server start.');
+        console.error('Could not locate required SSL files ' + keyfile +
+	              ' and/or ' + certfile + ', aborting server start.');
         process.exit(3);
       } else {
         var https = require('https');
@@ -285,7 +288,7 @@ mineos.dependencies(function(err, binaries) {
         });
       }
     })
-  else {
+  } else {
     console.warn('mineos.conf set to host insecurely: starting HTTP server.');
     http.listen(SOCKET_PORT, SOCKET_HOST, function(){
       console.log('MineOS webui listening on HTTP://' + SOCKET_HOST + ':' + SOCKET_PORT);
