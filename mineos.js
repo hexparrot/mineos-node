@@ -1580,9 +1580,9 @@ mineos.mc = function(server_name, base_dir) {
       return retval;
     }
 
-    function send_query_packet(port,host='localhost') {
+    function send_query_packet(port) {
       var net = require('net');
-      var socket = net.connect({host: host, port: port});
+      var socket = net.connect({port: port});
       var query = 'modern';
       var QUERIES = {
         'modern': '\xfe\x01',
@@ -1644,10 +1644,7 @@ mineos.mc = function(server_name, base_dir) {
     }
 
     self.sp(function(err, dict) {
-      if (dict['server-ip'] != '0.0.0.0')
-        send_query_packet(dict['server-port'],dict['server-ip']);
-      else
-        send_query_packet(dict['server-port']);
+      send_query_packet(dict['server-port']);
     })  
   }
 
