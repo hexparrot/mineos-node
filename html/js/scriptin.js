@@ -465,6 +465,13 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     $translate.use(locale);
   })
 
+  socket.on('/', 'optional_columns', function(user_data) {
+    var columns = [];
+    if (user_data.length > 0)
+      columns = user_data.split(',');
+    $scope.columns = columns;
+  })
+
   socket.on('/', 'file_progress', function(data) {
     for (var p in $scope.profiles)
       if (data.group == $scope.profiles[p].group &&

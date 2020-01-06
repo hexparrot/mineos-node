@@ -412,6 +412,8 @@
                                                 <th class="hidden-phone" translate="PORT"></th>
                                                 <th translate="STATUS"></th>
                                                 <th translate="MEMORY"></th>
+                                                <th ng-repeat-start="col in columns">{{ col }}</th>
+                                                <th ng-repeat-end></th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -424,6 +426,8 @@
                                                 <td class="hidden-phone">{{ (instance.sc.minecraft.unconventional ? '-----' : instance.sp['server-port']) }}</td>
                                                 <td><span class="label" ng-show="instance.heartbeat" ng-class="{'label-success': instance.heartbeat.up, 'label-important': !instance.heartbeat.up}">{{ instance.heartbeat.up ? 'up' : 'down' }}</span></td>
                                                 <td>{{ instance.heartbeat.memory.VmRSS | kb_string_to_mb }}</td>
+                                                <td ng-repeat-start="col in columns">{{ instance.sp[col] }}</td>
+                                                <td ng-repeat-end></td>
                                             </tr>
                                         </tbody>
                                     </table>

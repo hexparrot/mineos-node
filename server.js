@@ -620,6 +620,7 @@ server.backend = function(base_dir, socket_emitter, user_config) {
     socket.emit('whoami', username);
     socket.emit('commit_msg', self.commit_msg);
     socket.emit('change_locale', (user_config || {})['webui_locale']);
+    socket.emit('optional_columns', (user_config || {})['optional_columns']);
 
     for (var server_name in self.servers)
       socket.emit('track_server', server_name);
