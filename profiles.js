@@ -98,7 +98,7 @@ exports.profile_manifests = {
   ftb: {
     name: 'Feed the Beast Server Packs',
     request_args: {
-      url: 'http://ftb.cursecdn.com/FTB2/static/modpacks.xml',
+      url: 'http://dist.creeper.host/FTB2/static/modpacks.xml',
       json: false
     },
     handler: function(profile_dir, body, callback) {
@@ -122,7 +122,7 @@ exports.profile_manifests = {
             item['webui_desc'] = '{0} (mc: {1})'.format(ref_obj['name'], ref_obj['mcVersion']);
             item['weight'] = 3;
             item['filename'] = ref_obj['serverPack'];
-            item['url'] = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(ref_obj.dir, ref_obj.version.replace(/\./g, '_'), ref_obj.serverPack);
+            item['url'] = 'http://dist.creeper.host/FTB2/modpacks/{0}/{1}/{2}'.format(ref_obj.dir, ref_obj.version.replace(/\./g, '_'), ref_obj.serverPack);
             item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
             item['version'] = ref_obj['mcVersion'];
             item['release_version'] = ref_obj['version'];
@@ -140,7 +140,7 @@ exports.profile_manifests = {
               new_item['webui_desc'] = ref_obj['name'];
               new_item['weight'] = 3;
               new_item['filename'] = ref_obj['serverPack'];
-              new_item['url'] = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(ref_obj.dir, old_versions[idx].replace(/\./g, '_'), ref_obj.serverPack);
+              new_item['url'] = 'http://dist.creeper.host/FTB2/modpacks/{0}/{1}/{2}'.format(ref_obj.dir, old_versions[idx].replace(/\./g, '_'), ref_obj.serverPack);
               new_item['downloaded'] = fs.existsSync(path.join(profile_dir, new_item.id, new_item.filename));
               new_item['version'] = ref_obj['mcVersion'];
               new_item['release_version'] = old_versions[idx];
@@ -161,7 +161,7 @@ exports.profile_manifests = {
   ftb_third_party: {
     name: 'Feed the Beast Third-Party Server Packs',
     request_args: {
-      url: 'http://ftb.cursecdn.com/FTB2/static/thirdparty.xml',
+      url: 'http://dist.creeper.host/FTB2/static/thirdparty.xml',
       json: false
     },
     handler: function(profile_dir, body, callback) {
@@ -185,7 +185,7 @@ exports.profile_manifests = {
             item['webui_desc'] = '{0} (mc: {1})'.format(ref_obj['name'], ref_obj['mcVersion']);
             item['weight'] = 3;
             item['filename'] = ref_obj['serverPack'];
-            item['url'] = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(ref_obj.dir, ref_obj.version.replace(/\./g, '_'), ref_obj.serverPack);
+            item['url'] = 'http://dist.creeper.host/FTB2/modpacks/{0}/{1}/{2}'.format(ref_obj.dir, ref_obj.version.replace(/\./g, '_'), ref_obj.serverPack);
             item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
             item['version'] = ref_obj['mcVersion'];
             item['release_version'] = ref_obj['version'];
@@ -203,7 +203,7 @@ exports.profile_manifests = {
               new_item['webui_desc'] = ref_obj['name'];
               new_item['weight'] = 3;
               new_item['filename'] = ref_obj['serverPack'];
-              new_item['url'] = 'http://ftb.cursecdn.com/FTB2/modpacks/{0}/{1}/{2}'.format(ref_obj.dir, ref_obj.version.replace(/\./g, '_'), ref_obj.serverPack);
+              new_item['url'] = 'http://dist.creeper.host/FTB2/modpacks/{0}/{1}/{2}'.format(ref_obj.dir, ref_obj.version.replace(/\./g, '_'), ref_obj.serverPack);
               new_item['downloaded'] = fs.existsSync(path.join(profile_dir, new_item.id, new_item.filename));
               new_item['version'] = ref_obj['mcVersion'];
               new_item['release_version'] = old_versions[idx];
