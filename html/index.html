@@ -401,14 +401,17 @@
                     <!-- START Row -->
                     <div class="row-fluid">
                         <!-- START Basic Table -->
-                        <div class="span12 widget">
+                        <div class="span12 widget" ng-init="advanced = 1">
                             <section class="body">
+                        <label><input type="checkbox" ng-checked="advanced" translate="ADVANCED"/>Show Advanced Columns</label>
                                 <div class="body-inner no-padding">
                                     <table class="table">
                                         <thead>
                                             <tr>
                                                 <th translate="SERVER"></th>
                                                 <th translate="PROFILE"></th>
+                                                <th class="hidden-phone" translate="VERSION" ng-show="advanced"></th>
+                                                <th class="hidden-phone" translate="IP" ng-show="advanced"></th>
                                                 <th class="hidden-phone" translate="PORT"></th>
                                                 <th translate="STATUS"></th>
                                                 <th translate="MEMORY"></th>
@@ -423,6 +426,8 @@
                                                     <a ng-click="$parent.change_page('server_status', server_name)">{{ server_name }}</a>
                                                 </td>
                                                 <td><a ng-attr-title="{{ 'MC Protocol: ' + instance.heartbeat.ping.protocol }}">{{ instance.sc.minecraft.profile }}</a></td>
+                                                <td ng-show="advanced">{{ instance.heartbeat.ping.server_version }}</td>
+                                                <td class="hidden-phone" ng-show="advanced">{{ (instance.sc.minecraft.unconventional ? '-----' : instance.sp['server-ip']) }}</td>
                                                 <td class="hidden-phone">{{ (instance.sc.minecraft.unconventional ? '-----' : instance.sp['server-port']) }}</td>
                                                 <td><span class="label" ng-show="instance.heartbeat" ng-class="{'label-success': instance.heartbeat.up, 'label-important': !instance.heartbeat.up}">{{ instance.heartbeat.up ? 'up' : 'down' }}</span></td>
                                                 <td>{{ instance.heartbeat.memory.VmRSS | kb_string_to_mb }}</td>
