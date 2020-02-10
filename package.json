@@ -71,7 +71,7 @@
     "tmp": "0.0.33",
     "unzip": "0.1.x",
     "urllib": "^2.34.1",
-    "userid": "0.3.x",
+    "userid": "^0.3.1",
     "uuid": "3.0.x",
     "which": "1.2.x",
     "whoami": "0.0.x",
