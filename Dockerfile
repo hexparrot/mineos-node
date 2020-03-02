@@ -8,7 +8,10 @@ RUN apt-get update && apt-get install -y \
   screen \
   rsync \
   git \
+  htop \
+  tree \
   curl \
+  nano\
   rlwrap \
   default-jre-headless \
   ca-certificates-java \
