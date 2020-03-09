@@ -279,11 +279,11 @@ exports.profile_manifests = {
           var version = body.versions[index];
           var item = new profile_template();
 
-          item['id'] = '{0}-latest'.format(version);
+          item['id'] = 'Paper-{0}-latest'.format(version);
           item['group'] = 'papermc';
           item['webui_desc'] = 'Latest Paper build for {0}'.format(version);
           item['weight'] = 0;
-          item['filename'] = 'paper-{0}.jar'.format(version);
+          item['filename'] = 'paperclip.jar'.format(version);
           item['url'] = 'https://papermc.io/api/v1/paper/{0}/latest/download'.format(version);
           item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
           item['version'] = version;
