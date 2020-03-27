@@ -42,7 +42,7 @@ if id -u $USER_NAME >/dev/null 2>&1; then
 else
   useradd -Ms /bin/false -u $USER_UID -g $USER_GID $USER_NAME
   echo "$USER_NAME:$USER_PASSWORD" | chpasswd
-  echo >&2 "Created user: $USER_NAME (uid: $USER_UID, guid: $USER_GID)"
+  echo >&2 "Created user: $USER_NAME (uid: $USER_UID, gid: $USER_GID)"
 fi
 
 if [ ! -f /etc/ssl/certs/mineos.crt ]; then
