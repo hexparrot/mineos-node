@@ -17,6 +17,17 @@ else
   USER_NAME=mc
 fi
 
+if [ "$GROUP_NAME" ]; then
+  # group name specifically provided, will overwrite 'mc'
+  if [[ "$GROUP_NAME" =~ [^a-zA-Z0-9] ]]; then
+    echo >&2 'GROUP_NAME must contain only alphanumerics [a-zA-Z0-9]'
+    exit 1
+  fi
+else
+  echo >&2 'GROUP_NAME not provided; defaulting to "mc"'
+  GROUP_NAME=mc
+fi
+
 if [ "$USER_UID" ]; then
   # uid specifically provided, will overwrite 1000 default
   if [[ "$USER_UID" =~ [^0-9] ]]; then
@@ -37,11 +48,11 @@ else
   USER_GID=1000
 fi
 
-if getent group $USER_NAME >/dev/null 2>&1; then
-  echo "a group named $USER_NAME already exists."
+if getent group $GROUP_NAME >/dev/null 2>&1; then
+  echo "a group named $GROUP_NAME already exists."
 else
-  groupadd -og $USER_GID $USER_NAME
-  echo >&2 "Created group: $USER_NAME (gid: $USER_GID)"
+  groupadd -og $GROUP_NAME $USER_NAME
+  echo >&2 "Created group: $GROUP_NAME (gid: $USER_GID)"
 fi
 
 if id -u $USER_NAME >/dev/null 2>&1; then
