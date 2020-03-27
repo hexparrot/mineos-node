@@ -37,10 +37,16 @@ else
   USER_GID=1000
 fi
 
-if id -u $USER_NAME >/dev/null 2>&1; then
-  echo "$USER_NAME already exists."
+if getent group $USER_NAME >/dev/null 2>&1; then
+  echo "a group named $USER_NAME already exists."
 else
   groupadd -og $USER_GID $USER_NAME
+  echo >&2 "Created group: $USER_NAME (gid: $USER_GID)"
+fi
+
+if id -u $USER_NAME >/dev/null 2>&1; then
+  echo "a user named $USER_NAME already exists."
+else
   useradd -Mos /bin/false -u $USER_UID -g $USER_GID $USER_NAME
   echo "$USER_NAME:$USER_PASSWORD" | chpasswd
   echo >&2 "Created user: $USER_NAME (uid: $USER_UID, gid: $USER_GID)"
