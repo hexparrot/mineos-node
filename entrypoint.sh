@@ -40,6 +40,7 @@ fi
 if id -u $USER_NAME >/dev/null 2>&1; then
   echo "$USER_NAME already exists."
 else
+  groupadd -og $USER_GID $USER_NAME
   useradd -Ms /bin/false -u $USER_UID -g $USER_GID $USER_NAME
   echo "$USER_NAME:$USER_PASSWORD" | chpasswd
   echo >&2 "Created user: $USER_NAME (uid: $USER_UID, gid: $USER_GID)"
