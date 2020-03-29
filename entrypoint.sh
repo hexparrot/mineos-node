@@ -99,4 +99,18 @@ else
   echo >&2 "Skipping Self-Signed SSL, it either exists or is disabled."
 fi
 
+if [ "$USE_HTTPS" ]; then
+    if [ "$USE_HTTPS" == "true" ]; then
+        echo "Setting https to true"
+        sed -i 's/use_https = false/use_https = true/' /etc/mineos.conf
+
+    else
+        echo "Setting https to false"
+        sed -i 's/use_https = true/use_https = false/' /etc/mineos.conf
+    fi
+else
+    echo "Falling back to https true"
+    sed -i 's/use_https = false/use_https = true/' /etc/mineos.conf
+fi
+
 exec "$@"
