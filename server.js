@@ -108,7 +108,11 @@ server.backend = function(base_dir, socket_emitter, user_config) {
     function discover() {
       //http://stackoverflow.com/a/24594123/1191579
       return fs.readdirSync(server_path).filter(function(p) {
-        return fs.statSync(path.join(server_path, p)).isDirectory();
+        try {
+          return fs.statSync(path.join(server_path, p)).isDirectory();
+        } catch (e) {
+          logging.warn("Filepath {0} does not point to an existing directory".format(path.join(server_path,p)));
+        }
       });
     }
 
