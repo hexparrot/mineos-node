@@ -300,7 +300,7 @@ exports.profile_manifests = {
         item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
         item['url'] = 'https://ci.destroystokyo.com/job/Paper-1.15/{0}/artifact/paperclip.jar'.format(item.version);
         p.push(JSON.parse(JSON.stringify(item)));
-		
+
         item['version'] = '1618';
         item['id'] = 'paperspigot-{0}'.format(item.version);
         item['time'] = new Date().getTime();
@@ -315,7 +315,7 @@ exports.profile_manifests = {
         item['url'] = 'https://ci.destroystokyo.com/job/Paper/{0}/artifact/paperclip.jar'.format(item.version);
         p.push(JSON.parse(JSON.stringify(item)));
 
-	    item['version'] = '655';
+        item['version'] = '655';
         item['id'] = 'paperspigot-{0}'.format(item.version);
         item['time'] = new Date().getTime();
         item['releaseTime'] = new Date().getTime();
@@ -328,7 +328,7 @@ exports.profile_manifests = {
         item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
         item['url'] = 'https://ci.destroystokyo.com/job/Paper-1.13/{0}/artifact/paperclip.jar'.format(item.version);
         p.push(JSON.parse(JSON.stringify(item)));
-		
+
         item['version'] = '243';
         item['id'] = 'paperspigot-{0}'.format(item.version);
         item['time'] = new Date().getTime();
