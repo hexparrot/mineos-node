@@ -1,11 +1,13 @@
 #!/bin/bash
 set -eo pipefail
 
-if [ -z "$USER_PASSWORD" ]; then
+if [ -z "$USER_PASSWORD" ] || [ "$USER_PASSWORD" = "random_see_log"; then
   echo >&2 'USER_PASSWORD not specified, generating random password.'
   USER_PASSWORD=$(date +%s | sha256sum | base64 | head -c 20 ; echo)
+  echo >2& '*******************************************************'
   echo >&2 'Password set to: ' $USER_PASSWORD
-  #echo >&2 'You need to specify USER_PASSWORD'
+  echo >2& '*******************************************************'
+
   #exit 1
 fi
 

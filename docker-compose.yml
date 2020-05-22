@@ -13,7 +13,11 @@ services:
     stop_grace_period: 10m
 
     volumes:
-      - mineos_data:/var/games/minecraft
+      # Using a bind mapping is preferrable here due to how docker
+      # stores names volumes by default in /var/lib/docker/volumes
+      # with permissions that prevent normal users from accessing
+      # the folder structure.
+      - /var/games/mineos/minecraft:/var/games/minecraft
 
     environment:
       # Should the web interface use HTTPS or HTTP?
@@ -37,8 +41,9 @@ services:
 
       # If the account is being created, it will use either the password
       # set below, or a random, 20 character password will generated for
-      # you and displayed in the console log.
-      # USER_PASSWORD: password
+      # you and displayed in the console log. After first launch, you
+      # should check the log.
+      USER_PASSWORD: random_see_log
 
     ports:
       # HTTPS port for web interface. If you change the SERVER_PORT
