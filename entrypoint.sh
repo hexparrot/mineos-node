@@ -1,14 +1,20 @@
 #!/bin/bash
 set -eo pipefail
 
-if [ -z "$USER_PASSWORD" ] || [ "$USER_PASSWORD" = "random_see_log"; then
-  echo >&2 'USER_PASSWORD not specified, generating random password.'
-  USER_PASSWORD=$(date +%s | sha256sum | base64 | head -c 20 ; echo)
-  echo >2& '*******************************************************'
-  echo >&2 'Password set to: ' $USER_PASSWORD
-  echo >2& '*******************************************************'
+if [[ ! -f /root/password ]]; then
+  if [ -z "$USER_PASSWORD" ] || [ "$USER_PASSWORD" = "random_see_log" ]; then
+    echo >&2 'USER_PASSWORD not specified, generating random password.'
+    USER_PASSWORD=$(date +%s | sha256sum | base64 | head -c 20 ; echo)
+    echo >&2 '*******************************************************'
+    echo >&2 'Password set to: ' $USER_PASSWORD
+    echo >&2 '*******************************************************'
 
-  #exit 1
+    echo 'Password set to: ' $USER_PASSWORD > /root/password
+
+  fi
+  else
+  echo >&2 "Password already set by entrypoint.sh, at /root/password"
+  cat /root/password
 fi
 
 if [ "$USER_NAME" ]; then
@@ -33,7 +39,7 @@ else
 fi
 
 if id -u $USER_NAME >/dev/null 2>&1; then
-  echo "$USER_NAME already exists."
+  echo "User: $USER_NAME already exists."
 else
   useradd -Ms /bin/false -u $USER_UID $USER_NAME
   echo "$USER_NAME:$USER_PASSWORD" | chpasswd
