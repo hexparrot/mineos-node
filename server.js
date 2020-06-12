@@ -904,7 +904,7 @@ function server_container(server_name, user_config, socket_io) {
       if (err)
         callback(null);
       else {
-        var msg = new Buffer("[MOTD]" + sp_data.motd + "[/MOTD][AD]" + sp_data['server-port'] + "[/AD]");
+        var msg = Buffer.from("[MOTD]" + sp_data.motd + "[/MOTD][AD]" + sp_data['server-port'] + "[/AD]");
         var server_ip = sp_data['server-ip'];
         callback(msg, server_ip);
       }
@@ -957,7 +957,7 @@ function server_container(server_name, user_config, socket_io) {
     var filepath = path.join(instance.env.cwd, 'server-icon.png');
     fs.readFile(filepath, function(err, data) {
       if (!err && data.toString('hex',0,4) == '89504e47') //magic number for png first 4B
-        nsp.emit('server-icon.png', new Buffer(data).toString('base64'));
+        nsp.emit('server-icon.png', Buffer.from(data).toString('base64'));
     });
   }
 
@@ -967,7 +967,7 @@ function server_container(server_name, user_config, socket_io) {
     var filepath = path.join(instance.env.cwd, 'config.yml');
     fs.readFile(filepath, function(err, data) {
       if (!err)
-        nsp.emit('config.yml', new Buffer(data).toString());
+        nsp.emit('config.yml', Buffer.from(data).toString());
     });
   }
 
