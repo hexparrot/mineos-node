@@ -2,16 +2,48 @@
 
 var getopt = require('node-getopt');
 var mineos = require('./mineos');
+var fs = require('fs-extra');
 
 var opt = getopt.create([
   ['s' , 'server_name=SERVER_NAME'  , 'server name'],
-  ['d' , 'base_dir=BASE_DIR'        , 'defaults to /var/games/minecraft'],
   ['D' , 'debug'                    , 'show debug output'],
   ['V' , 'version'                  , 'show version'],
   ['h' , 'help'                     , 'display this help']
 ])              // create Getopt instance
 .bindHelp()     // bind option 'help' to default action
 .parseSystem(); // parse command line
+
+function read_ini(filepath) {
+  var ini = require('ini');
+  try {
+    var data = fs.readFileSync(filepath);
+    return ini.parse(data.toString());
+  } catch (e) {
+	  console.log(e)
+    return null;
+  }
+}
+
+var mineos_config = read_ini('mineos.conf') || {};
+var base_dir = '';
+
+if ('base_directory' in mineos_config) {
+  try {
+    if (mineos_config['base_directory'].length < 2)
+      throw new error('Invalid base_directory length.');
+
+    base_dir = mineos_config['base_directory'];
+    fs.ensureDirSync(base_directory);
+  } catch (e) {
+    process.exit(2);
+  }
+
+  console.info('base_directory found in mineos.conf, using:', base_dir);
+} else {
+  console.error('base_directory not specified--missing mineos.conf?');
+  console.error('Aborting startup.');
+  process.exit(4);
+}
 
 function return_git_commit_hash(callback) {
   var child_process = require('child_process');
@@ -41,7 +73,6 @@ function return_git_commit_hash(callback) {
 function handle_server(args, callback) {
   var introspect = require('introspect');
 
-  var base_dir = (args.options || {}).d || '/var/games/minecraft';
   var command = args.argv.shift();
   var fn = instance[command];
   var arg_array = [];
@@ -114,8 +145,6 @@ function retrieve_property(args, callback) {
 
   fn.apply(instance, arg_array);
 }
-
-var base_dir = (opt.options || {}).base_dir || '/var/games/minecraft';
 
 if ('version' in opt.options) {
   return_git_commit_hash(function(code, hash) {
