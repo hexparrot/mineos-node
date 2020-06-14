@@ -8,7 +8,7 @@ var fs = require('fs-extra');
 var server = exports;
 
 logging.add(logging.transports.File, {
-  filename: '/var/log/mineos.log',
+  filename: 'mineos.log',
   handleExceptions: true
 });
 

@@ -22,17 +22,15 @@ var http = require('http').Server(app);
 var response_options = {root: __dirname};
 
 // Authorization
-var localAuth = function (username, password) {
+var localAuth = function (username) {
+  var whoami = require('whoami');
   var Q = require('q');
-  var auth = require('./auth');
   var deferred = Q.defer();
 
-  auth.authenticate_shadow(username, password, function(authed_user) {
-    if (authed_user)
-        deferred.resolve({ username: authed_user });
-    else
-        deferred.reject(new Error('incorrect password'));
-  })
+  if (username == whoami)
+    deferred.resolve({ username: username });
+  else
+    deferred.reject(new Error('incorrect user'));
 
   return deferred.promise;
 }
@@ -52,19 +50,19 @@ passport.deserializeUser(function(obj, done) {
 passport.use('local-signin', new LocalStrategy(
   {passReqToCallback : true}, //allows us to pass back the request to the callback
   function(req, username, password, done) {
-    localAuth(username, password)
+    localAuth(username)
     .then(function (user) {
       if (user) {
         console.log('Successful login attempt for username:', username);
         var logstring = new Date().toString() + ' - success from: ' + req.connection.remoteAddress + ' user: ' + username + '\n';
-        fs.appendFileSync('/var/log/mineos.auth.log', logstring);
+        fs.appendFileSync('mineos.auth.log', logstring);
         done(null, user);
       }
     })
     .fail(function (err) {
       console.log('Unsuccessful login attempt for username:', username);
       var logstring = new Date().toString() + ' - failure from: ' + req.connection.remoteAddress + ' user: ' + username + '\n';
-      fs.appendFileSync('/var/log/mineos.auth.log', logstring);
+      fs.appendFileSync('mineos.auth.log', logstring);
       done(null);
     });
   }
@@ -110,26 +108,6 @@ io.use(passportSocketIO.authorize({
   store:        sessionStore        // we NEED to use a sessionstore. no memorystore please
 }));
 
-function tally(callback) {
-  var os = require('os');
-  var urllib = require('urllib');
-  var child_process = require('child_process');
-
-  var tally_info = {
-    sysname: os.type(), 
-    release: os.release(), 
-    nodename: os.hostname(),
-    version: '',
-    machine: process.arch
-  }
-
-  child_process.execFile('uname', ['-v'], function(err, output) {
-    if (!err)
-      tally_info['version'] = output.replace(/\n/,'');
-    urllib.request('http://minecraft.codeemo.com/tally/tally-node.py', {data: tally_info}, function(){});
-  })
-}
-
 function read_ini(filepath) {
   var ini = require('ini');
   try {
@@ -147,8 +125,8 @@ mineos.dependencies(function(err, binaries) {
     process.exit(1);
   } 
 
-  var mineos_config = read_ini('/etc/mineos.conf') || read_ini('/usr/local/etc/mineos.conf') || {};
-  var base_directory = '/var/games/minecraft';
+  var mineos_config = read_ini('mineos.conf') || {};
+  var base_directory = '';
 
   if ('base_directory' in mineos_config) {
     try {
@@ -172,26 +150,23 @@ mineos.dependencies(function(err, binaries) {
 
   var be = new server.backend(base_directory, io, mineos_config);
 
-  tally();
-  setInterval(tally, 7200000); //7200000 == 120min
+  app.get('/', function(req, res){
+      res.redirect('/admin/index.html');
+  });
 
-    app.get('/', function(req, res){
-        res.redirect('/admin/index.html');
-    });
+  app.get('/admin/index.html', ensureAuthenticated, function(req, res){
+      res.sendfile('/html/index.html', response_options);
+  });
 
-    app.get('/admin/index.html', ensureAuthenticated, function(req, res){
-        res.sendfile('/html/index.html', response_options);
-    });
+  app.get('/login', function(req, res){
+      res.sendfile('/html/login.html');
+  });
 
-    app.get('/login', function(req, res){
-        res.sendfile('/html/login.html');
-    });
-
-    app.post('/auth', passport.authenticate('local-signin', {
-        successRedirect: '/admin/index.html',
-        failureRedirect: '/admin/login.html'
-        })
-    );
+  app.post('/auth', passport.authenticate('local-signin', {
+      successRedirect: '/admin/index.html',
+      failureRedirect: '/admin/login.html'
+      })
+  );
 
   app.all('/api/:server_name/:command', ensureAuthenticated, function(req, res) {
     var target_server = req.params.server_name;
@@ -242,58 +217,19 @@ mineos.dependencies(function(err, binaries) {
     process.exit();
   });
 
-  var SOCKET_PORT = null;
-  var SOCKET_HOST = '0.0.0.0';
-  var USE_HTTPS = true;
-
-  if ('use_https' in mineos_config)
-    USE_HTTPS = mineos_config['use_https'];
+  var SOCKET_PORT = 8443;
+  var SOCKET_HOST = '127.0.0.1';
 
   if ('socket_host' in mineos_config)
     SOCKET_HOST = mineos_config['socket_host'];
 
   if ('socket_port' in mineos_config)
     SOCKET_PORT = mineos_config['socket_port'];
-  else
-    if (USE_HTTPS)
-      SOCKET_PORT = 8443;
-    else
-      SOCKET_PORT = 8080;
 
-  if (USE_HTTPS) {
-    keyfile = mineos_config['ssl_private_key'] || '/etc/ssl/certs/mineos.key';
-    certfile = mineos_config['ssl_certificate'] || '/etc/ssl/certs/mineos.crt';
-    async.parallel({
-      key: async.apply(fs.readFile, keyfile),
-      cert: async.apply(fs.readFile, certfile)
-    }, function(err, ssl) {
-      if (err) {
-        console.error('Could not locate required SSL files ' + keyfile +
-	              ' and/or ' + certfile + ', aborting server start.');
-        process.exit(3);
-      } else {
-        var https = require('https');
-
-        if ('ssl_cert_chain' in mineos_config) {
-          try {
-            var cert_chain_data = fs.readFileSync(mineos_config['ssl_cert_chain']);
-            if (cert_chain_data.length)
-              ssl['ca'] = cert_chain_data;
-          } catch (e) {}
-        }
-
-        var https_server = https.createServer(ssl, app).listen(SOCKET_PORT, SOCKET_HOST, function() {
-          io.attach(https_server);
-          console.log('MineOS webui listening on HTTPS://' + SOCKET_HOST + ':' + SOCKET_PORT);
-        });
-      }
-    })
-  } else {
-    console.warn('mineos.conf set to host insecurely: starting HTTP server.');
-    http.listen(SOCKET_PORT, SOCKET_HOST, function(){
-      console.log('MineOS webui listening on HTTP://' + SOCKET_HOST + ':' + SOCKET_PORT);
-    });
-  }
+  console.warn('mineos.conf set to host over HTTP server.');
+  http.listen(SOCKET_PORT, SOCKET_HOST, function(){
+    console.log('MineOS webui listening on HTTP://' + SOCKET_HOST + ':' + SOCKET_PORT);
+  });
 
   setInterval(session_cleanup, 3600000); //check for expired sessions every hour
 
