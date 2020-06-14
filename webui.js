@@ -23,11 +23,10 @@ var response_options = {root: __dirname};
 
 // Authorization
 var localAuth = function (username) {
-  var whoami = require('whoami');
   var Q = require('q');
   var deferred = Q.defer();
 
-  if (username == whoami)
+  if (username == require("os").userInfo().username)
     deferred.resolve({ username: username });
   else
     deferred.reject(new Error('incorrect user'));
