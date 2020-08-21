@@ -117,6 +117,7 @@ mineos.dependencies = async.memoize(function(callback) {
   async.parallel({
     'screen': async.apply(which, 'screen'),
     'tar': async.apply(which, 'tar'),
+    'rsync': async.apply(which, 'rsync'),
     'java': async.apply(which, 'java'),
     'rdiff-backup': async.apply(which, 'rdiff-backup')
   }, callback);
