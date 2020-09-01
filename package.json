@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "adm-zip": "^0.4.11",
-    "angular": "^1.4.14",
+    "angular": "1.4.x",
     "angular-moment": "1.0.x",
     "angular-sanitize": "1.5.x",
     "angular-translate": "^2.18.2",
@@ -63,7 +63,7 @@
     "request-progress": "0.3.x",
     "rsync": "0.6.x",
     "sha512crypt-node": "0.1.x",
-    "socket.io": "1.5.x",
+    "socket.io": "1.7.x",
     "strftime": "0.9.x",
     "tail": "1.2.1",
     "tar": "^2.2.2",
