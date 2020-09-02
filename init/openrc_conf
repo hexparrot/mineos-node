@@ -1,0 +1,24 @@
+#!/sbin/openrc-run
+
+name="MineOS Minecraft Server Management Interface"
+
+depend() {
+        need net localmount
+        after firewall
+}
+
+start() {
+        start-stop-daemon --start \
+                --chdir /usr/games/minecraft \
+                --pidfile /var/run/mineos.pid \
+                --exec "/usr/bin/node" \
+                -- service.js start
+}
+
+stop() {
+        start-stop-daemon --stop \
+                --chdir /usr/games/minecraft \
+                --pidfile /var/run/mineos.pid \
+                --exec "/usr/bin/node" \
+                -- service.js stop
+}

@@ -117,6 +117,7 @@ mineos.dependencies = async.memoize(function(callback) {
   async.parallel({
     'screen': async.apply(which, 'screen'),
     'tar': async.apply(which, 'tar'),
+    'rsync': async.apply(which, 'rsync'),
     'java': async.apply(which, 'java'),
     'rdiff-backup': async.apply(which, 'rdiff-backup')
   }, callback);
@@ -1106,7 +1107,7 @@ mineos.mc = function(server_name, base_dir) {
     var rdiff = child_process.spawn(binary, args, params);
 
     rdiff.stdout.on('data', function(data) {
-      var buffer = new Buffer(data, 'ascii');
+      var buffer = Buffer.from(data, 'ascii');
       var lines = buffer.toString('ascii').split('\n');
       var incrs = 0;
 
@@ -1602,7 +1603,7 @@ mineos.mc = function(server_name, base_dir) {
       socket.setTimeout(2500);
 
       socket.on('connect', function() {
-        var buf = new Buffer(2);
+        var buf = Buffer.alloc(2);
 
         buf.write(QUERIES[query], 0, query.length, 'binary');
         socket.write(buf);
