@@ -1605,7 +1605,7 @@ mineos.mc = function(server_name, base_dir) {
       socket.on('connect', function() {
         var buf = Buffer.alloc(2);
 
-        buf.write(QUERIES[query], 0, query.length, 'binary');
+        buf.write(QUERIES[query], 0, QUERIES[query].length, 'binary');
         socket.write(buf);
       });
 
