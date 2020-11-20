@@ -1,0 +1,16 @@
+[Unit]
+Description=MineOS clean shutdown hook
+DefaultDependencies=no
+RequiresMountsFor=/mnt/unraid
+After=network.target
+Before=shutdown.target reboot.target halt.target
+
+[Service]
+User=root
+ExecStart=/bin/true
+ExecStop=/bin/bash /usr/games/minecraft/stop_servers.sh
+RemainAfterExit=true
+Type=oneshot
+
+[Install]
+WantedBy=multi-user.target
