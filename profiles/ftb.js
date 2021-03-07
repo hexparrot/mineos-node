@@ -4,7 +4,7 @@
 // var profile = require('./template');
 
 // exports.profile = {
-//     name: 'Feed the Beast Mop Packs',
+//     name: 'Feed the Beast Mod Packs',
 //     request_args: {
 //       url: 'https://api.modpacks.ch/public/modpack/all',
 //       json: true
