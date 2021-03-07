@@ -12,4 +12,4 @@ glob.sync( './profiles/*.js').forEach( function(file){
 }
 });
 
-exports = profile_manifests;
+exports.profile_manifests = profile_manifests;

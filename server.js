@@ -230,7 +230,9 @@ server.backend = function(base_dir, socket_emitter, user_config) {
                 cb(response.statusCode != 200, body)
               },
               function(body, cb) {
-                collection.handler(profile_dir, body, cb);
+                try{
+                  collection.handler(profile_dir, body, cb);
+                }catch(e){cb(e);}
               }
             ], function(err, output) {
               if (err || typeof output == 'undefined')
@@ -244,7 +246,11 @@ server.backend = function(base_dir, socket_emitter, user_config) {
           } else { //for profiles like paperspigot which are hardcoded
             async.waterfall([
               function(cb) {
-                collection.handler(profile_dir, cb);
+                try{
+                  collection.handler(profile_dir, cb);
+                } catch (e){
+                  cb(e);
+                  }
               }
             ], function(err, output) {
               if (err || typeof output == 'undefined')
