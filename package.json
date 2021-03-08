@@ -41,7 +41,6 @@
     "express-session": "^1.16.2",
     "fireworm": "0.7.x",
     "fs-extra": "5.0.x",
-    "glob": "^7.1.6",
     "ini": "^1.3.5",
     "introspect": "0.0.x",
     "lazylines": "1.0.0",

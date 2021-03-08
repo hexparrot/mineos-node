@@ -232,7 +232,7 @@ server.backend = function (base_dir, socket_emitter, user_config) {
               function (body, cb) {
                 try {
                   collection.handler(profile_dir, body, cb);
-                } catch (e) { cb(e); }
+                } catch (e) { cb(e,null); }
               }
             ], function (err, output) {
               if (err || typeof output == 'undefined')
@@ -248,7 +248,7 @@ server.backend = function (base_dir, socket_emitter, user_config) {
               function (cb) {
                 try {
                   collection.handler(profile_dir, cb);
-                } catch (e) { cb(e); }
+                } catch (e) { cb(e,null); }
               }
             ], function (err, output) {
               if (err || typeof output == 'undefined')
