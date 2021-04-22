@@ -221,43 +221,64 @@ exports.profile_manifests = {
       callback();
     }
   },
+
+
   forge: {
     name: 'Forge Mod',
-    request_args: {
-      url: 'http://files.minecraftforge.net/maven/net/minecraftforge/forge/promotions.json',
-      json: true
-    },
-    handler: function(profile_dir, body, callback) {
+    handler: function(profile_dir, callback) {
       var p = [];
+      var releases = [
+        { mcver: '1.16.5', forgever: '36.1.6' },
+        { mcver: '1.16.5', forgever: '36.1.4' },
+        { mcver: '1.16.5', forgever: '36.1.3' },
+        { mcver: '1.16.5', forgever: '36.1.2' },
+        { mcver: '1.16.5', forgever: '36.1.1' },
+        { mcver: '1.16.5', forgever: '36.1.0' },
+        { mcver: '1.16.5', forgever: '36.1.6' },
+        { mcver: '1.16.5', forgever: '36.0.63' },
+        { mcver: '1.16.5', forgever: '36.0.62' },
+        { mcver: '1.16.5', forgever: '36.0.61' },
+        { mcver: '1.16.5', forgever: '36.0.60' },
+
+        { mcver: '1.16.4', forgever: '35.1.37' },
+        { mcver: '1.16.4', forgever: '35.1.36' },
+        { mcver: '1.16.4', forgever: '35.1.35' },
+        { mcver: '1.16.4', forgever: '35.1.34' },
+        { mcver: '1.16.4', forgever: '35.1.33' },
+        { mcver: '1.16.4', forgever: '35.1.32' },
+        { mcver: '1.16.4', forgever: '35.1.31' },
+
+        { mcver: '1.16.3', forgever: '34.1.42' },
+        { mcver: '1.16.3', forgever: '34.1.41' },
+        { mcver: '1.16.3', forgever: '34.1.40' },
+        { mcver: '1.16.3', forgever: '34.1.39' },
+        { mcver: '1.16.3', forgever: '34.1.35' },
+        { mcver: '1.16.3', forgever: '34.1.34' },
+
+        { mcver: '1.15.2', forgever: '31.2.50' },
+        { mcver: '1.15.2', forgever: '31.2.49' },
+        { mcver: '1.15.2', forgever: '31.2.48' },
+        { mcver: '1.15.2', forgever: '31.2.47' },
+      ];
 
       try {
-        for (var index in body.promos) {
+        for (var pair of releases) {
           var item = new profile_template();
-          var ref_obj = body.promos[index];
 
-          item['id'] = index;
-          item['time'] = ref_obj['modified'];
-          item['releaseTime'] = ref_obj['modified'];
+          item['id'] = 'forge-{0}-{1}'.format(pair.mcver, pair.forgever);
+          item['time'] = new Date().getTime();
+          item['releaseTime'] = new Date().getTime();
           item['type'] = 'release';
           item['group'] = 'forge';
-          item['webui_desc'] = 'Forge Jar (build {0})'.format(ref_obj['build']);
+          item['webui_desc'] = 'Forge Jar (mc: {0})'.format(pair.mcver);
           item['weight'] = 0;
-          if (ref_obj['branch'])
-            item['filename'] = 'forge-{0}-{1}-{2}-installer.jar'.format(ref_obj['mcversion'], ref_obj['version'], ref_obj['branch']);
-          else
-            item['filename'] = 'forge-{0}-{1}-installer.jar'.format(ref_obj['mcversion'], ref_obj['version']);
+          item['filename'] = 'forge-{0}-{1}-installer.jar'.format(pair.mcver, pair.forgever);
           item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
-          item['version'] = ref_obj['mcversion'];
-          item['release_version'] = ref_obj['version'];
-          if (ref_obj['branch'])
-            item['url'] = 'http://files.minecraftforge.net/maven/net/minecraftforge/forge/{0}-{1}-{2}/{3}'.format(ref_obj['mcversion'], ref_obj['version'], ref_obj['branch'], item['filename']);
-          else
-            item['url'] = 'http://files.minecraftforge.net/maven/net/minecraftforge/forge/{0}-{1}/{2}'.format(ref_obj['mcversion'], ref_obj['version'], item['filename']);
+          item['version'] = 0;
+          item['release_version'] = '';
+          item['url'] = 'https://maven.minecraftforge.net/net/minecraftforge/forge/{0}-{1}/forge-{0}-{1}-installer.jar'.format(pair.mcver, pair.forgever);
 
-          var ver = ref_obj['mcversion'].match(/(\d+)\.(\d+)\.?(\d+)?/);
-
-          if (parseInt(ver[1]) >= 1 && parseInt(ver[2]) >= 6)
-            p.push(item); // 1.x major, .6 minor, chosen because 1.6.1 changed the installation process so drastically
+          p.push(item);
         }
 
       } catch (e) {}
