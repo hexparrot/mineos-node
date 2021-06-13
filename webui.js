@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+var TALLY_ENABLED = false
+var WEB_ROOT = "/"
 var mineos = require('./mineos');
 var server = require('./server');
 var async = require('async');
