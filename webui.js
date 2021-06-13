@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-var TALLY_ENABLED = false
+// Disable tally until enabled by config.
+var ENABLE_TALLY = false
 
 var mineos = require('./mineos');
 var server = require('./server');
@@ -177,8 +178,8 @@ mineos.dependencies(function(err, binaries) {
   var be = new server.backend(base_directory, io, mineos_config);
 
   if (TALLY_ENABLED) {
-  tally();
-  setInterval(tally, 7200000); //7200000 == 120min
+    tally();
+    setInterval(tally, 7200000); //7200000 == 120min
   }
 
     app.get('/', function(req, res){
@@ -252,6 +253,10 @@ mineos.dependencies(function(err, binaries) {
   var SOCKET_HOST = '0.0.0.0';
   var USE_HTTPS = true;
 
+  if ('enable_tally' in mineos_config) {
+    ENABLE_TALLY = mineos_config['enable_tally']
+  }
+ 
   if ('use_https' in mineos_config)
     USE_HTTPS = mineos_config['use_https'];
 
