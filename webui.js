@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 var TALLY_ENABLED = false
-var WEB_ROOT = "/"
+
 var mineos = require('./mineos');
 var server = require('./server');
 var async = require('async');
@@ -113,6 +113,7 @@ io.use(passportSocketIO.authorize({
 }));
 
 function tally(callback) {
+  if (TALLY_ENABLED) {
   var os = require('os');
   var urllib = require('urllib');
   var child_process = require('child_process');
@@ -130,6 +131,7 @@ function tally(callback) {
       tally_info['version'] = output.replace(/\n/,'');
     urllib.request('http://minecraft.codeemo.com/tally/tally-node.py', {data: tally_info}, function(){});
   })
+}
 }
 
 function read_ini(filepath) {
@@ -174,8 +176,10 @@ mineos.dependencies(function(err, binaries) {
 
   var be = new server.backend(base_directory, io, mineos_config);
 
+  if (TALLY_ENABLED) {
   tally();
   setInterval(tally, 7200000); //7200000 == 120min
+  }
 
     app.get('/', function(req, res){
         res.redirect('/admin/index.html');
