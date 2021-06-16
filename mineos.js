@@ -322,6 +322,7 @@ mineos.mc = function(server_name, base_dir) {
       async.apply(fs.ensureFile, self.env.cc),
       async.apply(fs.chown, self.env.cc, owner['uid'], owner['gid']),
       async.apply(self.overlay_sp, mineos.SP_DEFAULTS),
+      async.apply(self.modify_sc, 'java', 'java_binary', ''),
       async.apply(self.modify_sc, 'java', 'java_xmx', '256'),
       async.apply(self.modify_sc, 'onreboot', 'start', false),
     ], callback)
