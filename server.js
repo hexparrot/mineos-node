@@ -372,8 +372,7 @@ server.backend = function(base_dir, socket_emitter, user_config) {
                 function(cb) {
                   var progress = require('request-progress');
                   var request = require('request');
-
-                  progress(request(args.profile.url), { throttle: 250, delay: 100 })
+                  progress(request({url: args.profile.url, headers: {'User-Agent': 'MineOS-node'}}), { throttle: 250, delay: 100 })
                     .on('error', function(err) {
                       logging.error(err);
                     })
