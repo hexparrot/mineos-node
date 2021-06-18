@@ -70,9 +70,11 @@ if id -u $USER_NAME >/dev/null 2>&1; then
   echo "a user named $USER_NAME already exists."
 else
   useradd -Mos /bin/false -u $USER_UID -g $GROUP_GID $USER_NAME
-  echo "$USER_NAME:$USER_PASSWORD" | chpasswd
   echo >&2 "Created user: $USER_NAME (uid: $USER_UID, gid: $GROUP_GID)"
 fi
+
+echo >&2 "Setting user password for '$USER_NAME'"
+echo "$USER_NAME:$USER_PASSWORD" | chpasswd
 
 if [ ! -z "$USE_HTTPS" ]; then
   # update mineos.conf from environment
