@@ -21,7 +21,7 @@ exports.profile = {
           var packs = result['metadata']['versioning'][0]['versions'][0]['version'];
 
           for (var index in packs) {
-            var item = new profile_template();
+            var item = new profile();
             var matches = packs[index].match(/([\d\.]+)-([\d\.]+)?-?(\D+)-(\d+)/);
 
             item['version'] = packs[index];
