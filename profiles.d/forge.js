@@ -14,7 +14,7 @@ exports.profile = {
 
     try {
       for (var index in body.promos) {
-        var item = new profile_template();
+        var item = new profile();
         var mcver = index.split('-')[0];
         var forgever = body.promos[index];
 
