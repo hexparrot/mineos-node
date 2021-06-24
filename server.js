@@ -416,10 +416,19 @@ server.backend = function(base_dir, socket_emitter, user_config) {
                   }
                 },
                 function(cb) {
-                  if ('postdownload' in SOURCES[args.profile['group']])
-                    SOURCES[args.profile['group']].postdownload(profile_dir, dest_filepath, cb);
-                  else
+                  // wide-area net try/catch. addressing issue of multiple simultaneous downloads.
+                  // current theory: if multiple downloads occuring, and one finishes, forcing a
+                  // redownload of profiles, SOURCES might be empty/lacking the unfinished dl.
+                  // opting for full try/catch around postdownload to silently handle profile errors
+                  try {
+                    if ('postdownload' in SOURCES[args.profile['group']])
+                      SOURCES[args.profile['group']].postdownload(profile_dir, dest_filepath, cb);
+                    else
+                      cb();
+                  } catch (e) {
+                    logging.error('simultaneous download race condition means postdownload hook may not have executed. redownload the profile to ensure proper operation.');
                     cb();
+                  }
                 }
               ], function(err, output) {
                 self.send_profile_list();
