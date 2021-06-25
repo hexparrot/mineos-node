@@ -115,7 +115,7 @@ function retrieve_property(args, callback) {
   fn.apply(instance, arg_array);
 }
 
-var base_dir = (opt.options || {}).base_dir || '/var/games/minecraft';
+var base_dir = (opt.options || {}).d || '/var/games/minecraft';
 
 if ('version' in opt.options) {
   return_git_commit_hash(function(code, hash) {

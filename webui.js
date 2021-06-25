@@ -180,11 +180,11 @@ mineos.dependencies(function(err, binaries) {
     });
 
     app.get('/admin/index.html', ensureAuthenticated, function(req, res){
-        res.sendFile('/html/index.html', response_options);
+        res.sendfile('/html/index.html', response_options);
     });
 
     app.get('/login', function(req, res){
-        res.sendFile('/html/login.html');
+        res.sendfile('/html/login.html');
     });
 
     app.post('/auth', passport.authenticate('local-signin', {
