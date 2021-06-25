@@ -46,3 +46,5 @@ ENTRYPOINT ["/entrypoint.sh"]
 
 EXPOSE 8443 25565-25570
 VOLUME /var/games/minecraft
+
+ENV USER_PASSWORD=random_see_log USER_NAME=mc USER_UID=1000 USE_HTTPS=true SERVER_PORT=8443

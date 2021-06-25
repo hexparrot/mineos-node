@@ -372,8 +372,7 @@ server.backend = function(base_dir, socket_emitter, user_config) {
                 function(cb) {
                   var progress = require('request-progress');
                   var request = require('request');
-
-                  progress(request(args.profile.url), { throttle: 250, delay: 100 })
+                  progress(request({url: args.profile.url, headers: {'User-Agent': 'MineOS-node'}}), { throttle: 250, delay: 100 })
                     .on('error', function(err) {
                       logging.error(err);
                     })
@@ -417,10 +416,19 @@ server.backend = function(base_dir, socket_emitter, user_config) {
                   }
                 },
                 function(cb) {
-                  if ('postdownload' in SOURCES[args.profile['group']])
-                    SOURCES[args.profile['group']].postdownload(profile_dir, dest_filepath, cb);
-                  else
+                  // wide-area net try/catch. addressing issue of multiple simultaneous downloads.
+                  // current theory: if multiple downloads occuring, and one finishes, forcing a
+                  // redownload of profiles, SOURCES might be empty/lacking the unfinished dl.
+                  // opting for full try/catch around postdownload to gracefully handle profile errors
+                  try {
+                    if ('postdownload' in SOURCES[args.profile['group']])
+                      SOURCES[args.profile['group']].postdownload(profile_dir, dest_filepath, cb);
+                    else
+                      cb();
+                  } catch (e) {
+                    logging.error('simultaneous download race condition means postdownload hook may not have executed. redownload the profile to ensure proper operation.');
                     cb();
+                  }
                 }
               ], function(err, output) {
                 self.send_profile_list();
@@ -904,7 +912,7 @@ function server_container(server_name, user_config, socket_io) {
       if (err)
         callback(null);
       else {
-        var msg = new Buffer("[MOTD]" + sp_data.motd + "[/MOTD][AD]" + sp_data['server-port'] + "[/AD]");
+        var msg = Buffer.from("[MOTD]" + sp_data.motd + "[/MOTD][AD]" + sp_data['server-port'] + "[/AD]");
         var server_ip = sp_data['server-ip'];
         callback(msg, server_ip);
       }
@@ -957,7 +965,7 @@ function server_container(server_name, user_config, socket_io) {
     var filepath = path.join(instance.env.cwd, 'server-icon.png');
     fs.readFile(filepath, function(err, data) {
       if (!err && data.toString('hex',0,4) == '89504e47') //magic number for png first 4B
-        nsp.emit('server-icon.png', new Buffer(data).toString('base64'));
+        nsp.emit('server-icon.png', Buffer.from(data).toString('base64'));
     });
   }
 
@@ -967,7 +975,7 @@ function server_container(server_name, user_config, socket_io) {
     var filepath = path.join(instance.env.cwd, 'config.yml');
     fs.readFile(filepath, function(err, data) {
       if (!err)
-        nsp.emit('config.yml', new Buffer(data).toString());
+        nsp.emit('config.yml', Buffer.from(data).toString());
     });
   }
 
