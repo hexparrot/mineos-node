@@ -1,7 +1,8 @@
-FROM debian:stretch
-MAINTAINER William Dizon <wdchromium@gmail.com>
+FROM ubuntu:focal
+LABEL MAINTAINER='William Dizon <wdchromium@gmail.com>'
 
 #update and accept all prompts
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
   supervisor \
   rdiff-backup \
@@ -10,14 +11,14 @@ RUN apt-get update && apt-get install -y \
   git \
   curl \
   rlwrap \
-  default-jre-headless \
+  openjdk-16-jre-headless \
   ca-certificates-java \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-#install node from nodesource
-RUN curl https://deb.nodesource.com/node_8.x/pool/main/n/nodejs/nodejs_8.9.4-1nodesource1_amd64.deb > node.deb \
- && dpkg -i node.deb \
- && rm node.deb
+#install node from nodesource following instructions: https://github.com/nodesource/distributions#debinstall
+RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
+  && apt-get install -y nodejs \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 #download mineos from github
 RUN mkdir /usr/games/minecraft \
