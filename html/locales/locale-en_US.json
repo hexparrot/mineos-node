@@ -185,5 +185,7 @@
   "up": "Server must be up when performing this action.",
   "!exists": "Server may not exist when performing this action.",
   "exists": "Cannot find server to act on.",
-  "eula": "The Mojang End-User Licesnce Agreement must be accepted to start this server."
+  "eula": "The Mojang End-User Licesnce Agreement must be accepted to start this server.",
+  "SHOW_NEW_UI": "Introducing the new user interface.",
+  "SHOW_OLD_UI": "Return to legacy interface."
 }

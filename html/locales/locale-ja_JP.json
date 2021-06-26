@@ -185,5 +185,7 @@
   "up": "Server must be up when performing this action.",
   "!exists": "Server may not exist when performing this action.",
   "exists": "実行対象のサーバーが見つかりません。",
-  "eula": "このサーバーを開始するには、Mojang End-User Licesnce Agreement に同意する必要があります。"
+  "eula": "このサーバーを開始するには、Mojang End-User Licesnce Agreement に同意する必要があります。",
+  "SHOW_NEW_UI": "Introducing the new user interface.",
+  "SHOW_OLD_UI": "Return to legacy interface."
 }

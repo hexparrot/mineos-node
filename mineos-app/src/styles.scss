@@ -1,0 +1,54 @@
+
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+@use '~@angular/material' as mat;
+// Plus imports for other components in your app.
+
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+@include mat.core();
+
+// The warn palette is optional (defaults to red).
+$mineos-warn: mat.define-palette(mat.$red-palette);
+
+.light-theme {
+  // Define the palettes for your theme using the Material Design palettes available in palette.scss
+  // (imported above). For each palette, you can optionally specify a default, lighter, and darker
+  // hue. Available color palettes: https://material.io/design/color/
+  $mineos-light-primary: mat.define-palette(mat.$green-palette);
+  $mineos-light-accent: mat.define-palette(mat.$deep-purple-palette, A100, A200, A700);
+
+  // Create the theme object. A theme consists of configurations for individual
+  // theming systems such as "color" or "typography".
+  $mineos-light-theme: mat.define-light-theme((
+    color: (
+      primary: $mineos-light-primary,
+      accent: $mineos-light-accent,
+      warn: $mineos-warn,
+    )
+  ));
+
+  // Include theme styles for core and each component used in your app.
+  // Alternatively, you can import and @include the theme mixins for each component
+  // that you are using.
+  @include mat.all-component-themes($mineos-light-theme);
+}
+
+.dark-theme {
+  $mineos-dark-primary: mat.define-palette(mat.$green-palette, 700, 500, 900);
+  $mineos-dark-accent: mat.define-palette(mat.$deep-purple-palette);
+
+  $mineos-dark-theme: mat.define-dark-theme((
+    color: (
+      primary: $mineos-dark-primary,
+      accent: $mineos-dark-accent,
+      warn: $mineos-warn,
+    )
+  ));
+  @include mat.all-component-themes($mineos-dark-theme);
+}
+/* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

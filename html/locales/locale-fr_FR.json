@@ -185,5 +185,7 @@
   "up": "Le serveur doit être démarré pour effectuer cette action.",
   "!exists": "On dirait que le serveur n'existe pas.",
   "exists": "Le serveur est introuvable.",
-  "eula": "Les conditions générales d'utilisation (EULA) de Mojang doivent être acceptées pour démarrer ce serveur."
+  "eula": "Les conditions générales d'utilisation (EULA) de Mojang doivent être acceptées pour démarrer ce serveur.",
+  "SHOW_NEW_UI": "Introducing the new user interface.",
+  "SHOW_OLD_UI": "Return to legacy interface."
 }

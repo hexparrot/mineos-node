@@ -152,23 +152,63 @@ mineos.dependencies(function(err, binaries) {
 
   var be = new server.backend(base_directory, io, mineos_config);
 
-    app.get('/', function(req, res){
-        res.redirect('/admin/index.html');
-    });
+  app.get('/', function(req, res){
+    if(USE_NEW_UI){
+      res.redirect('/ui');
+    }else{
+      res.redirect('/admin/index.html');
+    }
+  });
+  
+  app.get('/admin/index.html', ensureAuthenticated, function(req, res){
+      res.sendFile('/html/index.html', response_options);
+  });
 
-    app.get('/admin/index.html', ensureAuthenticated, function(req, res){
-        res.sendFile('/html/index.html', response_options);
-    });
+  app.get('/login', function(req, res){
+      res.sendFile('/html/login.html');
+  });
 
-    app.get('/login', function(req, res){
-        res.sendFile('/html/login.html');
-    });
+  app.post('/auth', passport.authenticate('local-signin', {
+    successRedirect: '/admin/index.html',
+    failureRedirect: '/admin/login.html'
+    })
+  );
 
-    app.post('/auth', passport.authenticate('local-signin', {
-        successRedirect: '/admin/index.html',
-        failureRedirect: '/admin/login.html'
-        })
-    );
+  app.get('/api/auth/is-authenticated', function(req, res){
+    let result = { authenticated : false };
+    if(req.isAuthenticated()){
+      result.authenticated = true;
+    }
+    res.json(result);
+    res.end();
+  });
+  
+  // Page redirect/routing managed by the ui AuthGaurd class
+  app.post('/api/auth', 
+    passport.authenticate('local-signin'),
+    function(req, res) {
+      res.json({ username: req.user.username });
+      res.end();
+    }
+  );
+
+  app.get('/api/logout', function(req, res){
+    req.logout();
+    res.end();
+  });
+
+  app.get('/api/switch_ui', function(req, res){
+    if(res.params.new_ui){
+      res.redirect('/ui');
+    }else{}
+    
+    if(res.params.redirect){
+      res.redirect('/ui');
+    }
+    if(res.params.redirect){
+      res.redirect('/ui');
+    }
+  });
 
   app.all('/api/:server_name/:command', ensureAuthenticated, function(req, res) {
     var target_server = req.params.server_name;
@@ -212,6 +252,7 @@ mineos.dependencies(function(err, binaries) {
   app.use('/angular-moment-duration-format', express.static(__dirname + '/node_modules/moment-duration-format/lib'));
   app.use('/angular-sanitize', express.static(__dirname + '/node_modules/angular-sanitize'));
   app.use('/admin', express.static(__dirname + '/html'));
+  app.use('/ui/', express.static(__dirname + '/ui'));
 
   process.on('SIGINT', function() {
     console.log("Caught interrupt signal; closing webui....");
@@ -222,6 +263,10 @@ mineos.dependencies(function(err, binaries) {
   var SOCKET_PORT = null;
   var SOCKET_HOST = '0.0.0.0';
   var USE_HTTPS = true;
+  var USE_NEW_UI = false;
+
+  if ('use_new_ui' in mineos_config)
+    USE_NEW_UI = mineos_config['use_new_ui'];
 
   if ('use_https' in mineos_config)
     USE_HTTPS = mineos_config['use_https'];

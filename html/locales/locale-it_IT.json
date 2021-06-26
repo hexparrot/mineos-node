@@ -185,5 +185,7 @@
   "up": "Il server deve essere acceso per eseguire questa azione",
   "!exists": "Il server sembra non esistere",
   "exists": "Impossibile trovare un server sul quale agire",
-  "eula": "La licensa \"End-User Licesnce Agreement\" di Mojact deve essere accettata per poter far partire il server."
+  "eula": "La licensa \"End-User Licesnce Agreement\" di Mojact deve essere accettata per poter far partire il server.",
+  "SHOW_NEW_UI": "Introducing the new user interface.",
+  "SHOW_OLD_UI": "Return to legacy interface."
 }

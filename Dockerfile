@@ -23,9 +23,10 @@ RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
 
 #download mineos from github
 RUN mkdir /usr/games/minecraft \
-  && cd /usr/games/minecraft \
-  && git clone --depth=1 https://github.com/hexparrot/mineos-node.git . \
-  && cp mineos.conf /etc/mineos.conf \
+  && cd /usr/games/minecraft
+COPY . .
+  # && git clone --depth=1 https://github.com/hexparrot/mineos-node.git . \
+RUN cp mineos.conf /etc/mineos.conf \
   && chmod +x webui.js mineos_console.js service.js
 
 #build npm deps and clean up apt for image minimalization
@@ -38,6 +39,10 @@ RUN cd /usr/games/minecraft \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+#build UI
+RUN cd /usr/games/minecraft/mineos-app \
+  && npm install \ 
+  && ng build
 #configure and run supervisor
 RUN cp /usr/games/minecraft/init/supervisor_conf /etc/supervisor/conf.d/mineos.conf
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]
