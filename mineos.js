@@ -887,7 +887,7 @@ mineos.mc = function(server_name, base_dir) {
     if (!(self.server_name in pids)) {
       callback(true);
     } else {
-      process.kill(pids[self.server_name].java);
+      process.kill(pids[self.server_name].java, 'SIGKILL');
       var iterations = 0;
 
       async.doWhilst(
