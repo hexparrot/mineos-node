@@ -1,126 +1,52 @@
-Node.JS MineOS
-======
+## MineOS
 
-MineOS is a server front-end to ease managing Minecraft administrative tasks.
-This iteration using Node.js aims to enhance previous MineOS scripts (Python-based),
-by leveraging the event-triggering, asyncronous model of Node.JS and websockets.
+MineOS is an entire ecosystem of web applications, shell scripts, wikis, and support forums
+designed to help Minecraft enthusiasts successfully host servers on *nix platforms.
 
-This allows the front-end to provide system health, disk and memory usage, and logging in real-time.
+### Why MineOS?
 
-This has been tested on Debian, Ubuntu, ArchLinux, and FreeBSD and should work on all variants, Linux or BSD.
+MineOS is all about learning to be an effective game host. Even better, a system administrator. No sacrifices are made--neither in security nor functionality--to provide users with a fun, educational, and effective hosting platform.
 
-Installation
-------------
+There have been numerous iterations of MineOS, all of which shared the same moniker.
+For clarity, here are some of the ways the name is used:
 
-MineOS is distributed through github and downloads its dependencies with npm.
+### MineOS (the web user interface): Node.JS-based single-page application (SPA)
 
-MineOS requires root-privileges, as the authentication relies on the underlying system's /etc/shadow.
+MineOS is a web-based server front-end to centralize and simplify Minecraft sysadmin tasks.
 
-Do not install this atop an existing MineOS system (using the Python-based webui), since the installation location is the same /usr/games/minecraft. Following are steps for installing MineOS on an apt-get based distribution, such as Debian or Ubuntu.  These instructions are detailed further (as well as for additional distributions) on the [MineOS wiki](https://minecraft.codeemo.com/mineoswiki/index.php?title=Installing_MineOS).
+The single-page application leverages the event-triggering, asyncronous model of Node.JS and websockets.  This is the primary interface for admins to download Minecraft server jars, create and configure multiple servers, start/stop instances, and create backups and initiate restores.
 
-Using an apt-get based Linux distribution:
+It provides system health, disk and memory usage, and logging in real-time. The webui supports multiple, independent users, and uses standard Linux file permissions to keep data appropriately isolated. 
 
-    curl -sL https://deb.nodesource.com/setup_8.x | bash -
-    apt-get update
-    apt-get install -y nodejs git rdiff-backup screen build-essential openjdk-8-jre-headless
-    mkdir -p /usr/games
-    cd /usr/games
-    git clone https://github.com/hexparrot/mineos-node.git minecraft
-    cd minecraft
-    chmod +x generate-sslcert.sh
-    ./generate-sslcert.sh
-    cp mineos.conf /etc/mineos.conf
-    npm install
-    
-For hosts using 'upstart':
+The webui has been tested on all major distributions and is confirmed to work on both Linux and BSD, x86_64 and ARM architectures.
 
-    cp /usr/games/minecraft/init/upstart_conf /etc/init/mineos.conf
-    start mineos
+### MineOS Turnkey (the Debian-based distribution)
 
-For hosts using 'supervisor':
+MineOS Turnkey is the current flagship distribution of MineOS. Based on the proven Debian foundation, [Turnkey Linux](https://www.turnkeylinux.org/) is a perfect delivery system: a trimmed, yet infinitely extensible server platform. Respun with MineOS components pre-configured, MineOS Turnkey is the quickest way to get a _managed hosting platform_ up and running.
 
-    cp /usr/games/minecraft/init/supervisor_conf /etc/supervisor/conf.d/mineos.conf
-    supervisorctl reread
-    supervisorctl update
-    supervisorctl start mineos
+The [MineOS Turnkey ISO](https://my.syncplicity.com/share/ajsnpyhdoivvekm/mineos-node_buster-x64) is approximately 575MB and supports x86_64 architectures only. 
 
-For hosts using 'systemd':
+### MineOS appliance (the other ways)
 
-    cp /usr/games/minecraft/init/systemd_conf /etc/systemd/system/mineos.service
-    systemctl enable mineos
-    systemctl start mineos
+Sysadmins familiar with Docker or unRAID also have easy deployment options:
 
-To use the webui as a background daemon:
-
-    node service.js [start|stop|restart|status]
-
-To start the webui in the foreground:
-
-    node webui.js
-
-Things to watch out for
-------
-
-On FreeBSD, you will need to mount a Linux-compatible /proc filesystem, i.e., linprocfs,
-at /usr/compat/linux/proc in order for the web-ui to work. In addition, where CLANG is
-default for your system, you'll need to build the NPM modules differently:
-
-    echo "CXX=c++ npm install" | sh
-
-Mineos-node requires rsync 3.1.x or later, 3.0.x does not have the ability to chown
-on copy, which is essential for profiles. Depending on your distribution, you may need
-to build it from source.
+- Docker via [Docker Hub](https://hub.docker.com/repository/docker/hexparrot/mineos)
+- Docker via [manual build](https://github.com/hexparrot/mineos-node/blob/master/Dockerfile)
+- Appliance in unRAID
 
 Developing and Contributing
 ------
 
-I'd love to get contributions from you! Whether you are most comfortable writing
-HTML, CSS, or Javascript (either Nodejs or Angular), feel free to reach out to me about
-some of my design goals and we'll see where your efforts can best be used.
-
+I'd love to see contributions from the community! Whether you are most comfortable writing
+HTML, CSS, or Javascript (either node or angular), feel free to reach out to me about
+some of the design goals and we'll see where your efforts can best be used.
 
 License
 -------
 
-See [LICENSE.md](LICENSE.md) file.
+See [LICENSE.md](../LICENSE.md) file.
 
 Support
 -------
 
-Create an issue in github or start a post on the [MineOS support forums](http://discourse.codeemo.com).
-
-CURRENTLY WORKING
--------
-
-The Angular.JS-based web user interface capable of:
-
-* creating and deleting servers, 
-* starting, restarting, killing and stopping servers 
-* backup, archive, wait-for-stop-and-backup
-* reading ingame console in real-time and submitting commands
-* create cronjobs for the most common tasks
-* adding and modifying server.properties
-* delete previous archives and restore poitns to free up space
-* restore server from previous restore point
-* see filesystem usage of live server files, archives, and restore points
-* authentication via shadow passwords (/etc/shadow) of underlying Linux system
-* logs all user actions to file
-* cronjobs saved to portable format cron.config
-* server can be daemonized to background
-* upstart/supervisord restart process on unhandled exceptions
-* easy selection of server packs from FTB or Mojang official jars
-* PHAR support for Pocketmine servers
-* Support for BungeeCord servers
-* command-line interface for scripting
-
-TODO
--------
-
-* macro often-repeated tasks from web-ui
-* more fully document functions
-
-EVENTUALLY
--------
-
-* implement previous_versions: functionality to roll back or view particular files' previous state
-* identify java versions in web-ui, allow choice of utilized jvm
+Create an issue in github or start a post on the [MineOS support forums](https://discourse.codeemo.com).
