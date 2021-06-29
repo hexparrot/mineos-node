@@ -34,6 +34,16 @@ Sysadmins familiar with Docker or unRAID also have easy deployment options:
 - Docker via [manual build](https://github.com/hexparrot/mineos-node/blob/master/Dockerfile)
 - Appliance in unRAID
 
+### Adding the webui to an existing distro
+
+- [Debian 10](install/debian_10.md)
+- [CentOS 8](install/centos_8.md)
+- [Ubuntu 20](install/ubuntu_20.md)
+- [Archlinux](install/archlinux.md)
+- [Alpine](install/alpine.md)
+- [FreeBSD](install/freebsd.md)
+
+
 Developing and Contributing
 ------
 
@@ -44,7 +54,7 @@ some of the design goals and we'll see where your efforts can best be used.
 License
 -------
 
-See [LICENSE.md](../LICENSE.md) file.
+See [LICENSE.md](LICENSE.md) file.
 
 Support
 -------
