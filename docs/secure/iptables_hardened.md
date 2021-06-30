@@ -4,7 +4,7 @@
 
 ### Full lockdown
 
-Turn off receiving of all foreign packets--`DENY` on all the default policies of `INPUT`, `FORWARD`, and `OUTPUT`.
+Turn off receiving of all foreign packets--`DENY` on all the default policies of `INPUT`, `FORWARD`, and `OUTPUT`. The final command will flush out any existing rules, giving a clean slate.
 
 ```
 # iptables -P INPUT DROP
@@ -111,11 +111,13 @@ Many activies a server will perform will likely require DNS lookups. DNS operate
 ```
 # ping minecraft.codeemo.com
 ping: minecraft.codeemo.com: Temporary failure in name resolution
+
 # iptables -I OUTPUT 2 -j STDOUT
 # iptables -A STDOUT -p udp -m udp --dport 53 -j ACCEPT
-# iptables -I INPUT 2 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+# iptables -I INPUT 1 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+
 # ping minecraft.codeemo.com
-PING codeemo.com (167.71.248.91) 56(84) bytes of data.
+PING minecraft.codeemo.com (167.71.248.91) 56(84) bytes of data.
  [snip]
 ```
 
@@ -145,24 +147,24 @@ Let's let `ICMP` through. For now, friendly-inbound only, and any outgoing.
 
 ### New logging
 
-There's now a newly-emerging logging opportunity, now that there are inbound services listening (22). We can further classify our logged packets by identifying packets that are 1) received by the host on a listening port and 2) not in any trusted subnets.
+There's now a newly-emerging logging opportunity; that is, to 1) catch traffic aimed at listening services but 2) are not from trusted subnets, and tag them separately.
 
 ```
-# iptables -A FRIENDLY -p udp -m udp -j LOG --log-prefix "udp.in.foreigner "
-# iptables -A FRIENDLY -p tcp -m tcp -j LOG --log-prefix "tcp.in.foreigner "
+# iptables -A FRIENDLY -p udp -m udp -j LOG --log-prefix "udp.in.foreign "
+# iptables -A FRIENDLY -p tcp -m tcp -j LOG --log-prefix "tcp.in.foreign "
 # iptables -A FRIENDLY -j DROP
 ```
 
 ## Understanding the packet flow
 
-While it seems like sending packets on ever-increasing paths, the information we seek most from a hardened host is now easier to distill than ever.
+Let's look at the current rules so far. We use the parameters "-vnL" which gives us [v]erbose, [n]umeric ports, [L]ist rules. This also gives us packet/byte counters.
 
 ```
 # iptables -vnL
 Chain INPUT (policy DROP 8 packets, 416 bytes)
  pkts bytes target     prot opt in     out     source               destination         
- 2478  137K MALICIOUS  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
  1134 61912 ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            ctstate RELATED,ESTABLISHED
+ 2478  137K MALICIOUS  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
  1341 75108 STDIN      all  --  *      *       0.0.0.0/0            0.0.0.0/0           
   663 36552 LOG        tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp LOG flags 0 level 4 prefix "tcp.in.dropped "
    15  1603 LOG        udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp LOG flags 0 level 4 prefix "udp.in.dropped "
@@ -180,8 +182,8 @@ Chain OUTPUT (policy DROP 1 packets, 40 bytes)
 Chain FRIENDLY (1 references)
  pkts bytes target     prot opt in     out     source               destination         
  1098 61649 ACCEPT     all  --  *      *       10.137.0.14          0.0.0.0/0            /* [i trust one machine only] */
-    0     0 LOG        udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp LOG flags 0 level 4 prefix "udp.in.foreigner "
-    0     0 LOG        tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp LOG flags 0 level 4 prefix "tcp.in.foreigner "
+    0     0 LOG        udp  --  *      *       0.0.0.0/0            0.0.0.0/0            udp LOG flags 0 level 4 prefix "udp.in.foreign "
+    0     0 LOG        tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            tcp LOG flags 0 level 4 prefix "tcp.in.foreign "
     5   420 DROP       all  --  *      *       0.0.0.0/0            0.0.0.0/0           
 
 Chain MALICIOUS (1 references)
@@ -198,22 +200,52 @@ Chain STDOUT (1 references)
     0     0 ACCEPT     all  --  *      lo      0.0.0.0/0            0.0.0.0/0            /* Permit loopback traffic */
 
 ```
-Based on the prefixes produced to `/var/log/messages`, we can easily decipher the lines at a glance:
 
+Now, all inbound packets will traverse one of the following possible routes:
+
+```
+INPUT (related) -> ACCEPT
+INPUT -> MALICIOUS -> STDIN -> FRIENDLY (trusted subnet) -> ACCEPT
+INPUT -> MALICIOUS -> STDIN -> FRIENDLY -> LOG -> DROP
+INPUT -> MALICIOUS -> STDIN -> LOG -> DROP
+```
+
+For easy organization, it is desirable to leave `INPUT` and `OUTPUT` unchanged; any additional rules can be added to `STDIN` or `STDOUT`. If you are adding more complex rules, consider appending new chains to `STDIN` to combine related rules. This allows you to make rules in batches, enabling them all or none, simply by removing the `STDIN ... -j NEWCHAIN` entry.
+
+## Reading the logs
+
+Our logging rules will produce lines that append to `/var/log/messages`:
 ```
 Jun 30 06:06:13 mineos-tkldev kernel: [ 8486.974964] tcp.in.dropped IN=eth0 OUT= MAC=00:16:3e:5e:6c:00:fe:ff:ff:ff:ff:ff:08:00 SRC=10.137.0.14 DST=10.137.0.16 LEN=52 TOS=0x00 PREC=0x00 TTL=63 ID=758 DF PROTO=TCP SPT=56296 DPT=8443 WINDOW=64240 RES=0x00 SYN URGP=0
 ```
-You can grep for hits easily:
+
+There are resources online to help you understand each of these logged segments, but in the meantime it will suffice to be able to identify these key/value pairs:
+
+`... tcp.in.dropped IN=eth0 ... SRC=10.137.0.14 DEST=10.137.0.16 ... DPORT=8443 ...`
+
+`tcp.in.dropped` tells us it's a TCP packet, from a friendly subnet, inbound at 8443.
+
+### Grepping logs for comfort
+
+We can easily remove all the noise and get to the interesting lines using `grep`.
 
 ```
-# grep 'tcp.in.dropped' /var/log/messages | tail
-# grep 'udp.in.dropped' /var/log/messages | tail
-# grep 'tcp.in.foreign' /var/log/messages | tail
+# grep 'tcp.in.dropped' /var/log/messages    #all the tcp packets that showed up at silent ports
+# grep 'tcp.in.foreign' /var/log/messages    #all the tcp packets received at listening ports, but not from trusted subnets
+# grep 'udp.in.dropped' /var/log/messages    #all the udp packets that showed up at silent ports
+# grep 'udp.in.foreign' /var/log/messages    #all the udp packets received at listening ports, but not from trusted subnets
+
+# grep 'tcp.in' /var/log/messages            #shorthand to see all unexpected tcp traffic (untrusted origin, unused port)
+# grep 'in.dropped' /var/log/messages        #shorthand to see unused port traffic
 ```
 
-From above, remember `tcp.in.foreign` signifies any packets received on a listening port, but not from an accepted subnet. Later, these packets can be rerouted (if desired), to an external [opencanary](https://github.com/thinkst/opencanary) or a local hosted docker.
+### Turning dropped packet logs into rules
 
-### Get rid of trash-packets
+Writing a rule to allow inbound 8443 traffic through is simple; the reverse traffic is already handled with the `OUTPUT` rule `RELATED/ESTABLISHED`.
+
+`iptables -A STDIN -p tcp -m tcp --dport 8443 -m comment --comment "mineos webui" -j ACCEPT`
+
+## Get rid of trash-packets
 
 Let's find some packets that just don't make sense to ever honor, and drop them immediately.
 ```
@@ -221,3 +253,18 @@ Let's find some packets that just don't make sense to ever honor, and drop them 
 # iptables -A MALICIOUS -p tcp -m tcp --tcp-flags FIN,SYN FIN,SYN -m comment --comment "[malicious packet patterns]" -j DROP
 # iptables -A MALICIOUS -p tcp -m tcp --tcp-flags SYN,RST SYN,RST -m comment --comment "[malicious packet patterns]" -j DROP
 ```
+
+## Doing something with foreign connections
+
+From above, remember `tcp.in.foreign` signifies any packets received on a listening port, but not from an accepted subnet. Or put another way: "actors that now know of a listening service." While simply having their packets pass through the firewall does not give them any access, we also have an option for more deliberate handling of their traffic. As an example, these packets can be rerouted, to an external or locally hosted docker of [opencanary](https://github.com/thinkst/opencanary).
+
+`in.foreign` packets will always want to be logged. You can also rely on additional services like [fail2ban](https://www.fail2ban.org/wiki/index.php/Main_Page) to help manage consistent traffic.
+
+Since `tcp.in.dropped` and `udp.in.dropped` will create again more noise in your logs, you can address this by adding blacklist rules that suppress logging of traffic that does nothing but distract. For example, on a Linux machine, you may not be interested in TCP/UDP 138 traffic (NetBIOS):
+
+`Jun 30 13:39:49 officebear kernel: udp.in.dropped IN=eno1 OUT= MAC=ff:ff:ff:ff:ff:ff:b0:6e:bf:bf:1d:c4:08:00 SRC=192.168.50.223 DST=192.168.50.255 LEN=229 TOS=0x00 PREC=0x00 TTL=128 ID=26400 PROTO=UDP SPT=138 DPT=138 LEN=209`
+
+`# iptables -A MALICIOUS -p tcp -m tcp --dport 138 -m comment --comment "[unwanted netbios]" -j DROP`
+
+Now, the traffic will no longer be logged, making all the remaining log entries comparatively more relevant. Repeat this process, [iteratively removing known-uninteresting lines until you're left with only interesting, relevant packets](http://www.ranum.com/security/computer_security/editorials/dumb/).
+
