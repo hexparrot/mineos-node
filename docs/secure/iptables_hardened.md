@@ -24,7 +24,7 @@ Creating logging rules before any additional rules is a great way to audit what 
 # iptables -A OUTPUT -p tcp -m tcp -j LOG --log-prefix "tcp.out.dropped "
 ```
 
-All the logged traffic goes to `/var/messages` and contains the prefix designated above.
+All the logged traffic goes to `/var/log/messages` and contains the prefix designated above.
 
 ### DEFINE NEW CHAINS
 
@@ -235,7 +235,7 @@ Writing a rule to allow inbound 8443 traffic through is simple; the reverse traf
 
 `iptables -A STDIN -p tcp -m tcp --dport 8443 -m comment --comment "mineos webui" -j ACCEPT`
 
-## GET RID OF TRASH-PACKETS
+### GET RID OF TRASH-PACKETS
 
 Let's find some packets that just don't make sense to ever honor, and drop them immediately.
 ```
@@ -271,4 +271,17 @@ Since `tcp.in.dropped` and `udp.in.dropped` will create again more noise in your
 `# iptables -A MALICIOUS -p tcp -m tcp --dport 138 -m comment --comment "[unwanted netbios]" -j DROP`
 
 Now, the traffic will no longer be logged, making all the remaining log entries comparatively more relevant. Repeat this process, [iteratively removing known-uninteresting lines until you're left with only interesting, relevant packets](http://www.ranum.com/security/computer_security/editorials/dumb/).
+
+## Save and Restore your Work
+
+```
+# iptables-save > ~/iptables.v4
+# iptables-restore < ~/iptables.v4
+```
+
+Different distributions apply iptables in different ways, some use `iptables-persistent`, some put `iptables-restore` in `/etc/rc.local`, some expect the rules at `/etc/sysconfig/iptables`. Check your distribution manual for further details.
+
+## Conclusion
+
+`iptables` provides an immense amount of control of packet flow. Creating good rules from the outset will lower the effort required to maintain a secured system. There's much more `iptables` offers for the discerning sysadmin.
 
