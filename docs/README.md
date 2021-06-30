@@ -43,6 +43,10 @@ Sysadmins familiar with Docker or unRAID also have easy deployment options:
 - [Alpine](install/alpine.md)
 - [FreeBSD](install/freebsd.md)
 
+## Wiki Landing Pages
+
+- [Installation](install/index.md)
+- [Securing](secure/index.md)
 
 Developing and Contributing
 ------
@@ -54,7 +58,7 @@ some of the design goals and we'll see where your efforts can best be used.
 License
 -------
 
-See [LICENSE.md](LICENSE.md) file.
+See [LICENSE.md](../LICENSE.md) file.
 
 Support
 -------
