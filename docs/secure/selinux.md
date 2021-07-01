@@ -21,7 +21,8 @@ The following command is written for Debian, but equivalent packages exist for a
 ## Locate the Development Suite
 
 ```
-# locate selinux/deve/Makefile
+# updatedb
+# locate selinux/devel/Makefile
 /usr/share/selinux/devel/Makefile
 ```
 
@@ -43,7 +44,7 @@ libsemanage.add_user: user system_u not in password file
 ```
 ## Restore Contexts to Applicable Files
 
-The new rules now live in the kernel only apply to files with their respective types. We use `restorecon` to relabel files per our file context/file system map: `mineos.fc`
+The new rules now live in the kernel only apply to files with their respective types. Use `restorecon` to relabel files per our file context map: `mineos.fc`
 
 ```
 # restorecon -R /
