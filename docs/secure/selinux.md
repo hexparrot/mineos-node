@@ -2,12 +2,11 @@
 
 SELinux is not for the faint-of-heart, but it is an opportunity to capitalize on every possible defense against bad actors, malware, or... simply buggy code. Mandatory Access Control (SELinux) + Discretionary Access Control (linux perms) together is the true test of patience. This will install a draft set of rules to lock down MineOS' necessary system permissions. Be sure you understand the implications of adding new permission systems to a production or a development system.
 
-This walkthrough is currently in development; *use at your own risk*.
-
-The following walkthrough is written for Debian, but equivalent packages exist for all distros.
+This walkthrough is currently in development; **use at your own risk**.
 
 ## Install Package Dependencies
 
+The following command is written for Debian, but equivalent packages exist for all distros.
 ```
 # apt install selinux-basics selinux-policy-default selinux-policy-src selinux-policydoc auditd locate
 ```
