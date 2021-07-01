@@ -1,4 +1,5 @@
 # Securing your system
 
-- [iptables](iptables_hardened.md)
+- [iptables_hardened](iptables_hardened.md)
+- [iptables_simple](iptables_simple.md)
 
