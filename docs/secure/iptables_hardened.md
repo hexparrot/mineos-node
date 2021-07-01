@@ -1,8 +1,8 @@
-## iptables
+# Server Hardening with iptables
 
 `iptables` is a powerful and precise firewall; this document is to show how to configure `iptables` to conform to a default-deny access strategy: nothing goes through until expressly permitted. Such a setup is more time-consuming up front, but comes with great satisfaction of an iron-clad first-line-of-defense. From this point forward, this document will assume the host is live and accessible to the internet, and you are directly connected to the host via keyboard.
 
-## Full Lockdown
+# Full Lockdown
 
 Turn off receiving of all foreign packets--`DENY` on all the default policies of `INPUT`, `FORWARD`, and `OUTPUT`. The final command will flush out any existing rules, giving a clean slate.
 
@@ -13,7 +13,7 @@ Turn off receiving of all foreign packets--`DENY` on all the default policies of
 # iptables -F
 ```
 
-### LOG ALL UNIDENTIFIED TRAFFIC
+## LOG ALL UNIDENTIFIED TRAFFIC
 
 Creating logging rules before any additional rules is a great way to audit what and where is already hitting your server. It'll create a _little bit_ of extra noise at the start, but the verbosity of these logs and the way it is positioned in the chain is invaluable to creating this hardened ruleset.
 
@@ -26,7 +26,7 @@ Creating logging rules before any additional rules is a great way to audit what 
 
 All the logged traffic goes to `/var/log/messages` and contains the prefix designated above.
 
-### DEFINE NEW CHAINS
+## DEFINE NEW CHAINS
 
 Let's use chains to help us make each packet do an extra check based on origin. Create a chain called 'FRIENDLY' which will signify IP origins that are trusted and 'MALICIOUS' for traffic we know to be bad, reducing the noise further for `/var/log/messages`.
 
@@ -57,7 +57,8 @@ INPUT -> MALICIOUS -> STDIN -> FRIENDLY -> LOG -> DROP
 INPUT -> MALICIOUS -> STDIN -> LOG -> DROP
 ```
 
-### ALLOW SSH TRAFFIC
+# Letting through Traffic
+## ALLOW SSH
 
 `ssh` can be further secured with various configuration changes, but that is beyond the scope of this document. We can make rules that are permissive for the services we care about without exposing the host unnecessarily. There are arguments to having `ssh` host on a different port, but this document does not endorse security-by-obscurity, and purposefully hosts on `22` to improve logging organization.
 
@@ -102,7 +103,7 @@ num  target     prot opt source               destination
 Chain STDOUT (0 references)
 num  target     prot opt source               destination         
 ```
-### DNS RESOLUTION
+## ALLOW DNS RESOLUTION
 
 Many activies a server will perform will likely require DNS lookups. DNS operates on outbound UDP port 53, and since the only packets that would be put on the `STDOUT` chain would have to be from itself, we can `ACCEPT`, directly.
 
@@ -121,7 +122,7 @@ PING minecraft.codeemo.com (167.71.248.91) 56(84) bytes of data.
 
 Having DNS figured out means other common utilities for downloading applications will now be possible, easily.
 
-### WGET AND CURL
+## ALLOW WGET AND CURL
 
 If you need to download an online file, it's easy to get files via `HTTP` and `HTTPS`
 
@@ -130,7 +131,7 @@ If you need to download an online file, it's easy to get files via `HTTP` and `H
 # iptables -A STDOUT -p tcp -m tcp --dport 443 -m comment --comment "allow outbound https" -j ACCEPT
 ```
 
-### ICMP (ping)
+## ALLOW ICMP (ping)
 
 Let's let `ICMP` through. For now, friendly-inbound only, and any outgoing.
 
@@ -139,11 +140,11 @@ Let's let `ICMP` through. For now, friendly-inbound only, and any outgoing.
 # iptables -A STDOUT -p icmp -j ACCEPT
 ```
 
-### LOCAL LOOPBACK INTERFACE
+## ALLOW LOCAL LOOPBACK INTERFACE
 
 `# iptables -A STDOUT -o lo -m comment --comment "Permit loopback traffic" -j ACCEPT`
 
-### LOGGING NEAR-HITS
+## LOGGING NEAR-HITS
 
 There's now a newly-emerging logging opportunity: that is, to 1) catch traffic directed at listening ports but 2) are not from trusted subnets, and tag them separately.
 
@@ -153,7 +154,7 @@ There's now a newly-emerging logging opportunity: that is, to 1) catch traffic d
 # iptables -A FRIENDLY -j DROP
 ```
 
-## Understanding the Packet Flow
+# Understanding the Packet Flow
 
 Let's look at the current rules so far. We use the parameters "-vnL" which gives us [v]erbose, [n]umeric ports, [L]ist rules. This also gives us packet/byte counters.
 
@@ -210,13 +211,13 @@ INPUT -> MALICIOUS -> STDIN -> LOG -> DROP
 
 For easy organization, it is desirable to leave `INPUT` and `OUTPUT` unchanged; any additional rules can be added to `STDIN` or `STDOUT`. If you are adding more complex rules, consider appending new chains to `STDIN` to combine related rules. This allows you to make rules in batches, enabling them all or none, simply by removing the `STDIN ... -j NEWCHAIN` entry.
 
-### WATCHING THE TRAFFIC
+## WATCHING THE TRAFFIC
 
 `# watch -n .5 iptables -vnL`
 
 You can open a new terminal session that provides a real-time view of packets hitting your server. If you are trying to let a new service though, you'll see the packet show up first on the `INPUT` chain. Follow where the numbers increment to see where the packet ends up--if it doesn't increment the rule you expect to `ACCEPT` it through, then you'll instead see it increment `LOG` rules. The log rule will help you determine exactly what packet-matching component is not working.
 
-### READING THE LOGS
+## READING THE LOGS
 
 Our logging rules will produce lines that append to `/var/log/messages`:
 ```
@@ -229,13 +230,13 @@ There are resources online to help you understand each of these logged segments,
 
 `tcp.in.dropped` tells us it's a TCP packet, from a friendly subnet, inbound at 8443.
 
-### DESIGNING NEW RULES TO ALLOW TRAFFIC
+## DESIGNING NEW RULES TO ALLOW TRAFFIC
 
 Writing a rule to allow inbound 8443 traffic through is simple; the reverse traffic is already handled with the `OUTPUT` rule `RELATED/ESTABLISHED`.
 
 `iptables -A STDIN -p tcp -m tcp --dport 8443 -m comment --comment "mineos webui" -j ACCEPT`
 
-### GET RID OF TRASH-PACKETS
+## GET RID OF TRASH-PACKETS
 
 Let's find some packets that just don't make sense to ever honor, and drop them immediately.
 ```
@@ -244,7 +245,7 @@ Let's find some packets that just don't make sense to ever honor, and drop them 
 # iptables -A MALICIOUS -p tcp -m tcp --tcp-flags SYN,RST SYN,RST -m comment --comment "[malicious packet patterns]" -j DROP
 ```
 
-### GREPPING LOGS FOR COMFORT
+## GREPPING LOGS FOR COMFORT
 
 We can easily remove excessive noise and get to the interesting lines using `grep`.
 
@@ -258,7 +259,7 @@ We can easily remove excessive noise and get to the interesting lines using `gre
 # grep 'in.dropped' /var/log/messages        #shorthand to see unused port traffic
 ```
 
-## Doing Something with Foreign Connections
+# Doing Something with Foreign Connections
 
 From above, remember `tcp.in.foreign` signifies any packets received on a listening port, but not from an accepted subnet. Or put another way: "actors that now know of a listening service." While simply having their packets pass through the firewall does not give them any access, we also have an option for more deliberate handling of their traffic. As an example, these packets can be rerouted, to an external or locally hosted docker of [opencanary](https://github.com/thinkst/opencanary).
 
@@ -272,7 +273,7 @@ Since `tcp.in.dropped` and `udp.in.dropped` will create again more noise in your
 
 Now, the traffic will no longer be logged, making all the remaining log entries comparatively more relevant. Repeat this process, [iteratively removing known-uninteresting lines until you're left with only interesting, relevant packets](http://www.ranum.com/security/computer_security/editorials/dumb/).
 
-## Save and Restore your Work
+# Save and Restore your Work
 
 ```
 # iptables-save > ~/iptables.v4
@@ -281,7 +282,7 @@ Now, the traffic will no longer be logged, making all the remaining log entries 
 
 Different distributions apply iptables in different ways, some use `iptables-persistent`, some put `iptables-restore` in `/etc/rc.local`, some expect the rules at `/etc/sysconfig/iptables`. Check your distribution manual for further details.
 
-## Conclusion
+# Conclusion
 
-`iptables` provides an immense amount of control of packet flow. Creating good rules from the outset will lower the effort required to maintain a secured system. There's much more `iptables` offers for the discerning sysadmin.
+`iptables` provides an immense amount of control of packet flow. Creating good rules from the outset will lower the effort required to maintain a secured system. There's much more `iptables` offers for the discerning sysadmin; check out the iptables man pages for more inspiration!
 
