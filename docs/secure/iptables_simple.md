@@ -12,13 +12,15 @@ On the assumption one must set up a server strictly remotely, and relying on SSH
 
 ```
 # cat << EOF > ~/iptables
--P INPUT DROP
--P FORWARD DROP
--P OUTPUT DROP
+*filter
+:INPUT DROP
+:FORWARD DROP
+:OUTPUT DROP
 
 -A INPUT -p tcp -m tcp -s 10.137.0.0/24 --dport 22 -j ACCEPT
 -A OUTPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-EOF
+
+COMMIT
 ```
 
 This rule means nothing goes through except inbound port 22 from a friendly subnet, and any related traffic to sustain this connection.
@@ -38,6 +40,7 @@ In the absence of `iptables-apply`, you can redirect your rules to `iptables-res
 ```
 # iptables-save > ~/iptables.safe
 # iptables-restore < ~/iptables; sleep 30; iptables-restore < ~/iptables.safe
+```
 
 Following the same philosophy, once you execute the compound statement below--if the rules break your connectivity--there will be a 30 second delay and then a revert to the original rules. If connectivity remains, you can `CTRL-C` to break out of the sleep, avoiding the iptables.safe restoration.
 
@@ -184,5 +187,5 @@ Different distributions apply iptables in different ways, some use `iptables-per
 
 ## Conclusion
 
-`iptables` provides an immense amount of control of packet flow. Creating good rules from the outset will lower the effort required to maintain a secured system. Be safe
+`iptables` provides an immense amount of control of packet flow. Creating good rules from the outset will lower the effort required to maintain a secured system. Be safe!
 
