@@ -1,14 +1,14 @@
-## iptables (simple)
+# Securing servers with iptables (simplified)
 
 `iptables` is a powerful and precise firewall; this document is to show how to configure `iptables` to conform to a default-deny access strategy: nothing goes through until expressly permitted. This is a substantially simplified version of [iptables-hardened](iptables_hardened.md); it will do exactly the job it needs to to keep your host secure, but will lack certain features that may be of marginal interest to the sysadmin, such as logging and complex chains.
 
-## Green Field Firewall
+# Green Field Firewall
 
 Depending on the circumstances, it may not always be possible to be at a keyboard and monitor of the host you are administering. It is key to never apply a rule you're not able to roll-back due to disconnecting yourself. This is what makes default-deny so especially fortuitous! Once set up properly, your only task is opening the _minimum_ ports available to get a service appropriate connectivity--you shouldn't have to spend time chasing holes in the firewall.
 
 On the assumption one must set up a server strictly remotely, and relying on SSH as the exclusive out-of-band management, we need to defensively write rules--we need to write rules to transition to default-deny without getting disconnected. In the following segment, be sure to modify the subnet to your own network.
 
-### CREATE A NEW RULES FILE
+## CREATE A NEW RULES FILE
 
 ```
 # cat << EOF > ~/iptables
@@ -25,15 +25,15 @@ COMMIT
 
 This rule means nothing goes through except inbound port 22 from a friendly subnet, and any related traffic to sustain this connection.
 
-### IPTABLES-APPLY
+## IPTABLES-APPLY
 
-If available, check if your distro offers [https://www.man7.org/linux/man-pages/man8/iptables-apply.8.html](iptables-apply). This tool allows you to apply a new rulesfile which will undo itself if the rules prove to break connectivity.
+If available, check if your distro offers [iptables-apply](https://www.man7.org/linux/man-pages/man8/iptables-apply.8.html). This tool allows you to apply a new rulesfile which will undo itself if the rules prove to break connectivity.
 
 `# iptables-apply -t 30 ~/iptables`
 
 The onscreen rules will then guide you to start a _new_ `ssh` session within 30 seconds, because only a new session will definitively prove the rules file is working as expected. If your new session connects, continue with `iptables-apply` on the original terminal. Confirming you can create the new session will commit the new rules rules to memory.
 
-### IPTABLES-RESTORE
+## IPTABLES-RESTORE
 
 In the absence of `iptables-apply`, you can redirect your rules to `iptables-restore`. If you have to rely on this method, create a backup of your current-working rules:
 
@@ -45,7 +45,7 @@ In the absence of `iptables-apply`, you can redirect your rules to `iptables-res
 Following the same philosophy, once you execute the compound statement below--if the rules break your connectivity--there will be a 30 second delay and then a revert to the original rules. If connectivity remains, you can `CTRL-C` to break out of the sleep, avoiding the iptables.safe restoration.
 
 
-### REVIEW THE RULES
+## REVIEW THE RULES
 
 ```
 # iptables -vnL  
@@ -65,9 +65,9 @@ Chain OUTPUT (policy DROP 3 packets, 214 bytes)
 
 Finally, save your new rules with the `iptables-save > ~/iptables.safe` command.
 
-## Let Through More
+# Let Through Traffic
 
-### DNS RESOLUTION
+## ALLOW DNS RESOLUTION
 
 Many activies a server will perform will likely require DNS lookups. DNS operates on outbound UDP port 53.
 
@@ -85,7 +85,7 @@ PING minecraft.codeemo.com (167.71.248.91) 56(84) bytes of data.
 
 Having DNS figured out means other common utilities for downloading applications will now be possible, easily.
 
-### WGET AND CURL
+## ALLOW WGET AND CURL
 
 If you need to download an online file, it's easy to get files via `HTTP` and `HTTPS`
 
@@ -94,7 +94,7 @@ If you need to download an online file, it's easy to get files via `HTTP` and `H
 # iptables -A OUTPUT -p tcp -m tcp --dport 443 -m comment --comment "allow outbound https" -j ACCEPT
 ```
 
-### ICMP (ping)
+## ALLOW ICMP (ping)
 
 Let's let `ICMP` through. For now, friendly-inbound only, and any outgoing.
 
@@ -103,11 +103,11 @@ Let's let `ICMP` through. For now, friendly-inbound only, and any outgoing.
 # iptables -A OUTPUT -p icmp -j ACCEPT
 ```
 
-### LOCAL LOOPBACK INTERFACE
+## ALLOW LOCAL LOOPBACK INTERFACE
 
 `# iptables -A OUTPUT -o lo -m comment --comment "Permit loopback traffic" -j ACCEPT`
 
-## Understanding the Packet Flow
+# Understanding the Packet Flow
 
 Let's look at the current rules so far. We use the parameters "-vnL" which gives us [v]erbose, [n]umeric ports, [L]ist rules. This also gives us packet/byte counters.
 
@@ -132,7 +132,7 @@ Chain OUTPUT (policy DROP 0 packets, 0 bytes)
     0     0 ACCEPT     all  --  *      lo      0.0.0.0/0            0.0.0.0/0            /* Permit loopback traffic */
 ```
 
-### WATCHING THE TRAFFIC
+## WATCHING THE TRAFFIC
 
 `# watch -n .5 iptables -vnL`
 
@@ -162,13 +162,13 @@ num  target     prot opt source               destination
 ```
 You can delete a rule with the syntax: `iptables -D [POLICY] [RULENO]`, for example `iptables -D OUTPUT 5` to remove the ICMP rule.
 
-### DESIGNING NEW RULES TO ALLOW TRAFFIC
+## DESIGNING NEW RULES TO ALLOW TRAFFIC
 
 Writing a rule to allow inbound 8443 traffic through is simple; the reverse traffic is already handled with the `OUTPUT` rule `RELATED/ESTABLISHED`.
 
 `iptables -A INPUT -p tcp -m tcp --dport 8443 -m comment --comment "mineos webui" -j ACCEPT`
 
-### GET RID OF TRASH-PACKETS
+## GET RID OF TRASH-PACKETS
 
 Let's find some packets that just don't make sense to ever honor, and drop them immediately.
 ```
@@ -176,7 +176,7 @@ Let's find some packets that just don't make sense to ever honor, and drop them 
 # iptables -I INPUT 2 -p tcp -m tcp --tcp-flags FIN,SYN FIN,SYN -m comment --comment "[malicious packet patterns]" -j DROP
 # iptables -I INPUT 2 -p tcp -m tcp --tcp-flags SYN,RST SYN,RST -m comment --comment "[malicious packet patterns]" -j DROP
 ```
-## Save and Restore your Work
+# Save and Restore your Work
 
 ```
 # iptables-save > ~/iptables.v4
@@ -185,7 +185,7 @@ Let's find some packets that just don't make sense to ever honor, and drop them 
 
 Different distributions apply iptables in different ways, some use `iptables-persistent`, some put `iptables-restore` in `/etc/rc.local`, some expect the rules at `/etc/sysconfig/iptables`. Check your distribution manual for further details.
 
-## Conclusion
+# Conclusion
 
 `iptables` provides an immense amount of control of packet flow. Creating good rules from the outset will lower the effort required to maintain a secured system. Be safe!
 
