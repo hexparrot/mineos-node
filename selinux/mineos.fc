@@ -1,0 +1,15 @@
+/etc/mineos.conf                         -- gen_context(system_u:object_r:mineos_t,s0)
+
+/usr/games/minecraft/node_modules(/.*)?  -d gen_context(system_u:object_r:mineos_t,s0)
+/usr/games/minecraft(/.*)?               -d gen_context(system_u:object_r:mineos_t,s0)
+/usr/games/minecraft(/.*)?               -- gen_context(system_u:object_r:mineos_t,s0)
+
+/usr/games/minecraft/webui.js            -- gen_context(system_u:object_r:mineos_exec_t,s0)
+/usr/games/minecraft/mineos_console.js   -- gen_context(system_u:object_r:mineos_exec_t,s0)
+/usr/games/minecraft/generate-sslcert.sh -- gen_context(system_u:object_r:mineos_exec_t,s0)
+
+/var/games/minecraft(/.*)?               -d gen_context(system_u:object_r:mineos_var_t,s0)
+/var/games/minecraft(/.*)?               -- gen_context(system_u:object_r:mineos_var_t,s0)
+
+/var/log/mineos.log                      -- gen_context(system_u:object_r:mineos_log_t,s0)
+/var/log/mineos.auth.log                 -- gen_context(system_u:object_r:mineos_log_t,s0)
