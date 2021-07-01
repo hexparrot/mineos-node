@@ -1,0 +1,81 @@
+policy_module(mineos, 0.1)
+
+# imports
+
+require {
+  type usr_t;
+  type unconfined_t;
+  type initrc_t;
+  type setfiles_t;
+  type games_data_t;
+  type rsync_t;
+  type unconfined_java_t;
+  type fs_t;
+  class process execmem;
+}
+
+# Declaration
+
+type mineos_t;
+type mineos_exec_t;
+domain_type(mineos_t)
+domain_entry_file(mineos_t, mineos_exec_t)
+
+type mineos_log_t;
+type mineos_var_t;
+
+# mineos local policy
+
+allow mineos_t mineos_log_t: file {read_file_perms append};
+
+allow mineos_t mineos_var_t: file manage_file_perms;
+
+allow mineos_t mineos_exec_t: file {getattr execute};
+allow mineos_t mineos_exec_t: file entrypoint;
+allow mineos_t fs_t: filesystem associate;
+
+## root policy
+allow unconfined_t self: process execmem;
+
+allow unconfined_t mineos_t: file {manage_file_perms relabelfrom relabelto getattr execute};
+allow unconfined_t mineos_t: dir {manage_file_perms search add_name remove_name rmdir create reparent relabelfrom relabelto};
+allow unconfined_t mineos_t: lnk_file {create unlink};
+
+allow unconfined_t mineos_var_t: file manage_file_perms;
+allow unconfined_t mineos_var_t: dir {manage_file_perms search remove_name};
+
+allow unconfined_t mineos_log_t: file manage_file_perms;
+allow unconfined_t mineos_log_t: dir {manage_file_perms search};
+
+allow setfiles_t mineos_t: file {getattr manage_file_perms relabelfrom};
+allow setfiles_t mineos_t: dir {getattr manage_file_perms};
+allow setfiles_t mineos_t: lnk_file getattr;
+
+
+allow unconfined_t mineos_t: process transition;
+
+allow unconfined_t self: process execmem;
+ 
+type_transition unconfined_t mineos_exec_t: process mineos_t;
+
+
+## supervisorctl/init policy
+allow initrc_t self: process execmem;
+
+allow initrc_t mineos_t: process transition;
+allow initrc_t mineos_t: file {getattr execute};
+allow initrc_t mineos_var_t: file manage_file_perms;
+allow initrc_t mineos_var_t: dir {search read open getattr setattr};
+
+allow rsync_t mineos_t: dir {search};
+allow rsync_t games_data_t: dir {search};
+allow rsync_t mineos_var_t: dir {manage_file_perms search};
+allow rsync_t mineos_var_t: file {manage_file_perms};
+
+allow unconfined_java_t mineos_var_t: dir {manage_file_perms search add_name remove_name};
+allow unconfined_java_t mineos_var_t: file {manage_file_perms};
+
+allow mineos_var_t fs_t: filesystem associate;
+
+type_transition initrc_t mineos_exec_t: process mineos_t;
+type_transition initrc_t mineos_var_t: process mineos_t;
