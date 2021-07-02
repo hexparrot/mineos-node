@@ -152,3 +152,62 @@ root@mineos-tkldev ~#
 ```
 
 It is attractive to omit the passphrase for truly instant, passwordless login. Establish your own threat model and decide what is best for your system and needs.
+
+# Further Lockdown
+
+## DISALLOW PLAINTEXT PASSWORDS
+If cryptographic keys completely replace your user passwords for system login, you can further harden your server by disallowing passwords:
+
+```
+# To disable tunneled clear text passwords, change to no here!
+#PasswordAuthentication yes
+#PermitEmptyPasswords no
+```
+TO:
+```
+# To disable tunneled clear text passwords, change to no here!
+PasswordAuthentication no
+#PermitEmptyPasswords no
+```
+
+## USING SSH-AGENTS
+As a convenience when using passphrases, you can use an SSH-AGENT to save you repetitive passphrase entry. Notice this login (and all subsequent logins until reboot) will automatically handle the passphrase prompt for you.
+
+```
+# ssh-add ~/.ssh/mineos
+Enter passphrase for .ssh/mineos: 
+Identity added: .ssh/mineos (for root@mineos)
+
+$ ssh -i ~/.ssh/mineos root@10.137.0.12
+Welcome to Mineos-tkldev, TurnKey GNU/Linux 14.0 / TurnKey 9.13 Stretch
+
+Linux mineos-tkldev 4.9.0-16-amd64 #1 SMP Debian 4.9.272-1 (2021-06-21) x86_64
+You have new mail.
+Last login: Fri Jul  2 20:06:55 2021 from 10.137.0.14
+```
+
+## USING SSH USER CONFIG
+Finally, you can simplify the connection process by making all attempts to a host always use a given identity file. Add the following content (adjust as necessary) to `~/.ssh/config`:
+
+```
+Host 10.137.0.12
+        User root
+        IdentityFile ~/.ssh/mineos
+        Port 22
+```
+
+Now, login with only the IP and notice it automatically uses your config to determine the identify file and intended user `root`:
+
+```
+$ ssh 10.137.0.12
+Welcome to Mineos-tkldev, TurnKey GNU/Linux 14.0 / TurnKey 9.13 Stretch
+
+Linux mineos-tkldev 4.9.0-16-amd64 #1 SMP Debian 4.9.272-1 (2021-06-21) x86_64
+You have new mail.
+Last login: Fri Jul  2 20:16:57 2021 from 10.137.0.14
+root@mineos-tkldev ~# 
+```
+
+# Conclusion
+
+Cryptographic keys help reduce danger by eliminating the need to type passwords on foreign, potentially compromised hosts. It also greatly reduces attack surface by making unauthorized logins nearly impossible. In conjunction with other `sshd` security functions and firewalls, `sshd` can live peacefully and securely on your host.
