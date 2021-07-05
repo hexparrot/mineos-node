@@ -57,14 +57,26 @@ passport.use('local-signin', new LocalStrategy(
       if (user) {
         console.log('Successful login attempt for username:', username);
         var logstring = new Date().toString() + ' - success from: ' + req.connection.remoteAddress + ' user: ' + username + '\n';
-        fs.appendFileSync('/var/log/mineos.auth.log', logstring);
+        try {
+          fs.appendFileSync('/var/log/mineos.auth.log', logstring);
+        } catch (e) {
+          console.log(e);
+          console.log("Appending to local repo copy instead: ./mineos.auth.log");
+          fs.appendFileSync('mineos.auth.log', logstring);
+        }
         done(null, user);
       }
     })
     .fail(function (err) {
       console.log('Unsuccessful login attempt for username:', username);
       var logstring = new Date().toString() + ' - failure from: ' + req.connection.remoteAddress + ' user: ' + username + '\n';
-      fs.appendFileSync('/var/log/mineos.auth.log', logstring);
+      try {
+        fs.appendFileSync('/var/log/mineos.auth.log', logstring);
+      } catch (e) {
+        console.log(e);
+        console.log("Appending to local repo copy instead: ./mineos.auth.log");
+        fs.appendFileSync('mineos.auth.log', logstring);
+      }
       done(null);
     });
   }
