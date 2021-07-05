@@ -127,7 +127,9 @@ mineos.dependencies(function(err, binaries) {
     process.exit(1);
   } 
 
-  var mineos_config = read_ini('/etc/mineos.conf') || read_ini('/usr/local/etc/mineos.conf') || {};
+  var mineos_config = read_ini('custom.conf') ||
+                      read_ini('/etc/mineos.conf') ||
+                      read_ini('/usr/local/etc/mineos.conf') || {};
   var base_directory = '/var/games/minecraft';
 
   if ('base_directory' in mineos_config) {
@@ -146,6 +148,7 @@ mineos.dependencies(function(err, binaries) {
     console.info('base_directory found in mineos.conf, using:', base_directory);
   } else {
     console.error('base_directory not specified--missing mineos.conf?');
+    console.error('alternatively, you can make custom.conf in the repository root directory');
     console.error('Aborting startup.');
     process.exit(4); 
   }
