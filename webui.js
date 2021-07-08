@@ -4,6 +4,7 @@ var mineos = require('./mineos');
 var server = require('./server');
 var async = require('async');
 var fs = require('fs-extra');
+var getopt = require('node-getopt');
 
 var express = require('express');
 var compression = require('compression');
@@ -20,6 +21,15 @@ var app = express();
 var http = require('http').Server(app);
 
 var response_options = {root: __dirname};
+
+var opt = getopt.create([
+  ['c' , 'config_file=CONFIG_PATH'  , 'defaults to $PWD/custom.conf, then /etc/mineos.conf'],
+  ['h' , 'help'                     , 'display this help']
+])              // create Getopt instance
+.bindHelp()     // bind option 'help' to default action
+.parseSystem(); // parse command line
+
+var config_file = (opt.options || {}).config_file;
 
 // Authorization
 var localAuth = function (username, password) {
@@ -57,14 +67,26 @@ passport.use('local-signin', new LocalStrategy(
       if (user) {
         console.log('Successful login attempt for username:', username);
         var logstring = new Date().toString() + ' - success from: ' + req.connection.remoteAddress + ' user: ' + username + '\n';
-        fs.appendFileSync('/var/log/mineos.auth.log', logstring);
+        try {
+          fs.appendFileSync('/var/log/mineos.auth.log', logstring);
+        } catch (e) {
+          console.log(e);
+          console.log("Appending to local repo copy instead: ./mineos.auth.log");
+          fs.appendFileSync('mineos.auth.log', logstring);
+        }
         done(null, user);
       }
     })
     .fail(function (err) {
       console.log('Unsuccessful login attempt for username:', username);
       var logstring = new Date().toString() + ' - failure from: ' + req.connection.remoteAddress + ' user: ' + username + '\n';
-      fs.appendFileSync('/var/log/mineos.auth.log', logstring);
+      try {
+        fs.appendFileSync('/var/log/mineos.auth.log', logstring);
+      } catch (e) {
+        console.log(e);
+        console.log("Appending to local repo copy instead: ./mineos.auth.log");
+        fs.appendFileSync('mineos.auth.log', logstring);
+      }
       done(null);
     });
   }
@@ -127,7 +149,25 @@ mineos.dependencies(function(err, binaries) {
     process.exit(1);
   } 
 
-  var mineos_config = read_ini('/etc/mineos.conf') || read_ini('/usr/local/etc/mineos.conf') || {};
+  var config_locs = ['custom.conf',
+                     '/etc/mineos.conf',
+                     '/usr/local/etc/mineos.conf']
+
+  var mineos_config = {};
+  if (typeof config_file !== 'undefined') {
+    console.info('using command-line provided configuration identified as', config_file);
+    mineos_config = read_ini(config_file);
+  } else {
+    for (var loc in config_locs) {
+      try {
+        fs.statSync(config_locs[loc]);
+        console.info('first mineos configuration identified as', config_locs[loc]);
+        mineos_config = read_ini(config_locs[loc])
+        break;
+      } catch (e) {}
+    }
+  }
+
   var base_directory = '/var/games/minecraft';
 
   if ('base_directory' in mineos_config) {
@@ -137,15 +177,14 @@ mineos.dependencies(function(err, binaries) {
 
       base_directory = mineos_config['base_directory'];
       fs.ensureDirSync(base_directory);
-
     } catch (e) {
       console.error(e.message, 'Aborting startup.');
       process.exit(2); 
     }
-
-    console.info('base_directory found in mineos.conf, using:', base_directory);
+    console.info('using base_directory: ', base_directory);
   } else {
     console.error('base_directory not specified--missing mineos.conf?');
+    console.error('alternatively, you can make custom.conf in the repository root directory');
     console.error('Aborting startup.');
     process.exit(4); 
   }
