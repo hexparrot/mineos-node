@@ -10,11 +10,11 @@ MineOS is all about learning to be an effective game host. Even better, a system
 There have been numerous iterations of MineOS, all of which shared the same moniker.
 For clarity, here are some of the ways the name is used:
 
-### MineOS (the web user interface): Node.JS-based single-page application (SPA)
+### MineOS (the web user interface): Node.JS-based webapp
 
 MineOS is a web-based server front-end to centralize and simplify Minecraft sysadmin tasks.
 
-The single-page application leverages the event-triggering, asyncronous model of Node.JS and websockets.  This is the primary interface for admins to download Minecraft server jars, create and configure multiple servers, start/stop instances, and create backups and initiate restores.
+This is the primary interface for admins to download Minecraft server jars, create and configure multiple servers, start/stop instances, and create backups and initiate restores.
 
 It provides system health, disk and memory usage, and logging in real-time. The webui supports multiple, independent users, and uses standard Linux file permissions to keep data appropriately isolated. 
 
@@ -47,6 +47,7 @@ Sysadmins familiar with Docker or unRAID also have easy deployment options:
 
 - [Installation](install/index.md)
 - [Securing](secure/index.md)
+- [Maintenance and Troubleshooting](maint/webui.md)
 
 Developing and Contributing
 ------
