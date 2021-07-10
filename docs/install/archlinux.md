@@ -73,7 +73,7 @@ Then, to manage the service:
 
 ### SUPERVISORD
 ```
-# apt install -y supervisord
+# pacman -S --noconfirm supervisord
 # cp /usr/games/minecraft/init/supervisor_conf /etc/supervisor/conf.d/mineos.conf
 # supervisorctl reload
 ```
@@ -84,6 +84,6 @@ Then, to manage the service:
 # supervisorctl stop mineos
 ```
 
-# USAGE
+# Usage
 
 Once the background daemon is running, you can visit `https://[ipaddress]:8443` in your web browser and you will see a user and password prompt. When creating minecraft and managing Minecraft servers, use an unprivileged user to log into the webui. Creating an unprivileged user (a user that is not `root`) can be accomplished with the `adduser username` command. The password you set during user creation will also be the password used for the web-ui.
