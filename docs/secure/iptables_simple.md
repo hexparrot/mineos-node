@@ -21,6 +21,7 @@ On the assumption one must set up a server strictly remotely, and relying on SSH
 -A OUTPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 
 COMMIT
+EOF
 ```
 
 This rule means nothing goes through except inbound port 22 from a friendly subnet, and any related traffic to sustain this connection.
@@ -43,7 +44,6 @@ In the absence of `iptables-apply`, you can redirect your rules to `iptables-res
 ```
 
 Following the same philosophy, once you execute the compound statement below--if the rules break your connectivity--there will be a 30 second delay and then a revert to the original rules. If connectivity remains, you can `CTRL-C` to break out of the sleep, avoiding the iptables.safe restoration.
-
 
 ## REVIEW THE RULES
 
@@ -164,9 +164,9 @@ You can delete a rule with the syntax: `iptables -D [POLICY] [RULENO]`, for exam
 
 ## DESIGNING NEW RULES TO ALLOW TRAFFIC
 
-Writing a rule to allow inbound 8443 traffic through is simple; the reverse traffic is already handled with the `OUTPUT` rule `RELATED/ESTABLISHED`.
+Writing a rule to allow inbound arbitrary port traffic is simple; the reverse traffic is already handled with the `OUTPUT` rule `RELATED/ESTABLISHED`.
 
-`iptables -A INPUT -p tcp -m tcp --dport 8443 -m comment --comment "mineos webui" -j ACCEPT`
+`# iptables -A INPUT -p tcp -m tcp --dport 8443 -m comment --comment "mineos webui" -j ACCEPT`
 
 ## GET RID OF TRASH-PACKETS
 
@@ -176,6 +176,7 @@ Let's find some packets that just don't make sense to ever honor, and drop them 
 # iptables -I INPUT 2 -p tcp -m tcp --tcp-flags FIN,SYN FIN,SYN -m comment --comment "[malicious packet patterns]" -j DROP
 # iptables -I INPUT 2 -p tcp -m tcp --tcp-flags SYN,RST SYN,RST -m comment --comment "[malicious packet patterns]" -j DROP
 ```
+
 # Save and Restore your Work
 
 ```
