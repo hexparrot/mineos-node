@@ -234,7 +234,7 @@ There are resources online to help you understand each of these logged segments,
 
 Writing a rule to allow inbound 8443 traffic through is simple; the reverse traffic is already handled with the `OUTPUT` rule `RELATED/ESTABLISHED`.
 
-`iptables -A STDIN -p tcp -m tcp --dport 8443 -m comment --comment "mineos webui" -j ACCEPT`
+`# iptables -A STDIN -p tcp -m tcp --dport 8443 -m comment --comment "mineos webui" -j ACCEPT`
 
 ## GET RID OF TRASH-PACKETS
 
@@ -261,9 +261,9 @@ We can easily remove excessive noise and get to the interesting lines using `gre
 
 # Doing Something with Foreign Connections
 
-From above, remember `tcp.in.foreign` signifies any packets received on a listening port, but not from an accepted subnet. Or put another way: "actors that now know of a listening service." While simply having their packets pass through the firewall does not give them any access, we also have an option for more deliberate handling of their traffic. As an example, these packets can be rerouted, to an external or locally hosted docker of [opencanary](https://github.com/thinkst/opencanary).
+From above, remember `tcp.in.foreign` signifies any packets received on a listening port, but not from an accepted subnet. Or put another way: "actors that now know of a listening service." While simply having their packets pass through the firewall does not give them any access, we also have an option for more deliberate handling of their traffic. As an example, these packets can be rerouted, to an external [opencanary](https://github.com/thinkst/opencanary).
 
-`in.foreign` packets will always want to be logged. You can also rely on additional services like [fail2ban](https://www.fail2ban.org/wiki/index.php/Main_Page) to help manage consistent traffic.
+`in.foreign` packets will always want to be logged. You can also rely on additional services like [fail2ban](https://www.fail2ban.org/wiki/index.php/Main_Page) to help manage consistent offenders.
 
 Since `tcp.in.dropped` and `udp.in.dropped` will create again more noise in your logs, you can address this by adding blacklist rules that suppress logging of traffic that does nothing but distract. For example, on a Linux machine, you may not be interested in TCP/UDP 138 traffic (NetBIOS):
 
@@ -272,6 +272,18 @@ Since `tcp.in.dropped` and `udp.in.dropped` will create again more noise in your
 `# iptables -A MALICIOUS -p tcp -m tcp --dport 138 -m comment --comment "[unwanted netbios]" -j DROP`
 
 Now, the traffic will no longer be logged, making all the remaining log entries comparatively more relevant. Repeat this process, [iteratively removing known-uninteresting lines until you're left with only interesting, relevant packets](http://www.ranum.com/security/computer_security/editorials/dumb/).
+
+## REDIRECTING HOSTILE TRAFFIC
+
+Recall earlier that `iptables` is only letting through `ssh` traffic from a friendly origin:
+
+`# iptables -A FRIENDLY -s 10.137.0.0/24 -m comment --comment "[known-friendly network]" -j ACCEPT`
+
+When `ssh` traffic arrives, it never hits an `ACCEPT` rule, so eventually it gets logged as `tcp.in.foreigner`--that is, it's marked as traffic bound for listening ports, but dropped due to being from an untrusted subnet. If a network honeypot is in place, `iptables` can capture that traffic while still letting through valid port 22 traffic with the 'negation' operator (!).
+
+`iptables -t nat -A PREROUTING ! -s 10.137.0.0/24 -p tcp --dport 22 -j DNAT --to-destination 172.17.0.4:8022`
+
+Any traffic that is _not_ from `10.137.0.0/24` _and_ is `ssh` inbound traffic, destination-NAT it to another address, on an arbitrary port. In this specific example, a docker container with the IP `172.17.0.4` is listening for `ssh` traffic--configured on port 8022--because the host has already bound port 22 to the existing, real `sshd` server.
 
 # Save and Restore your Work
 
