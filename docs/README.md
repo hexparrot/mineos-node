@@ -45,7 +45,6 @@ Sysadmins familiar with Docker or unRAID also have easy deployment options:
 
 # Wiki Landing Pages
 
-- [Installation](install/index.md)
 - [Securing](secure/index.md)
 - [Maintenance and Troubleshooting](maint/webui.md)
 
