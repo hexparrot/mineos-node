@@ -35,9 +35,11 @@ The MineOS web-ui requires a Linux-compatible /proc filesystem. To enable linpro
 
 ### JAVA
 
-OpenJDK versions lag behind in getting released to FreeBSD, so an appropriately recent version for Minecraft 1.17 may not be available. Instead, Oracle's JDK will work:
+Multiple appropriate Java editions exist, choose one to your liking:
 
 ```
+# pkg install openjdk16-16.0.1+9.1
+
 # pkg install linux-oracle-jdk18
 ```
 
