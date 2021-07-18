@@ -185,5 +185,7 @@
   "up": "Serveren må være aktiv når du gjør dette.",
   "!exists": "Kan ikke finne serveren.",
   "exists": "Serveren eksisterer.",
-  "eula": "Mojangs sluttbrukerlisensavtale må aksepteres for å starte serveren."
+  "eula": "Mojangs sluttbrukerlisensavtale må aksepteres for å starte serveren.",
+  "SHOW_NEW_UI": "Introducing the new user interface.",
+  "SHOW_OLD_UI": "Return to legacy interface."
 }

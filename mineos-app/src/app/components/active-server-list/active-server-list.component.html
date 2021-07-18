@@ -1,0 +1,66 @@
+<mat-card class="dashboard-card">
+  <mat-card-header>
+    <mat-card-title>Active Servers</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <table mat-table
+           [dataSource]="activeServers$"
+           class="server-list-table">
+      <!-- Server Column -->
+      <ng-container matColumnDef="Server">
+        <th mat-header-cell
+            *matHeaderCellDef>Server</th>
+        <td mat-cell
+            *matCellDef="let element"> {{element.server_name}} </td>
+      </ng-container>
+
+      <!-- Profile Column -->
+      <ng-container matColumnDef="Profile">
+        <th mat-header-cell
+            *matHeaderCellDef>Profile</th>
+        <td mat-cell
+            *matCellDef="let element"> {{element.server_version}} </td>
+      </ng-container>
+
+      <!-- Port Column -->
+      <ng-container matColumnDef="Port">
+        <th mat-header-cell
+            *matHeaderCellDef>Port</th>
+        <td mat-cell
+            *matCellDef="let element"> {{element.port}} </td>
+      </ng-container>
+
+      <!-- Status Column -->
+      <ng-container matColumnDef="Status">
+        <th mat-header-cell
+            *matHeaderCellDef>Status</th>
+        <td mat-cell
+            *matCellDef="let element">
+          <div *ngIf="element.status; else elseBlock">
+            <mat-icon aria-hidden="false"
+                      aria-label="Server status Up"
+                      style="color:lime; font-weight: bolder;">arrow_upward</mat-icon>
+          </div>
+          <ng-template #elseBlock>
+            <mat-icon aria-hidden="false"
+                      aria-label="Server status Up"
+                      style="color:red; font-weight: bolder;">arrow_downward</mat-icon>
+          </ng-template>
+        </td>
+      </ng-container>
+
+      <!-- Status Memory -->
+      <ng-container matColumnDef="Memory">
+        <th mat-header-cell
+            *matHeaderCellDef>Memory</th>
+        <td mat-cell
+            *matCellDef="let element"> {{element.memory?.VmRSS | bytes_to_mb }} </td>
+      </ng-container>
+
+      <tr mat-header-row
+          *matHeaderRowDef="columnsToDisplay"></tr>
+      <tr mat-row
+          *matRowDef="let row; columns: columnsToDisplay;"></tr>
+    </table>
+  </mat-card-content>
+</mat-card>

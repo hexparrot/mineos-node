@@ -1,0 +1,13 @@
+<mat-card class="dashboard-card">
+  <mat-card-header>
+    <mat-card-title>
+      <h1 class="value-text" bytes_to_mb>{{serverMemory$ | async | bytes_to_mb}}</h1>
+    </mat-card-title>
+    <div mat-card-avatar
+         class="card-icon">
+      <mat-icon [color]="iconColor"
+                class="avatar-icon">show_chart</mat-icon>
+    </div>
+  </mat-card-header>
+  <h3 class="title-text">RAM Free</h3>
+</mat-card>

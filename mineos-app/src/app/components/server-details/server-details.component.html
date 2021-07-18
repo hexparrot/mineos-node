@@ -1,0 +1,48 @@
+<mat-sidenav-container>
+  <mat-sidenav mode="side"
+               opened="true"
+               fixedInViewport="true"
+               fixedTopGap="64">
+    <mat-nav-list>
+      <mat-list-item>
+        <mat-icon>home</mat-icon>
+        <a class="menu-text"
+           [routerLink]="'status'">Status</a>
+      </mat-list-item>
+      <mat-list-item>
+        <mat-icon>tune</mat-icon>
+        <a class="menu-text"
+              [routerLink]="'environment'">Environment</a>
+      </mat-list-item>
+      <mat-list-item>
+        <mat-icon>flag</mat-icon>
+        <a class="menu-text"
+              [routerLink]="'restore-point'"
+              matBadge="24"
+              matBadgeOverlap="false"
+              matBadgeColor="accent">Restore Points</a>
+      </mat-list-item>
+      <mat-list-item>
+        <mat-icon>inventory_2</mat-icon>
+        <a class="menu-text"
+              [routerLink]="'archive'"
+              matBadge="4"
+              matBadgeOverlap="false"
+              matBadgeColor="accent">Archives</a>
+      </mat-list-item>
+      <mat-list-item>
+        <mat-icon>edit_calendar</mat-icon>
+        <a class="menu-text"
+              [routerLink]="'schedule'">Scheduling</a>
+      </mat-list-item>
+      <mat-list-item>
+        <mat-icon>message</mat-icon>
+        <a class="menu-text"
+              [routerLink]="'logging'">Logging</a>
+      </mat-list-item>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

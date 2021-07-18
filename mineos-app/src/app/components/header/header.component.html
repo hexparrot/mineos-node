@@ -1,0 +1,87 @@
+<ng-container *ngIf="userLoggedIn | async">
+  <mat-toolbar color="primary"
+               class="app-header"
+               role="heading">
+    <span>MineOS</span>
+    <div class="button-row">
+      <a mat-raised-button
+         [routerLink]="['dashboard']"
+         routerLinkActive
+         #rla1="routerLinkActive"
+         [color]="rla1.isActive ? 'accent' : 'primary'">Dashboard
+      </a>
+      <a mat-raised-button
+         [routerLink]="['profiles']"
+         routerLinkActive
+         #rla2="routerLinkActive"
+         [color]="rla2.isActive ? 'accent' : 'primary'">Profiles
+      </a>
+      <a mat-raised-button
+         [routerLink]="['server-details']"
+         routerLinkActive
+         #rla3="routerLinkActive"
+         [color]="rla3.isActive ? 'accent' : 'primary'">Servers
+      </a>
+      <a mat-raised-button
+         [routerLink]="['calendar']"
+         routerLinkActive
+         #rla4="routerLinkActive"
+         [color]="rla4.isActive ? 'accent' : 'primary'">Calendar
+      </a>
+      <a mat-raised-button
+         href="https://minecraft.codeemo.com/mineoswiki/index.php"
+         target="_blank"
+         [color]="'primary'">Documentation
+      </a>
+    </div>
+    <span class="spacer"></span>
+    <button mat-icon-button
+            [matMenuTriggerFor]="menu"
+            aria-label="MineOS menu">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item>
+        <mat-icon>source</mat-icon>
+        <span>git commit (commitHash)</span>
+      </button>
+      <ng-container *ngIf="darkMode | async; then light; else dark"></ng-container>
+      <button mat-menu-item>
+        <mat-icon>dns</mat-icon>
+        <span>Refresh Server List</span>
+      </button>
+      <button mat-menu-item>
+        <mat-icon>sync</mat-icon>
+        <span>Refresh Profile List</span>
+      </button>
+      <a mat-menu-item
+         href="/admin/index.html">
+        <mat-icon>exit_to_app</mat-icon>
+        <span>Legacy interface</span>
+      </a>
+      <button mat-menu-item>
+        <mat-icon>translate</mat-icon>
+        <span>Change Localization</span>
+      </button>
+      <button mat-menu-item
+              (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>LOGOFF</span>
+      </button>
+    </mat-menu>
+  </mat-toolbar>
+</ng-container>
+<ng-template #dark>
+  <button mat-menu-item
+          (click)="changeMode(true)">
+    <mat-icon>dark_mode</mat-icon>
+    <span>Dark Mode</span>
+  </button>
+</ng-template>
+<ng-template #light>
+  <button mat-menu-item
+          (click)="changeMode(false)">
+    <mat-icon>light_mode</mat-icon>
+    <span>Light Mode</span>
+  </button>
+</ng-template>

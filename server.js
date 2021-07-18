@@ -1121,7 +1121,7 @@ function server_container(server_name, user_config, socket_io) {
 
   nsp.on('connection', function(socket) {
     var ip_address = socket.request.connection.remoteAddress;
-    var username = socket.request.user.username;
+    var username = socket.request.user?.username;
     var NOTICES_QUEUE_LENGTH = 10; // 0 < q <= 10
 
     function server_dispatcher(args) {

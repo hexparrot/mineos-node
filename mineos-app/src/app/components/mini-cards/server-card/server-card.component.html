@@ -1,0 +1,13 @@
+<mat-card class="dashboard-card">
+  <mat-card-header>
+    <mat-card-title>
+      <h1 class="value-text">{{activeServers$ | async}}</h1>
+    </mat-card-title>
+    <div mat-card-avatar
+         class="card-icon">
+      <mat-icon [color]="iconColor"
+                class="avatar-icon">check_circle</mat-icon>
+    </div>
+  </mat-card-header>
+  <h3 class="title-text">Servers Running</h3>
+</mat-card>

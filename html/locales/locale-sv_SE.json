@@ -185,5 +185,7 @@
   "up": "Servern måste köras när du utför denna åtgärden.",
   "!exists": "Servern får inte existera när du utför denna åtgärden.",
   "exists": "Kan inte hitta servern.",
-  "eula": "Mojangs slutanvändar Licensavtal måste accepteras för att starta den här servern."
+  "eula": "Mojangs slutanvändar Licensavtal måste accepteras för att starta den här servern.",
+  "SHOW_NEW_UI": "Introducing the new user interface.",
+  "SHOW_OLD_UI": "Return to legacy interface."
 }

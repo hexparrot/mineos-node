@@ -1,0 +1,30 @@
+<div class="grid-container">
+  <h1 class="mat-h1">Dashboard</h1>
+  <mat-grid-list cols="{{ ( cardLayout$ | async )?.columns }}"
+                 rowHeight="150px">
+    <mat-grid-tile [colspan]="( cardLayout$ | async )?.smallCard?.cols"
+                   [rowspan]="( cardLayout$ | async )?.smallCard?.rows">
+      <app-server-card></app-server-card>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="( cardLayout$ | async )?.smallCard?.cols"
+                   [rowspan]="( cardLayout$ | async )?.smallCard?.rows">
+      <app-player-card></app-player-card>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="( cardLayout$ | async )?.smallCard?.cols"
+                   [rowspan]="( cardLayout$ | async )?.smallCard?.rows">
+      <app-uptime-card></app-uptime-card>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="( cardLayout$ | async )?.smallCard?.cols"
+                   [rowspan]="( cardLayout$ | async )?.smallCard?.rows">
+      <app-memory-card></app-memory-card>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="( cardLayout$ | async )?.largeCard?.cols"
+                   [rowspan]="( cardLayout$ | async )?.largeCard?.rows">
+      <app-load-averages></app-load-averages>
+    </mat-grid-tile>
+    <mat-grid-tile [colspan]="( cardLayout$ | async )?.largeCard?.cols"
+                   [rowspan]="( cardLayout$ | async )?.largeCard?.rows">
+      <app-active-server-list></app-active-server-list>
+    </mat-grid-tile>
+  </mat-grid-list>
+</div>

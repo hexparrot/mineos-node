@@ -1,0 +1,13 @@
+<mat-card class="dashboard-card">
+  <mat-card-header>
+    <mat-card-title>
+      <h1 class="value-text">{{activePlayers$ | async}}</h1>
+    </mat-card-title>
+    <div mat-card-avatar
+         class="card-icon">
+      <mat-icon [color]="iconColor"
+                class="avatar-icon">people_outline</mat-icon>
+    </div>
+  </mat-card-header>
+  <h3 class="title-text">Players Online</h3>
+</mat-card>

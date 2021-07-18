@@ -27,11 +27,21 @@ ECHO_LOG_N "Pulling master branch..."
 git pull origin master >> $LOG
 if [ $? -eq 0 ]; then ECHO_LOG "OK"; else ECHO_LOG "FAILED" && exit 1; fi
 
-ECHO_LOG_N "Updating npm dependencies..."
+ECHO_LOG_N "Updating server npm dependencies..."
 npm install --no-spin --unsafe-perm >> $LOG
 if [ $? -eq 0 ]; then ECHO_LOG "OK"; else ECHO_LOG "FAILED" && exit 1; fi
 
+ECHO_LOG_N "Updating UI npm dependencies..."
+cd mineos-app
+npm install --no-spin --unsafe-perm >> $LOG
+if [ $? -eq 0 ]; then ECHO_LOG "OK"; else ECHO_LOG "FAILED" && exit 1; fi
+
+ECHO_LOG_N "Building UI content..."
+npm run build >> $LOG
+if [ $? -eq 0 ]; then ECHO_LOG "OK"; else ECHO_LOG "FAILED" && exit 1; fi
+
 ECHO_LOG_N "Setting node javascript files to executable..."
+cd ..
 chmod +x mineos_console.js webui.js update_webui.sh reset_webui.sh >> $LOG
 if [ $? -eq 0 ]; then ECHO_LOG "OK"; else ECHO_LOG "FAILED" && exit 1; fi
 
