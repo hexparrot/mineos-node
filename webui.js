@@ -197,19 +197,6 @@ mineos.dependencies(function(err, binaries) {
     res.end();
   });
 
-  app.get('/api/switch_ui', function(req, res){
-    if(res.params.new_ui){
-      res.redirect('/ui');
-    }else{}
-    
-    if(res.params.redirect){
-      res.redirect('/ui');
-    }
-    if(res.params.redirect){
-      res.redirect('/ui');
-    }
-  });
-
   app.all('/api/:server_name/:command', ensureAuthenticated, function(req, res) {
     var target_server = req.params.server_name;
     var user = req.user.username;
