@@ -38,6 +38,11 @@ RUN cd /usr/games/minecraft \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+#build UI
+RUN cd /usr/games/minecraft/mineos-app \
+  && npm install \ 
+  && npm run build
+
 #configure and run supervisor
 RUN cp /usr/games/minecraft/init/supervisor_conf /etc/supervisor/conf.d/mineos.conf
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]

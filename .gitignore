@@ -25,3 +25,11 @@ build/Release
 # Dependency directory
 # https://docs.npmjs.com/misc/faq#should-i-check-my-node-modules-folder-into-git
 node_modules
+
+# Angular build artifacts
+ui/
+
+# Visual Studio Code Dev files
+.devcontainer
+.vscode
+*.code-workspace

@@ -18,7 +18,8 @@
   },
   "homepage": "https://github.com/hexparrot/mineos-node",
   "scripts": {
-    "start": "node webui.js"
+    "start": "node webui.js",
+    "dev": "nodemon webui.js"
   },
   "dependencies": {
     "adm-zip": "^0.4.11",
@@ -65,7 +66,7 @@
     "request-progress": "0.3.x",
     "rsync": "0.6.x",
     "sha512crypt-node": "0.1.x",
-    "socket.io": "1.7.x",
+    "socket.io": "^4.1.3",
     "strftime": "0.9.x",
     "tail": "1.2.1",
     "tar": "^2.2.2",
@@ -81,6 +82,7 @@
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
+    "nodemon": "^2.0.9",
     "nodeunit": "^0.11.3"
   }
 }

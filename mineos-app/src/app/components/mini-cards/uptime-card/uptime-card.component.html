@@ -1,0 +1,13 @@
+<mat-card class="dashboard-card">
+  <mat-card-header>
+    <mat-card-title>
+      <h1 class="value-text">{{serverUptime$ | async | amDuration:'seconds' }}</h1>
+    </mat-card-title>
+    <div mat-card-avatar
+         class="card-icon">
+      <mat-icon [color]="iconColor"
+                class="avatar-icon">av_timer</mat-icon>
+    </div>
+  </mat-card-header>
+  <h3 class="title-text">Uptime</h3>
+</mat-card>
