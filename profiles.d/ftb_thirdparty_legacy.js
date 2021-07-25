@@ -38,7 +38,7 @@ exports.profile = {
 
           var old_versions = ref_obj['oldVersions'].split(';');
           for (var idx in old_versions) {
-            var new_item = new profile_template();
+            var new_item = new profile();
 
             new_item['id'] = '{0}-{1}'.format(ref_obj['dir'], old_versions[idx]);
             //new_item['time'] = ref_obj['time'];
