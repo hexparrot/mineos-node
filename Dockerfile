@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
   git \
   curl \
   rlwrap \
+  unzip \
   openjdk-16-jre-headless \
   openjdk-8-jre-headless \
   ca-certificates-java \
