@@ -156,7 +156,7 @@ exports.profile = {
     var child = require('child_process');
     var which = require('which');
     var binary = which.sync('unzip');
-    var args = [dest_filepath];
+    var args = ['-qq', dest_filepath];
     var params = { cwd: profile_dir }
 
     async.series([
