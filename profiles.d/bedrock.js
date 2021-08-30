@@ -5,12 +5,8 @@ var fs = require('fs-extra');
 var profile = require('./template');
 
 exports.profile = {
-  name: "Minecraft Bedrock",
-  request_args: {
-    url: '',
-    json: false
-  },
-  handler: function (profile_dir, body, callback) {
+  name: 'Minecraft Bedrock',
+  handler: function (profile_dir, callback) {
     var p = [];
 
     try {  // BEGIN PARSING LOGIC
@@ -32,7 +28,7 @@ exports.profile = {
       item['type'] = 'release';
       item['group'] = 'minecraft-bedrock';
       item['webui_desc'] = '1.16.221.01 Linux x64 release';
-      item['weight'] = 0;
+      item['weight'] = 1;
       item['filename'] = 'bedrock-server-1.16.221.01.zip';
       item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
       item['version'] = 0;
@@ -44,7 +40,7 @@ exports.profile = {
       item['type'] = 'release';
       item['group'] = 'minecraft-bedrock';
       item['webui_desc'] = '1.14.60.5 Linux x64 release';
-      item['weight'] = 0;
+      item['weight'] = 2;
       item['filename'] = 'bedrock-server-1.14.60.5.zip';
       item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
       item['version'] = 0;
@@ -56,7 +52,7 @@ exports.profile = {
       item['type'] = 'release';
       item['group'] = 'minecraft-bedrock';
       item['webui_desc'] = '1.13.3.0 Linux x64 release';
-      item['weight'] = 0;
+      item['weight'] = 3;
       item['filename'] = 'bedrock-server-1.13.3.0.zip';
       item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
       item['version'] = 0;
@@ -68,7 +64,7 @@ exports.profile = {
       item['type'] = 'release';
       item['group'] = 'minecraft-bedrock';
       item['webui_desc'] = '1.12.1.1 Linux x64 release';
-      item['weight'] = 0;
+      item['weight'] = 4;
       item['filename'] = 'bedrock-server-1.12.1.1.zip';
       item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
       item['version'] = 0;
@@ -80,7 +76,7 @@ exports.profile = {
       item['type'] = 'release';
       item['group'] = 'minecraft-bedrock';
       item['webui_desc'] = '1.11.4.2 Linux x64 release';
-      item['weight'] = 0;
+      item['weight'] = 5;
       item['filename'] = 'bedrock-server-1.11.4.2.zip';
       item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
       item['version'] = 0;
@@ -92,7 +88,7 @@ exports.profile = {
       item['type'] = 'release';
       item['group'] = 'minecraft-bedrock';
       item['webui_desc'] = '1.10.0.7 Linux x64 release';
-      item['weight'] = 0;
+      item['weight'] = 6;
       item['filename'] = 'bedrock-server-1.10.0.7.zip';
       item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
       item['version'] = 0;
@@ -104,7 +100,7 @@ exports.profile = {
       item['type'] = 'release';
       item['group'] = 'minecraft-bedrock';
       item['webui_desc'] = '1.9.0.15 Linux x64 release';
-      item['weight'] = 0;
+      item['weight'] = 7;
       item['filename'] = 'bedrock-server-1.9.0.15.zip';
       item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
       item['version'] = 0;
@@ -116,7 +112,7 @@ exports.profile = {
       item['type'] = 'release';
       item['group'] = 'minecraft-bedrock';
       item['webui_desc'] = '1.8.1.2 Linux x64 release';
-      item['weight'] = 0;
+      item['weight'] = 8;
       item['filename'] = 'bedrock-server-1.8.1.2.zip';
       item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
       item['version'] = 0;
@@ -128,7 +124,7 @@ exports.profile = {
       item['type'] = 'release';
       item['group'] = 'minecraft-bedrock';
       item['webui_desc'] = '1.7.0.13 Linux x64 release';
-      item['weight'] = 0;
+      item['weight'] = 9;
       item['filename'] = 'bedrock-server-1.7.0.13.zip';
       item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
       item['version'] = 0;
@@ -140,15 +136,15 @@ exports.profile = {
       item['type'] = 'release';
       item['group'] = 'minecraft-bedrock';
       item['webui_desc'] = '1.6.1.0 Linux x64 release';
-      item['weight'] = 0;
+      item['weight'] = 10;
       item['filename'] = 'bedrock-server-1.6.1.0.zip';
       item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
       item['version'] = 0;
       item['release_version'] = '1.6.1.0';
       item['url'] = 'https://minecraft.azureedge.net/bin-linux/bedrock-server-1.6.1.0.zip';
-      p.push(JSON.parse(JSON.stringify(item)));
-	    
-    } catch (e) { }
+      p.push(JSON.parse(JSON.stringify(item)));      
+
+    } catch (e) { console.error(e); }
 
     callback(null, p);
   }, //end handler
