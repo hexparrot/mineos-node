@@ -13,7 +13,7 @@ exports.profile = {
 
       item['id'] = 'bedrock-server-wrapper';
       item['type'] = 'snapshot';
-      item['group'] = 'mineosbedrockwrapper';
+      item['group'] = 'MineOS-bedrock-wrapper';
       item['webui_desc'] = 'Bedrock Server Wrapper';
       item['weight'] = 0;
       item['filename'] = 'mineos-bedrock-wrapper-1.0-SNAPSHOT.jar';
