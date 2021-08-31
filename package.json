@@ -68,7 +68,7 @@
     "socket.io": "1.7.x",
     "strftime": "0.9.x",
     "tail": "1.2.1",
-    "tar": "^2.2.2",
+    "tar": "^4.4.18",
     "tarball-extract": "0.0.3",
     "tmp": "0.0.33",
     "unzip": "0.1.x",
