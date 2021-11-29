@@ -6,7 +6,7 @@ var profile = require('./template');
 exports.profile = {
   name: 'Paper',
   request_args: {
-    url: 'https://papermc.io/api/v1/paper',
+    url: 'https://papermc.io/api/v2/projects/paper',
     json: true
   },
   handler: function (profile_dir, body, callback) {
@@ -21,7 +21,9 @@ exports.profile = {
         item['group'] = 'papermc';
         item['webui_desc'] = 'Latest Paper build for {0}'.format(version);
         item['weight'] = 0;
-        item['filename'] = 'paperclip.jar'.format(version);
+        item['filename'] = 'paper-{0}.jar'.format(version);
+         // this should be updated to v2 endpoints eventually
+         // https://papermc.io/api/docs/swagger-ui/index.html?configUrl=/api/openapi/swagger-config#/projects-controller/projectBuildDownload
         item['url'] = 'https://papermc.io/api/v1/paper/{0}/latest/download'.format(version);
         item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
         item['version'] = version;
