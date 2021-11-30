@@ -6,7 +6,7 @@ var profile = require('./template');
 exports.profile = {
   name: 'Waterfall',
   request_args: {
-    url: 'https://papermc.io/api/v1/waterfall',
+    url: 'https://papermc.io/api/v2/projects/waterfall/',
     json: true
   },
   handler: function (profile_dir, body, callback) {
