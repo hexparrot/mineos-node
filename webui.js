@@ -110,26 +110,6 @@ io.use(passportSocketIO.authorize({
   store:        sessionStore        // we NEED to use a sessionstore. no memorystore please
 }));
 
-function tally(callback) {
-  var os = require('os');
-  var urllib = require('urllib');
-  var child_process = require('child_process');
-
-  var tally_info = {
-    sysname: os.type(), 
-    release: os.release(), 
-    nodename: os.hostname(),
-    version: '',
-    machine: process.arch
-  }
-
-  child_process.execFile('uname', ['-v'], function(err, output) {
-    if (!err)
-      tally_info['version'] = output.replace(/\n/,'');
-    urllib.request('http://minecraft.codeemo.com/tally/tally-node.py', {data: tally_info}, function(){});
-  })
-}
-
 function read_ini(filepath) {
   var ini = require('ini');
   try {
@@ -171,9 +151,6 @@ mineos.dependencies(function(err, binaries) {
   }
 
   var be = new server.backend(base_directory, io, mineos_config);
-
-  tally();
-  setInterval(tally, 7200000); //7200000 == 120min
 
     app.get('/', function(req, res){
         res.redirect('/admin/index.html');

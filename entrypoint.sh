@@ -70,9 +70,11 @@ if id -u $USER_NAME >/dev/null 2>&1; then
   echo "a user named $USER_NAME already exists."
 else
   useradd -Mos /bin/false -u $USER_UID -g $GROUP_GID $USER_NAME
-  echo "$USER_NAME:$USER_PASSWORD" | chpasswd
   echo >&2 "Created user: $USER_NAME (uid: $USER_UID, gid: $GROUP_GID)"
 fi
+
+echo >&2 "Setting user password for '$USER_NAME'"
+echo "$USER_NAME:$USER_PASSWORD" | chpasswd
 
 if [ ! -z "$USE_HTTPS" ]; then
   # update mineos.conf from environment
@@ -95,6 +97,20 @@ if [[ ! -f /etc/ssl/certs/mineos.crt ]] && [[ ! -z $( grep 'use_https = true' /e
   sh /usr/games/minecraft/generate-sslcert.sh
 else
   echo >&2 "Skipping Self-Signed SSL, it either exists or is disabled."
+fi
+
+if [ "$USE_HTTPS" ]; then
+    if [ "$USE_HTTPS" == "true" ]; then
+        echo "Setting https to true"
+        sed -i 's/use_https = false/use_https = true/' /etc/mineos.conf
+
+    else
+        echo "Setting https to false"
+        sed -i 's/use_https = true/use_https = false/' /etc/mineos.conf
+    fi
+else
+    echo "Falling back to https true"
+    sed -i 's/use_https = false/use_https = true/' /etc/mineos.conf
 fi
 
 exec "$@"
