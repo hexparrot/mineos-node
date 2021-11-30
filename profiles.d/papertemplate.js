@@ -37,7 +37,7 @@ return {
           item['group'] = lowername;
           item['webui_desc'] = `Latest ${titlename} build for ${ver}`;
           item['weight'] = 0;
-          item['filename'] = `${titlename}-${ver}-${build}.jar`;
+          item['filename'] = `${lowername}-${ver}-${build}.jar`;
           item['url'] = `${response.request.res.responseUrl}builds/${build}/downloads/${lowername}-${ver}-${build}.jar`;
           item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
           item['version'] = ver;
