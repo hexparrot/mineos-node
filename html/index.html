@@ -968,6 +968,15 @@
                                                     <!-- Select -->
                                                     <div class="control-group">
                                                         <div class="controls">
+                                                            <select class="span6" ng-model="myjavaversion" data-ng-options="j.name for j in servers[current].page_data.glance.java_versions track by j.path" ng-change="change_sc('java', 'java_binary', myjavaversion.path)">
+                                                                <option value="" selected translate="CHANGE_JAVA_VER_TO"></option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <!-- /Select -->
+                                                    <!-- Select -->
+                                                    <div class="control-group">
+                                                        <div class="controls">
                                                             <select class="span6" ng-model="myjarfile" data-ng-options="j for j in servers[current].page_data.glance.server_files" ng-change="change_sc('java', 'jarfile', myjarfile)">
                                                                 <option value="" selected translate="CHANGE_JARFILE_TO"></option>
                                                             </select>
@@ -1632,6 +1641,15 @@
                         <select class="" ng-model="myprofile" default-option="Select a profile" data-ng-options="p as p.id group by p.group for p in profiles | profile_downloaded: 'only_downloaded' | orderBy:'-releaseTime'" ng-change="change_sc('minecraft', 'profile', myprofile.id)">
                             <option value="" disabled selected translate="CHANGE_PROFILE_TO"></option>
                         </select>
+                        <!-- Select -->
+                        <div class="control-group">
+                            <div class="controls">
+                                <select class="span6" ng-model="myjavaversion" data-ng-options="j.name for j in servers[current].page_data.glance.java_versions track by j.path" ng-change="change_sc('java', 'java_binary', myjavaversion.path)">
+                                    <option value="" selected translate="CHANGE_JAVA_VER_TO"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- /Select -->
                         <!-- Select -->
                         <div class="control-group">
                             <div class="controls">

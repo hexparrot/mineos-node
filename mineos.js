@@ -5,6 +5,7 @@ var async = require('async');
 var child_process = require('child_process');
 var which = require('which');
 var mineos = exports;
+var java = require('./java');
 
 mineos.DIRS = {
   'servers': 'servers',
@@ -1487,6 +1488,9 @@ mineos.mc = function(server_name, base_dir) {
         ], function(err) {
           callback(err, server_files);
         })
+        break;
+      case 'java_versions':
+        java.getJavaVersionsAvailable(callback);
         break;
       case 'autosave':
         var TIMEOUT_LENGTH = 2000;
