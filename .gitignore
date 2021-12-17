@@ -1,3 +1,5 @@
+# mineos.conf but non-tracked, kept intact through pulls
+custom.conf
 # Logs
 logs
 *.log
