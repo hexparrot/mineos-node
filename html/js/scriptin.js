@@ -723,7 +723,7 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     var events = [];
     for (var server_name in Servers) {
       try { //archives
-        Servers[server_name].page_data.glance.archives.forEach(function(value, idx) {
+        Servers[server_name].page_data.archives.forEach(function(value, idx) {
           events.push({
             title: '{0} archive'.format(server_name),
             start: value.time,
@@ -733,7 +733,7 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
       } catch (e) {}
 
       try { //backups
-        Servers[server_name].page_data.glance.increments.forEach(function(value, idx) {
+        Servers[server_name].page_data.increments.forEach(function(value, idx) {
           events.push({
             title: '{0} backup'.format(server_name),
             start: value.time,
@@ -889,6 +889,12 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
       me.latest_notice[data.command] = data;
       me.channel.emit(server_name, 'page_data', 'glance');
 
+      if(data.command == 'archive')
+        me.channel.emit(server_name, 'page_data', 'archives');
+
+      if(data.command == 'backup')
+        me.channel.emit(server_name, 'page_data', 'increments');
+
       var suppress = false;
       if ('suppress_popup' in data || data.success)
         suppress = true;
@@ -918,6 +924,8 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
 
     me.channel.emit(server_name, 'server-icon.png');
     me.channel.emit(server_name, 'page_data', 'glance');
+    me.channel.emit(server_name, 'page_data', 'increments');
+    me.channel.emit(server_name, 'page_data', 'archives');
     me.channel.emit(server_name, 'get_available_tails');
     me.channel.emit(server_name, 'req_server_activity');
     me.channel.emit(server_name, 'config.yml');
