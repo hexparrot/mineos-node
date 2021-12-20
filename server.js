@@ -1268,8 +1268,6 @@ function server_container(server_name, user_config, socket_io) {
           logging.debug('[{0}] {1} requesting server at a glance info'.format(server_name, username));
 
           async.parallel({
-            'increments': async.apply(instance.list_increments),
-            'archives': async.apply(instance.list_archives),
             'du_awd': async.apply(instance.property, 'du_awd'),
             'du_bwd': async.apply(instance.property, 'du_bwd'),
             'du_cwd': async.apply(instance.property, 'du_cwd'),
@@ -1282,10 +1280,29 @@ function server_container(server_name, user_config, socket_io) {
             }
           }, function(err, results) {
             if (err instanceof Object)
-              logging.error('[{0}] Error with get_page_data'.format(server_name), err, results);
+              logging.error('[{0}] Error with get_page_data glance'.format(server_name), err, results);
             nsp.emit('page_data', {page: page, payload: results});
           })
           break;
+
+        case 'increments':
+          logging.debug('[{0}] {1} requesting server increments'.format(server_name, username));
+          instance.list_increments(function(err, results) {
+            if (err)
+              logging.error('[{0}] Error with get_page_data increments'.format(server_name), err, results)
+            nsp.emit('page_data', {page: page, payload: results});
+          })
+          break;
+
+        case 'archives':
+          logging.debug('[{0}] {1} requesting server archives'.format(server_name, username));
+          instance.list_archives(function(err, results) {
+            if (err)
+              logging.error('[{0}] Error with get_page_data archives'.format(server_name), err, results)
+            nsp.emit('page_data', {page: page, payload: results});
+          })
+          break;
+
         default:
           nsp.emit('page_data', {page: page});
           break;
