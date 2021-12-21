@@ -767,13 +767,21 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
   }
 
   $scope.change_page = function(page, server_name) {
-    if (server_name)
+    if (server_name) {
       $scope.current = server_name;
+      $scope.servers[$scope.current].refresh_all_data();
+    }
 
     switch(page) {
       case 'calendar':
         $scope.refresh_calendar();
         break;
+      // case 'restore_points':
+      //   $scope.servers[$scope.current].refresh_increments();
+      //   break;
+      // case 'archives':
+      //   $scope.servers[$scope.current].refresh_archives();
+      //   break;
       default:
         break;
     }
@@ -890,10 +898,10 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
       me.channel.emit(server_name, 'page_data', 'glance');
 
       if(data.command == 'archive')
-        me.channel.emit(server_name, 'page_data', 'archives');
+        me.refresh_archives();
 
       if(data.command == 'backup')
-        me.channel.emit(server_name, 'page_data', 'increments');
+        me.refresh_increments();
 
       var suppress = false;
       if ('suppress_popup' in data || data.success)
@@ -922,17 +930,47 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
         $('#modal_eula').modal('show');
     })
 
-    me.channel.emit(server_name, 'server-icon.png');
-    me.channel.emit(server_name, 'page_data', 'glance');
-    me.channel.emit(server_name, 'page_data', 'increments');
-    me.channel.emit(server_name, 'page_data', 'archives');
-    me.channel.emit(server_name, 'get_available_tails');
-    me.channel.emit(server_name, 'req_server_activity');
-    me.channel.emit(server_name, 'config.yml');
-    me.channel.emit(server_name, 'cron.config');
-    me.channel.emit(server_name, 'server.config');
-    me.channel.emit(server_name, 'server.properties');
+    //request all data for this server
+    me.refresh_all_data = function() {
+      me.refresh_glance();
+      me.refresh_increments();
+      me.refresh_archives();
+      me.get_dashboard_data();
+      me.refresh_cron_data();
+      me.channel.emit(me.server_name, 'get_available_tails');
+      me.channel.emit(me.server_name, 'req_server_activity');
+      me.channel.emit(me.server_name, 'config.yml');
+    }
+    
+    //request new server at a glance info
+    me.refresh_glance = function() {
+      me.channel.emit(me.server_name, 'page_data', 'glance');
+    }
 
+    //request new incrments data for this server
+    me.refresh_increments = function() {
+      me.channel.emit(me.server_name, 'page_data', 'increments');
+    }
+
+    //request new archives data for this server
+    me.refresh_archives = function() {
+      me.channel.emit(me.server_name, 'page_data', 'archives');
+    }
+
+    // request new cron data for this server
+    me.refresh_cron_data = function() {
+      me.channel.emit(me.server_name, 'cron.config');
+    }
+    
+    //request all data necessary to populate the dashboard
+    me.get_dashboard_data = function() {
+      me.channel.emit(me.server_name, 'server-icon.png');
+      me.channel.emit(me.server_name, 'server.config');
+      me.channel.emit(me.server_name, 'server.properties');
+    }
+
+    //request minimum data for use by dashboard before returning constructed server
+    me.get_dashboard_data()
     return me;
   }
 
