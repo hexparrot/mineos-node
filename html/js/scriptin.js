@@ -835,7 +835,7 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
       me.heartbeat = data.payload;
 
       if ((previous_state || {}).up == true && me.heartbeat.up == false) {
-        me.channel.emit(server_name, 'page_data', 'glance');
+        me.refresh_glance();
         $.gritter.add({
           title: "[{0}] {1}".format(me.server_name, $filter('translate')('DOWN') ),
           text: ''
@@ -895,7 +895,7 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
     me.channel.on(server_name, 'server_fin', function(data) {
       me.notices[data.uuid] = data;
       me.latest_notice[data.command] = data;
-      me.channel.emit(server_name, 'page_data', 'glance');
+      me.refresh_glance();
 
       if(data.command == 'archive')
         me.refresh_archives();
