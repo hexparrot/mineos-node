@@ -4,6 +4,7 @@ var events = require('events');
 var async = require('async');
 var child_process = require('child_process');
 var which = require('which');
+var logging = require('winston');
 var mineos = exports;
 
 mineos.DIRS = {
@@ -1317,7 +1318,7 @@ mineos.mc = function(server_name, base_dir) {
               var pids = mineos.server_pids_up();
               if (self.server_name in pids) {
                 self.ping(function(err, ping){
-                  cb(null, ping);
+                  cb(err, ping);
                 })
               } else {
                 cb(true, null);
@@ -1584,7 +1585,7 @@ mineos.mc = function(server_name, base_dir) {
 
     function send_query_packet(port) {
       var net = require('net');
-      var socket = net.connect({port: port});
+      var socket = new net.Socket();
       var query = 'modern';
       var QUERIES = {
         'modern': '\xfe\x01',
@@ -1640,12 +1641,21 @@ mineos.mc = function(server_name, base_dir) {
       });
 
       socket.on('error', function(err) {
-        console.error('error:', err);
+        logging.error(`Ping, MC Server not available on port ${port}`);
+        //logging.debug(err);
+        //logging.debug(err.stack);
         callback(err, null);
       })
+
+      socket.connect({port: port});
     }
 
     self.sp(function(err, dict) {
+      if(err) {
+        logging.error('Ping, error while getting server port');
+        callback(err, null);
+        return;
+      }
       send_query_packet(dict['server-port']);
     })  
   }

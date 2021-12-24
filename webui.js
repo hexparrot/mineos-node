@@ -315,16 +315,17 @@ mineos.dependencies(function(err, binaries) {
 
 })
 
-process.on('uncaughtException', function(err, origin) {
+process.on('uncaughtExceptionMonitor', function(err) {
   
-  // Handle the error safely
+  // Monitor but allow unhandled excaptions to fall through
   console.error(`Uncaught Exception: ${err}`);
   console.error(err.stack);
-})
+  process.exit(1);
+});
 
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-  // Application specific logging, throwing an error, or other logic here
+  process.exit(1);
 });
 
 process.on('exit', (code) => {
