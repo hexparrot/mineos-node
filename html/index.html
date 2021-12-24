@@ -1200,6 +1200,8 @@
                                         </ul>
                                     </li>
                                 </ul>
+                                <button type="button" class="btn btn-mini btn-success pull-right" ng-click="servers[current].refresh_increment_sizes()" translate="GET_INCREMENT_SIZES"></button>
+                                
                                 <!--/ END Toolbar -->
                             </header>
                             <section class="body">
@@ -1218,8 +1220,8 @@
                                             <tr ng-repeat="incr in servers[current].increments">
                                                 <td>{{ incr.step }}</td>
                                                 <td>{{ incr.time | amDateFormat: "dddd, MMMM Do YYYY, h:mm:ss a" }}</td>
-                                                <td>{{ incr.size }}</td>
-                                                <td>{{ incr.cum }}</td>
+                                                <td>{{ (servers[current].data_statis.increment_sizes == 'loading') ? "Loading..." : incr.size }}</td>
+                                                <td>{{ (servers[current].data_statis.increment_sizes == 'loading') ? "Loading..." : incr.cum }}</td>
                                                 <td>
                                                     <p>
                                                         <button type="button" class="btn btn-mini btn-success" ng-click="server_command('restore', {step: incr.step})" translate="RESTORE"></button>

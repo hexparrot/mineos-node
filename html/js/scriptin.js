@@ -721,6 +721,7 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
 
   $scope.refresh_calendar = function() {
     var events = [];
+    console.log('Refreshing calendar')
     for (var server_name in Servers) {
       try { //archives
         Servers[server_name].archives.forEach(function(value, idx) {
@@ -767,6 +768,7 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
   }
 
   $scope.change_page = function(page, server_name) {
+    console.log(`changed page to ${page} ${server_name}`)
     if (server_name) {
       $scope.current = server_name;
       $scope.servers[$scope.current].refresh_all_data();
@@ -816,6 +818,11 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
     me.server_name = server_name;
     me.channel = socket;
     me.page_data = {};
+    me.increments = {};
+    me.archives = {};
+    me.data_statis = {
+      increment_sizes: null
+    };
     me.live_logs = {};
     me.notices = {};
     me.latest_notice = {};
@@ -852,10 +859,12 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
     })
 
     me.channel.on(server_name, 'increments', function(data) {
+      me.data_statis.increment_sizes = null;
       me.increments = data.payload;
     })
 
     me.channel.on(server_name, 'increment_sizes', function(data) {
+      me.data_statis.increment_sizes = 'ready';
       me.increments = data.payload;
     })
 
@@ -971,7 +980,10 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
 
     //request new incrments data for this server
     me.refresh_increment_sizes = function() {
-      me.channel.emit(me.server_name, 'increments');
+      if (me.data_statis.increment_sizes != 'loading') {
+        me.data_statis.increment_sizes = 'loading';
+        me.channel.emit(me.server_name, 'increment_sizes');
+      }
     }
 
     // request new cron data for this server
