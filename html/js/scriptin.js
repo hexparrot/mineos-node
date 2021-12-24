@@ -723,7 +723,7 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     var events = [];
     for (var server_name in Servers) {
       try { //archives
-        Servers[server_name].page_data.archives.forEach(function(value, idx) {
+        Servers[server_name].archives.forEach(function(value, idx) {
           events.push({
             title: '{0} archive'.format(server_name),
             start: value.time,
@@ -733,7 +733,7 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
       } catch (e) {}
 
       try { //backups
-        Servers[server_name].page_data.increments.forEach(function(value, idx) {
+        Servers[server_name].increments.forEach(function(value, idx) {
           events.push({
             title: '{0} backup'.format(server_name),
             start: value.time,
@@ -847,6 +847,18 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
       me.page_data[data.page] = data.payload;
     })
 
+    me.channel.on(server_name, 'archives', function(data) {
+      me.archives = data.payload;
+    })
+
+    me.channel.on(server_name, 'increments', function(data) {
+      me.increments = data.payload;
+    })
+
+    me.channel.on(server_name, 'increment_sizes', function(data) {
+      me.increments = data.payload;
+    })
+
     me.channel.on(server_name, 'tail_data', function(data) {
       try {
         if (me.auto_rate_interval) {
@@ -949,12 +961,17 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
 
     //request new incrments data for this server
     me.refresh_increments = function() {
-      me.channel.emit(me.server_name, 'page_data', 'increments');
+      me.channel.emit(me.server_name, 'increments');
     }
 
     //request new archives data for this server
     me.refresh_archives = function() {
-      me.channel.emit(me.server_name, 'page_data', 'archives');
+      me.channel.emit(me.server_name, 'archives');
+    }
+
+    //request new incrments data for this server
+    me.refresh_increment_sizes = function() {
+      me.channel.emit(me.server_name, 'increments');
     }
 
     // request new cron data for this server

@@ -1098,8 +1098,50 @@ mineos.mc = function(server_name, base_dir) {
       callback(code);
     })
   }
-
+  
   self.list_increments = function(callback) {
+    var binary = which.sync('rdiff-backup');
+    var args = ['--list-increments', self.env.bwd];
+    var params = { cwd: self.env.bwd };
+    var regex = /^.+ +(\w{3} \w{3} \d{2} \d{2}:\d{2}:\d{2} \d{4})/
+    var increment_lines = [];
+
+    var rdiff = child_process.spawn(binary, args, params);
+
+    rdiff.stdout.on('data', function(data) {
+      var buffer = Buffer.from(data, 'ascii');
+      var lines = buffer.toString('ascii').split('\n');
+      var incrs = 0;
+
+      for (var i=0; i < lines.length; i++) {
+        var match = lines[i].match(regex);
+        if (match) {
+          increment_lines.push({
+            step: '{0}B'.format(incrs),
+            time: match[1],
+            size: '',
+            cum: ''
+          });
+          incrs += 1;
+        }
+      }
+    });
+
+    rdiff.on('error', function(code) {
+      // branch if path does not exist
+      if (code != 0)
+        callback(true, []);
+    });
+
+    rdiff.on('exit', function(code) {
+      if (code == 0) // branch if all is well
+        callback(code, increment_lines);
+      else // branch if dir exists, not an rdiff-backup dir
+        callback(true, []);
+    });
+  }
+
+  self.list_increment_sizes = function(callback) {
     var binary = which.sync('rdiff-backup');
     var args = ['--list-increment-sizes', self.env.bwd];
     var params = { cwd: self.env.bwd };

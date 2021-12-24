@@ -1262,6 +1262,33 @@ function server_container(server_name, user_config, socket_io) {
       })
     }
 
+    function get_archives() {
+      logging.debug('[{0}] {1} requesting server archives'.format(server_name, username));
+      instance.list_archives(function(err, results) {
+        if (err)
+          logging.error('[{0}] Error with get_archives'.format(server_name), err, results)
+        nsp.emit('archives', {payload: results});
+      })
+    }
+
+    function get_increments() {
+      logging.debug('[{0}] {1} requesting server increments'.format(server_name, username));
+      instance.list_increments(function(err, results) {
+        if (err)
+          logging.error('[{0}] Error with get_increments'.format(server_name), err, results)
+        nsp.emit('increments', {payload: results});
+      })
+    }
+
+    function get_increment_sizes() {
+      logging.debug('[{0}] {1} requesting server increment sizes'.format(server_name, username));
+      instance.list_increment_sizes(function(err, results) {
+        if (err)
+          logging.error('[{0}] Error with get_increment_sizes'.format(server_name), err, results)
+        nsp.emit('increment_sizes', {payload: results});
+      })
+    }
+
     function get_page_data(page) {
       switch (page) {
         case 'glance':
@@ -1281,24 +1308,6 @@ function server_container(server_name, user_config, socket_io) {
           }, function(err, results) {
             if (err instanceof Object)
               logging.error('[{0}] Error with get_page_data glance'.format(server_name), err, results);
-            nsp.emit('page_data', {page: page, payload: results});
-          })
-          break;
-
-        case 'increments':
-          logging.debug('[{0}] {1} requesting server increments'.format(server_name, username));
-          instance.list_increments(function(err, results) {
-            if (err)
-              logging.error('[{0}] Error with get_page_data increments'.format(server_name), err, results)
-            nsp.emit('page_data', {page: page, payload: results});
-          })
-          break;
-
-        case 'archives':
-          logging.debug('[{0}] {1} requesting server archives'.format(server_name, username));
-          instance.list_archives(function(err, results) {
-            if (err)
-              logging.error('[{0}] Error with get_page_data archives'.format(server_name), err, results)
             nsp.emit('page_data', {page: page, payload: results});
           })
           break;
@@ -1419,6 +1428,9 @@ function server_container(server_name, user_config, socket_io) {
         socket.on('get_available_tails', get_available_tails);
         socket.on('property', get_prop);
         socket.on('page_data', get_page_data);
+        socket.on('archives', get_archives);
+        socket.on('increments', get_increments);
+        socket.on('increment_sizes', get_increment_sizes);
         socket.on('cron', manage_cron);
         socket.on('server.properties', broadcast_sp);
         socket.on('server.config', broadcast_sc);
