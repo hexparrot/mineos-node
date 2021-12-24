@@ -1519,7 +1519,7 @@ test.prune = function(test) {
       })
     },
     function(callback) {
-      instance.list_increments(function(err, increments) {
+      instance.list_increment_sizes(function(err, increments) {
         test.equal(increments.length, 2);
         test.equal(increments[0].step, '0B');
         test.equal(increments[1].step, '1B');
@@ -1534,7 +1534,7 @@ test.prune = function(test) {
       })
     },
     function(callback) {
-      instance.list_increments(function(err, increments) {
+      instance.list_increment_sizes(function(err, increments) {
         test.equal(increments.length, 1);
         test.equal(increments[0].step, '0B');
         test.equal(saved_increment, increments[0].time);
@@ -2794,20 +2794,20 @@ test.onreboot = function(test) {
   })
 }
 
-test.list_increments = function(test) {
+test.list_increment_sizes = function(test) {
   var server_name = 'testing';
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   async.series([
     function(callback) {
-      instance.list_increments(function(err, increments) {
+      instance.list_increment_sizes(function(err, increments) {
         test.ok(err); // testing for error
         callback(!err);
       })
     },
     async.apply(instance.create, OWNER_CREDS),
     function(callback) {
-      instance.list_increments(function(err, increments) {
+      instance.list_increment_sizes(function(err, increments) {
         test.ok(err); // testing for error
         callback(!err);
       })
@@ -2829,7 +2829,7 @@ test.list_increments = function(test) {
       })
     },
     function(callback) {
-      instance.list_increments(function(err, increments) {
+      instance.list_increment_sizes(function(err, increments) {
         test.equal(increments[0].step, '0B');
         test.equal(increments[1].step, '1B');
         for (var i in increments) {
