@@ -1110,7 +1110,8 @@ mineos.mc = function(server_name, base_dir) {
 
     rdiff.stdout.on('data', function(data) {
       var buffer = Buffer.from(data, 'ascii');
-      var lines = buffer.toString('ascii').split('\n');
+      // --list-incremets option returns increments in reverse order
+      var lines = buffer.toString('ascii').split('\n').reverse();
       var incrs = 0;
 
       for (var i=0; i < lines.length; i++) {
@@ -1134,8 +1135,9 @@ mineos.mc = function(server_name, base_dir) {
     });
 
     rdiff.on('exit', function(code) {
-      if (code == 0) // branch if all is well
+      if (code == 0) { // branch if all is well
         callback(code, increment_lines);
+      }
       else // branch if dir exists, not an rdiff-backup dir
         callback(true, []);
     });
