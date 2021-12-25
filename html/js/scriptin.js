@@ -818,8 +818,8 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
     me.server_name = server_name;
     me.channel = socket;
     me.page_data = {};
-    me.increments = {};
-    me.archives = {};
+    me.increments = [];
+    me.archives = [];
     me.data_statis = {
       increment_sizes: null
     };
@@ -859,8 +859,11 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
     })
 
     me.channel.on(server_name, 'increments', function(data) {
-      me.data_statis.increment_sizes = null;
-      me.increments = data.payload;
+      // only replace increments data if a change has occoured
+      if (data.payload.length != me.increments) {
+        me.data_statis.increment_sizes = null;
+        me.increments = data.payload;
+      }
     })
 
     me.channel.on(server_name, 'increment_sizes', function(data) {
@@ -922,6 +925,9 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
         me.refresh_archives();
 
       if(data.command == 'backup')
+        me.refresh_increments();
+
+      if(data.command == 'prune')
         me.refresh_increments();
 
       var suppress = false;
@@ -996,6 +1002,11 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
       me.channel.emit(me.server_name, 'server-icon.png');
       me.channel.emit(me.server_name, 'server.config');
       me.channel.emit(me.server_name, 'server.properties');
+    }
+
+    me.get_calendar_data = function() {
+      me.refresh_increments();
+      me.refresh_archives();
     }
 
     //request minimum data for use by dashboard before returning constructed server
