@@ -1010,7 +1010,8 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
     }
 
     //request minimum data for use by dashboard before returning constructed server
-    me.get_dashboard_data()
+    me.get_dashboard_data();
+    me.get_calendar_data();
     return me;
   }
 
