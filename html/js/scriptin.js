@@ -721,7 +721,6 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
 
   $scope.refresh_calendar = function() {
     var events = [];
-    console.log('Refreshing calendar')
     for (var server_name in Servers) {
       try { //archives
         Servers[server_name].archives.forEach(function(value, idx) {
@@ -768,7 +767,6 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
   }
 
   $scope.change_page = function(page, server_name) {
-    console.log(`changed page to ${page} ${server_name}`)
     if (server_name) {
       $scope.current = server_name;
       $scope.servers[$scope.current].refresh_all_data();
