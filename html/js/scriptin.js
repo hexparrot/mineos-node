@@ -91,7 +91,9 @@ app.filter('kb_string_to_mb', function() {
 
     if (kbytes) {
       var i = Math.floor(Math.log(kbytes) / Math.log(k));
-      return (kbytes / Math.pow(k, i)).toPrecision(3) + sizes[i];
+      var converted = kbytes / Math.pow(k, i);
+    
+      return (Math.round(converted) >= 1000 ? (converted).toPrecision(4) : (converted).toPrecision(3)) + sizes[i];
     } else {
       return '';
     }
