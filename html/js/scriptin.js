@@ -818,7 +818,7 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
     me.page_data = {};
     me.increments = [];
     me.archives = [];
-    me.data_statis = {
+    me.data_status = {
       increment_sizes: null
     };
     me.live_logs = {};
@@ -857,15 +857,15 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
     })
 
     me.channel.on(server_name, 'increments', function(data) {
-      // only replace increments data if a change has occoured
-      if (data.payload.length != me.increments) {
-        me.data_statis.increment_sizes = null;
+      // only replace increments data if a change has occurred
+      if (data.payload.length != me.increments.length) {
+        me.data_status.increment_sizes = null;
         me.increments = data.payload;
       }
     })
 
     me.channel.on(server_name, 'increment_sizes', function(data) {
-      me.data_statis.increment_sizes = 'ready';
+      me.data_status.increment_sizes = 'ready';
       me.increments = data.payload;
     })
 
@@ -984,8 +984,8 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
 
     //request new incrments data for this server
     me.refresh_increment_sizes = function() {
-      if (me.data_statis.increment_sizes != 'loading') {
-        me.data_statis.increment_sizes = 'loading';
+      if (me.data_status.increment_sizes != 'loading') {
+        me.data_status.increment_sizes = 'loading';
         me.channel.emit(me.server_name, 'increment_sizes');
       }
     }
