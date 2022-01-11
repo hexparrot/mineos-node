@@ -116,6 +116,7 @@
   "FAILURE": "Uh oh!",
   "RESTORE_POINT_FAILED": "Restore point attempt failed",
   "CREATE_NEW_RESTORE_POINT": "Create a new restore point",
+  "GET_INCREMENT_SIZES": "Get Restore Point Sizes (slow)",
 
   "MOST_RECENT_ARCHIVE": "Most recent archive",
   "OLDEST_ARCHIVE": "Oldest Archive",

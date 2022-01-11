@@ -46,7 +46,8 @@ return {
     
           p.push(item);
         })
-      }).then(() => { callback(null, p)});
+      }).then(() => { callback(null, p)})
+      .catch((err) => {console.error(err)});
       
     } catch (e) { console.log(e) }
   } //end handler
