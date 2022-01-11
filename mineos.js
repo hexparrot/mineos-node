@@ -1103,7 +1103,7 @@ mineos.mc = function(server_name, base_dir) {
     var binary = which.sync('rdiff-backup');
     var args = ['--list-increments', self.env.bwd];
     var params = { cwd: self.env.bwd };
-    var regex = /^.+ +(\w{3} \w{3} \d{2} \d{2}:\d{2}:\d{2} \d{4})/
+    var regex = /^.+ +(\w{3} \w{3} {1,2}\d{1,2} \d{2}:\d{2}:\d{2} \d{4})/
     var increment_lines = [];
 
     var rdiff = child_process.spawn(binary, args, params);
