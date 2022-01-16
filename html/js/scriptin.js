@@ -288,7 +288,7 @@ app.filter('colorize', [ '$sce', function($sce){
 
 /* controllers */
 
-app.controller("Webui", ['$scope', 'socket', 'ServerService', '$filter', '$translate', function($scope, socket, ServerService, $filter, $translate) {
+app.controller("Webui", ['$scope', 'socket', 'ServerService', '$filter', '$translate', '$timeout', function($scope, socket, ServerService, $filter, $translate, $timeout) {
   $scope.page = 'dashboard';
   $scope.servers = ServerService.servers;
   $scope.current = null;
@@ -778,22 +778,24 @@ app.controller("Webui", ['$scope', 'socket', 'ServerService', '$filter', '$trans
       $scope.current = server_name;
       $scope.servers[$scope.current].refresh_all_data();
     }
-
-    switch(page) {
-      case 'calendar':
-        $scope.refresh_calendar();
-        break;
-      // case 'restore_points':
-      //   $scope.servers[$scope.current].refresh_increments();
-      //   break;
-      // case 'archives':
-      //   $scope.servers[$scope.current].refresh_archives();
-      //   break;
-      default:
-        break;
-    }
-
     $scope.page = page;
+
+    // allow DOM to update before evaluating
+    $timeout(() => {
+      switch(page) {
+        case 'calendar':
+          $scope.refresh_calendar();
+          break;
+        // case 'restore_points':
+        //   $scope.servers[$scope.current].refresh_increments();
+        //   break;
+        // case 'archives':
+        //   $scope.servers[$scope.current].refresh_archives();
+        //   break;
+        default:
+          break;
+      }
+    })
   }
 }]);
 
