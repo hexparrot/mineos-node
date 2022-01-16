@@ -290,7 +290,7 @@
                                 <!-- Select -->
                                     <div class="control-group">
                                         <div class="controls">
-                                            <select class="span2" ng-model="current" ng-options="name as name for (name, instance) in servers | membership">
+                                            <select class="span2" ng-model="current" ng-change="change_page(page, current)" ng-options="name as name for (name, instance) in servers | membership">
                                             </select>
                                         </div>
                                     </div>
