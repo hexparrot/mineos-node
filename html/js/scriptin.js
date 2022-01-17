@@ -780,22 +780,22 @@ app.controller("Webui", ['$scope', 'socket', 'ServerService', '$filter', '$trans
     }
     $scope.page = page;
 
-    // allow DOM to update before evaluating
-    $timeout(() => {
-      switch(page) {
-        case 'calendar':
+    switch(page) {
+      case 'calendar':
+        $timeout(() => {
+          // Allow DOM to update before calling
           $scope.refresh_calendar();
-          break;
-        // case 'restore_points':
-        //   $scope.servers[$scope.current].refresh_increments();
-        //   break;
-        // case 'archives':
-        //   $scope.servers[$scope.current].refresh_archives();
-        //   break;
-        default:
-          break;
-      }
-    })
+        })
+        break;
+      // case 'restore_points':
+      //   $scope.servers[$scope.current].refresh_increments();
+      //   break;
+      // case 'archives':
+      //   $scope.servers[$scope.current].refresh_archives();
+      //   break;
+      default:
+        break;
+    }
   }
 }]);
 
