@@ -4,6 +4,7 @@ var events = require('events');
 var async = require('async');
 var child_process = require('child_process');
 var which = require('which');
+var logging = require('winston');
 var mineos = exports;
 
 mineos.DIRS = {
@@ -1097,8 +1098,52 @@ mineos.mc = function(server_name, base_dir) {
       callback(code);
     })
   }
-
+  
   self.list_increments = function(callback) {
+    var binary = which.sync('rdiff-backup');
+    var args = ['--list-increments', self.env.bwd];
+    var params = { cwd: self.env.bwd };
+    var regex = /^.+ +(\w{3} \w{3} {1,2}\d{1,2} \d{2}:\d{2}:\d{2} \d{4})/
+    var increment_lines = [];
+
+    var rdiff = child_process.spawn(binary, args, params);
+
+    rdiff.stdout.on('data', function(data) {
+      var buffer = Buffer.from(data, 'ascii');
+      // --list-incremets option returns increments in reverse order
+      var lines = buffer.toString('ascii').split('\n').reverse();
+      var incrs = 0;
+
+      for (var i=0; i < lines.length; i++) {
+        var match = lines[i].match(regex);
+        if (match) {
+          increment_lines.push({
+            step: '{0}B'.format(incrs),
+            time: match[1],
+            size: '',
+            cum: ''
+          });
+          incrs += 1;
+        }
+      }
+    });
+
+    rdiff.on('error', function(code) {
+      // branch if path does not exist
+      if (code != 0)
+        callback(true, []);
+    });
+
+    rdiff.on('exit', function(code) {
+      if (code == 0) { // branch if all is well
+        callback(code, increment_lines);
+      }
+      else // branch if dir exists, not an rdiff-backup dir
+        callback(true, []);
+    });
+  }
+
+  self.list_increment_sizes = function(callback) {
     var binary = which.sync('rdiff-backup');
     var args = ['--list-increment-sizes', self.env.bwd];
     var params = { cwd: self.env.bwd };
@@ -1317,7 +1362,7 @@ mineos.mc = function(server_name, base_dir) {
               var pids = mineos.server_pids_up();
               if (self.server_name in pids) {
                 self.ping(function(err, ping){
-                  cb(null, ping);
+                  cb(err, ping);
                 })
               } else {
                 cb(true, null);
@@ -1584,7 +1629,7 @@ mineos.mc = function(server_name, base_dir) {
 
     function send_query_packet(port) {
       var net = require('net');
-      var socket = net.connect({port: port});
+      var socket = new net.Socket();
       var query = 'modern';
       var QUERIES = {
         'modern': '\xfe\x01',
@@ -1640,12 +1685,21 @@ mineos.mc = function(server_name, base_dir) {
       });
 
       socket.on('error', function(err) {
-        console.error('error:', err);
+        logging.error(`Ping, MC Server not available on port ${port}`);
+        //logging.debug(err);
+        //logging.debug(err.stack);
         callback(err, null);
       })
+
+      socket.connect({port: port});
     }
 
     self.sp(function(err, dict) {
+      if(err) {
+        logging.error('Ping, error while getting server port');
+        callback(err, null);
+        return;
+      }
       send_query_packet(dict['server-port']);
     })  
   }

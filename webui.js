@@ -256,8 +256,8 @@ mineos.dependencies(function(err, binaries) {
     console.log("Caught interrupt signal; closing webui....");
     be.shutdown();
     process.exit();
-  });
-
+  }); 
+  
   var SOCKET_PORT = null;
   var SOCKET_HOST = '0.0.0.0';
   var USE_HTTPS = true;
@@ -313,4 +313,21 @@ mineos.dependencies(function(err, binaries) {
 
   setInterval(session_cleanup, 3600000); //check for expired sessions every hour
 
+})
+
+process.on('uncaughtExceptionMonitor', function(err) {
+  
+  // Monitor but allow unhandled excaptions to fall through
+  console.error(`Uncaught Exception: ${err}`);
+  console.error(err.stack);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
+});
+
+process.on('exit', (code) => {
+  console.log(`About to exit with code ${code}`)
 })

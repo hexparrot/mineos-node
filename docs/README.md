@@ -24,7 +24,7 @@ The webui has been tested on all major distributions and is confirmed to work on
 
 MineOS Turnkey is the current flagship distribution of MineOS. Based on the proven Debian foundation, [Turnkey Linux](https://www.turnkeylinux.org/) is a perfect delivery system: a trimmed, yet infinitely extensible server platform. Respun with MineOS components pre-configured, MineOS Turnkey is the quickest way to get a _managed hosting platform_ up and running.
 
-The [MineOS Turnkey ISO](https://my.syncplicity.com/share/ajsnpyhdoivvekm/mineos-node_buster-x64) is approximately 575MB and supports x86_64 architectures only. 
+The [MineOS Turnkey ISO](https://my.syncplicity.com/share/zkpd23mz0pod8ls/mineos-node_bullseye-x64) is approximately 720MB and supports x86_64 architectures only. 
 
 ## MineOS appliance (the other ways)
 
