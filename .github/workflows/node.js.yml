@@ -27,7 +27,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - name: download jarfiles
-      run: cd test && sh download_profiles.sh
+      run: cd test && sudo sh download_profiles.sh
     - run: npm install
     - run: npm ci
     - run: npm test
