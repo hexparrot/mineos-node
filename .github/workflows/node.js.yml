@@ -26,6 +26,11 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+    - uses: abbbi/github-actions-tune@v1
+    - name : Update sources
+      run: sudo apt-get update -y
+    - name: Install rdiff-backup
+      run: sudo apt-get install rdiff-backup -y
     - name: create live file tree
       run: sudo mkdir -p /var/games/minecraft/{archive,backup,import,profiles,servers}
     - run: sudo chown -R runner:runner /var/games/minecraft/
