@@ -27,7 +27,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - name: create live file tree
-      run: sudo mkdir -p /var/games/minecraft
+      run: sudo mkdir -p /var/games/minecraft/{archive,backup,import,profiles,servers}
     - name: download jarfiles
       run: cd test && sudo sh download_profiles.sh
     - run: npm install
