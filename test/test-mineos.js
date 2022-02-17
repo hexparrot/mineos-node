@@ -11,8 +11,8 @@ var FS_DELAY_MS = 200;
 var PROC_START_DELAY_MS = 200;
 
 var OWNER_CREDS = {
-  uid: userid.uid(process.env.USER) || 1000,
-  gid: userid.gid(process.env.USER) || 1000
+  uid: userid.uid(process.env.USER) || 1001,
+  gid: userid.gid(process.env.USER) || 1001
 }
 
 function oct2dec(octal_val) {
