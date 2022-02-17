@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x]
+        node-version: [12.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -26,11 +26,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-
-    - uses: abbbi/github-actions-tune@v1
-    - name : Update sources
-      run: sudo apt-get update -y
-    - name: Install rsync
-      run: sudo apt-get install rsync -y
+    - name: download jarfiles
+      run: cd test && sh download_profiles.sh
+    - run: npm install
     - run: npm ci
     - run: npm test
