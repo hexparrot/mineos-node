@@ -6,7 +6,7 @@ var userid = require('userid');
 var whoami = require('whoami');
 var test = exports;
 
-var BASE_DIR = '/var/games/minecraft';
+var BASE_DIR = '/home/runner/mineos-node';
 var FS_DELAY_MS = 200;
 var PROC_START_DELAY_MS = 200;
 
@@ -879,29 +879,6 @@ test.sp = function(test) {
   ], function(err) {
     test.ifError(err);
     test.expect(5);
-    test.done();
-  })
-}
-
-test.owner_unknown_ids = function(test) {
-  var server_name = 'testing';
-  var instance = new mineos.mc(server_name, BASE_DIR);
-
-  async.series([
-    async.apply(instance.create, OWNER_CREDS),
-    async.apply(fs.chown, instance.env.cwd, 4141, 4141),
-    function(callback) {
-      instance.property('owner', function(err, owner_info) {
-        test.ifError(err);
-        test.ok('uid' in owner_info);
-        test.ok('gid' in owner_info);
-        test.equal(owner_info.username, 4141);
-        test.equal(owner_info.groupname, 4141);
-        callback(err);
-      })
-    }
-  ], function(err) {
-    test.ifError(err);
     test.done();
   })
 }
