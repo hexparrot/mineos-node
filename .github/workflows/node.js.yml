@@ -31,6 +31,7 @@ jobs:
       run: sudo apt-get update -y
     - name: Install rdiff-backup
       run: sudo apt-get install rdiff-backup -y
+    - run: cp test/custom.conf .
     - run: npm install
     - run: npm ci
     - run: npm test
