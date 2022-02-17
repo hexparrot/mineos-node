@@ -895,8 +895,8 @@ test.owner_unknown_ids = function(test) {
         test.ifError(err);
         test.ok('uid' in owner_info);
         test.ok('gid' in owner_info);
-        test.equal(owner_info.username, '?');
-        test.equal(owner_info.groupname, '?');
+        test.equal(owner_info.username, 4141);
+        test.equal(owner_info.groupname, 4141);
         callback(err);
       })
     }
@@ -1279,8 +1279,8 @@ test.chown = function(test) {
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   var NEW_OWNER_CREDS = {
-    uid: 1001,
-    gid: 1001
+    uid: 1000,
+    gid: 1000
   }
 
   if (userid.uid(process.env.USER) != 0) {
@@ -1337,8 +1337,8 @@ test.chown_recursive = function(test) {
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   var NEW_OWNER_CREDS = {
-    uid: 1001,
-    gid: 1001
+    uid: 1000,
+    gid: 1000
   }
 
   if (userid.uid(process.env.USER) != 0) {
