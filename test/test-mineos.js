@@ -1260,13 +1260,6 @@ test.chown = function(test) {
     gid: 121
   }
 
-  if (userid.uid(process.env.USER) != 0) {
-    NEW_OWNER_CREDS = {
-      uid: userid.uid(process.env.USER),
-      gid: userid.gid(process.env.USER)
-    }
-  }
-
   async.series([
     async.apply(instance.create, OWNER_CREDS),
     function(callback) {
@@ -1316,13 +1309,6 @@ test.chown_recursive = function(test) {
   var NEW_OWNER_CREDS = {
     uid: 1001,
     gid: 121
-  }
-
-  if (userid.uid(process.env.USER) != 0) {
-    NEW_OWNER_CREDS = {
-      uid: userid.uid(process.env.USER),
-      gid: userid.gid(process.env.USER)
-    }
   }
 
   var newfile = path.join(instance.env.cwd, 'newfile');
