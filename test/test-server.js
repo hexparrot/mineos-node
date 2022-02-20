@@ -7,7 +7,7 @@ var mineos = require('../mineos');
 var server = require('../server');
 var events = require('events');
 var test = exports;
-var BASE_DIR = '/var/games/minecraft';
+var BASE_DIR = '/home/runner/minecraft';
 
 test.setUp = function(callback) {
   fs.removeSync(BASE_DIR);
