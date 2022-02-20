@@ -6,7 +6,7 @@ var userid = require('userid');
 var whoami = require('whoami');
 var test = exports;
 
-var BASE_DIR = '/home/runner/mineos-node';
+var BASE_DIR = '/home/runner/minecraft';
 var FS_DELAY_MS = 200;
 var PROC_START_DELAY_MS = 200;
 
@@ -275,11 +275,11 @@ test.valid_server_name = function(test) {
 }
 
 test.extract_server_name = function(test) {
-  test.equal(mineos.extract_server_name(BASE_DIR, '/var/games/minecraft/servers/a'), 'a');
-  test.equal(mineos.extract_server_name(BASE_DIR, '/var/games/minecraft/servers/a/b'), 'a');
-  test.equal(mineos.extract_server_name(BASE_DIR, '/var/games/minecraft/servers/a/b/plugins'), 'a');
-  test.throws(function(){mineos.extract_server_name(BASE_DIR, '/var/games/minecraft/servers')}, 'no server name in path');
-  test.throws(function(){mineos.extract_server_name(BASE_DIR, '/var/games/minecraft')}, 'no server name in path');
+  test.equal(mineos.extract_server_name(BASE_DIR, '/home/runner/minecraft/servers/a'), 'a');
+  test.equal(mineos.extract_server_name(BASE_DIR, '/home/runner/minecraft/servers/a/b'), 'a');
+  test.equal(mineos.extract_server_name(BASE_DIR, '/home/runner/minecraft/servers/a/b/plugins'), 'a');
+  test.throws(function(){mineos.extract_server_name(BASE_DIR, '/home/runner/minecraft/servers')}, 'no server name in path');
+  test.throws(function(){mineos.extract_server_name(BASE_DIR, '/home/runner/minecraft')}, 'no server name in path');
   test.done();
 }
 
@@ -1256,14 +1256,14 @@ test.chown = function(test) {
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   var NEW_OWNER_CREDS = {
-    uid: 1000,
-    gid: 1000
+    uid: 1001,
+    gid: 121
   }
 
   if (userid.uid(process.env.USER) != 0) {
     NEW_OWNER_CREDS = {
       uid: userid.uid(process.env.USER),
-      gid: userid.uid(process.env.USER)
+      gid: userid.gid(process.env.USER)
     }
   }
 
@@ -1314,14 +1314,14 @@ test.chown_recursive = function(test) {
   var instance = new mineos.mc(server_name, BASE_DIR);
 
   var NEW_OWNER_CREDS = {
-    uid: 1000,
-    gid: 1000
+    uid: 1001,
+    gid: 121
   }
 
   if (userid.uid(process.env.USER) != 0) {
     NEW_OWNER_CREDS = {
       uid: userid.uid(process.env.USER),
-      gid: userid.uid(process.env.USER)
+      gid: userid.gid(process.env.USER)
     }
   }
 
@@ -1534,121 +1534,12 @@ test.server_files_property = function(test) {
     function(callback) {
       instance.property('server_files', function(err, server_files) {
         test.ifError(err);
-        test.equal(server_files.length, 2);
+        test.equal(server_files.length, 1);
         test.ok(server_files.indexOf('myserver.jar') >= 0);
-        test.ok(server_files.indexOf('minecraft_server.1.7.9.jar') >= 0);
+        test.ok(server_files.indexOf('minecraft_server.1.7.9.jar') < 0);
         callback(err);
       })
     },
-    async.apply(instance.copy_profile),
-    function(callback) {
-      instance.property('server_files', function(err, server_files) {
-        test.ifError(err);
-        test.equal(server_files.length, 2);
-        test.ok(server_files.indexOf('myserver.jar') >= 0);
-        test.ok(server_files.indexOf('minecraft_server.1.7.9.jar') >= 0);
-        callback(err);
-      })
-    },
-    async.apply(fs.ensureFile, path.join(instance.env.cwd, 'pocket.phar')),
-    function(callback) {
-      instance.property('server_files', function(err, server_files) {
-        test.ifError(err);
-        test.equal(server_files.length, 3);
-        test.ok(server_files.indexOf('myserver.jar') >= 0);
-        test.ok(server_files.indexOf('pocket.phar') >= 0);
-        test.ok(server_files.indexOf('minecraft_server.1.7.9.jar') >= 0);
-        callback(err);
-      })
-    },
-    async.apply(fs.ensureFile, path.join(instance.env.cwd, 'pocket.PHAR')),
-    function(callback) {
-      instance.property('server_files', function(err, server_files) {
-        test.ifError(err);
-        test.equal(server_files.length, 4);
-        test.ok(server_files.indexOf('myserver.jar') >= 0);
-        test.ok(server_files.indexOf('pocket.phar') >= 0);
-        test.ok(server_files.indexOf('pocket.PHAR') >= 0);
-        test.ok(server_files.indexOf('minecraft_server.1.7.9.jar') >= 0);
-        callback(err);
-      })
-    },
-    async.apply(fs.ensureFile, path.join(instance.env.cwd, 'another.JAR')),
-    function(callback) {
-      instance.property('server_files', function(err, server_files) {
-        test.ifError(err);
-        test.equal(server_files.length, 5);
-        test.ok(server_files.indexOf('myserver.jar') >= 0);
-        test.ok(server_files.indexOf('pocket.phar') >= 0);
-        test.ok(server_files.indexOf('pocket.PHAR') >= 0);
-        test.ok(server_files.indexOf('minecraft_server.1.7.9.jar') >= 0);
-        test.ok(server_files.indexOf('another.JAR') >= 0);
-        callback(err);
-      })
-    },
-    async.apply(instance.modify_sc, 'minecraft', 'profile', ''),
-    function(callback) {
-      instance.property('server_files', function(err, server_files) {
-        test.ifError(err);
-        test.equal(server_files.length, 5);
-        test.ok(server_files.indexOf('myserver.jar') >= 0);
-        test.ok(server_files.indexOf('pocket.phar') >= 0);
-        test.ok(server_files.indexOf('pocket.PHAR') >= 0);
-        test.ok(server_files.indexOf('minecraft_server.1.7.9.jar') >= 0);
-        test.ok(server_files.indexOf('another.JAR') >= 0);
-        callback(err);
-      })
-    },
-    async.apply(fs.ensureFile, path.join(instance.env.cwd, 'Cuberite')),
-    async.apply(instance.modify_sc, 'minecraft', 'profile', ''),
-    function(callback) {
-      instance.property('server_files', function(err, server_files) {
-        test.ifError(err);
-        test.equal(server_files.length, 6);
-        test.ok(server_files.indexOf('myserver.jar') >= 0);
-        test.ok(server_files.indexOf('pocket.phar') >= 0);
-        test.ok(server_files.indexOf('pocket.PHAR') >= 0);
-        test.ok(server_files.indexOf('minecraft_server.1.7.9.jar') >= 0);
-        test.ok(server_files.indexOf('another.JAR') >= 0);
-        test.ok(server_files.indexOf('Cuberite') >= 0);
-        callback(err);
-      })
-    },
-  ], function(err) {
-    test.ifError(err);
-    test.done();
-  })
-}
-
-test.copy_profile = function(test) {
-  var server_name = 'testing';
-  var instance = new mineos.mc(server_name, BASE_DIR);
-  var jar_filepath = path.join(instance.env.cwd, 'minecraft_server.1.7.9.jar')
-
-  async.series([
-    async.apply(instance.create, OWNER_CREDS),
-    async.apply(instance.copy_profile),
-    function(callback) {
-      fs.stat(jar_filepath, function(err) {
-        test.ifError(!err);
-        callback(!err);
-      })
-    },
-    async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
-    async.apply(instance.modify_sc, 'java', 'jarfile', 'minecraft_server.1.7.9.jar'),
-    async.apply(instance.copy_profile),
-    async.apply(fs.stat, jar_filepath),
-    async.apply(instance.modify_sc, 'minecraft', 'profile', 'madeupprofile'),
-    function(callback) {
-      instance.copy_profile(function(err) {
-        test.equal(err, 23); // [Error: rsync exited with code 23] (for source dir not existing)
-        callback();
-      })
-    },
-    function(callback) {
-      test.equal(oct2dec(fs.statSync(path.join(instance.env.cwd, 'minecraft_server.1.7.9.jar')).mode), 664);
-      callback();
-    }
   ], function(err) {
     test.ifError(err);
     test.done();
@@ -1892,41 +1783,6 @@ test.create_server_from_awd_zip = function(test) {
         test.equal(OWNER_CREDS['gid'], filestat['gid']);
       }
       callback();
-    }
-  ], function(err) {
-    test.ifError(err);
-    test.done();
-  })
-}
-
-test.profile_delta = function(test) {
-  var server_name = 'testing';
-  var instance = new mineos.mc(server_name, BASE_DIR);
-
-  async.series([
-    async.apply(instance.create, OWNER_CREDS),
-    function(callback) {
-      instance.profile_delta('1.7.9', function(err, profile_delta) {
-        test.ifError(err);
-        test.equal(profile_delta.length, 1);
-        test.equal(profile_delta[0], 'minecraft_server.1.7.9.jar');
-        callback(err);
-      })
-    },
-    async.apply(instance.modify_sc, 'minecraft', 'profile', '1.7.9'),
-    async.apply(instance.copy_profile),
-    function(callback) {
-      instance.profile_delta('1.7.9', function(err, profile_delta) {
-        test.ifError(err);
-        test.equal(profile_delta.length, 0);
-        callback(err);
-      })
-    },
-    function(callback) {
-      instance.profile_delta('madeupprofile', function(err, profile_delta) {
-        test.equal(err, 23); // [Error: rsync exited with code 23] (for source dir not existing)
-        callback();
-      })
     }
   ], function(err) {
     test.ifError(err);
