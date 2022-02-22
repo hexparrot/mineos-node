@@ -8,8 +8,8 @@ As written, these steps will install the webui with the following properties:
 
 * The nodejs scripts will be installed to `$HOME/mineos-node`
 * The user-data (servers, world config, etc.) will be in `$HOME/minecraft`
-* The webui will be accessible at `https://[ip-address]:9443` in your browser
-* It will run as `$USER`, and support ONE user
+* The webui will be accessible at `https://[ip-address]:8443` in your browser
+* It will run as `$USER` and support only one user
 * It will support an unlimited amount of servers (bound by your hardware)
 
 # Installation steps
@@ -24,15 +24,15 @@ Only the following steps must be executed as `root`.
 # dnf install rsync screen rdiff-backup openssl git
 # chmod 777 /run/screen
 ```
-The metapackage "Development tools" includes the `gcc` compiler, and any other required buildtools for `npm` packages. Depending on your distrobution, `dnf groupinstall` will differ, e.g., `apt install build-essential` on `apt`-based distros.
+The metapackage "Development tools" includes the `gcc` compiler, and any other required buildtools for `npm` packages. Depending on your distribution, `dnf groupinstall` will differ, e.g., `apt install build-essential` on `apt`-based distros.
 
-All the following steps from here out should be executed as your normal, unprivileged user.
+All the following steps from here out should be executed as your normal, unprivileged user. This user does not need `sudo` privileges.
 
 ## DOWNLOAD JAVA
 ```
 cd ~
 mkdir -p ~/.local/opt
-#wget https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz
+wget https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-x64_bin.tar.gz
 tar xf openjdk-17*
 mv ~/jdk-17.0.2 ~/.local/opt/
 JDK_PATH=$(realpath ~/.local/opt/jdk-17.0.2/bin)
@@ -59,16 +59,16 @@ The `sed` commands offer a shortcut to change the configuration file via scripti
 
 ## USE HTTPS FOR SECURE TRANSPORT
 ```
-mkdir -p ~/.local/etc/ssl/certs
 SSL_PATH=~/.local/etc/ssl/certs
+mkdir -p $SSL_PATH
 CERTFILE=$SSL_PATH/mineos.pem CRTFILE=$SSL_PATH/mineos.crt KEYFILE=$SSL_PATH/mineos.key ./generate-sslcert.sh
 ```
-The SSL certificates in the standard location require `root` permissions.  Rather than adjust _any_ permissions, and to still maintain the appropriate file structure, these files can be put into `~/.local`.
+The SSL certificates in the standard location require `root` permissions.  Rather than adjust _any_ permissions--and to still maintain the appropriate file structure--these files can be put into `~/.local`, too.
 
-### ACQUIRE NODEJS
+### DOWNLOAD NODEJS
 ```
 cd ~
-#wget https://s3-us-west-2.amazonaws.com/nodesource-public-downloads/4.6.3/artifacts/bundles/nsolid-bundle-v4.6.3-linux-x64.tar.gz
+wget https://s3-us-west-2.amazonaws.com/nodesource-public-downloads/4.6.3/artifacts/bundles/nsolid-bundle-v4.6.3-linux-x64.tar.gz
 tar -xf nsolid*
 cd nsolid-bundle-v4.6.3-linux-x64
 ./install.sh
@@ -97,7 +97,7 @@ $ cd ~/.local/bin
 $ curl -LO https://proot.gitlab.io/proot/bin/proot
 $ chmod +x proot
 ```
-`proot` is a utility to allow userland overlays of files and directories over traditionally `root`-owned locations. In the previous steps, `~/.local` was used to reproduce an ordinary `/etc` filetree. The same could be done for `nsolid` and `java` (using `~/.local/opt`, for example). The usage below helps demonstrate the scope and utility of `proot`. 
+`proot` is a utility to allow userland overlays of files and directories over traditionally `root`-owned locations. In the previous steps, `~/.local` was used to reproduce an ordinary `/etc` filetree. The same could be done for `nsolid` (using `~/.local/opt/nsolid`, for example). The usage section below helps demonstrate the scope and utility of `proot`. 
 
 See documentation here: https://proot-me.github.io/
 
@@ -109,11 +109,11 @@ Due to the unprivileged user being used to host this process, server init comman
 
 ## PROOT, ROOT-FAKER
 
-`proot`'s primary function with the webui is to present replacement authentication files, e.g., `/etc/{passwd, group, shadow}` owned by the user: it contains no authentic system user information and can be managed separately even from the linux user's password. In actuality, no such privilege execution occurs, but this file overlay allows use of `/etc/{passwd,group,shadow,mineos.conf}` where it otherwise would be restricted.
+`proot`'s primary function with the webui is to present replacement authentication files owned by `$USER`: it contains no authentic system user information and is separate from the linux user's password. In actuality, no such privilege escalation occurs, but this file overlay allows use of `/etc/{passwd,group,shadow,mineos.conf}` where it otherwise would be restricted.
 
-`proot` can execute any program while also overlaying just the specific files. Without a particular file to run, `proot` will default to `/bin/sh`. Alternate shells can be used, and even run the webui. 
+`proot` can execute any program while also overlaying just the specific files. Without a particular file to run, `proot` will default to `/bin/sh`. Alternate shells can be used, and even run the webui.
 
-This step will use normal linux utilities to generate passwords and groups.
+This step will use normal linux utilities to generate passwords and groups. Enter a `proot` subshell, then generate local versions of the authentication files. `$UIPW` is the webui password to accompany `$USER`.
 ```
 cd ~
 read -s UIPW
@@ -125,14 +125,13 @@ echo "$USER:$UIPW" | chpasswd -c SHA512
 EOHC
 ```
 
-Enter a `proot` subshell, then generate local versions of the authentication files.
-
 ## USAGE
 
-Start a new terminal session, which will demonstrate whether the $PATH vars have successfully taken. Finally use `proot` to start the webui process. This invocation will only overwrite four mineos-specific files which must be user-readable; all other files in `/etc` are now inherited.
+Start a new terminal session, which will demonstrate whether the $PATH vars have successfully taken. Then, use `proot` to start the webui process. This invocation will only overwrite four mineos-specific files which must be user-readable; all other files in `/etc` are now inherited.
 
 ```
-$ proot -w ~/mineos-node -b ~/.local/etc/passwd:/etc/passwd -b ~/.local/etc/shadow:/etc/shadow -b ~/.local/etc/group:/etc/group -b ~/.local/etc/mineos.conf:/etc/mineos.conf ./webui
+$ proot -w ~/mineos-node -b ~/.local/etc/passwd:/etc/passwd -b ~/.local/etc/shadow:/etc/shadow -b ~/.local/etc/group:/etc/group -b ~/.local/etc/mineos.conf:/etc/mineos.conf
+bash-5-2$ ./webui
 ```
 
-Once the daemon is running, you can visit `https://[ipaddress]:8443` in your web browser and you will see a user and password prompt. Log in with your normal username and password selected from the previous `prot` step.
+Once the daemon is running, you can visit `https://[ipaddress]:8443` in your web browser and you will see a user and password prompt. Log in with your normal username and password selected from the previous `proot` step.
