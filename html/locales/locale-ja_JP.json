@@ -102,6 +102,7 @@
   "MB_ABBREVIATION": "MB",
   "SELECT_SERVER_PROFILE": "サーバー プロファイルの選択",
   "CHANGE_PROFILE_TO": "プロファイルを変更:",
+  "CHANGE_JAVA_VER_TO": "Change java version to:",
   "CHANGE_JARFILE_TO": "実行 jarを変更:",
   "ADDITIONAL_JAVA_ARGS": "追加のJava引数:",
   "ADDITIONAL_JAR_ARGS": "追加のJar引数:",

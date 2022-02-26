@@ -102,6 +102,7 @@
   "MB_ABBREVIATION": "MB",
   "SELECT_SERVER_PROFILE": "Velg serverprofil",
   "CHANGE_PROFILE_TO": "Bytt profil til:",
+  "CHANGE_JAVA_VER_TO": "Change java version to:",
   "CHANGE_JARFILE_TO": "Bytt Jarfil til:",
   "ADDITIONAL_JAVA_ARGS": "Fler Java-argumenter:",
   "ADDITIONAL_JAR_ARGS": "Fler Jarargumenter:",
