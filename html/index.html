@@ -965,6 +965,9 @@
                                             </header>
                                             <section class="body">
                                                 <div class="body-inner">
+                                                    <div class="control-group">
+                                                        {{( 'CURRENT_JAVA_VERSION' | translate)+': ' + servers[current].page_data.glance.java_version_in_use}}
+                                                    </div>
                                                     <!-- Select -->
                                                     <div class="control-group">
                                                         <div class="controls">
@@ -1635,6 +1638,9 @@
                         <select class="" ng-model="myprofile" default-option="Select a profile" data-ng-options="p as p.id group by p.group for p in profiles | profile_downloaded: 'only_downloaded' | orderBy:'-releaseTime'" ng-change="change_sc('minecraft', 'profile', myprofile.id)">
                             <option value="" disabled selected translate="CHANGE_PROFILE_TO"></option>
                         </select>
+                        <div class="control-group">
+                            {{( 'CURRENT_JAVA_VERSION' | translate)+': ' + servers[current].page_data.glance.java_version_in_use}}
+                        </div>
                         <!-- Select -->
                         <div class="control-group">
                             <div class="controls">

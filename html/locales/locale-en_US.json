@@ -103,6 +103,7 @@
   "SELECT_SERVER_PROFILE": "Select server profile",
   "CHANGE_PROFILE_TO": "Change profile to:",
   "CHANGE_JARFILE_TO": "Change runnable jar to:",
+  "CURRENT_JAVA_VERSION": "Java Version in Use",
   "ADDITIONAL_JAVA_ARGS": "Additional Java arguments:",
   "ADDITIONAL_JAR_ARGS": "Additional Jar arguments:",
   "CHANGE_NICENESS": "Change Process Niceness",
