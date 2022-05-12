@@ -1304,7 +1304,8 @@ function server_container(server_name, user_config, socket_io) {
             'eula': async.apply(instance.property, 'eula'),
             'base_dir': function(cb) {
               cb(null, user_config.base_directory)
-            }
+            },
+            'java_version_in_use': async.apply(instance.property, 'java_version_in_use'),
           }, function(err, results) {
             if (err instanceof Object)
               logging.error('[{0}] Error with get_page_data glance'.format(server_name), err, results);
