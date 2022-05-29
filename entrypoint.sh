@@ -74,7 +74,7 @@ else
 fi
 
 echo >&2 "Setting user password for '$USER_NAME'"
-echo "$USER_NAME:$USER_PASSWORD" | chpasswd
+echo "$USER_NAME:$USER_PASSWORD" | chpasswd --crypt-method SHA512
 
 if [ ! -z "$USE_HTTPS" ]; then
   # update mineos.conf from environment
