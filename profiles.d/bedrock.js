@@ -12,6 +12,78 @@ exports.profile = {
     try {  // BEGIN PARSING LOGIC
       var item = new profile();
 
+      item['id'] = 'bedrock-server-1.18.33.02';
+      item['type'] = 'release';
+      item['group'] = 'minecraft-bedrock';
+      item['webui_desc'] = 'Latest Linux x64 release';
+      item['weight'] = 0;
+      item['filename'] = 'bedrock-server-1.18.33.02.zip';
+      item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
+      item['version'] = 0;
+      item['release_version'] = '1.18.33.02';
+      item['url'] = 'https://minecraft.azureedge.net/bin-linux/bedrock-server-1.18.33.02.zip';
+      p.push(JSON.parse(JSON.stringify(item)));	    
+
+      item['id'] = 'bedrock-server-1.18.32.02';
+      item['type'] = 'release';
+      item['group'] = 'minecraft-bedrock';
+      item['webui_desc'] = 'Latest Linux x64 release';
+      item['weight'] = 0;
+      item['filename'] = 'bedrock-server-1.18.32.02.zip';
+      item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
+      item['version'] = 0;
+      item['release_version'] = '1.18.32.02';
+      item['url'] = 'https://minecraft.azureedge.net/bin-linux/bedrock-server-1.18.32.02.zip';
+      p.push(JSON.parse(JSON.stringify(item)));	    
+
+      item['id'] = 'bedrock-server-1.18.31.04';
+      item['type'] = 'release';
+      item['group'] = 'minecraft-bedrock';
+      item['webui_desc'] = 'Latest Linux x64 release';
+      item['weight'] = 0;
+      item['filename'] = 'bedrock-server-1.18.31.04.zip';
+      item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
+      item['version'] = 0;
+      item['release_version'] = '1.18.31.04';
+      item['url'] = 'https://minecraft.azureedge.net/bin-linux/bedrock-server-1.18.31.04.zip';
+      p.push(JSON.parse(JSON.stringify(item)));
+
+      item['id'] = 'bedrock-server-1.18.30.04';
+      item['type'] = 'release';
+      item['group'] = 'minecraft-bedrock';
+      item['webui_desc'] = 'Latest Linux x64 release';
+      item['weight'] = 0;
+      item['filename'] = 'bedrock-server-1.18.30.04.zip';
+      item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
+      item['version'] = 0;
+      item['release_version'] = '1.18.30.04';
+      item['url'] = 'https://minecraft.azureedge.net/bin-linux/bedrock-server-1.18.30.04.zip';
+      p.push(JSON.parse(JSON.stringify(item)));	    
+
+      item['id'] = 'bedrock-server-1.18.12.01';
+      item['type'] = 'release';
+      item['group'] = 'minecraft-bedrock';
+      item['webui_desc'] = 'Latest Linux x64 release';
+      item['weight'] = 0;
+      item['filename'] = 'bedrock-server-1.18.12.01.zip';
+      item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
+      item['version'] = 0;
+      item['release_version'] = '1.18.12.01';
+      item['url'] = 'https://minecraft.azureedge.net/bin-linux/bedrock-server-1.18.12.01.zip';
+      p.push(JSON.parse(JSON.stringify(item)));	    
+
+      item['id'] = 'bedrock-server-1.18.11.01';
+      item['type'] = 'release';
+      item['group'] = 'minecraft-bedrock';
+      item['webui_desc'] = 'Latest Linux x64 release';
+      item['weight'] = 0;
+      item['filename'] = 'bedrock-server-1.18.11.01.zip';
+      item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
+      item['version'] = 0;
+      item['release_version'] = '1.18.11.01';
+      item['url'] = 'https://minecraft.azureedge.net/bin-linux/bedrock-server-1.18.11.01.zip';
+      p.push(JSON.parse(JSON.stringify(item)));
+
       item['id'] = 'bedrock-server-1.18.2.03';
       item['type'] = 'release';
       item['group'] = 'minecraft-bedrock';
