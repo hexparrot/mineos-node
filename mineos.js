@@ -6,6 +6,7 @@ var child_process = require('child_process');
 var which = require('which');
 var logging = require('winston');
 var mineos = exports;
+const java = require('./java.js');
 
 mineos.DIRS = {
   'servers': 'servers',
@@ -537,7 +538,7 @@ mineos.mc = function(server_name, base_dir) {
             var value = (dict.java || {}).java_tweaks || null;
             cb(null, value);
           });
-        }
+        },
       }, function(err, results) {
         if (err) {
           inner_callback(err, {});
@@ -1567,6 +1568,12 @@ mineos.mc = function(server_name, base_dir) {
         fs.stat(path.join(self.env.cwd, 'FTBInstall.sh'), function(err, stat_data) {
           callback(null, !!stat_data);
         })
+        break;
+      case 'java_version_in_use':
+        self.sc(function(err,dict){
+          java.usedJavaVersion(dict,callback);
+        })
+        
         break;
       default:
         callback(true, undefined);

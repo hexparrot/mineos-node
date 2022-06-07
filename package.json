@@ -74,7 +74,7 @@
     "tar": "^4.4.18",
     "tarball-extract": "0.0.3",
     "tmp": "0.0.33",
-    "unzip": "0.1.x",
+    "unzipper": "0.10.11",
     "urllib": "^2.34.1",
     "userid": "1.0.0-beta.9",
     "uuid": "3.0.x",

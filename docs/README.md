@@ -42,6 +42,7 @@ Sysadmins familiar with Docker or unRAID also have easy deployment options:
 - [Archlinux](install/archlinux.md)
 - [Alpine](install/alpine.md)
 - [FreeBSD](install/freebsd.md)
+- [rootless, distro-agnostic](install/rootless.md)
 
 # Wiki Landing Pages
 
