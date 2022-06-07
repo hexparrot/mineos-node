@@ -397,7 +397,7 @@ server.backend = function(base_dir, socket_emitter, user_config) {
                       cb();
                       break;
                     case '.zip':
-                      var unzip = require('unzip');
+                      var unzip = require('unzipper');
                       fs.createReadStream(dest_filepath)
                         .pipe(unzip.Extract({ path: profile_dir })
                                 .on('close', function() { cb() })
