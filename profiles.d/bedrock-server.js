@@ -1,11 +1,7 @@
 
-// var async = require('async');
 var path = require('path');
 var fs = require('fs-extra');
 var profile = require('./template');
-
-var logging = require('winston');
-logging.info('helloworld');
 
 exports.profile = {
   name: 'Minecraft Bedrock',
@@ -356,26 +352,9 @@ exports.profile = {
     callback(null, p);
   }, //end handler
   postdownload: function (profile_dir, dest_filepath, callback) {
-    var child = require('child_process');
-    var which = require('which');
-    var binary = which.sync('chmod');
-    var args = ['755', 'bedrock_server'];
 
-    const { spawn } = require('node:child_process');
-
-    var proc = child.spawn('chmod', ['755', profile_dir + '/bedrock_server']);
-    proc.stdout.on('data', (data) => {
-      logging.info(`stdout: ${data}`);
-    });
-
-    proc.stderr.on('data', (data) => {
-      logging.info(`stderr: ${data}`);
-    });
-
-    proc.on('close', (code) => {
-      logging.info(`child process exited with code ${code}`);
-    });
-
+    // perform an async chmod of the unipper extracted bedrock_server binary
+    fs.chmod((profile_dir + '/bedrock_server'), 0755);
     callback();
   }
 }
