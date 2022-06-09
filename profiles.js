@@ -5,7 +5,7 @@ var profile_manifests = {};
 var normalizedPath = require("path").join(__dirname, "profiles.d");
 
 logging.info(normalizedPath);
-require("fs").readdirSync(normalizedPath).forEach(function(file) {
+require("fs").readdirSync(normalizedPath).filter(fn => fn.endsWith('.js')).forEach(function(file) {
   if (!file.match('template.js')) {
     var loadedProfile = require('./profiles.d/' + file);
     if(loadedProfile.profile !== undefined){
