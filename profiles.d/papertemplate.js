@@ -15,6 +15,7 @@ return {
   },
   handler: function (profile_dir, body, callback) {
     var p = [];
+    var weight = 0;
 
     try {
       for (var index in body.versions) {
@@ -36,7 +37,7 @@ return {
           item['id'] = `${titlename}-${ver}-${build}`;
           item['group'] = lowername;
           item['webui_desc'] = `Latest ${titlename} build for ${ver}`;
-          item['weight'] = 0;
+          item['weight'] = weight;
           item['filename'] = `${lowername}-${ver}-${build}.jar`;
           item['url'] = `${response.request.res.responseUrl}builds/${build}/downloads/${lowername}-${ver}-${build}.jar`;
           item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
@@ -45,6 +46,7 @@ return {
           item['type'] = 'release'
     
           p.push(item);
+          weight++;
         })
       }).then(() => { callback(null, p)})
       .catch((err) => {console.error(err)});
