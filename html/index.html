@@ -965,6 +965,9 @@
                                             </header>
                                             <section class="body">
                                                 <div class="body-inner">
+                                                    <div class="control-group">
+                                                        {{( 'CURRENT_JAVA_VERSION' | translate)+': ' + servers[current].page_data.glance.java_version_in_use}}
+                                                    </div>
                                                     <!-- Select -->
                                                     <div class="control-group">
                                                         <div class="controls">
@@ -1051,12 +1054,12 @@
                                         <div class="span6 widget">
                                             <header>
                                                 <h4 class="title"><span class="icon icone-hdd"></span> {{ 'RESTORE_POINTS' | translate }}</h4>
-                                                <span class="badge badge-success pull-right" ng-click="change_page('restore_points')">{{ servers[current].page_data.glance.increments.length }}</span>
+                                                <span class="badge badge-success pull-right" ng-click="change_page('restore_points')">{{ servers[current].increments.length }}</span>
                                             </header>
                                             <section class="body">
                                                 <div class="body-inner">
-                                                    <p>{{ 'MOST_RECENT_RESTORE_POINT' | translate }}: <a rel="tooltip" title="{{ servers[current].page_data.glance.increments[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" am-time-ago="servers[current].page_data.glance.increments[0].time"></a></p>
-                                                    <p>{{ 'OLDEST_RESTORE_POINT' | translate }}: <a href="#" rel="tooltip" title="{{ servers[current].page_data.glance.increments.slice(-1)[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" am-time-ago="servers[current].page_data.glance.increments.slice(-1)[0].time"></a></p>
+                                                    <p>{{ 'MOST_RECENT_RESTORE_POINT' | translate }}: <a rel="tooltip" title="{{ servers[current].increments[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" am-time-ago="servers[current].increments[0].time"></a></p>
+                                                    <p>{{ 'OLDEST_RESTORE_POINT' | translate }}: <a href="#" rel="tooltip" title="{{ servers[current].increments.slice(-1)[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" am-time-ago="servers[current].increments.slice(-1)[0].time"></a></p>
                                                     <p>{{ 'SPACE_USED_RESTORES' | translate }}: {{ servers[current].page_data.glance.du_bwd | bytes_to_mb }}</p>
                                                     <!-- Alert Error -->
                                                     <div class="alert alert-success" ng-show="servers[current].latest_notice['backup'].success">
@@ -1078,12 +1081,12 @@
                                         <div class="span6 widget">
                                             <header>
                                                 <h4 class="title"><span class="icon icone-hdd"></span> {{ 'ARCHIVES' | translate }}</h4>
-                                                <span class="badge badge-success pull-right" ng-click="change_page('archives')">{{ servers[current].page_data.glance.archives.length }}</span>
+                                                <span class="badge badge-success pull-right" ng-click="change_page('archives')">{{ servers[current].archives.length }}</span>
                                             </header>
                                             <section class="body">
                                                 <div class="body-inner">
-                                                    <p>{{ 'MOST_RECENT_ARCHIVE' | translate }}: <a title="{{ servers[current].page_data.glance.archives[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" rel="tooltip" am-time-ago="servers[current].page_data.glance.archives[0].time"></a></p>
-                                                    <p>{{ 'OLDEST_ARCHIVE' | translate }}: <a title="{{ servers[current].page_data.glance.archives.slice(-1)[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" rel="tooltip" am-time-ago="servers[current].page_data.glance.archives.slice(-1)[0].time"></a></p>
+                                                    <p>{{ 'MOST_RECENT_ARCHIVE' | translate }}: <a title="{{ servers[current].archives[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" rel="tooltip" am-time-ago="servers[current].archives[0].time"></a></p>
+                                                    <p>{{ 'OLDEST_ARCHIVE' | translate }}: <a title="{{ servers[current].archives.slice(-1)[0].time | amDateFormat:'dddd, MMMM Do YYYY, h:mm:ss a' }}" rel="tooltip" am-time-ago="servers[current].archives.slice(-1)[0].time"></a></p>
                                                     <p>{{ 'SPACE_USED_ARCHIVES' | translate }}: {{ servers[current].page_data.glance.du_awd | bytes_to_mb }}</p>
                                                     <!-- Alert Error -->
                                                     <div class="alert alert-success" ng-show="servers[current].latest_notice['archive'].success">
@@ -1209,6 +1212,9 @@
                                         </ul>
                                     </li>
                                 </ul>
+                                <!-- button is put after dropdown, pull-right class makes them float to the right order -->
+                                <button type="button" class="btn btn-mini btn-success pull-right" ng-click="servers[current].refresh_increment_sizes()" translate="GET_INCREMENT_SIZES"></button>
+                                
                                 <!--/ END Toolbar -->
                             </header>
                             <section class="body">
@@ -1224,11 +1230,11 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr ng-repeat="incr in servers[current].page_data.glance.increments">
+                                            <tr ng-repeat="incr in servers[current].increments">
                                                 <td>{{ incr.step }}</td>
                                                 <td>{{ incr.time | amDateFormat: "dddd, MMMM Do YYYY, h:mm:ss a" }}</td>
-                                                <td>{{ incr.size }}</td>
-                                                <td>{{ incr.cum }}</td>
+                                                <td>{{ (servers[current].data_statis.increment_sizes == 'loading') ? "Loading..." : incr.size }}</td>
+                                                <td>{{ (servers[current].data_statis.increment_sizes == 'loading') ? "Loading..." : incr.cum }}</td>
                                                 <td>
                                                     <p>
                                                         <button type="button" class="btn btn-mini btn-success" ng-click="server_command('restore', {step: incr.step})" translate="RESTORE"></button>
@@ -1279,7 +1285,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr ng-repeat="archive in servers[current].page_data.glance.archives">
+                                            <tr ng-repeat="archive in servers[current].archives">
                                                 <td>{{ archive.time | amDateFormat: "dddd, MMMM Do YYYY, h:mm:ss a"  }}</td>
                                                 <td>{{ archive.size | bytes_to_mb }}</td>
                                                 <td>{{ archive.filename }}</td>
@@ -1641,6 +1647,9 @@
                         <select class="" ng-model="myprofile" default-option="Select a profile" data-ng-options="p as p.id group by p.group for p in profiles | profile_downloaded: 'only_downloaded' | orderBy:'-releaseTime'" ng-change="change_sc('minecraft', 'profile', myprofile.id)">
                             <option value="" disabled selected translate="CHANGE_PROFILE_TO"></option>
                         </select>
+                        <div class="control-group">
+                            {{( 'CURRENT_JAVA_VERSION' | translate)+': ' + servers[current].page_data.glance.java_version_in_use}}
+                        </div>
                         <!-- Select -->
                         <div class="control-group">
                             <div class="controls">

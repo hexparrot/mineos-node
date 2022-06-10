@@ -20,7 +20,13 @@ exports.profile = {
           inner_cb(response.statusCode != 200, body)
         },
         function (body, inner_cb) {
-          var parsed = JSON.parse(body);
+          try {
+            var parsed = JSON.parse(body);
+          } catch (err) {
+            callback(err);
+            inner_cb(err);
+            return;
+          }
           for (var idx in p)
             if (p[idx]['id'] == obj['id'])
               try {

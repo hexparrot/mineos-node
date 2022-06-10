@@ -1,0 +1,58 @@
+FROM ubuntu:focal as build
+LABEL MAINTAINER='William Dizon <wdchromium@gmail.com>'
+
+#set build directory
+WORKDIR /build
+
+#install necessary build dependancies
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y \
+  curl \
+  build-essential \
+  && curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
+  && apt-get install -y nodejs
+
+# copy package.json and npm install
+# by copying package.json first we stop changes in other files from triggerig a rebuild of this image stage
+COPY package.json /build
+RUN npm install
+
+#copy other files to build dir
+COPY . /build
+
+#final image
+FROM ubuntu:focal
+
+WORKDIR /usr/games/minecraft
+
+#install necessary run dependancies
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y \
+  rdiff-backup \
+  screen \
+  rsync \
+  git \
+  curl \
+  rlwrap \
+  openjdk-17-jre-headless \
+  openjdk-8-jre-headless \
+  ca-certificates-java \
+  && curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
+  && apt-get install -y nodejs \
+  && apt-get autoremove -y \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+COPY --from=build /build /usr/games/minecraft
+RUN cp /usr/games/minecraft/mineos.conf /etc/mineos.conf \
+  && cp /usr/games/minecraft/entrypoint.sh /entrypoint.sh
+
+#set start command and entrypoint
+CMD ["node", "webui.js"]
+ENTRYPOINT ["/entrypoint.sh"]
+
+#set image ports volumes and envs
+EXPOSE 8443 25565-25570
+VOLUME /var/games/minecraft
+VOLUME /etc/ssl/certs
+ENV USER_PASSWORD=random_see_log USER_NAME=mc USER_UID=1000 USE_HTTPS=true SERVER_PORT=8443

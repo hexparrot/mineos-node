@@ -77,8 +77,9 @@ app.filter('bytes_to_mb', function() {
     var k = 1024;
     var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
     var i = Math.floor(Math.log(bytes) / Math.log(k));
-
-    return (bytes / Math.pow(k, i)).toPrecision(3) + sizes[i];
+    var converted = bytes / Math.pow(k, i);
+    
+    return (Math.round(converted) >= 1000 ? (converted).toPrecision(4) : (converted).toPrecision(3)) + sizes[i];
   };
 })
 
@@ -90,7 +91,9 @@ app.filter('kb_string_to_mb', function() {
 
     if (kbytes) {
       var i = Math.floor(Math.log(kbytes) / Math.log(k));
-      return (kbytes / Math.pow(k, i)).toPrecision(3) + sizes[i];
+      var converted = kbytes / Math.pow(k, i);
+    
+      return (Math.round(converted) >= 1000 ? (converted).toPrecision(4) : (converted).toPrecision(3)) + sizes[i];
     } else {
       return '';
     }
@@ -723,7 +726,7 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     var events = [];
     for (var server_name in Servers) {
       try { //archives
-        Servers[server_name].page_data.glance.archives.forEach(function(value, idx) {
+        Servers[server_name].archives.forEach(function(value, idx) {
           events.push({
             title: '{0} archive'.format(server_name),
             start: value.time,
@@ -733,7 +736,7 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
       } catch (e) {}
 
       try { //backups
-        Servers[server_name].page_data.glance.increments.forEach(function(value, idx) {
+        Servers[server_name].increments.forEach(function(value, idx) {
           events.push({
             title: '{0} backup'.format(server_name),
             start: value.time,
@@ -767,13 +770,21 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
   }
 
   $scope.change_page = function(page, server_name) {
-    if (server_name)
+    if (server_name) {
       $scope.current = server_name;
+      $scope.servers[$scope.current].refresh_all_data();
+    }
 
     switch(page) {
       case 'calendar':
         $scope.refresh_calendar();
         break;
+      // case 'restore_points':
+      //   $scope.servers[$scope.current].refresh_increments();
+      //   break;
+      // case 'archives':
+      //   $scope.servers[$scope.current].refresh_archives();
+      //   break;
       default:
         break;
     }
@@ -808,6 +819,11 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
     me.server_name = server_name;
     me.channel = socket;
     me.page_data = {};
+    me.increments = [];
+    me.archives = [];
+    me.data_status = {
+      increment_sizes: null
+    };
     me.live_logs = {};
     me.notices = {};
     me.latest_notice = {};
@@ -827,7 +843,7 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
       me.heartbeat = data.payload;
 
       if ((previous_state || {}).up == true && me.heartbeat.up == false) {
-        me.channel.emit(server_name, 'page_data', 'glance');
+        me.refresh_glance();
         $.gritter.add({
           title: "[{0}] {1}".format(me.server_name, $filter('translate')('DOWN') ),
           text: ''
@@ -837,6 +853,23 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
 
     me.channel.on(server_name, 'page_data', function(data) {
       me.page_data[data.page] = data.payload;
+    })
+
+    me.channel.on(server_name, 'archives', function(data) {
+      me.archives = data.payload;
+    })
+
+    me.channel.on(server_name, 'increments', function(data) {
+      // only replace increments data if a change has occurred
+      if (data.payload.length != me.increments.length) {
+        me.data_status.increment_sizes = null;
+        me.increments = data.payload;
+      }
+    })
+
+    me.channel.on(server_name, 'increment_sizes', function(data) {
+      me.data_status.increment_sizes = 'ready';
+      me.increments = data.payload;
     })
 
     me.channel.on(server_name, 'tail_data', function(data) {
@@ -887,7 +920,16 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
     me.channel.on(server_name, 'server_fin', function(data) {
       me.notices[data.uuid] = data;
       me.latest_notice[data.command] = data;
-      me.channel.emit(server_name, 'page_data', 'glance');
+      me.refresh_glance();
+
+      if(data.command == 'archive')
+        me.refresh_archives();
+
+      if(data.command == 'backup')
+        me.refresh_increments();
+
+      if(data.command == 'prune')
+        me.refresh_increments();
 
       var suppress = false;
       if ('suppress_popup' in data || data.success)
@@ -916,15 +958,61 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
         $('#modal_eula').modal('show');
     })
 
-    me.channel.emit(server_name, 'server-icon.png');
-    me.channel.emit(server_name, 'page_data', 'glance');
-    me.channel.emit(server_name, 'get_available_tails');
-    me.channel.emit(server_name, 'req_server_activity');
-    me.channel.emit(server_name, 'config.yml');
-    me.channel.emit(server_name, 'cron.config');
-    me.channel.emit(server_name, 'server.config');
-    me.channel.emit(server_name, 'server.properties');
+    //request all data for this server
+    me.refresh_all_data = function() {
+      me.refresh_glance();
+      me.refresh_increments();
+      me.refresh_archives();
+      me.get_dashboard_data();
+      me.refresh_cron_data();
+      me.channel.emit(me.server_name, 'get_available_tails');
+      me.channel.emit(me.server_name, 'req_server_activity');
+      me.channel.emit(me.server_name, 'config.yml');
+    }
+    
+    //request new server at a glance info
+    me.refresh_glance = function() {
+      me.channel.emit(me.server_name, 'page_data', 'glance');
+    }
 
+    //request new incrments data for this server
+    me.refresh_increments = function() {
+      me.channel.emit(me.server_name, 'increments');
+    }
+
+    //request new archives data for this server
+    me.refresh_archives = function() {
+      me.channel.emit(me.server_name, 'archives');
+    }
+
+    //request new incrments data for this server
+    me.refresh_increment_sizes = function() {
+      if (me.data_status.increment_sizes != 'loading') {
+        me.data_status.increment_sizes = 'loading';
+        me.channel.emit(me.server_name, 'increment_sizes');
+      }
+    }
+
+    // request new cron data for this server
+    me.refresh_cron_data = function() {
+      me.channel.emit(me.server_name, 'cron.config');
+    }
+    
+    //request all data necessary to populate the dashboard
+    me.get_dashboard_data = function() {
+      me.channel.emit(me.server_name, 'server-icon.png');
+      me.channel.emit(me.server_name, 'server.config');
+      me.channel.emit(me.server_name, 'server.properties');
+    }
+
+    me.get_calendar_data = function() {
+      me.refresh_increments();
+      me.refresh_archives();
+    }
+
+    //request minimum data for use by dashboard before returning constructed server
+    me.get_dashboard_data();
+    me.get_calendar_data();
     return me;
   }
 
