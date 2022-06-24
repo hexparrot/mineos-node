@@ -84,42 +84,39 @@ server.backend = function(base_dir, socket_emitter, user_config) {
     )
   })();
 
-  // disk space
-  // (function() {
-  //   var procfs = require('procfs-stats');
-  //   var HOST_HEARTBEAT_DELAY_MS = 1000;
-
-  //   function host_diskspace() {
-  //     async.waterfall([
-  //       async.apply(procfs.meminfo)
-  //     ], function(err, meminfo) {
-  //       self.front_end.emit('host_diskspace', {
-  //         'freemem': ((meminfo && meminfo['MemAvailable']) ? meminfo['MemAvailable'] * 1024 : os.freemem()),
-  //         'freedisk': 1214125215215
-  //       })
-  //     })
-  //   }
-
-  //   setInterval(host_diskspace, HOST_HEARTBEAT_DELAY_MS);
-  // })();
-
-
   (function() {
     var procfs = require('procfs-stats');
+    const { check } = require('diskusage');
+
+    var HOST_DU_HEARTBEAT_DELAY_MS = 10000;  // statvfs might be heavy, every 10s should be reasonable
     var HOST_HEARTBEAT_DELAY_MS = 1000;
 
-    function host_diskspace() {
+    /**
+     * Obtains the disk utilisation for a given mount point using statvfs
+     * 
+     * @param {string} path The disk mount point to monitor for free space
+     */
+    async function getFreeSpace(path) {
 
-      logging.info('host diskspace');
+      try {
+        const info = await check(path);
+        self.front_end.emit('host_diskspace', { 
+          'availdisk': info.available,
+          'freedisk': info.free, 
+          'totaldisk': info.total
+        });
+      } catch (err) {
+        logging.error('Failure in server.js:getFreeSpace() ' + err);
+      }
+    }
 
-      async.waterfall([
-        async.apply(procfs.meminfo)
-      ], function(err, meminfo) {
-        self.front_end.emit('host_diskspace', {
-          'freemem': ((meminfo && meminfo['MemAvailable']) ? meminfo['MemAvailable'] * 1024 : os.freemem()),
-          'freedisk': 12141232523
-        })
-      })
+    /**
+     * A callback function fired by setInterval (below)
+     * in turn calls Promise getFreeSpace()
+     */
+    async function host_diskspace() {
+
+      await getFreeSpace('/');
     }    
 
     function host_heartbeat() {
@@ -135,8 +132,9 @@ server.backend = function(base_dir, socket_emitter, user_config) {
       })
     }
 
+    setInterval(host_diskspace, HOST_DU_HEARTBEAT_DELAY_MS);
     setInterval(host_heartbeat, HOST_HEARTBEAT_DELAY_MS);
-    setInterval(host_diskspace, HOST_HEARTBEAT_DELAY_MS);
+    
   })();
 
   (function() {
