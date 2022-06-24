@@ -410,9 +410,16 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     $scope.git_commit = commit_msg.split(' ')[0];
   })
 
+  /**
+   * Setup a callback for the event on socket
+   * 
+   * @param {string} eventName  The event to listen to
+   * @param {string} identifier  The data received from the client
+   * @param {function} callback  The listener called for the event
+   *  
+   */
   socket.on('/', 'host_diskspace', function(data) {
     $scope.host_diskspace = data;
-    //$scope.update_loadavg(data.loadavg);
   })
 
   socket.on('/', 'host_heartbeat', function(data) {
