@@ -5,7 +5,6 @@ var events = require('events');
 var os = require('os');
 var logging = require('winston');
 var fs = require('fs-extra');
-var disk = require('diskusage');
 var server = exports;
 
 logging.add(logging.transports.File, {
