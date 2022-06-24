@@ -410,6 +410,11 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     $scope.git_commit = commit_msg.split(' ')[0];
   })
 
+  socket.on('/', 'host_diskspace', function(data) {
+    $scope.host_diskspace = data;
+    //$scope.update_loadavg(data.loadavg);
+  })
+
   socket.on('/', 'host_heartbeat', function(data) {
     $scope.host_heartbeat = data;
     $scope.update_loadavg(data.loadavg);

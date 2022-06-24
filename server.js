@@ -5,6 +5,7 @@ var events = require('events');
 var os = require('os');
 var logging = require('winston');
 var fs = require('fs-extra');
+var disk = require('diskusage');
 var server = exports;
 
 logging.add(logging.transports.File, {
@@ -83,11 +84,46 @@ server.backend = function(base_dir, socket_emitter, user_config) {
     )
   })();
 
+  // disk space
+  // (function() {
+  //   var procfs = require('procfs-stats');
+  //   var HOST_HEARTBEAT_DELAY_MS = 1000;
+
+  //   function host_diskspace() {
+  //     async.waterfall([
+  //       async.apply(procfs.meminfo)
+  //     ], function(err, meminfo) {
+  //       self.front_end.emit('host_diskspace', {
+  //         'freemem': ((meminfo && meminfo['MemAvailable']) ? meminfo['MemAvailable'] * 1024 : os.freemem()),
+  //         'freedisk': 1214125215215
+  //       })
+  //     })
+  //   }
+
+  //   setInterval(host_diskspace, HOST_HEARTBEAT_DELAY_MS);
+  // })();
+
+
   (function() {
     var procfs = require('procfs-stats');
     var HOST_HEARTBEAT_DELAY_MS = 1000;
 
+    function host_diskspace() {
+
+      logging.info('host diskspace');
+
+      async.waterfall([
+        async.apply(procfs.meminfo)
+      ], function(err, meminfo) {
+        self.front_end.emit('host_diskspace', {
+          'freemem': ((meminfo && meminfo['MemAvailable']) ? meminfo['MemAvailable'] * 1024 : os.freemem()),
+          'freedisk': 12141232523
+        })
+      })
+    }    
+
     function host_heartbeat() {
+
       async.waterfall([
         async.apply(procfs.meminfo)
       ], function(err, meminfo) {
@@ -100,6 +136,7 @@ server.backend = function(base_dir, socket_emitter, user_config) {
     }
 
     setInterval(host_heartbeat, HOST_HEARTBEAT_DELAY_MS);
+    setInterval(host_diskspace, HOST_HEARTBEAT_DELAY_MS);
   })();
 
   (function() {
