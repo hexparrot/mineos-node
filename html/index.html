@@ -364,6 +364,16 @@
                                             <h4>{{ host_heartbeat.freemem | bytes_to_mb }}<small translate="RAM_FREE"></small></h4>
                                         </figcaption>
                                     </figure><!--/ END Circular -->
+
+                                    <!-- START Circular -->
+                                    <figure class="stats summary stacked circular" ng-show="host_diskspace.freedisk">
+                                        <div class="gauge gauge-teal" data-percent="20">
+                                            <span class="icon icone-save"></span>
+                                        </div>
+                                        <figcaption>
+                                            <h4>{{ host_diskspace.freedisk | bytes_to_mb }}<small translate="DISK_FREE"></small></h4>
+                                        </figcaption>
+                                    </figure><!--/ END Circular -->
                                 </div>
                             </section>
                         </div>
