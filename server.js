@@ -397,7 +397,7 @@ server.backend = function(base_dir, socket_emitter, user_config) {
                       cb();
                       break;
                     case '.zip':
-                      var unzip = require('unzip');
+                      var unzip = require('unzipper');
                       fs.createReadStream(dest_filepath)
                         .pipe(unzip.Extract({ path: profile_dir })
                                 .on('close', function() { cb() })
@@ -427,6 +427,7 @@ server.backend = function(base_dir, socket_emitter, user_config) {
                       cb();
                   } catch (e) {
                     logging.error('simultaneous download race condition means postdownload hook may not have executed. redownload the profile to ensure proper operation.');
+	            logging.error('exception in postdownload server.js try/catch {0}'.format(e));
                     cb();
                   }
                 }
