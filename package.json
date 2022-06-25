@@ -68,7 +68,7 @@
     "request-progress": "0.3.x",
     "rsync": "0.6.x",
     "sha512crypt-node": "0.1.x",
-    "socket.io": "1.7.x",
+    "socket.io": "2.4.x",
     "strftime": "0.9.x",
     "tail": "1.2.1",
     "tar": "^4.4.18",
