@@ -56,7 +56,7 @@ Multiple appropriate Java editions exist, choose one to your liking:
 
 ### BUILD NODE DEPENDENCIES
 ```
-# echo "CXX=c++ npm install userid" | sh
+# echo "CXX=c++ CXXFLAGS=\"-DBSD\" npm install userid" | sh
 # echo "CXX=c++ npm install" | sh
 ```
 
