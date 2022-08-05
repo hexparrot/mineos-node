@@ -1,6 +1,6 @@
-# MineOS Webui on CentOS 8
+# MineOS Webui on Fedora 36
 
-The MineOS user interface can be installed on CentOS systems using the `yum` package manager and either `init.d` or `supervisord`.
+The MineOS user interface can be installed on Fedora systems using the `dnf` package manager and either `init.d` or `supervisord`.
 
 As written, these steps will install the webui with the following properties:
 
@@ -16,28 +16,23 @@ The following steps much be executed as `root`.
 
 ## DEPENDENCIES
 
-### NODE.JS 14.x
+### NODE.JS 16.x
 
+Node will be installed through the normal system packages via `dnf`.
 ```
-# yum -y install curl
-# curl -sL https://deb.nodesource.com/setup_14.x | bash -
-# yum -y install nodejs
+# dnf -y install nodejs
 ```
 ### JAVA
 
-The following steps install `openjdk16` into a neutral space (`/opt`) and then symlinks it to `/usr/bin/java`. Note, that so long as `root` has a `java` binary in its `$PATH`, any version you choose--and even different installation methods--are permissible. This particular openjdk binary is chosen because CentOS 8 does not yet have Java 16 available in its normal repos at time of writing.  
+The following steps install `openjdk` via system packages. It is permissible/configurable to use other java instances, versions, and deployments. This particular openjdk binary is chosen because Fedora 36 provides a modern Java for modern Minecraft.
 
 ```
-# wget https://github.com/AdoptOpenJDK/openjdk16-binaries/releases/download/jdk-16.0.1%2B9/OpenJDK16U-jre_x64_linux_hotspot_16.0.1_9.tar.gz -O openjdk-16-jre.tgz
-# tar xf openjdk-16-jre.tgz
-# mv jdk-16.0.* /opt/openjdk-16.0-jre
-# ln -s /opt/openjdk-16.0-jre/bin/java /usr/bin/java
-# rm openjdk-16-jre.tgz
+# dnf install java-latest-openjdk
 ```
 
 ### ADDITIONAL DEPENDENCIES
 ```
-# yum -y install git wget openssl openssl-devel gcc-c++ make rsync screen rdiff-backup
+# dnf -y install git wget openssl openssl-devel gcc-c++ make rsync screen rdiff-backup curl
 ```
 
 ## DOWNLOAD WEBUI FILES
@@ -64,7 +59,7 @@ The following steps install `openjdk16` into a neutral space (`/opt`) and then s
 
 ## SELECTING SERVICE INIT TYPE
 
-CentOS 8 offers `systemd` by default, which you can use to have the webui start at boot. You may, alternatively, use `supervisord`--but be sure to only choose one.
+Fedora 36 offers `systemd` by default, which you can use to have the webui start at boot. You may, alternatively, use `supervisord`--but be sure to only choose one.
 
 ### SYSTEMD
 
@@ -81,7 +76,7 @@ Then, to manage the service:
 
 ### SUPERVISORD
 ```
-# yum install -y supervisord
+# dnf install -y supervisord
 # cp /usr/games/minecraft/init/supervisor_conf /etc/supervisor/conf.d/mineos.conf
 # supervisorctl reload
 ```
@@ -96,17 +91,9 @@ Then, to manage the service:
 
 Once the background daemon is running, you can visit `https://[ipaddress]:8443` in your web browser and you will see a user and password prompt. When creating minecraft and managing Minecraft servers, use an unprivileged user to log into the webui. Creating an unprivileged user (a user that is not `root`) can be accomplished with the `adduser username` command. The password you set during user creation will also be the password used for the web-ui.
 
-## FIREWALLD
+## IPTABLES
 
-CentOS8 installs `firewalld` by default. Using a firewall is highly recommended, but note that system rules will prohibit connectivity to the webui without adding in targetted rules.
+Fedora 36 installs `iptables` by default. Using a firewall is highly recommended, but note that system rules will prohibit connectivity to the webui without adding in targetted rules.
 
-Firewalld is outside the scope of this specific page. It is recommended to properly implement firewall rules, but to address firewalls at a different time after confirming webui operability; you can stop the firewall until next reboot with:
+iptables is outside the scope of this specific page. It is recommended to properly implement firewall rules, but to address firewalls at a different time after confirming webui operability.
 
-`systemctl stop firewalld`
-
-If you prefer `iptables` to `firewalld`, you can change the firewall selected with:
-
-```
-systemctl disable firewalld
-yum remove firewalld
-```
