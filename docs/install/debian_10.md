@@ -12,7 +12,7 @@ As written, these steps will install the webui with the following properties:
 
 # Installation steps
 
-The following steps much be executed as `root`.
+The following steps must be executed as `root`.
 
 ## DEPENDENCIES
 
@@ -57,7 +57,7 @@ The following steps install `openjdk16` into a neutral space (`/opt`) and then s
 # npm install --unsafe-perm
 ```
 
-### USE HTTPS FOR SECURET TRANSPORT
+### USE HTTPS FOR SECURE TRANSPORT
 
 ```
 # cd /usr/games/minecraft
@@ -66,7 +66,7 @@ The following steps install `openjdk16` into a neutral space (`/opt`) and then s
 
 ## SELECT INIT TYPE
 
-Debian 10 offers `systemd` by default, which you can use to have the webui start at boot. You may, alternatively, use `supervisord`--but be sure to only choose one.
+Debian 10 offers `systemd` by default, which you can use to have the webui start at boot. You may alternatively use `supervisord`, but be sure to only choose one.
 
 ### SYSTEMD
 
