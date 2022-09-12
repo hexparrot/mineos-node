@@ -1,6 +1,6 @@
 # Cryptographic Keys
 
-A long-held is the belief that `root` should never be allowed to login directly, but should instead come from elevation from an unprivileged user. Nowadays, there are enough methods to allow `root` login without increasing your attack surface, thanks to cryptographic keys.
+Long-held is the belief that `root` should never be allowed to login directly into a remote terminal, but should instead come from elevation from an unprivileged user. Nowadays, there are enough methods to allow `root` login without increasing your attack surface, thanks to cryptographic keys.
 
 The most common keys are `RSA` keys, but others exist which are readily accepted by modern `sshd` daemons.
 
@@ -20,7 +20,7 @@ SHA256:Maq2bflTz+vmKCRHcDcFM2o0IoXw41UnrYZSU4ZEju8 for root@mineos
 ...
 $
 ```
-In this example `-f ~/.ssh/mineos` is the filename of the private key to be generated. If this is omitted, it will default to `~/.ssh/id_ed25519`; this is often preferred, as it obviates the need to specify the `-i` identity file on subsequent steps.
+In this example `-f ~/.ssh/mineos` is the filename of the private key to be generated. If this is omitted, it will default to `~/.ssh/id_ed25519`; using this default is often preferred, as it obviates the need to specify the `-i` identity file on subsequent steps.
 
 ## CONFIGURE THE HOST
 
@@ -45,7 +45,7 @@ It is very possible your default installation of `sshd` already is allowing this
 139:3576:PermitRootLogin prohibit-password
 ```
 
-Line 32 shows `#PermitRootLogin`, which is actually a comment and therefore has no effect. A standard convention of configuration files, however, is to indicate the default value if unspecified (as a comment would do)--this means that plaintext passwords are already prohibited for `root` login, but cryptographic keys are OK.
+Line 32 shows `#PermitRootLogin`, which is actually a comment and therefore has no effect. A standard convention of configuration files is to indicate the default value if unspecified, as a comment. This entry signifies that plaintext passwords are already prohibited for `root` login, but cryptographic keys are accepted.
 
 Line 139 actually shows that for a user match of the user `root` connecting to this host, explicitly disallow plaintext passwords for `root` login.  Either of these `prohibit-password`s will work for this case, but the latter takes precedence.
 
@@ -65,13 +65,13 @@ Received disconnect from 10.137.0.12 port 22:2: Too many authentication failures
 Disconnected from 10.137.0.12 port 22
 ```
 
-Note, it is asking for `root`'s password, not your chosen passphrase. This is because while the identify file is being passed through, the `ssh` host is not aware of this key. Normally, we rectify this with `ssh-copy-id`. However, `root` doesn't have a password, so it's a catch-22 of how to get passwordless access without ever setting a password.
+Note, it is asking for `root`'s password, not your chosen passphrase. This is because while the identify file is being passed through, the `ssh` host is not aware of this key. Normally, we rectify this with `ssh-copy-id`. However, `root` doesn't have a password, so it's a catch-22 of how to get passwordless access without ever setting a password. Setting a password for `root`, enabling plaintext passwords, restarting the daemon, and copying the key is possible--but _suboptimal_, in terms of security best practices, and more error-prone. This document will only cover the process copying the key via a secondary user, designated as `mc`.
 
 ## COPY OVER THE PUBLIC KEY
 
-Remember the design of a private key/public key system: only the private key is delicate--the public key is just that, freely sharable. In fact, any user that tries to misuse your public key is really only _providing you access_ rather than _stealing your access_.
+Remember the design of a private key/public key system: only the private key is delicate--the public key is just that, freely-sharable. In fact, any user that tries to misuse your public key can really only _provide access_ rather than _steal access_.
 
-With this in mind, let's copy the public key to the new host, somehow, then ultimately put the key in the correct location: `/root/.ssh/authorized_keys`.
+With this in mind, let's copy the public key to the new host, then ultimately put the key in the correct location: `/root/.ssh/authorized_keys`.
 
 ```
 $ ssh-copy-id -i ~/.ssh/mineos mc@10.137.0.12
@@ -101,7 +101,7 @@ mc@10.137.0.12's password:
 
 ## CORRECT KEY PERMISSIONS
 
-Set the private and public key to read-only and access is granted. Remember, passphrases are separate from the user's password--if you did not use a passphrase in the previous step, the login will be automatic.
+Set the private and public key to read-only and access is granted. Remember, passphrases are separate from the user's password--if you did not use a passphrase in the previous step, you will be brought directly to the shell prompt.
 
 ```
 $ chmod 400 ~/.ssh/mineos*
@@ -120,13 +120,13 @@ mc@mineos-tkldev ~$ ll .ssh/authorized_keys
 
 ## EXTEND CRYPTO KEY TO ROOT LOGIN
 
-Because in the previous step we are able to confirm that there is only one `authorized_key`, and it matches the key we just generated, we can take a shortcut. On a more mature system, you will need to manually move the authorized key from `/home/mc/.ssh/authorized_keys` to `/root/.ssh/authorized_keys`.
+Because in the previous step we are able to confirm that there is only one `authorized_key`--and it matches the key we just generated--we can take a shortcut. On a more mature system, you will need to manually move the one, newly-added key from `/home/mc/.ssh/authorized_keys` to `/root/.ssh/authorized_keys`.
 
-Switch to `root` on the destination machine:
+As the superuser `root` on the destination machine:
 
 `# rsync -av --chown=root:root /home/mc/.ssh /root/`
 
-The reason this is a shortcut is it fully duplicates all authorized users for `mc` to `root`. Any *and all* keys that would permit `mc` access would now do the same for `root`. If this does not match your intended userset, edit `/root/.ssh/authorized_keys` to remove spurious entries.
+The reason this is a shortcut is it fully duplicates all authorized users for `mc` to `root`. Any *and all* keys that would permit `mc` access would now do the same for `root`. If this does not match your intended userset, edit `/root/.ssh/authorized_keys` to remove unwanted entries. Additional steps this command also accomplishes includes changing the owner and group to match `root:root`, as well as match the proper `rwx` permissions (that we executed in the previous step).
 
 ## VERIFY AUTHORIZED_KEYS PERMISSIONS
 
@@ -171,7 +171,7 @@ PasswordAuthentication no
 ```
 
 ## USING SSH-AGENTS
-As a convenience when using passphrases, you can use an SSH-AGENT to save you repetitive passphrase entry. Notice this login (and all subsequent logins until reboot) will automatically handle the passphrase prompt for you.
+As a convenience when using passphrases, you can use an SSH-AGENT to save you from repetitive passphrase entry. Notice this login (and all subsequent logins until reboot) will automatically handle the passphrase prompt for you.
 
 ```
 # ssh-add ~/.ssh/mineos
@@ -210,4 +210,4 @@ root@mineos-tkldev ~#
 
 # Conclusion
 
-Cryptographic keys help reduce danger by eliminating the need to type passwords on foreign, potentially compromised hosts. It also greatly reduces attack surface by making unauthorized logins nearly impossible. In conjunction with other `sshd` security functions and firewalls, `sshd` can live peacefully and securely on your host.
+Cryptographic keys help reduce danger by eliminating the need to type passwords on foreign, potentially compromised-hosts. It also greatly reduces attack surface by making unauthorized logins nearly impossible. In conjunction with other `sshd` security functions and firewalls, `sshd` can live peacefully and securely on your host.

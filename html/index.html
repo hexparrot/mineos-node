@@ -290,7 +290,7 @@
                                 <!-- Select -->
                                     <div class="control-group">
                                         <div class="controls">
-                                            <select class="span2" ng-model="current" ng-options="name as name for (name, instance) in servers | membership">
+                                            <select class="span2" ng-model="current" ng-change="change_page(page, current)" ng-options="name as name for (name, instance) in servers | membership">
                                             </select>
                                         </div>
                                     </div>
@@ -362,6 +362,16 @@
                                         </div>
                                         <figcaption>
                                             <h4>{{ host_heartbeat.freemem | bytes_to_mb }}<small translate="RAM_FREE"></small></h4>
+                                        </figcaption>
+                                    </figure><!--/ END Circular -->
+
+                                    <!-- START Circular -->
+                                    <figure class="stats summary stacked circular" ng-show="host_diskspace.freedisk">
+                                        <div class="gauge gauge-teal" data-percent="20">
+                                            <span class="icon icone-save"></span>
+                                        </div>
+                                        <figcaption>
+                                            <h4>{{ host_diskspace.freedisk | bytes_to_mb }}<small translate="DISK_FREE"></small></h4>
                                         </figcaption>
                                     </figure><!--/ END Circular -->
                                 </div>
@@ -684,7 +694,7 @@
                                                            profile_filter: {field: 'group', value: serverprofiles.group} | 
                                                            profile_filter: {field: 'type', value: serverprofiles.type} | 
                                                            profile_downloaded: serverprofiles.downloaded | 
-                                                           orderBy:['+weight', '-releaseTime', 'id']">
+                                                           orderBy:['-weight', '-releaseTime', 'id']">
                                                 <td>{{ jar.id }}</td>
                                                 <td>{{ jar.webui_desc }}</td>
                                                 <td>[{{ jar.group }}] <strong>{{ jar.type }}</strong></td>

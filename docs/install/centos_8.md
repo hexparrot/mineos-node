@@ -81,7 +81,7 @@ Then, to manage the service:
 
 ### SUPERVISORD
 ```
-# apt install -y supervisord
+# yum install -y supervisord
 # cp /usr/games/minecraft/init/supervisor_conf /etc/supervisor/conf.d/mineos.conf
 # supervisorctl reload
 ```

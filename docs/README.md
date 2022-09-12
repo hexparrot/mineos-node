@@ -38,6 +38,7 @@ Sysadmins familiar with Docker or unRAID also have easy deployment options:
 
 - [Debian 10](install/debian_10.md)
 - [CentOS 8](install/centos_8.md)
+- [Fedora 36](install/fedora_36.md)
 - [Ubuntu 20](install/ubuntu_20.md)
 - [Archlinux](install/archlinux.md)
 - [Alpine](install/alpine.md)

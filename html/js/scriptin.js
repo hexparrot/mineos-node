@@ -288,9 +288,9 @@ app.filter('colorize', [ '$sce', function($sce){
 
 /* controllers */
 
-app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate', function($scope, socket, Servers, $filter, $translate) {
+app.controller("Webui", ['$scope', 'socket', 'ServerService', '$filter', '$translate', '$timeout', function($scope, socket, ServerService, $filter, $translate, $timeout) {
   $scope.page = 'dashboard';
-  $scope.servers = Servers;
+  $scope.servers = ServerService.servers;
   $scope.current = null;
   $scope.build_jar_log = [];
   $scope.user_input = { input: { text: '' } }; //convoluted structure required; see http://jsfiddle.net/sirhc/z9cGm/#run
@@ -318,7 +318,7 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     function() {
       $scope.refresh_checkboxes();
 
-      if (!($scope.current in Servers))
+      if (!($scope.current in $scope.servers))
         $scope.change_page('dashboard');
     }
   );
@@ -326,7 +326,7 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
   /* computed variables */
 
   $scope.servers_up = function() {
-    return $.map(Servers, function(instance, server_name) {
+    return $.map($scope.servers, function(instance, server_name) {
       return instance;
     }).filter(function(instance) {
       return ('heartbeat' in instance ? instance.heartbeat.up : false);
@@ -335,7 +335,7 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
 
   $scope.players_online = function() {
     var online = 0;
-    $.each(Servers, function(server_name, instance) {
+    $.each($scope.servers, function(server_name, instance) {
       try {
         if (instance.heartbeat.ping.players_online)
           online += (instance.heartbeat.ping.players_online)
@@ -347,7 +347,7 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
   $scope.player_capacity = function() {
     //variable for populating players online circular gauge
     var capacity = 0;
-    $.each(Servers, function(server_name, instance) {
+    $.each($scope.servers, function(server_name, instance) {
       if ('sp' in instance)
         try {
           capacity += parseInt(instance.sp['max-players']);
@@ -408,6 +408,18 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
     console.log(commit_msg)
     $scope.commit_msg = commit_msg;
     $scope.git_commit = commit_msg.split(' ')[0];
+  })
+
+  /**
+   * Setup a callback for the event on socket
+   * 
+   * @param {string} eventName  The event to listen to
+   * @param {string} identifier  The data received from the client
+   * @param {function} callback  The listener called for the event
+   *  
+   */
+  socket.on('/', 'host_diskspace', function(data) {
+    $scope.host_diskspace = data;
   })
 
   socket.on('/', 'host_heartbeat', function(data) {
@@ -724,26 +736,30 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
 
   $scope.refresh_calendar = function() {
     var events = [];
-    for (var server_name in Servers) {
+    for (var server_name in $scope.servers) {
       try { //archives
-        Servers[server_name].archives.forEach(function(value, idx) {
+        $scope.servers[server_name].archives.forEach(function(value, idx) {
           events.push({
             title: '{0} archive'.format(server_name),
             start: value.time,
             allDay : false
           })
         })
-      } catch (e) {}
+      } catch (e) {
+        console.error(e)
+      }
 
       try { //backups
-        Servers[server_name].increments.forEach(function(value, idx) {
+        $scope.servers[server_name].increments.forEach(function(value, idx) {
           events.push({
             title: '{0} backup'.format(server_name),
             start: value.time,
             allDay : false
           })
         })
-      } catch (e) {}
+      } catch (e) {
+        console.error(e)
+      }
     }
     $('#calendar').fullCalendar('destroy').fullCalendar({events: events });
   }
@@ -774,10 +790,14 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
       $scope.current = server_name;
       $scope.servers[$scope.current].refresh_all_data();
     }
+    $scope.page = page;
 
     switch(page) {
       case 'calendar':
-        $scope.refresh_calendar();
+        $timeout(() => {
+          // Allow DOM to update before calling
+          $scope.refresh_calendar();
+        })
         break;
       // case 'restore_points':
       //   $scope.servers[$scope.current].refresh_increments();
@@ -788,19 +808,17 @@ app.controller("Webui", ['$scope', 'socket', 'Servers', '$filter', '$translate',
       default:
         break;
     }
-
-    $scope.page = page;
   }
 }]);
 
-app.controller("Toolbar", ['$scope', 'Servers', function($scope, Servers) {
-  $scope.servers = Servers;
+app.controller("Toolbar", ['$scope', 'ServerService', function($scope, ServerService) {
+  $scope.servers = ServerService.servers;
 
   $scope.all_notices = function() {
     var all = [];
-    for (var server_name in Servers) {
-      for (var uuid in Servers[server_name].notices) {
-        var new_obj = Servers[server_name].notices[uuid];
+    for (var server_name in $scope.servers) {
+      for (var uuid in $scope.servers[server_name].notices) {
+        var new_obj = $scope.servers[server_name].notices[uuid];
         new_obj.server_name = server_name;
         all.push(new_obj);
       }
@@ -811,8 +829,9 @@ app.controller("Toolbar", ['$scope', 'Servers', function($scope, Servers) {
 
 /* factories */
 
-app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
+app.factory('ServerService', ['socket', '$filter', function(socket, $filter) {
   var self = this;
+  self.servers = {}
 
   var server_model = function(server_name) {
     var me = this;
@@ -975,7 +994,7 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
       me.channel.emit(me.server_name, 'page_data', 'glance');
     }
 
-    //request new incrments data for this server
+    //request new increments data for this server
     me.refresh_increments = function() {
       me.channel.emit(me.server_name, 'increments');
     }
@@ -1017,11 +1036,11 @@ app.factory("Servers", ['socket', '$filter', function(socket, $filter) {
   }
 
   socket.on('/', 'track_server', function(server_name) {
-    self[server_name] = new server_model(server_name);
+    self.servers[server_name] = new server_model(server_name);
   })
 
   socket.on('/', 'untrack_server', function(server_name) {
-    delete self[server_name];
+    delete self.servers[server_name];
   })
 
   return self;

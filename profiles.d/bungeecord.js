@@ -11,6 +11,7 @@ exports.profile = {
   },
   handler: function (profile_dir, body, callback) {
     var p = [];
+    var weight = 0;
 
     try {
       var xml_parser = require('xml2js');
@@ -28,11 +29,12 @@ exports.profile = {
             item['type'] = 'release';
             item['id'] = 'BungeeCord-{0}'.format(item.version);
             item['webui_desc'] = packs[index]['title'][0];
-            item['weight'] = 5;
+            item['weight'] = weight;
             item['filename'] = 'BungeeCord-{0}.jar'.format(item.version);
             item['downloaded'] = fs.existsSync(path.join(profile_dir, item.id, item.filename));
             item['url'] = 'http://ci.md-5.net/job/BungeeCord/{0}/artifact/bootstrap/target/BungeeCord.jar'.format(item.version);
             p.push(item);
+	    weight++;
           }
           callback(err || inner_err, p);
         } catch (e) { }
