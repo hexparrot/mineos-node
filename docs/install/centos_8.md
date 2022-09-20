@@ -12,7 +12,7 @@ As written, these steps will install the webui with the following properties:
 
 # Installation steps
 
-The following steps much be executed as `root`.
+The following steps must be executed as `root`.
 
 ## DEPENDENCIES
 
