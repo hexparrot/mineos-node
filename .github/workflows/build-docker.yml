@@ -60,7 +60,6 @@ jobs:
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }} 
-          build-args: TARGET_ELIXER_TAG=elixir:1.14-alpine
       - name: Build and push Docker image (master branch)
         uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
         if: github.ref == 'refs/heads/master '
@@ -69,15 +68,3 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }} 
-          build-args: TARGET_ELIXER_TAG=elixir:1.14-alpine
-      - id: lowercaseImageName
-        uses: ASzc/change-string-case-action@v2
-        with:
-          string: ${{ env.IMAGE_NAME }}
-      - name: Save Docker Image archive to local filesystem
-        run: "docker save --output mineos-node.tar ${{env.REGISTRY}}/${{ steps.lowercaseImageName.outputs.lowercase }}"
-      - name: Upload application's Docker Image as pipeline artifact
-        uses: actions/upload-artifact@v2
-        with:
-          path: mineos-node.tar
-          name: mineos-node.tar
