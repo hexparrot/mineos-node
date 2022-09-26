@@ -1,0 +1,83 @@
+name: build-docker
+
+on:
+  workflow_dispatch:
+  schedule: 
+    - cron: '0 0 * * 0'
+  push:
+    branches:
+      - master  # Trigger CI on main branch
+  pull_request:
+    branches:
+      - master  # Trigger gated pipeline on PR to main
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: brandonmcclure/mineos-node
+  JUST_IMAGE_NAME: mineos-node
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+        with:
+          tags: |
+            type=ref,event=pr
+            type=ref,event=branch
+            type=sha,format=long
+            type=raw,value=latest
+          images: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+            bmcclure89/${{ env.JUST_IMAGE_NAME }}
+
+      - name: Build Docker image (non main branch)
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        if: github.ref != 'refs/heads/main'
+        with:
+          context: .
+          load: true
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }} 
+          build-args: TARGET_ELIXER_TAG=elixir:1.14-alpine
+      - name: Build and push Docker image (main branch)
+        uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
+        if: github.ref == 'refs/heads/main'
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }} 
+          build-args: TARGET_ELIXER_TAG=elixir:1.14-alpine
+      - id: lowercaseImageName
+        uses: ASzc/change-string-case-action@v2
+        with:
+          string: ${{ env.IMAGE_NAME }}
+      - name: Save Docker Image archive to local filesystem
+        run: "docker save --output mineos-node.tar ${{env.REGISTRY}}/${{ steps.lowercaseImageName.outputs.lowercase }}"
+      - name: Upload application's Docker Image as pipeline artifact
+        uses: actions/upload-artifact@v2
+        with:
+          path: mineos-node.tar
+          name: mineos-node.tar
