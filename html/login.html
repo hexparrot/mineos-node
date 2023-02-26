@@ -171,9 +171,9 @@
         try {
           $('input[name=password]').attr('type', (MASK_PASSWORD ? 'password' : 'text'));
           if (MASK_PASSWORD)
-            $('input[name=hide]').attr('checked','checked');
+            $('input[name=hide]').attr('');
           else
-            $('input[name=hide]').removeAttr('checked');
+            $('input[name=hide]').attr('checked');
           $('input[name=hide]').on('change', function () {
             if ($(this).is(':checked'))
               $('input[name=password]').attr('type', 'text');
