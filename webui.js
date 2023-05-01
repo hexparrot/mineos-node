@@ -20,7 +20,7 @@ var sessionStore = new expressSession.MemoryStore();
 var app = express();
 var http = require('http').Server(app);
 
-var response_options = {root: __dirname};
+// Config
 
 var opt = getopt.create([
   ['c' , 'config_file=CONFIG_PATH'  , 'defaults to $PWD/custom.conf, then /etc/mineos.conf'],
@@ -30,6 +30,39 @@ var opt = getopt.create([
 .parseSystem(); // parse command line
 
 var config_file = (opt.options || {}).config_file;
+
+var config_locs = ['custom.conf',
+'/etc/mineos.conf',
+'/usr/local/etc/mineos.conf']
+
+var mineos_config = {};
+if (typeof config_file !== 'undefined') {
+  console.info('using command-line provided configuration identified as', config_file);
+  mineos_config = read_ini(config_file);
+} else {
+  for (var loc in config_locs) {
+    try {
+      fs.statSync(config_locs[loc]);
+      console.info('first mineos configuration identified as', config_locs[loc]);
+      mineos_config = read_ini(config_locs[loc])
+      break;
+    } catch (e) { }
+  }
+}
+
+var overwrite_web_root = '';
+
+if ('overwrite_web_root' in mineos_config && mineos_config['overwrite_web_root'] !== '') {
+  overwrite_web_root = mineos_config['overwrite_web_root'];
+
+  if (!overwrite_web_root.startsWith('/'))
+    overwrite_web_root = '/' + overwrite_web_root;
+
+  if (overwrite_web_root.endsWith('/'))
+    overwrite_web_root = overwrite_web_root.substring(0, overwrite_web_root.length - 1);
+
+  console.info('using overwrite_web_root: ', overwrite_web_root);
+}
 
 // Authorization
 var localAuth = function (username, password) {
@@ -124,7 +157,7 @@ app.use(expressSession({
 app.use(passport.initialize());
 app.use(passport.session());
 
-var io = require('socket.io')(http)
+var io = require('socket.io')(http, {path: overwrite_web_root + '/socket.io'})
 io.use(passportSocketIO.authorize({
   cookieParser: cookieParser,       // the same middleware you registrer in express
   key:          'express.sid',       // the name of the cookie where express/connect stores its session_id
@@ -147,25 +180,6 @@ mineos.dependencies(function(err, binaries) {
     console.error('MineOS is missing dependencies:', err);
     console.log(binaries);
     process.exit(1);
-  } 
-
-  var config_locs = ['custom.conf',
-                     '/etc/mineos.conf',
-                     '/usr/local/etc/mineos.conf']
-
-  var mineos_config = {};
-  if (typeof config_file !== 'undefined') {
-    console.info('using command-line provided configuration identified as', config_file);
-    mineos_config = read_ini(config_file);
-  } else {
-    for (var loc in config_locs) {
-      try {
-        fs.statSync(config_locs[loc]);
-        console.info('first mineos configuration identified as', config_locs[loc]);
-        mineos_config = read_ini(config_locs[loc])
-        break;
-      } catch (e) {}
-    }
   }
 
   var base_directory = '/var/games/minecraft';
@@ -190,26 +204,51 @@ mineos.dependencies(function(err, binaries) {
   }
 
   var be = new server.backend(base_directory, io, mineos_config);
+  var indexRouter = express.Router();
 
-    app.get('/', function(req, res){
-        res.redirect('/admin/index.html');
-    });
+  // Middleware to apply overwrite_web_root to all redirect method
+  indexRouter.use((req, res, next) => {
+    const redirector = res.redirect;
+    res.redirect = function (url) {
+      url = overwrite_web_root + url
+      redirector.call(this, url)
+    };
+    next();
+  });
 
-    app.get('/admin/index.html', ensureAuthenticated, function(req, res){
-        res.sendFile('/html/index.html', response_options);
-    });
+  /**
+   * Patch the given html file to include subdirectory
+   * @param {String} path 
+   * @returns {String}
+   */
+  const getFileWithBaseUrl = (path) => {
+    let indexHTML = fs.readFileSync(__dirname + path).toString();
+    return indexHTML.replace(/\<base href.*?\>/, `<base href="${overwrite_web_root}/">`);
+  }
 
-    app.get('/login', function(req, res){
-        res.sendFile('/html/login.html');
-    });
+  indexRouter.get('/', function(req, res){
+      res.redirect('/admin/index.html');
+  });
 
-    app.post('/auth', passport.authenticate('local-signin', {
-        successRedirect: '/admin/index.html',
-        failureRedirect: '/admin/login.html'
-        })
-    );
+  indexRouter.get('/admin/index.html', ensureAuthenticated, function(req, res){
+      res.send(getFileWithBaseUrl('/html/index.html'));
+  });
 
-  app.all('/api/:server_name/:command', ensureAuthenticated, function(req, res) {
+  indexRouter.get('/admin/login.html', function(req, res){
+      res.send(getFileWithBaseUrl('/html/login.html'));
+  });
+
+  indexRouter.get('/login', function(req, res){
+      res.redirect('/admin/login.html');
+  });
+
+  indexRouter.post('/auth', passport.authenticate('local-signin', {
+      successRedirect: '/admin/index.html',
+      failureRedirect: '/admin/login.html'
+      })
+  );
+
+  indexRouter.all('/api/:server_name/:command', ensureAuthenticated, function(req, res) {
     var target_server = req.params.server_name;
     var user = req.user.username;
     var instance = be.servers[target_server];
@@ -225,7 +264,7 @@ mineos.dependencies(function(err, binaries) {
     res.end();
   });
 
-  app.post('/admin/command', ensureAuthenticated, function(req, res) {
+  indexRouter.post('/admin/command', ensureAuthenticated, function(req, res) {
     var target_server = req.body.server_name;
     var instance = be.servers[target_server];
     var user = req.user.username;
@@ -238,19 +277,22 @@ mineos.dependencies(function(err, binaries) {
     res.end();
   });
 
-  app.get('/logout', function(req, res){
+  indexRouter.get('/logout', function(req, res){
     req.logout();
     res.redirect('/admin/login.html');
   });
 
-  app.use('/socket.io', express.static(__dirname + '/node_modules/socket.io'));
-  app.use('/angular', express.static(__dirname + '/node_modules/angular'));
-  app.use('/angular-translate', express.static(__dirname + '/node_modules/angular-translate/dist'));
-  app.use('/moment', express.static(__dirname + '/node_modules/moment'));
-  app.use('/angular-moment', express.static(__dirname + '/node_modules/angular-moment'));
-  app.use('/angular-moment-duration-format', express.static(__dirname + '/node_modules/moment-duration-format/lib'));
-  app.use('/angular-sanitize', express.static(__dirname + '/node_modules/angular-sanitize'));
-  app.use('/admin', express.static(__dirname + '/html'));
+  indexRouter.use('/socket.io', express.static(__dirname + '/node_modules/socket.io'));
+  indexRouter.use('/angular', express.static(__dirname + '/node_modules/angular'));
+  indexRouter.use('/angular-translate', express.static(__dirname + '/node_modules/angular-translate/dist'));
+  indexRouter.use('/moment', express.static(__dirname + '/node_modules/moment'));
+  indexRouter.use('/angular-moment', express.static(__dirname + '/node_modules/angular-moment'));
+  indexRouter.use('/angular-moment-duration-format', express.static(__dirname + '/node_modules/moment-duration-format/lib'));
+  indexRouter.use('/angular-sanitize', express.static(__dirname + '/node_modules/angular-sanitize'));
+  indexRouter.use('/admin', express.static(__dirname + '/html'));
+  indexRouter.use(express.static(__dirname + '/html'));
+
+  app.use(overwrite_web_root, indexRouter);
 
   process.on('SIGINT', function() {
     console.log("Caught interrupt signal; closing webui....");

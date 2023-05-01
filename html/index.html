@@ -5,6 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" ng-app="mineos"> <!--<![endif]-->
 <head>
     <!-- START META SECTION -->
+    <base href="/" >
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title translate="WEBSITE_TITLE"></title>
@@ -102,7 +103,7 @@
                                 <a ng-click="host_command('refresh_server_list')" class="text pointer"><span class="icon icone-globe"></span> {{ 'REFRESH_SERVER_LIST' | translate }}</a><br>
                                 <a ng-click="host_command('refresh_profile_list', {redownload: true})" class="text pointer"><span class="icon icone-globe"></span> {{ 'REFRESH_PROFILE_LIST' | translate }}</a><br>
                                 <a ng-click="modals.open_locales()" class="text pointer"><span class="icon icone-globe"></span> {{ 'CHANGE_LOCALE' | translate }}</a><br>
-                                <a href="/logout" class="text"><span class="icon icone-off"></span> {{ 'LOGOFF' | translate }}</a>
+                                <a href="logout" class="text"><span class="icon icone-off"></span> {{ 'LOGOFF' | translate }}</a>
                             </footer>
                         </div>
                         <!--/ END Dropdown Menu -->
@@ -1803,14 +1804,14 @@
     <!--/ Javascript(Plugins) -->
 
     <!-- Javascript (Application) -->
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="/moment/min/moment.min.js"></script>
-    <script src="/angular/angular.min.js"></script>
-    <script src="/angular-translate/angular-translate.min.js"></script>
-    <script src="/angular-translate/angular-translate-loader-static-files/angular-translate-loader-static-files.min.js"></script>
-    <script src="/angular-moment/angular-moment.min.js"></script>
-    <script src="/angular-moment-duration-format/moment-duration-format.js"></script>
-    <script src="/angular-sanitize/angular-sanitize.min.js"></script>
+    <script src="socket.io/socket.io.js"></script>
+    <script src="moment/min/moment.min.js"></script>
+    <script src="angular/angular.min.js"></script>
+    <script src="angular-translate/angular-translate.min.js"></script>
+    <script src="angular-translate/angular-translate-loader-static-files/angular-translate-loader-static-files.min.js"></script>
+    <script src="angular-moment/angular-moment.min.js"></script>
+    <script src="angular-moment-duration-format/moment-duration-format.js"></script>
+    <script src="angular-sanitize/angular-sanitize.min.js"></script>
     <script src="js/scriptin.js"></script>
     <script src="js/plugins.js"></script>
     <script src="js/application.js"></script>
