@@ -1049,6 +1049,8 @@ app.factory('ServerService', ['socket', '$filter', function(socket, $filter) {
 app.factory('socket', function ($rootScope) {
   //http://briantford.com/blog/angular-socket-io
   var sockets = {};
+  
+  const urlBase = document.querySelector("head base").getAttribute("href");
 
   var port = window.location.port || null;
   if (port === null) {
@@ -1067,9 +1069,9 @@ app.factory('socket', function ($rootScope) {
     on: function (server_name, eventName, callback) {
       if (!(server_name in sockets)) {
         if (server_name == '/')
-          sockets[server_name] = io(connect_string, {secure: true});
+          sockets[server_name] = io(connect_string, {secure: true, path: urlBase + "socket.io"});
         else
-          sockets[server_name] = io(connect_string + server_name, {secure: true});
+          sockets[server_name] = io(connect_string + server_name, {secure: true, path: urlBase + "socket.io"});
       }
 
       sockets[server_name].on(eventName, function () {  
@@ -1082,9 +1084,9 @@ app.factory('socket', function ($rootScope) {
     emit: function (server_name, eventName, data, callback) {
       if (!(server_name in sockets)) {
         if (server_name == '/')
-          sockets[server_name] = io(connect_string, {secure: true});
+          sockets[server_name] = io(connect_string, {secure: true, path: urlBase + "socket.io"});
         else
-          sockets[server_name] = io(connect_string + server_name, {secure: true});
+          sockets[server_name] = io(connect_string + server_name, {secure: true, path: urlBase + "socket.io"});
       }
 
       sockets[server_name].emit(eventName, data, function () {
