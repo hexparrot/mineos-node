@@ -47,7 +47,7 @@ exports.profile = {
             cb();
           })
           .catch((err) => {
-            console.log(err);
+            console.error(err);
             callback(err);
           });
       }, 2);
