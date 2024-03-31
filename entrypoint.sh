@@ -1,20 +1,24 @@
 #!/bin/bash
 set -eo pipefail
 
-if [[ ! -f /root/password ]]; then
-  if [ -z "$USER_PASSWORD" ] || [ "$USER_PASSWORD" = "random_see_log" ]; then
+if [ -z "$USER_PASSWORD" ]; then
+    echo "Password taken from environment. Not saved."
+else
+  # since a password wssn't supplied in the environment, we make a new one
+  if [[ ! -f /root/password ]]; then
+    # If no password file is found, generate a new password and save it in /root/password
+    USER_PASSWORD=$(echo -n "$RANDOM$RANDOM$RANDOM" | sha256sum | base64 | head -c 20 | tee /root/password)
+    echo >&2 '*******************************************************'
     echo >&2 'USER_PASSWORD not specified, generating random password.'
-    USER_PASSWORD=$(date +%s | sha256sum | base64 | head -c 20 ; echo)
+    echo >&2 'Password randomly generated:  ' $USER_PASSWORD
     echo >&2 '*******************************************************'
-    echo >&2 'Password set to: ' $USER_PASSWORD
-    echo >&2 '*******************************************************'
-
-    echo 'Password set to: ' $USER_PASSWORD > /root/password
-
-  fi
   else
-  echo >&2 "Password already set by entrypoint.sh, at /root/password"
-  cat /root/password
+    # /root/password file exists, use it and announce it to the console/log
+    USER_PASSWORD=$(cat /root/password)
+    echo >&2 '*******************************************************'
+    echo >&2 'Password from /root/password: ' $USER_PASSWORD
+    echo >&2 '*******************************************************'
+  fi
 fi
 
 if [ "$USER_NAME" ]; then
