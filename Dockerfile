@@ -13,7 +13,6 @@ RUN apt-get update && apt-get install -y \
   rlwrap \
   unzip \
   openjdk-21-jre-headless \
-  openjdk-17-jre-headless \
   openjdk-8-jre-headless \
   ca-certificates-java \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

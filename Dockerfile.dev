@@ -35,7 +35,6 @@ RUN apt-get update && apt-get install -y \
   curl \
   rlwrap \
   openjdk-21-jre-headless \
-  openjdk-17-jre-headless \
   openjdk-8-jre-headless \
   ca-certificates-java \
   && curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
