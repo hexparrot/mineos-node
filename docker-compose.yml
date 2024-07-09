@@ -18,7 +18,7 @@ services:
       # with permissions that prevent normal users from accessing
       # the folder structure.
       - /var/games/mineos/minecraft:/var/games/minecraft
-       # Set timezone from the host
+      # Set timezone from the host
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
 
