@@ -1158,7 +1158,9 @@ mineos.mc = function(server_name, base_dir) {
       var lines = buffer.toString('ascii').split('\n');
       var incrs = 0;
 
-      for (var i=0; i < lines.length; i++) {
+      // Since rdiff-backup v2.1.1a0 increments been listed in ascending order instead of descending
+      // https://github.com/rdiff-backup/rdiff-backup/blob/v2.1.1a0/CHANGELOG.adoc#11-changes
+      for (var i=lines.length-1; i >= 0; i--) {
         var match = lines[i].match(regex);
         if (match) {
           increment_lines.push({
