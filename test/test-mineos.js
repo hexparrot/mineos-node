@@ -925,10 +925,13 @@ test.prune = function(test) {
     },
     function(callback) {
       instance.list_increment_sizes(function(err, increments) {
+        // Since rdiff-backup v2.1.1a0 increments been listed in ascending order instead of descending
+        // https://github.com/rdiff-backup/rdiff-backup/blob/v2.1.1a0/CHANGELOG.adoc#11-changes
         test.equal(increments.length, 2);
-        test.equal(increments[0].step, '0B');
-        test.equal(increments[1].step, '1B');
-        saved_increment = increments[0].time;
+        test.equal(increments[0].step, '1B');
+        test.equal(increments[1].step, '0B');
+
+        saved_increment = increments[1].time;
         setTimeout(function() { callback(err) }, FS_DELAY_MS*5);
       })
     },

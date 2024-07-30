@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:noble
 LABEL MAINTAINER='William Dizon <wdchromium@gmail.com>'
 
 #update and accept all prompts
@@ -12,13 +12,14 @@ RUN apt-get update && apt-get install -y \
   curl \
   rlwrap \
   unzip \
+  openjdk-21-jre-headless \
   openjdk-17-jre-headless \
   openjdk-8-jre-headless \
   ca-certificates-java \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 #install node from nodesource following instructions: https://github.com/nodesource/distributions#debinstall
-RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
   && apt-get install -y nodejs \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 

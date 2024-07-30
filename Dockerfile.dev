@@ -1,4 +1,4 @@
-FROM ubuntu:focal as build
+FROM ubuntu:noble as build
 LABEL MAINTAINER='William Dizon <wdchromium@gmail.com>'
 
 #set build directory
@@ -9,7 +9,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
   curl \
   build-essential \
-  && curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
+  && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
   && apt-get install -y nodejs
 
 # copy package.json and npm install
@@ -21,7 +21,7 @@ RUN npm install
 COPY . /build
 
 #final image
-FROM ubuntu:focal
+FROM ubuntu:noble
 
 WORKDIR /usr/games/minecraft
 
@@ -34,10 +34,11 @@ RUN apt-get update && apt-get install -y \
   git \
   curl \
   rlwrap \
+  openjdk-21-jre-headless \
   openjdk-17-jre-headless \
   openjdk-8-jre-headless \
   ca-certificates-java \
-  && curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
+  && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
   && apt-get install -y nodejs \
   && apt-get autoremove -y \
   && apt-get clean \
