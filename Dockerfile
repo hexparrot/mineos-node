@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
   curl \
   rlwrap \
   unzip \
+  openjdk-21-jre-headless \
   openjdk-17-jre-headless \
   openjdk-8-jre-headless \
   ca-certificates-java \
