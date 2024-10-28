@@ -39,16 +39,18 @@ Create a docker volume to contain the /var/games/minecraft filetree, allowing th
 Start the container, and let docker keep it restart it anytime it is down, unless deliberately stopped via command line.
 
 ```
-# export MINEOS_UN=mc
-# read -s MINEOS_PW
-# export MINEOS_PW
+# export USER_NAME=mc
+# export USER_LOCALE=en_US
+# read -s USER_PASSWORD
+# export USER_PASSWORD
 
 # docker run -td \
 --name=mineos \
 -p 8443:8443 \
 -p 25565:25565 \
--e MINEOS_UN \
--e MINEOS_PW \
+-e USER_NAME \
+-e USER_LOCALE \
+-e USER_PASSWORD \
 -v mineos:/var/games/minecraft \
 --restart=unless-stopped \
 hexparrot/mineos:latest

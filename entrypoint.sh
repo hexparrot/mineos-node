@@ -28,6 +28,19 @@ else
   USER_NAME=mc
 fi
 
+if [ "$USER_LOCALE" ]; then
+  # user locale provided, will overwrite 'en_US'
+  USER_LOCALE="$(ls -1 /usr/games/minecraft/html/locales/ | grep -o -E -e '[a-z]{2}_[A-Z]{2}' | grep -wo "$USER_LOCALE")"
+
+  if [ -z "$USER_LOCALE" ]; then
+    echo >&2 'USER_LOCALE must be one of the available ones'
+    exit 1
+  fi
+else
+  echo >&2 'USER_LOCALE not provided; defaulting to "en_US"'
+  USER_LOCALE=en_US
+fi
+
 if [ "$GROUP_NAME" ]; then
   # group name specifically provided, will overwrite 'mc'
   if [[ "$GROUP_NAME" =~ [^a-zA-Z0-9] ]]; then
@@ -76,10 +89,13 @@ fi
 echo >&2 "Setting user password for '$USER_NAME'"
 echo "$USER_NAME:$USER_PASSWORD" | chpasswd --crypt-method SHA512
 
+echo >&2 "Setting user locale to: $USER_LOCALE"
+sed -i "s/webui_locale = .*/webui_locale = '$USER_LOCALE'/" /etc/mineos.conf
+
 if [ ! -z "$USE_HTTPS" ]; then
   # update mineos.conf from environment
   sed -i 's/use_https = .*/use_https = '${USE_HTTPS}'/g' /etc/mineos.conf
-  echo >&2 "Setting use_https to: " $USE_HTTPS
+  echo >&2 "Setting use_https to: $USE_HTTPS"
   if [[ -z $SERVER_PORT ]] && [ "$USE_HTTPS" = "true"  ]; then
     Port=8443
   elif [[ -z $SERVER_PORT ]] && [ "$USE_HTTPS" = "false"  ]; then
@@ -88,7 +104,7 @@ if [ ! -z "$USE_HTTPS" ]; then
     Port=$SERVER_PORT
   fi
   sed -i 's/socket_port = .*/socket_port = '${Port}'/g' /etc/mineos.conf
-  echo >&2 "Setting server port to: "$Port
+  echo >&2 "Setting server port to: $Port"
 fi
 
 if [[ ! -f /etc/ssl/certs/mineos.crt ]] && [[ ! -z $( grep 'use_https = true' /etc/mineos.conf) ]]; then
