@@ -2,7 +2,7 @@ version: '3'
 
 services:
   mineos:
-    image: hexparrot/mineos:latest
+    image: andino66/mineos:latest
     container_name: mineos_server
     networks:
       - mineos
